@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<template id="account.report_invoice_document">
+            <div class="header text-center">
+                <style>
+
+                .box {
+                    border:think #000 !important;
+                    border-width:1px 1px 1px 1px !important;
+                }
+
+                .boxsq {
+                    border-collapse:collapse !important;
+                    border:solid #000 !important;
+                    border-width:1px 1px 1px 1px !important;
+                    background-color: #dddddd !important;
+                }
+
+                .boxsq1 {
+                    border-collapse:collapse !important;
+                    border:solid #000 !important;
+                    border-width:1px 1px 1px 1px !important;
+                }
+
+                .boxsq2 {
+                    border:solid #000 !important;
+                    border-width:1px 1px 0px 1px !important;
+                }
+                
+                .brl{
+                    border-style: solid!important;
+                    border-width: 0px 1px 0px 1px!important;
+                }
+                
+                .rcorners2 {
+                    border-radius: 5px;
+                    border: 1px solid #111;
+                    padding:5px 5px 5px 5px;
+                    font-size:11px!important;
+                    background-color: #dddddd;
+                }
+                .rcorners3 {
+                    border-radius: 5px;
+                    border: 1px solid #111;
+                    padding:5px 5px 5px 5px;
+                    font-size:11px!important;
+                    background-color: #dddddd;
+                }
+                </style>
+                <div class="row mt32 mb32">
+                    <div class="col-xs-3">
+                        <img t-if="o.company_id.logo" t-att-src="'data:image/png;base64,%s' % o.company_id.logo" style="max-height: 100px;"/><br/>
+                        Email: <t t-esc='o.company_id.email' />
+                    </div>
+                    <div class="col-xs-5">
+                        <h4>
+                           <t t-esc='o.company_id.name' />
+                        </h4>
+                        Cédula Jurídica <t t-esc='o.company_id.vat' /><br/>
+                        <t t-esc='o.company_id.street' /><br/>
+                        <t t-esc='o.company_id.street2' /><br/>
+                        Telf.:<t t-esc='o.company_id.phone' /> / Fax:<t t-esc='o.company_id.fax' /><br/>
+                        <t t-esc='o.company_id.website' /><br/>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="table">
+                            <div class="row">
+                                <div class="col col-xs-12 boxsq1">
+                                    <h4>
+                                        <span t-if="o.amount_total &gt;= 0 and not o.type == 'out_refund'">Factura No. </span> 
+                                        <span t-if="o.amount_total &lt; 0 or o.type == 'out_refund'">Nota de Crédito No. </span> 
+                                        <span t-esc="o.number or '00001'"/>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-xs-12"><br/><br/><br/></div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-xs-6 boxsq"><strong>FECHA</strong></div>
+                                <div class="col col-xs-6 boxsq"><strong>USUARIO</strong></div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-xs-6 boxsq1">
+                                    <span t-esc="o.date_invoice and (o.date_invoice[8:10] + ' - ' + o.date_invoice[5:7] + ' - ' + o.date_invoice[0:4]) or ''"/>
+                                </div>
+                                <div class="col col-xs-6 boxsq1"><span t-field="o.user_id.name"/></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page" style="height:210mm;width:100%" > 
+               <table style="border:1px solid black;height:5%;WIDTH:100%" class="table-condensed">
+                  <tr>
+                                <td style="background-color:#dddddd !important;border:1px solid black;WIDTH:60%"><strong>NOMBRE DELCLIENTE</strong></td>
+                                <td style="background-color:#dddddd !important;border:1px solid black;WIDTH:15%"><strong>CODIGO No.</strong></td>
+                                <td style="background-color:#dddddd !important;border:1px solid black;WIDTH:25%"><strong>CONDICIONES DE PAGO</strong></td>
+                  </tr>
+                  <tr>
+                                <td style="border:1px solid black">
+                                    <span t-field="o.partner_id.name"/>
+                                </td>
+                                <td style="border:1px solid black">
+                                    <span t-field="o.partner_id.ref"/>
+                                </td>
+                                <td style="border:1px solid black">
+                                    <span t-esc="o.payment_term and o.payment_term.name or 'CONTADO'"/>
+                                </td>
+                  </tr>
+                  <tr>
+                                <td style="background-color:#dddddd !important;border:1px solid black" colspan="2"><strong>DIRECCION</strong></td>
+                                <td style="background-color:#dddddd !important;border:1px solid black"><strong>Sucursal</strong></td>
+                  </tr>
+                  <tr>
+                                <td style="border:1px solid black" colspan="2"><span t-field="o.partner_id.street"/></td>
+                                <td style="border:1px solid black"><span t-field="o.partner_id.warehouse_id.name"/></td>
+                  </tr>
+               </table>
+               <br/>
+               <table style="border:1px solid black;height:80%;WIDTH:100%" class="table-condensed">
+                            <thead>
+                                <tr class="border-black" style="border:1px solid black;">
+                                    <th style="background-color:#dddddd !important;border:1px solid black;WIDTH:5%" class="text-center">CANTIDAD</th>
+                                    <th style="background-color:#dddddd !important;border:1px solid black;WIDTH:10%" class="text-center">CODIGO</th>
+                                    <th style="background-color:#dddddd !important;border:1px solid black;WIDTH:70%">DESCRIPCIÓN</th>
+                                    <th style="background-color:#dddddd !important;border:1px solid black;WIDTH:15%" class="text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="invoice_tbody">
+                                <tr style="height:4%" t-foreach="o.invoice_line" t-as="l">
+                                    <td class="text-center">
+                                        <span t-field="l.quantity"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="l.product_id.default_code"/>
+                                    </td>
+                                    <td><span t-field="l.name"/></td>
+                                    <td class="text-right">
+                                        <span t-field="l.price_subtotal" t-field-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                    </td>
+                                </tr>
+                                <tr style="height:5%">
+                                    <td/>
+                                    <td colspan="2" class="text-center" style="border-top:1px solid black">
+                                       ********** Ultima Línea **********
+                                    </td>
+                                    <td/>
+                                </tr>
+                                <tr>
+                                    <td colspan="4"></td>
+                                </tr>
+                                <tr style="height:5%">
+                                    <td/>
+                                    <td colspan="2" class="text-center">
+                                        <t t-if="o.comment" class="text-center" style="font-size:8.0px">
+                                              NOTAS:<span t-field="o.comment"/>
+                                        </t>
+                                    </td>
+                                    <td/>
+                                </tr>
+                            </tbody>
+                 </table>
+                 <table style="vertical-align:middle;height:10%;WIDTH:100%" class="table-condensed">
+                          <tr>
+                              <td>Recibido Conforme<br/>Nombre</td>
+                              <td>Firma</td>
+                              <td>No. DE CEDULA</td>
+                              <td style="vertical-align:middle;border:1px solid black;WIDTH:10%" class="text-right">  <strong>Total</strong></td> 
+                              <td style="vertical-align:middle;border:1px solid black;WIDTH:15%" class="text-right"> <span t-field="o.amount_total" t-field-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>  </td>
+                             </tr>
+                      </table>
+                      <div class="boxsq1">
+                                <span t-if="o.type == 'out_invoice'">
+                                 Esta factura constituye título ejecutivo, de acuerdo con las disposiciones del artículo 460 del código de comercio vigente.
+                                 No se aceptan devoluciones de mercadería en descuento. Cambios de mercadería se aceptan únicamente dentro de
+                                 los siguientes 7 días hábiles, en sus empaques originales con todas las etiquetas puestas y en buen estado. No se
+                                 hacen devoluciones de dinero sino crédito de tienda únicamente. Al cancelar esta factura, el/la cliente(a) acepta 
+                                 expresamente las condiciones de la venta anteriormente descritas
+                                 </span> 
+                                <span t-if="o.type == 'out_refund'">
+                                        Esta nota de crédito tiene una validez de tres meses a partir de la fecha indicada.
+                                 </span> 
+                      </div>
+                <div class="text-center" style="font-size:8.0px"> Autorizado mediante resolución #11-97 de la Dirección General de Tributación Directa, publicado en el diario oficial La Gaceta #171 el 5 de septiembre de 1997
+                </div>
+            </div>
+</template>
+
+<template id="account.report_invoice">
+    <t t-call="report.html_container">
+        <t t-foreach="doc_ids" t-as="doc_id">
+            <t t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang', 'account.report_invoice_document')"/>
+        </t>
+    </t>
+</template>
+</data>
+</openerp>

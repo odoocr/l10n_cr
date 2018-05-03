@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<openerp>
+<data>
+<!--
+
+    @@@  this should go at the end if enables...
+        <record id="voucher_qweb" model="ir.actions.report.xml">
+            <field name="paperformat_id" ref="purple_pos_invoice_qweb.paperformat_posreceipt"/>
+        </record>
+-->
+        <report 
+            id="sales_invoice_qweb"
+            model="sale.order"
+            string="Sale Order Print"
+            report_type="qweb-pdf"
+            name="purple_sale_invoice_qweb.report_sale_invoice_qweb"
+            file="purple_sale_invoice_qweb.report_sale_invoice_qweb"
+        />
+
+
+        <record id="view_sale_order_replace_reprint" model="ir.ui.view">
+            <field name="name">sale.order.replace.reprint</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <button string="Reprint" position="replace">
+                    <button name="%(pos_invoice_qweb)d" string="Reprint" type="action" states="paid,done,invoiced"/>
+                </button>
+            </field>
+        </record>
+
+</data>
+</openerp>
