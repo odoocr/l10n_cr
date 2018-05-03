@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<template id="purchase.report_purchasequotation_document">
+            <div class="header">
+                <div class="row mt32 mb32">
+                    <div class="col-xs-7">
+                        <img src="/web/static/src/img/encabezado.png" style="height:1in;width:5.11in"/>
+                    </div>
+                    <div class="col-xs-5">
+                        <h2 class="text-center" t-if="o.state != 'draft'">Purchase Order <br/><span t-field="o.name"/></h2>
+                        <h2 class="text-center" t-if="o.state == 'draft'">Request for Quotation <br/><span t-field="o.name"/></h2>
+                    </div>
+                </div>
+            </div>
+        <div class="page">
+            <div class="oe_structure"/>
+
+            <div class="row mt32 mb32">
+                <div class="col-xs-6">
+                    <strong>Shipping address:</strong>
+                    <br/>
+                    <span t-field="o.company_id.name"/>
+                    <br/>
+                    <span t-field="o.company_id.street"/>
+                    <br/>
+                    <span t-field="o.company_id.street2"/>
+                    <br/>
+                    <span t-field="o.company_id.city"/>
+                    <span t-field="o.company_id.country_id.name"/>
+                </div>
+                <div class="col-xs-5 col-xs-offset-1">
+                    <strong>Fecha:</strong> <span t-esc="o.date_order and o.date_order[0:10] or ''"/><br/>
+                    <strong>Proveedor:</strong><br/>
+                    <div t-field="o.partner_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: true}"/>
+                        <p t-if="o.partner_id.vat">VAT: <span t-field="o.partner_id.vat"/></p>
+                </div>
+            </div>
+
+            <div><br/>Favor cotizar los siguientes productos:<br/></div>
+
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th><strong>Description</strong></th>
+                        <th class="text-center"><strong>Expected Date</strong></th>
+                        <th class="text-right"><strong>Qty</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="o.order_line" t-as="order_line">
+                        <td>
+                            <span t-field="order_line.name"/>
+                        </td>
+                        <td class="text-center">
+                            <span t-field="order_line.date_planned"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="order_line.product_qty"/>
+                            <span t-field="order_line.product_uom" groups="product.group_uom"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p t-field="o.notes"/>
+<!--
+            <span>Regards,</span>
+            <span t-field="user.signature"/>
+-->
+        </div>
+    <div class="footer">
+        <div class="text-center" style="border-top: 1px solid black;">
+            <ul class="list-inline">
+              <li> <span t-field="o.company_id.name"/> </li>
+               <li>&amp;bull;</li>
+              <li> Ced.Jur.<span t-field="o.company_id.vat"/> </li>
+            </ul>
+            <ul class="list-inline">
+              <li><span t-field="o.company_id.street"/>,
+                    <span t-field="o.company_id.street2"/>,
+                    <span t-field="o.company_id.city"/>,
+                    <span t-field="o.company_id.country_id.name"/>
+              </li>
+            </ul>
+            <ul t-if="not o.company_id.custom_footer" class="list-inline">
+                <li t-if="o.company_id.phone">Teléfono: <span t-field="o.company_id.phone"/></li>
+
+                <li t-if="o.company_id.fax and o.company_id.phone">&amp;bull;</li>
+                <li t-if="o.company_id.fax">Fax: <span t-field="o.company_id.fax"/></li>
+
+                <li t-if="o.company_id.email">&amp;bull;</li>
+                <li t-if="o.company_id.email">Email: <span t-field="o.company_id.email"/></li>
+
+                <li t-if="o.company_id.website">&amp;bull;</li>
+                <li t-if="o.company_id.website"> <span t-field="o.company_id.website"/></li>
+            </ul>
+
+            <t t-if="o.company_id.custom_footer">
+                <span t-raw="o.company_id.rml_footer"/>
+            </t>
+
+            <ul class="list-inline">
+                <li>Page:</li>
+                <li><span class="page"/></li>
+                <li>/</li>
+                <li><span class="topage"/></li>
+            </ul>
+        </div>
+    </div>      
+</t>
+</template>
+
+<template id="purchase.report_purchasequotation">
+    <t t-call="report.html_container">
+        <t t-foreach="doc_ids" t-as="doc_id">
+            <t t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang', 'purchase.report_purchasequotation_document')"/>
+        </t>
+    </t>
+</template>
+</data>
+</openerp>

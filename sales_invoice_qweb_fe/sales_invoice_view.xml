@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<openerp>
+<data>
+<!--
+    <report 
+        id="sales_invoice_qweb"
+        model="account.invoice"
+        string="Invoice Print"
+        report_type="qweb-pdf"
+        name="sale_invoice_qweb.report_sale_invoice_qweb"
+        file="sale_invoice_qweb.report_sale_invoice_qweb"
+    />
+
+        <record id="view_sale_order_replace_reprint" model="ir.ui.view">
+            <field name="name">sale.order.replace.reprint</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <button string="Reprint" position="replace">
+                    <button name="%(pos_invoice_qweb)d" string="Reprint" type="action" states="paid,done,invoiced"/>
+                </button>
+            </field>
+        </record>
+-->
+</data>
+</openerp>

@@ -1,0 +1,92 @@
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
+
+import time
+from openerp.report import report_sxw
+from openerp.tools import amount_to_text_en
+from common_report_header import common_report_header
+
+class voucher_print(report_sxw.rml_parse, common_report_header):
+    _name = 'report.voucher.print'
+    def __init__(self, cr, uid, name, context):
+        super(voucher_print1, self).__init__(cr, uid, name, context)
+        self.localcontext.update({
+            'get_digits':self.get_digits,
+
+            'time': time,
+            'convert':self.convert,
+            'debit':self.debit,
+            'credit':self.credit,
+            'get_lines': self.get_lines,
+            'get_on_account':self.get_on_account,
+        })
+        self.context = context
+
+    def convert(self, amount, cur):
+        amt_en = amount_to_text_en.amount_to_text(amount, 'en', cur)
+        return amt_en
+
+    def debit(self, move_ids):
+        debit = 0.0
+        for move in move_ids:
+            debit += move.debit
+        return debit
+
+    def credit(self, move_ids):
+        credit = 0.0
+        for move in move_ids:
+            credit += move.credit
+        return credit
+
+    def get_lines(self, line_ids):
+        inv = {}
+        for line in line_ids:
+            current_inv=inv.get(line.move_line_id.move_id.name,False)
+            if current_inv:
+               current_inv['amount_original']+=line.amount_original
+               current_inv['opening_balance']+=line.amount_unreconciled
+               current_inv['payment']+=line.amount
+               current_inv['closing_balance']+=line.amount_unreconciled-line.amount
+            else:
+               inv[line.move_line_id.move_id.name]={'name':line.move_line_id.move_id.name,'ref':line.move_line_id.ref, 'amount_original':line.amount_original, 'opening_balance':line.amount_unreconciled, 'payment':line.amount, 'closing_balance':line.amount_unreconciled-line.amount}
+        return [x for x in inv.itervalues() if x['payment']>0]
+
+    def get_on_account(self, voucher):
+        name = ""
+        if voucher.type == 'receipt':
+            name = "Received cash from "+str(voucher.partner_id.name)
+        elif voucher.type == 'payment':
+            name = "Payment from "+str(voucher.partner_id.name)
+        elif voucher.type == 'sale':
+            name = "Sale to "+str(voucher.partner_id.name)
+        elif voucher.type == 'purchase':
+            name = "Purchase from "+str(voucher.partner_id.name)
+        return name
+
+##report_sxw.report_sxw('report.voucher.print1','account.voucher','addons/account_voucher_print/report/account_voucher_print1.rml', parser=voucher_print1,header="internal")
+
+class report_voucher_print(osv.AbstractModel):
+    _name = 'report.account.voucher_print'
+    _inherit = 'report.abstract_report'
+    _template = 'account_voucher_print_xml.report_voucher_print'
+    _wrapped_report_class = voucher_print
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
