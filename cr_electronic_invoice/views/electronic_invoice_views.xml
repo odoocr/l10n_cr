@@ -161,38 +161,40 @@
 			</field>
 		</record>
 
-		<!--<record id="view_exoneration_form" model="ir.ui.view">-->
-			<!--<field name="name">exoneration.form</field>-->
-			<!--<field name="model">exoneration</field>-->
-			<!--<field name="arch" type="xml">-->
-				<!--<form string="Exoneración">-->
-					<!--<sheet string="Exoneración">-->
-						<!--<group col="4">-->
-							<!--<field name="type"/>-->
-							<!--<field name="code"/>-->
-							<!--<field name="exoneration_number"/>-->
-							<!--<field name="name_institution"/>-->
-							<!--<field name="date"/>-->
-							<!--<field name="percentage_exoneration"/>-->
-						<!--</group>-->
-					<!--</sheet>-->
-				<!--</form>-->
-			<!--</field>-->
-		<!--</record>-->
-		<!--<record id="view_exoneration_tree" model="ir.ui.view">-->
-			<!--<field name="name">exoneration.tree</field>-->
-			<!--<field name="model">exoneration</field>-->
-			<!--<field name="arch" type="xml">-->
-				<!--<tree string="Exoneración">-->
-					<!--<field name="type"/>-->
-					<!--<field name="code"/>-->
-					<!--<field name="exoneration_number"/>-->
-					<!--<field name="name_institution"/>-->
-					<!--<field name="date"/>-->
-					<!--<field name="percentage_exoneration"/>-->
-				<!--</tree>-->
-			<!--</field>-->
-		<!--</record>-->
+		<record id="view_exoneration_form" model="ir.ui.view">
+			<field name="name">exoneration.form</field>
+			<field name="model">exoneration</field>
+			<field name="arch" type="xml">
+				<form string="Exoneración">
+					<sheet string="Exoneración">
+						<group col="4">
+                            <field name="name"/>
+							<field name="type"/>
+							<field name="code"/>
+							<field name="exoneration_number"/>
+							<field name="name_institution"/>
+							<field name="date"/>
+							<field name="percentage_exoneration"/>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record id="view_exoneration_tree" model="ir.ui.view">
+			<field name="name">exoneration.tree</field>
+			<field name="model">exoneration</field>
+			<field name="arch" type="xml">
+				<tree string="exoneration">
+					<field name="name"/>
+					<field name="type"/>
+					<field name="code"/>
+					<field name="exoneration_number"/>
+					<field name="name_institution"/>
+					<field name="date"/>
+					<field name="percentage_exoneration"/>
+				</tree>
+			</field>
+		</record>
 
 		<record id="view_company_form_inherit" model="ir.ui.view">
 			<field name="name">res.company.form.inherit</field>
@@ -218,9 +220,9 @@
 					<field name="commercial_name"/>
 				</field>
 				<field name="vat" position="replace"/>
-				<field name="fax" position="before">
+				<!-- <field name="fax" position="before">
 					<field name="fax_code"/>
-				</field>
+				</field> -->
 				
 				<field name="country_id" position="attributes">
 					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
@@ -249,11 +251,11 @@
 							<!--<field name="is_active" invisible="False"/>-->
 							<!--<button name="to_register_client" type="object" attrs="{'invisible':[('is_active','=',True)]}" string="Activar o Registrar Cliente"/>-->
 							<!--<button name="to_disable_client" type="object" attrs="{'invisible':[('is_active','=',False)]}" string="Inactivar Cliente"/>-->
-							<button name="to_register_client" attrs="{'invisible':[('state','=','active')]}" type="object"  string="Activar o Registrar Cliente"/>
+							<!--<button name="to_register_client" attrs="{'invisible':[('state','=','active')]}" type="object"  string="Activar o Registrar Cliente"/>
 							<button name="to_disable_client"  attrs="{'invisible':[('state','=','inactive')]}" type="object"  string="Inactivar Cliente"/>
 							<button name="to_update_crt"      attrs="{'invisible':[('state','=','inactive')]}" type="object" string="Actualizar Certificado"/>
 							<button name="to_update_user"     attrs="{'invisible':[('state','=','inactive')]}" type="object" string="Actualizar Usuario"/>
-							
+							-->
 						<!--</div>-->
 						<group cols="2" >
 							<group cols="2" >
@@ -261,16 +263,17 @@
 								<field name="frm_ws_identificador"/>
 								<field name="frm_ws_password" password="True"/>
 								<field name="frm_pin" password="True"/>
-								<!--<field name="last_token_ok" readonly="1"/>-->
-								<!--<field name="password_atv" password="True"/>-->
+								<field name="frm_apicr_username" />
+								<field name="frm_apicr_password" password="True"/>
 								<!--<field name="pciaid"/>-->
 								<!--<field name="cta_id_electronic_invoice"/>-->
 							</group>
 							<group cols="2" >
 								<field name="frm_callback_url"/>
-								<field name="activated" readonly="True" invisible="True" />
+								<field name="activated" readonly="True" />
 								<field name="frm_ws_ambiente"  widget="radio"/>
 								<field name="security_code"/>
+                                <field name="frm_apicr_signaturecode"/>
 								<!--<field name="frm_tipo_id"/>-->
 							</group>
 						</group>
@@ -299,9 +302,9 @@
 					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 				</field>
-				<field name="fax" position="before">
+				<!-- <field name="fax" position="before">
 					<field name="fax_code"/>
-				</field>
+				</field> -->
 				<field name="property_payment_term_id" position="before">
 					<field name="payment_methods_id"/>
 				</field>
@@ -382,17 +385,6 @@
 				<field name="date_invoice" position="after">
 					<field name="date_issuance" readonly="1"/>
 				</field>
-				<!--<field name="residual" position="after">-->
-					<!--<field name="taxes_services_total" invisible="0"/>-->
-					<!--<field name="exempt_services_total" invisible="0"/>-->
-					<!--<field name="taxed_goods_total" invisible="0"/>-->
-					<!--<field name="taxed_total" invisible="0"/>-->
-					<!--<field name="exempt_total" invisible="0"/>-->
-					<!--<field name="taxes_total" invisible="0"/>-->
-					<!--<field name="sale_total" invisible="0"/>-->
-					<!--<field name="discount_total" invisible="0"/>-->
-					<!--<field name="net_total" invisible="0"/>-->
-				<!--</field>-->
 				<field name="fiscal_position_id" position="after">
 					<field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
 					<field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
@@ -406,13 +398,8 @@
 					<!--<field name="electronic_invoice_return_message" readonly="1"/>-->
 				</field>
 				<xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
-					<!--<field name="total_amount" invisible="1"/>-->
-					<!--<field name="total_discount" invisible="1"/>-->
-					<field name="discount_note" attrs="{'required':[('discount','>',0)]}"/>
-					<!--<field name="total_tax" invisible="1"/>-->
-					<!--<field name="exoneration_total"/>-->
-					<!--<field name="total_line_exoneration"/>-->
-					<!--<field name="exoneration_id"/>-->
+					<field name="discount_note"/>
+					<field name="exoneration_id" />
 				</xpath>
 				<button name="action_invoice_cancel" position="attributes">
 					<attribute name="invisible">1</attribute>
@@ -459,9 +446,9 @@
 					<field name="total_discount" invisible="1"/>
 					<field name="discount_note" invisible="1"/>
 					<field name="total_tax" invisible="1"/>
-					<!--<field name="exoneration_total"/>-->
-					<!--<field name="total_line_exoneration"/>-->
-					<!--<field name="exoneration_id"/>-->
+					<!--<field name="exoneration_total"/>
+					<field name="total_line_exoneration"/>-->
+					<field name="exoneration_id" />
 				</field>
 			</field>
 		</record>
@@ -548,12 +535,12 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
-		<!--<record id="action_exoneration" model="ir.actions.act_window">-->
-			<!--<field name="name">Exoneración</field>-->
-			<!--<field name="res_model">exoneration</field>-->
-			<!--<field name="view_type">form</field>-->
-			<!--<field name="view_mode">tree,form</field>-->
-		<!--</record>-->
+		<record id="action_exoneration" model="ir.actions.act_window">
+			<field name="name">Exoneración</field>
+			<field name="res_model">exoneration</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
 		<record id="action_code_type_product" model="ir.actions.act_window">
 			<field name="name">Tipos de códigos</field>
 			<field name="res_model">code.type.product</field>
@@ -576,9 +563,9 @@
 				  sequence="5" action="action_resolution"/>
 		<menuitem id="menu_code_type_product" name="Tipos de códigos(Productos)" parent="menu_electronic_invoice"
 				  sequence="6" action="action_code_type_product"/>
-		<menuitem id="menu_identification_type" name="Tipo de identificación" parent="sales_team.menu_localisation"
-				  sequence="6" action="action_identification_type"/>
-		<!--<menuitem id="menu_exoneration_type" name="Exoneración" parent="sales_team.menu_localisation"-->
-				  <!--sequence="6" action="action_exoneration"/>-->
+		<menuitem id="menu_identification_type" name="Tipo de identificación" parent="menu_electronic_invoice"
+				  sequence="7" action="action_identification_type"/>
+		<menuitem id="menu_exoneration_type" name="Exoneración" parent="menu_electronic_invoice"
+				  sequence="8" action="action_exoneration"/>
 	</data>
 </odoo>

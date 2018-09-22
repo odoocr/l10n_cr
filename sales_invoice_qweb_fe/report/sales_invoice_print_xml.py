@@ -20,26 +20,27 @@
 ##############################################################################
 
 import time
-from openerp.osv import osv
-from openerp.report import report_sxw
-from openerp.tools import amount_to_text_en
-#from common_report_header import common_report_header
+from odoo.osv import osv
+from odoo.report import report_sxw
 
-class sales_invoice_print(report_sxw.rml_parse): #, common_report_header):
-    #_name = 'report.sales.invoice.print'
+
+# from common_report_header import common_report_header
+
+class SalesInvoicePrint(report_sxw.rml_parse):  # , common_report_header):
+    # _name = 'report.sales.invoice.print'
     def __init__(self, cr, uid, name, context):
-        super(sales_invoice_print, self).__init__(cr, uid, name, context)
+        super(SalesInvoicePrint, self).__init__(cr, uid, name, context)
         self.localcontext.update({
-            'get_digits':self.get_digits,
+            'get_digits': self.get_digits,
             'time': time,
         })
         self.context = context
 
 
-class report_sales_invoice_qweb(osv.AbstractModel):
+class ReportSalesInvoiceQWeb(osv.AbstractModel):
     _name = 'report.sales_invoice_qweb.report_sales_invoice_qweb'
     _inherit = 'report.abstract_report'
     _template = 'account.report_invoice_document'
-    _wrapped_report_class = sales_invoice_print
+    _wrapped_report_class = SalesInvoicePrint
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
