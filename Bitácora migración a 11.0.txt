@@ -1,0 +1,26 @@
+- Modificación de los imports
+- Reubicar menú de configuración de provincias, cantones, distritos y barrios.
+- Eliminar llamada air.needaction_mixin que se eliminó en Odoo 11
+- Eliminar fax de contactos y direcciones
+- cron task en data  se ordena diferente y se hacen estos cambios:
+    - se modifica
+        <field name="model">account.invoice</field>
+      por
+        <field name="model_id">account.invoice</field>
+    - Se modificó:
+            <field name="function">_consultahacienda</field>
+			<field name="args">()</field>
+      y se cambia por: 
+            <field name="code">_consultahacienda()</field>
+    - se cambia
+        <field eval="True" name="doall"/>
+      por
+        <field name="doall" eval="True" />
+
+- 
+  - se cambió 
+      <xpath expr="//field[@name='amount_total']" position="after">
+    por
+      <xpath expr="(//field[@name='amount_total'])[2]" position="after">
+
+

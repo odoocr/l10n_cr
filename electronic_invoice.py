@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models, api, _
-from odoo.exceptions import UserError
-from odoo.tools.safe_eval import safe_eval
 import json
 import requests
 import logging
 import re
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
 import datetime
 import pytz
 import base64
@@ -25,12 +25,14 @@ class IdentificationType(models.Model):
 
 class CompanyElectronic(models.Model):
     _name = 'res.company'
-    _inherit = ['res.company', 'mail.thread']
+    _inherit = ['res.company', 'mail.thread', 'ir.needaction_mixin']
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
     phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
+    fax_code = fields.Char(string="Código de Fax", required=False, )
     signature = fields.Binary(string="Llave Criptográfica", )
-    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",required=False, )
+    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
+                                        required=False, )
     district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
     county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
     neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
@@ -69,11 +71,13 @@ class PartnerElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
     phone_code = fields.Char(string="Código de teléfono", required=False, default="506")
+    fax_code = fields.Char(string="Código de Fax", required=False, )
     state_id = fields.Many2one(comodel_name="res.country.state", string="Provincia", required=False, )
     district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
     county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
     neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
-    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion", required=False, )
+    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
+                                        required=False, )
     payment_methods_id = fields.Many2one(comodel_name="payment.methods", string="Métodos de Pago", required=False, )
 
     _sql_constraints = [
@@ -103,6 +107,18 @@ class PartnerElectronic(models.Model):
                         'message': 'Favor no introducir letras, espacios ni guiones en los números telefónicos.'
                     }
                     return {'value': {'mobile': ''}, 'warning': alert}
+
+    @api.onchange('fax')
+    def _onchange_mobile(self):
+        numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        if self.fax:
+            for p in str(self.fax):
+                if p not in numbers:
+                    alert = {
+                        'title': 'Atención',
+                        'message': 'Favor no introducir letras, espacios ni guiones en el fax.'
+                    }
+                    return {'value': {'fax': ''}, 'warning': alert}
 
     @api.onchange('email')
     def _onchange_email(self):
@@ -352,24 +368,36 @@ class InvoiceLineElectronic(models.Model):
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
 
-    number_electronic = fields.Char(string="Número electrónico", required=False, copy=False, index=True, )
-    date_issuance = fields.Char(string="Fecha de emisión", required=False, copy=False, )
-    state_send_invoice = fields.Selection([('aceptado', 'Aceptado'), ('rechazado', 'Rechazado'), ], 'Estado FE Proveedor', )
-    state_tributacion = fields.Selection( [('aceptado', 'Aceptado'), ('rechazado', 'Rechazado'), ('recibido', 'Recibido'), ('error', 'Error'), ('procesando', 'Procesando')], 'Estado FE', copy=False, )
-    state_invoice_partner = fields.Selection([('1', 'Aceptado'), ('3', 'Rechazado'), ('2', 'Aceptacion parcial')], 'Respuesta del Cliente', )
+    number_electronic = fields.Char(string="Número electrónico", required=False, copy=False, index=True)
+    date_issuance = fields.Char(string="Fecha de emisión", required=False, copy=False)
+    state_send_invoice = fields.Selection([('aceptado', 'Aceptado'), ('rechazado', 'Rechazado'), ],
+                                          'Estado FE Proveedor')
+    state_tributacion = fields.Selection(
+        [('aceptado', 'Aceptado'), ('rechazado', 'Rechazado'), ('recibido', 'Recibido'),
+         ('error', 'Error'), ('procesando', 'Procesando')], 'Estado FE',
+        copy=False)
+    state_invoice_partner = fields.Selection([('1', 'Aceptado'), ('3', 'Rechazado'), ('2', 'Aceptacion parcial')],
+                                             'Respuesta del Cliente')
     reference_code_id = fields.Many2one(comodel_name="reference.code", string="Código de referencia", required=False, )
     payment_methods_id = fields.Many2one(comodel_name="payment.methods", string="Métodos de Pago", required=False, )
-    invoice_id = fields.Many2one(comodel_name="account.invoice", string="Documento de referencia", required=False, copy=False, )
-    xml_respuesta_tributacion = fields.Binary(string="Respuesta Tributación XML", required=False, copy=False, attachment=True, )
-    fname_xml_respuesta_tributacion = fields.Char(string="Nombre de archivo XML Respuesta Tributación", required=False, copy=False, )
-    xml_comprobante = fields.Binary(string="Comprobante XML", required=False, copy=False, attachment=True, )
-    fname_xml_comprobante = fields.Char(string="Nombre de archivo Comprobante XML", required=False, copy=False, attachment=True, )
-    xml_supplier_approval = fields.Binary(string="XML Proveedor", required=False, copy=False, attachment=True, )
-    fname_xml_supplier_approval = fields.Char(string="Nombre de archivo Comprobante XML proveedor", required=False, copy=False, attachment=True, )
+    invoice_id = fields.Many2one(comodel_name="account.invoice", string="Documento de referencia", required=False,
+                                 copy=False)
+    xml_respuesta_tributacion = fields.Binary(string="Respuesta Tributación XML", required=False, copy=False,
+                                              attachment=True)
+    fname_xml_respuesta_tributacion = fields.Char(string="Nombre de archivo XML Respuesta Tributación", required=False,
+                                                  copy=False)
+    xml_comprobante = fields.Binary(string="Comprobante XML", required=False, copy=False, attachment=True)
+    fname_xml_comprobante = fields.Char(string="Nombre de archivo Comprobante XML", required=False, copy=False,
+                                        attachment=True)
+    xml_supplier_approval = fields.Binary(string="XML Proveedor", required=False, copy=False, attachment=True)
+    fname_xml_supplier_approval = fields.Char(string="Nombre de archivo Comprobante XML proveedor", required=False,
+                                              copy=False, attachment=True)
     amount_tax_electronic_invoice = fields.Monetary(string='Total de impuestos FE', readonly=True, )
     amount_total_electronic_invoice = fields.Monetary(string='Total FE', readonly=True, )
 
-    _sql_constraints = [('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),]
+    _sql_constraints = [
+        ('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),
+    ]
 
     @api.onchange('xml_supplier_approval')
     def _onchange_xml_supplier_approval(self):
@@ -430,13 +458,13 @@ class AccountInvoiceElectronic(models.Model):
                     if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
                         if inv.state_invoice_partner == '1':
                             detalle_mensaje = 'Aceptado'
-                            tipo = 5
-                        elif inv.state_invoice_partner == '2':
+                            tipo = 05
+                        if inv.state_invoice_partner == '2':
                             detalle_mensaje = 'Aceptado parcial'
-                            tipo = 6
-                        elif inv.state_invoice_partner == '3':
+                            tipo = 06
+                        if inv.state_invoice_partner == '3':
                             detalle_mensaje = 'Rechazado'
-                            tipo = 7
+                            tipo = 07
                         payload = {
                             'clave': {
                                 'tipo': tipo,
@@ -779,8 +807,14 @@ class AccountInvoiceElectronic(models.Model):
                     payload['emisor_otras_senas'] = inv.company_id.street
                     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
                     payload['emisor_tel'] = inv.company_id.phone
-                    payload['emisor_cod_pais_fax'] = ''
-                    payload['emisor_fax'] = ''
+                    if inv.company_id.fax_code:
+                        payload['emisor_cod_pais_fax'] = inv.company_id.fax_code
+                    else:
+                        payload['emisor_cod_pais_fax'] = ''
+                    if inv.company_id.fax:
+                        payload['emisor_fax'] = inv.company_id.fax
+                    else:
+                        payload['emisor_fax'] = ''
                     payload['emisor_email'] = inv.company_id.email
                     payload['receptor_nombre'] = inv.partner_id.name[:80]
                     payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
@@ -791,8 +825,14 @@ class AccountInvoiceElectronic(models.Model):
                     payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code
                     payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
                     payload['receptor_tel'] = inv.partner_id.phone
-                    payload['receptor_cod_pais_fax'] = ''
-                    payload['receptor_fax'] = ''
+                    if inv.partner_id.fax_code:
+                        payload['receptor_cod_pais_fax'] = inv.partner_id.fax_code
+                    else:
+                        payload['receptor_cod_pais_fax'] = ''
+                    if inv.partner_id.fax:
+                        payload['receptor_fax'] = inv.partner_id.fax
+                    else:
+                        payload['receptor_fax'] = ''
                     payload['receptor_email'] = inv.partner_id.email
                     payload['condicion_venta'] = sale_conditions
                     payload['plazo_credito'] = ''

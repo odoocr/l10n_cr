@@ -430,7 +430,7 @@
 						</group>
 					</group>
 				</xpath>
-				<xpath expr="//field[@name='amount_total']" position="after">
+				<xpath expr="(//field[@name='amount_total'])[2]" position="after">
 					<field name="amount_tax_electronic_invoice"/>
 					<field name="amount_total_electronic_invoice"/>
 				</xpath>
