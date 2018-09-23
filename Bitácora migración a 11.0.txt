@@ -21,6 +21,6 @@
   - se cambió 
       <xpath expr="//field[@name='amount_total']" position="after">
     por
-      <xpath expr="(//field[@name='amount_total'])[2]" position="after">
+      <xpath expr="(//field[@name='amount_total'])[last()]" position="after">
 
 
