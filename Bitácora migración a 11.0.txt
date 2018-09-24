@@ -24,3 +24,12 @@
       <xpath expr="(//field[@name='amount_total'])[last()]" position="after">
 
 
+Pendientes
+- Revisar las modificaciones de journal: sucursal Id y terminal Id
+- Revisar la aceptación de notas de crédito y débito.
+- Revisar qué hay que hacer con "air.needaction_mixin"
+- Habilitar el registro en el APi desde Odoo. 
+  - Generar usuario y subir la llave criptográfica.
+- Agregar tiquete electrónico al punto de ventas
+- Revisar notas de crédito
+
