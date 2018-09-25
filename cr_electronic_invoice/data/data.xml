@@ -5,7 +5,7 @@
 			<field name="name">Consulta Hacienda</field>
 			<field name="model_id" ref="model_account_invoice" />
 			<field name="state">code</field>
-			<field name="code">_consultahacienda()</field>
+			<field name="code">model._consultahacienda()</field>
 			<field name="interval_number">5</field>
 			<field name="interval_type">minutes</field>
 			<field name="numbercall">-1</field>
