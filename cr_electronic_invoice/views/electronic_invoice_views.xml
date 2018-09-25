@@ -220,9 +220,9 @@
 					<field name="commercial_name"/>
 				</field>
 				<field name="vat" position="replace"/>
-				<!-- <field name="fax" position="before">
+				<field name="fax" position="before">
 					<field name="fax_code"/>
-				</field> -->
+				</field>
 				
 				<field name="country_id" position="attributes">
 					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
@@ -302,9 +302,9 @@
 					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 				</field>
-				<!-- <field name="fax" position="before">
+				<field name="fax" position="before">
 					<field name="fax_code"/>
-				</field> -->
+				</field>
 				<field name="property_payment_term_id" position="before">
 					<field name="payment_methods_id"/>
 				</field>
@@ -430,7 +430,7 @@
 						</group>
 					</group>
 				</xpath>
-				<xpath expr="(//field[@name='amount_total'])[last()]" position="after">
+				<xpath expr="//field[@name='amount_total']" position="after">
 					<field name="amount_tax_electronic_invoice"/>
 					<field name="amount_total_electronic_invoice"/>
 				</xpath>

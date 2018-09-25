@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
-from odoo.tools.safe_eval import safe_eval
-from . import functions
+
 import json
 import requests
 import logging
 import re
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
 import datetime
 import pytz
 import base64
 import xml.etree.ElementTree as ET
-
+import functions
 
 _logger = logging.getLogger(__name__)
 
@@ -26,10 +26,11 @@ class IdentificationType(models.Model):
 
 class CompanyElectronic(models.Model):
     _name = 'res.company'
-    _inherit = ['res.company', 'mail.thread', ]
+    _inherit = ['res.company', 'mail.thread', 'ir.needaction_mixin']
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
     phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
+    fax_code = fields.Char(string="Código de Fax", required=False, )
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
                                         required=False, )
@@ -71,6 +72,7 @@ class PartnerElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
     phone_code = fields.Char(string="Código de teléfono", required=False, default="506")
+    fax_code = fields.Char(string="Código de Fax", required=False, )
     state_id = fields.Many2one(comodel_name="res.country.state", string="Provincia", required=False, )
     district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
     county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
@@ -102,6 +104,18 @@ class PartnerElectronic(models.Model):
                         'message': 'Favor no introducir letras, espacios ni guiones en los números telefónicos.'
                     }
                     return {'value': {'mobile': ''}, 'warning': alert}
+
+    @api.onchange('fax')
+    def _onchange_mobile(self):
+        numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        if self.fax:
+            for p in str(self.fax):
+                if p not in numbers:
+                    alert = {
+                        'title': 'Atención',
+                        'message': 'Favor no introducir letras, espacios ni guiones en el fax.'
+                    }
+                    return {'value': {'fax': ''}, 'warning': alert}
 
     @api.onchange('email')
     def _onchange_email(self):
@@ -783,7 +797,7 @@ class OrderElectronic(models.Model):
             now_utc = datetime.datetime.now(pytz.timezone('UTC'))
             now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
             date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-            medio_pago = 1
+            medio_pago = 01
             tipo_documento = 'TE'
             next_number = self.env['ir.sequence'].next_by_code('invoice_hacienda')
             if tipo_documento == 'FE':  # order.number.isdigit() and tipo_documento:
@@ -906,8 +920,14 @@ class OrderElectronic(models.Model):
                 payload['emisor_otras_senas'] = self.company_id.street
                 payload['emisor_cod_pais_tel'] = self.company_id.phone_code
                 payload['emisor_tel'] = self.company_id.phone
-                payload['emisor_cod_pais_fax'] = ''
-                payload['emisor_fax'] = ''
+                if self.company_id.fax_code:
+                    payload['emisor_cod_pais_fax'] = self.company_id.fax_code
+                else:
+                    payload['emisor_cod_pais_fax'] = ''
+                if self.company_id.fax:
+                    payload['emisor_fax'] = self.company_id.fax
+                else:
+                    payload['emisor_fax'] = ''
                 payload['emisor_email'] = self.company_id.email
                 payload['receptor_nombre'] = self.partner_id.name[:80]
                 payload['receptor_tipo_identif'] = self.partner_id.identification_id.code
@@ -918,8 +938,14 @@ class OrderElectronic(models.Model):
                 payload['receptor_barrio'] = self.partner_id.neighborhood_id.code
                 payload['receptor_cod_pais_tel'] = self.partner_id.phone_code
                 payload['receptor_tel'] = self.partner_id.phone
-                payload['receptor_cod_pais_fax'] = ''
-                payload['receptor_fax'] = ''
+                if self.partner_id.fax_code:
+                    payload['receptor_cod_pais_fax'] = self.partner_id.fax_code
+                else:
+                    payload['receptor_cod_pais_fax'] = ''
+                if self.partner_id.fax:
+                    payload['receptor_fax'] = self.partner_id.fax
+                else:
+                    payload['receptor_fax'] = ''
                 payload['receptor_email'] = self.partner_id.email
                 payload['condicion_venta'] = sale_conditions
                 payload['plazo_credito'] = ''
@@ -932,7 +958,8 @@ class OrderElectronic(models.Model):
                 payload['total_merc_exenta'] = total_mercaderia_exento
                 payload['total_gravados'] = total_servicio_gravado + total_mercaderia_gravado
                 payload['total_exentos'] = total_servicio_exento + total_mercaderia_exento
-                payload['total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
+                payload[
+                    'total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
                 payload['total_descuentos'] = round(base_total, 2) - round(self.amount_untaxed, 2)
                 payload['total_ventas_neta'] = (total_servicio_gravado + total_mercaderia_gravado
                                                 + total_servicio_exento + total_mercaderia_exento) \

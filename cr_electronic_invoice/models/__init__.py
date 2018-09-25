@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from . import electronic_invoice
-from . import account_journal
+import electronic_invoice
+import account_journal

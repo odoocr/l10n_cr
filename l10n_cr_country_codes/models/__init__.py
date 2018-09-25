@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from . import country_codes
+import country_codes
 
