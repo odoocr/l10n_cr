@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <template id="assets" name="pos_electronic_invoice assets" inherit_id="point_of_sale.assets">
+          <xpath expr="." position="inside">
+              <script type="text/javascript" src="/pos_electronic_invoice/static/src/js/pos_electronic_invoice.js"></script>
+           </xpath>
+        </template>
+    </data>
+</odoo>

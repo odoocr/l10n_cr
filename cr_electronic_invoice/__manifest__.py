@@ -3,15 +3,15 @@
 {
 	'name': 'Facturación electrónica Costa Rica',
 	'version': '0.1',
-	'author': 'DelfixCR',
+	'author': 'JackDevelopers',
 	'license': 'OPL-1',
-	'website': 'https://www.delfixcr.com',
+	'website': 'https://www.jackdevelopers.com',
 	'category': 'Account',
 	'description':
 		'''
 		Facturación electronica Costa Rica.
 		''',
-	'depends': ['base', 'account','product','sales_team','l10n_cr_country_codes','account_cancel'],
+	'depends': ['base', 'account','product','sales_team','l10n_cr_country_codes','account_cancel','point_of_sale'],
 	'data': ['views/account_journal_views.xml',
 			 'views/electronic_invoice_views.xml',
 	         'data/data.xml',
