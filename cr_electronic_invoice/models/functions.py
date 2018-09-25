@@ -1,10 +1,10 @@
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
 import json
 import requests
 import logging
 import re
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
-from odoo.tools.safe_eval import safe_eval
 import datetime
 import pytz
 import base64
@@ -61,14 +61,8 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['emisor_otras_senas'] = inv.company_id.street
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
     payload['emisor_tel'] = inv.company_id.phone
-    if inv.company_id.fax_code:
-        payload['emisor_cod_pais_fax'] = inv.company_id.fax_code
-    else:
-        payload['emisor_cod_pais_fax'] = ''
-    if inv.company_id.fax:
-        payload['emisor_fax'] = inv.company_id.fax
-    else:
-        payload['emisor_fax'] = ''
+    payload['emisor_cod_pais_fax'] = ''
+    payload['emisor_fax'] = ''
     payload['emisor_email'] = inv.company_id.email
     payload['receptor_nombre'] = inv.partner_id.name[:80]
     payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
@@ -79,14 +73,8 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code
     payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
     payload['receptor_tel'] = inv.partner_id.phone
-    if inv.partner_id.fax_code:
-        payload['receptor_cod_pais_fax'] = inv.partner_id.fax_code
-    else:
-        payload['receptor_cod_pais_fax'] = ''
-    if inv.partner_id.fax:
-        payload['receptor_fax'] = inv.partner_id.fax
-    else:
-        payload['receptor_fax'] = ''
+    payload['receptor_cod_pais_fax'] = ''
+    payload['receptor_fax'] = ''
     payload['receptor_email'] = inv.partner_id.email
     payload['condicion_venta'] = sale_conditions
     payload['plazo_credito'] = ''
@@ -211,7 +199,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
         elif inv.type == 'out_invoice':
-            inv.state_tributacion = estado_m_h;
+            inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
@@ -219,7 +207,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
         elif inv.type == 'out_invoice':
-            inv.state_tributacion = estado_m_h;
+            inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
@@ -227,7 +215,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
         elif inv.type == 'out_invoice':
-            inv.state_tributacion = estado_m_h;
+            inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado

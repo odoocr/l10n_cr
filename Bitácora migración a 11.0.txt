@@ -33,3 +33,5 @@ Pendientes
 - Agregar tiquete electrónico al punto de ventas
 - Revisar notas de crédito
 
+API para pruebas
+http://ec2-52-36-200-181.us-west-2.compute.amazonaws.com/api.php
