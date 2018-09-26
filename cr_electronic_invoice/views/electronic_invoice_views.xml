@@ -350,9 +350,9 @@
 				<field name="type" position="after">
 					<field name="code_type_id" required="1"/>
 				</field>
-				<field name="uom_po_id" position="after">
+				<!-- <field name="uom_po_id" position="after">
 					<field name="commercial_measurement"/>
-				</field>
+				</field> -->
 			</field>
 		</record>
 

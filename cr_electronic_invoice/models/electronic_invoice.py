@@ -646,7 +646,7 @@ class AccountInvoiceElectronic(models.Model):
                     sale_conditions = '01'
                     
                 if inv.number.isdigit() and tipo_documento:
-                    currency_rate = 1
+                    currency_rate = inv.currency_id.rate
                     if (inv.currency_id.rate < 1):
                         currency_rate = inv.currency_id.rate_ids[0].original_rate
 
@@ -659,7 +659,7 @@ class AccountInvoiceElectronic(models.Model):
                     total_mercaderia_gravado = 0.0
                     total_mercaderia_exento = 0.0
 
-                    response_json = functions.get_clave(self, url, tipo_documento, next_number)
+                    response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal, inv.journal_id.terminal)
 
                     _logger.debug('Clave Documento')
                     inv.number_electronic = response_json.get('resp').get('clave')
@@ -710,7 +710,7 @@ class AccountInvoiceElectronic(models.Model):
                                 total_mercaderia_gravado += inv_line.quantity * inv_line.price_unit
                             else:
                                 total_mercaderia_exento += inv_line.quantity * inv_line.price_unit
-                        unidad_medida = inv_line.product_id.commercial_measurement or 'Sp'
+                        unidad_medida = inv_line.product_id.uom_id.code or 'Sp'
                         total = inv_line.quantity * inv_line.price_unit
                         total_linea = inv_line.price_subtotal + impuestos_acumulados
                         descuento = (round(inv_line.quantity * inv_line.price_unit, 2)

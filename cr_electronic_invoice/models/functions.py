@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 _logger = logging.getLogger(__name__)
 
 
-def get_clave(self, url, tipo_documento, next_number):
+def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload = {}
     headers = {}
     # get Clave MH
@@ -62,8 +62,8 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['emisor_otras_senas'] = inv.company_id.street
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
     payload['emisor_tel'] = inv.company_id.phone
-    payload['emisor_cod_pais_fax'] = ''
-    payload['emisor_fax'] = ''
+    payload['emisor_cod_pais_fax'] = inv.company_id.phone_code
+    payload['emisor_fax'] = '00000000'
     payload['emisor_email'] = inv.company_id.email
     payload['receptor_nombre'] = inv.partner_id.name[:80]
     payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
@@ -74,11 +74,11 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code
     payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
     payload['receptor_tel'] = inv.partner_id.phone
-    payload['receptor_cod_pais_fax'] = ''
-    payload['receptor_fax'] = ''
+    payload['receptor_cod_pais_fax'] = inv.partner_id.phone_code
+    payload['receptor_fax'] = '00000000'
     payload['receptor_email'] = inv.partner_id.email
     payload['condicion_venta'] = sale_conditions
-    payload['plazo_credito'] = ''
+    payload['plazo_credito'] = inv.partner_id.property_payment_term_id.line_ids[0].days or '0'
     payload['medio_pago'] = medio_pago
     payload['cod_moneda'] = inv.currency_id.name
     payload['tipo_cambio'] = currency_rate
@@ -105,8 +105,8 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
 
     _logger.debug(payload)
     response = requests.request("POST", url, data=payload, headers=headers)
-    _logger.debug(response)
-    response_json = json.loads(response._content)
+    _logger.debug(response.content)
+    response_json = json.loads(response.content)
     return response_json
 
 
