@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 _logger = logging.getLogger(__name__)
 
 
-def get_clave(self, url, tipo_documento, next_number):
+def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload = {}
     headers = {}
     # get Clave MH
@@ -30,6 +30,7 @@ def get_clave(self, url, tipo_documento, next_number):
     payload['situacion'] = 'normal'
     payload['codigoSeguridad'] = self.company_id.security_code
 
+    _logger.debug(payload)
     response = requests.request("POST", url, data=payload, headers=headers)
     response_json = json.loads(response._content)
     return response_json
@@ -38,7 +39,7 @@ def get_clave(self, url, tipo_documento, next_number):
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
                      total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total, lines,
                      tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-                     codigo_referencia, razon_referencia, url):
+                     codigo_referencia, razon_referencia, url, currency_rate):
     headers = {}
     payload = {}
     # Generar FE payload
@@ -61,8 +62,8 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['emisor_otras_senas'] = inv.company_id.street
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
     payload['emisor_tel'] = inv.company_id.phone
-    payload['emisor_cod_pais_fax'] = ''
-    payload['emisor_fax'] = ''
+    payload['emisor_cod_pais_fax'] = inv.company_id.phone_code
+    payload['emisor_fax'] = '00000000'
     payload['emisor_email'] = inv.company_id.email
     payload['receptor_nombre'] = inv.partner_id.name[:80]
     payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
@@ -73,30 +74,28 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code
     payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
     payload['receptor_tel'] = inv.partner_id.phone
-    payload['receptor_cod_pais_fax'] = ''
-    payload['receptor_fax'] = ''
+    payload['receptor_cod_pais_fax'] = inv.partner_id.phone_code
+    payload['receptor_fax'] = '00000000'
     payload['receptor_email'] = inv.partner_id.email
     payload['condicion_venta'] = sale_conditions
-    payload['plazo_credito'] = ''
+    payload['plazo_credito'] = inv.partner_id.property_payment_term_id.line_ids[0].days or '0'
     payload['medio_pago'] = medio_pago
     payload['cod_moneda'] = inv.currency_id.name
-    payload['tipo_cambio'] = 1
+    payload['tipo_cambio'] = currency_rate
     payload['total_serv_gravados'] = total_servicio_gravado
     payload['total_serv_exentos'] = total_servicio_exento
     payload['total_merc_gravada'] = total_mercaderia_gravado
     payload['total_merc_exenta'] = total_mercaderia_exento
     payload['total_gravados'] = total_servicio_gravado + total_mercaderia_gravado
     payload['total_exentos'] = total_servicio_exento + total_mercaderia_exento
-    payload[
-        'total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
+    payload['total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
     payload['total_descuentos'] = round(base_total, 2) - round(inv.amount_untaxed, 2)
-    payload['total_ventas_neta'] = (total_servicio_gravado + total_mercaderia_gravado
-                                    + total_servicio_exento + total_mercaderia_exento) \
-                                   - (base_total - inv.amount_untaxed)
+    payload['total_ventas_neta'] = (total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) - (base_total - inv.amount_untaxed)
     payload['total_impuestos'] = inv.amount_tax
     payload['total_comprobante'] = inv.amount_total
     payload['otros'] = ''
     payload['detalles'] = lines
+
     if tipo_documento == 'NC':
         payload['infoRefeTipoDoc'] = tipo_documento_referencia
         payload['infoRefeNumero'] = numero_documento_referencia
@@ -104,8 +103,10 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['infoRefeCodigo'] = codigo_referencia
         payload['infoRefeRazon'] = razon_referencia
 
+    _logger.debug(payload)
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    _logger.debug(response.content)
+    response_json = json.loads(response.content)
     return response_json
 
 
