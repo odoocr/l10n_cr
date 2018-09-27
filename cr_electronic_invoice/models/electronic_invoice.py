@@ -608,7 +608,7 @@ class AccountInvoiceElectronic(models.Model):
                 if inv.type == 'out_invoice':  # FC Y ND
                     if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
                         tipo_documento = 'ND'
-                        next_number = inv.journal_id.sequence_number_next
+                        next_number = inv.number
                         tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]  # 50625011800011436041700100001 01 0000000154112345678
                         numero_documento_referencia = inv.invoice_id.number_electronic
                         fecha_emision_referencia = inv.invoice_id.date_issuance
@@ -617,7 +617,7 @@ class AccountInvoiceElectronic(models.Model):
                         medio_pago = ''
                     else:
                         tipo_documento = 'FE'
-                        next_number = inv.journal_id.sequence_number_next
+                        next_number = inv.number
                         
                 if inv.type == 'out_refund':  # NC
                     if inv.invoice_id.journal_id.nd:
@@ -625,7 +625,7 @@ class AccountInvoiceElectronic(models.Model):
                     else:
                         tipo_documento_referencia = '01'
                     tipo_documento = 'NC'
-                    next_number = inv.journal_id.sequence_number_next
+                    next_number = inv.number
                     numero_documento_referencia = inv.invoice_id.number_electronic
                     fecha_emision_referencia = inv.invoice_id.date_issuance
                     codigo_referencia = inv.reference_code_id.code
@@ -755,6 +755,7 @@ class AccountInvoiceElectronic(models.Model):
                         env = 'api-stag'
                     else:
                         env = 'api-prod'
+
                     # get token
                     response_json = functions.token_hacienda(inv, env, url)
                     _logger.info('Token MH')

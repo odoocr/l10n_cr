@@ -28,7 +28,7 @@ def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload['codigoPais'] = self.company_id.phone_code
     payload['consecutivo'] = next_number
     payload['situacion'] = 'normal'
-    payload['codigoSeguridad'] = self.company_id.security_code
+    payload['codigoSeguridad'] = self.company_id.frm_pin
 
     _logger.debug(payload)
     response = requests.request("POST", url, data=payload, headers=headers)
@@ -58,12 +58,12 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['emisor_provincia'] = inv.company_id.state_id.code
     payload['emisor_canton'] = inv.company_id.county_id.code
     payload['emisor_distrito'] = inv.company_id.district_id.code
-    payload['emisor_barrio'] = inv.company_id.neighborhood_id.code
+    payload['emisor_barrio'] = inv.company_id.neighborhood_id.code or ''
     payload['emisor_otras_senas'] = inv.company_id.street
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
     payload['emisor_tel'] = inv.company_id.phone
-    payload['emisor_cod_pais_fax'] = inv.company_id.phone_code
-    payload['emisor_fax'] = '00000000'
+    # payload['emisor_cod_pais_fax'] = ''
+    # payload['emisor_fax'] = ''
     payload['emisor_email'] = inv.company_id.email
     payload['receptor_nombre'] = inv.partner_id.name[:80]
     payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
@@ -71,11 +71,11 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['receptor_provincia'] = inv.partner_id.state_id.code
     payload['receptor_canton'] = inv.partner_id.county_id.code
     payload['receptor_distrito'] = inv.partner_id.district_id.code
-    payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code
+    payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
     payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
     payload['receptor_tel'] = inv.partner_id.phone
-    payload['receptor_cod_pais_fax'] = inv.partner_id.phone_code
-    payload['receptor_fax'] = '00000000'
+    # payload['receptor_cod_pais_fax'] = ''
+    # payload['receptor_fax'] = ''
     payload['receptor_email'] = inv.partner_id.email
     payload['condicion_venta'] = sale_conditions
     payload['plazo_credito'] = inv.partner_id.property_payment_term_id.line_ids[0].days or '0'

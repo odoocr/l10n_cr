@@ -42,6 +42,8 @@ class ResCurrencyRate(models.Model):
         _logger.info("=========================================================")
         _logger.info("Executing exchange rate update")
 
+        company_name = self.env.user.company_id.name
+
         # Get current date to get exchange rate for today
         currentDate = datetime.datetime.now().date()
         today = currentDate.strftime('%d/%m/%Y') #formato requerido por el BCCR dd/mm/yy
@@ -56,7 +58,8 @@ class ResCurrencyRate(models.Model):
         # Get Selling exchange Rate from BCCR
         # Indicators IDs at https://www.bccr.fi.cr/seccion-indicadores-economicos/servicio-web
         # The response is a string we need to convert it to XML to extract value
-        response = client.service.ObtenerIndicadoresEconomicosXML(tcIndicador='318', tcFechaInicio=today, tcFechaFinal=today, tcNombre='AKUREY', tnSubNiveles='N')
+
+        response = client.service.ObtenerIndicadoresEconomicosXML(tcIndicador='318', tcFechaInicio=today, tcFechaFinal=today, tcNombre=company_name, tnSubNiveles='N')
         xmlResponse = xml.etree.ElementTree.fromstring(response)
         rateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC/NUM_VALOR")
         sellingRate = 0
@@ -65,7 +68,7 @@ class ResCurrencyRate(models.Model):
             sellingRate = 1/sellingOriginalRate # Odoo utiliza un valor inverso. Es decir a cuantos dólares equivale 1 colón. Por eso se divide 1 colon entre el tipo de cambio. 
 
         # Get Buying exchange Rate from BCCR
-        response = client.service.ObtenerIndicadoresEconomicosXML(tcIndicador='317', tcFechaInicio=today, tcFechaFinal=today, tcNombre='AKUREY', tnSubNiveles='N')
+        response = client.service.ObtenerIndicadoresEconomicosXML(tcIndicador='317', tcFechaInicio=today, tcFechaFinal=today, tcNombre=company_name, tnSubNiveles='N')
         xmlResponse = xml.etree.ElementTree.fromstring(response)
         rateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC/NUM_VALOR")
         buyingRate = 0
