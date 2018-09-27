@@ -605,6 +605,8 @@ class AccountInvoiceElectronic(models.Model):
                 codigo_referencia = ''
                 razon_referencia = ''
                 medio_pago = inv.payment_methods_id.sequence or '01'
+                numeracion_consecutiva_trib = format(inv.journal_id.sucursal, '03d')
+                numeracion_consecutiva_trib += format(inv.journal_id.terminal, '05d')
                 if inv.type == 'out_invoice':  # FC Y ND
                     if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
                         tipo_documento = 'ND'
@@ -615,9 +617,11 @@ class AccountInvoiceElectronic(models.Model):
                         codigo_referencia = inv.reference_code_id.code
                         razon_referencia = inv.reference_code_id.name
                         medio_pago = ''
+                        numeracion_consecutiva_trib += "02"
                     else:
                         tipo_documento = 'FE'
                         next_number = inv.number
+                        numeracion_consecutiva_trib += "01"
                         
                 if inv.type == 'out_refund':  # NC
                     if inv.invoice_id.journal_id.nd:
@@ -625,6 +629,7 @@ class AccountInvoiceElectronic(models.Model):
                     else:
                         tipo_documento_referencia = '01'
                     tipo_documento = 'NC'
+                    numeracion_consecutiva_trib += "01"
                     next_number = inv.number
                     numero_documento_referencia = inv.invoice_id.number_electronic
                     fecha_emision_referencia = inv.invoice_id.date_issuance
@@ -760,6 +765,8 @@ class AccountInvoiceElectronic(models.Model):
                     response_json = functions.token_hacienda(inv, env, url)
                     _logger.info('Token MH')
                     token_m_h = response_json.get('resp').get('access_token')
+
+                    inv.number = numeracion_consecutiva_trib + inv.number
 
                     response_json = functions.send_file(inv, token_m_h, date_cr, xml_firmado, env, url)
 
