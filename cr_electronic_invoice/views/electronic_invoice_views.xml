@@ -12,6 +12,9 @@
 				<xpath expr="//button[@name='action_invoice_cancel']" position="attributes">
 					<attribute name="invisible">True</attribute>
 				</xpath>
+				<xpath expr="//button[@name='action_invoice_sent']" position="attributes">
+					<attribute name="invisible">True</attribute>
+				</xpath>
 			</field>
 		</record>
 
