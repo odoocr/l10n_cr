@@ -33,10 +33,10 @@ class CompanyElectronic(models.Model):
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
                                         required=False, )
-    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
-    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
-    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
-    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False, )
+    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=True, defaul="1", )
+    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=True, defaul="1", )
+    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=True, defaul="1", )
+    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=True, )
     frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False, )
     security_code = fields.Char(string="Código de seguridad para Factura Electrónica", size=8, required=False, )
     frm_ws_ambiente = fields.Selection(
@@ -675,30 +675,32 @@ class AccountInvoiceElectronic(models.Model):
                         numero += 1
                         base_total += inv_line.price_unit * inv_line.quantity
                         impuestos = '{'
-                        for i in inv_line.invoice_line_tax_ids:
-                            indextax += 1
-                            if i.tax_code != '00':
-                                monto_impuesto = round(i.amount / 100 * inv_line.price_subtotal, 2)
-                                impuestos = (impuestos + '"' + str(indextax) + '":' + '{"codigo": "'
-                                             + str(i.tax_code or '01') + '",' + '"tarifa": "' + str(i.amount) + '",' +
-                                             '"monto": "' + str(monto_impuesto))
-                                if inv_line.exoneration_id:
-                                    monto_exonerado = round(
-                                        monto_impuesto * inv_line.exoneration_id.percentage_exoneration / 100)
-                                    impuestos = (impuestos + ', ' +
-                                                 '"exoneracion": {'
-                                                 '"tipoDocumento": "' + inv_line.exoneration_id.type + '",' +
-                                                 '"numeroDocumento": "' + str(
-                                                inv_line.exoneration_id.exoneration_number) + '",' +
-                                                 '"nombreInstitucion": "' + inv_line.exoneration_id.name_institution + '",' +
-                                                 '"fechaEmision": "' + str(inv_line.exoneration_id.date) + '",' +
-                                                 '"montoImpuesto": " -' + monto_exonerado + '",' +
-                                                 '"porcentajeCompra": "' + str(
-                                                inv_line.exoneration_id.percentage_exoneration) + '"}')
-                                impuestos_acumulados += round(i.amount / 100 * inv_line.price_subtotal, 2)
-                                impuestos = impuestos + '"},'
-                        impuestos = impuestos[:-1] + '}'
-                        indextax = 0
+                        if inv_line.invoice_line_tax_ids:
+                            indextax = 0
+                            for i in inv_line.invoice_line_tax_ids:
+                                indextax += 1
+                                if i.tax_code != '00':
+                                    monto_impuesto = round(i.amount / 100 * inv_line.price_subtotal, 2)
+                                    impuestos = (impuestos + '"' + str(indextax) + '":' + '{"codigo": "'
+                                                 + str(i.tax_code or '01') + '",' + '"tarifa": "' + str(i.amount) + '",' +
+                                                 '"monto": "' + str(monto_impuesto))
+                                    if inv_line.exoneration_id:
+                                        monto_exonerado = round(monto_impuesto * inv_line.exoneration_id.percentage_exoneration / 100)
+                                        impuestos = (impuestos + ', ' +
+                                                     '"exoneracion": {'
+                                                     '"tipoDocumento": "' + inv_line.exoneration_id.type + '",' +
+                                                     '"numeroDocumento": "' + str(
+                                                    inv_line.exoneration_id.exoneration_number) + '",' +
+                                                     '"nombreInstitucion": "' + inv_line.exoneration_id.name_institution + '",' +
+                                                     '"fechaEmision": "' + str(inv_line.exoneration_id.date) + '",' +
+                                                     '"montoImpuesto": " -' + monto_exonerado + '",' +
+                                                     '"porcentajeCompra": "' + str(inv_line.exoneration_id.percentage_exoneration) + '"}')
+                                    impuestos_acumulados += round(i.amount / 100 * inv_line.price_subtotal, 2)
+                                    impuestos = impuestos + '"},'
+                            impuestos = impuestos[:-1] + '}'
+                        else:
+                            impuestos += '}'
+
                         if inv_line.product_id:
                             if inv_line.product_id.type == 'service':
                                 if impuestos_acumulados:
