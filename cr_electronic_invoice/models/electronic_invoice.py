@@ -33,9 +33,9 @@ class CompanyElectronic(models.Model):
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
                                         required=False, )
-    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=True, defaul="1", )
-    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=True, defaul="1", )
-    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=True, defaul="1", )
+    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
+    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
+    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
     frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=True, )
     frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False, )
     security_code = fields.Char(string="Código de seguridad para Factura Electrónica", size=8, required=False, )
@@ -133,8 +133,8 @@ class PartnerElectronic(models.Model):
                 raise UserError(
                     'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
         if self.identification_id and self.identification_id.code == '05':
-            if len(self.vat) < 10 or len(self.vat) > 20:
-                raise UserError('La identificación tipo Extrangero debe ser de 10 dígitos.')
+            if len(self.vat) == 0:
+                raise UserError('La identificación debe ser ingresada.')
 
 
 class CodeTypeProduct(models.Model):
@@ -650,7 +650,7 @@ class AccountInvoiceElectronic(models.Model):
                 else:
                     sale_conditions = '01'
                     
-                if inv.number.isdigit() and tipo_documento:
+                if inv.number.isdigit() and (len(inv.number) <= 10) and tipo_documento:
                     currency_rate = inv.currency_id.rate
                     if (inv.currency_id.rate < 1):
                         currency_rate = inv.currency_id.rate_ids[0].original_rate
@@ -778,4 +778,6 @@ class AccountInvoiceElectronic(models.Model):
                         raise UserError(
                             'No se pudo Crear la factura electrónica: \n' + str(response_json.get('resp').get('text')))
 
+                else:
+                    raise UserError('El consecutivo del documento debe ser un número con un máximo de 10 dígitos')
 
