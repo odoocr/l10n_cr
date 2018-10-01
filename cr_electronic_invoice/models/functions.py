@@ -2,6 +2,7 @@ from odoo.exceptions import UserError
 import json
 import requests
 import logging
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['emisor_barrio'] = inv.company_id.neighborhood_id.code or ''
     payload['emisor_otras_senas'] = inv.company_id.street
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
-    payload['emisor_tel'] = inv.company_id.phone
+    payload['emisor_tel'] = re.sub('[^0-9]+', '', inv.company_id.phone)
     # payload['emisor_cod_pais_fax'] = ''
     # payload['emisor_fax'] = ''
     payload['emisor_email'] = inv.company_id.email
@@ -66,7 +67,7 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['receptor_distrito'] = inv.partner_id.district_id.code
     payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
     payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
-    payload['receptor_tel'] = inv.partner_id.phone
+    payload['receptor_tel'] = re.sub('[^0-9]+', '', inv.partner_id.phone)
     # payload['receptor_cod_pais_fax'] = ''
     # payload['receptor_fax'] = ''
     payload['receptor_email'] = inv.partner_id.email

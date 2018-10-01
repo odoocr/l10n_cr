@@ -293,8 +293,13 @@
 			<field name="model">res.partner</field>
 			<field name="inherit_id" ref="base.view_partner_form"/>
 			<field name="arch" type="xml">
+				<xpath expr="//field[@name='name']" position="after">
+					<group>
+						<field name="commercial_name"/>
+					</group>
+				</xpath>
+
 				<field name="phone" position="before">
-					<field name="commercial_name"/>
 					<field name="phone_code"/>
 				</field>
 				<!--field name="vat" position="replace"/-->

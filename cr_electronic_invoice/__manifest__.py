@@ -3,9 +3,9 @@
 {
 	'name': 'Facturación electrónica Costa Rica',
 	'version': '0.1',
-	'author': 'JackDevelopers',
-	'license': 'OPL-1',
-	'website': 'https://www.jackdevelopers.com',
+	'author': 'CRLibre.org',
+	'license': 'AGPL-3',
+	'website': 'https://crlibre.org/',
 	'category': 'Account',
 	'description':
 		'''
