@@ -36,11 +36,11 @@ class CompanyElectronic(models.Model):
     district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
     county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
     neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
-    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=True, )
+    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False, )
     frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False, )
     security_code = fields.Char(string="Código de seguridad para Factura Electrónica", size=8, required=False, )
     frm_ws_ambiente = fields.Selection(
-        selection=[('disabled', 'Deshabilitado'), ('stag', 'Pruebas'), ('prod', 'Producción'), ], string="Ambiente",
+        selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'), ('api-prod', 'Producción'), ], string="Ambiente",
         required=True, default='disabled',
         help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente de calidad (stag) c3RhZw==, '
              'para el ambiente de producción (prod) '
@@ -261,8 +261,6 @@ class AccountInvoiceRefund(models.TransientModel):
 
             for form in self:
                 created_inv = []
-                date = False
-                description = False
                 for inv in inv_obj.browse(context.get('active_ids')):
                     if inv.state in ['draft', 'proforma2', 'cancel']:
                         raise UserError(_('Cannot refund draft/proforma/cancelled invoice.'))
@@ -462,7 +460,6 @@ class AccountInvoiceElectronic(models.Model):
                         headers = {}
 
                         response_json = self.get_clave(url, tipo_documento, next_number)
-                        _logger.info('Clave Documento')
                         consecutivo_receptor = response_json.get('resp').get('consecutivo')
 
                         payload['w'] = 'genXML'
@@ -483,19 +480,13 @@ class AccountInvoiceElectronic(models.Model):
 
                         xml = response_json.get('resp').get('xml')
 
-                        _logger.info('XML Sin Firmar')
-
                         response_json = functions.sign_xml(inv, tipo_documento, url, xml)
                         xml_firmado = response_json.get('resp').get('xmlFirmado')
-                        _logger.info('Firmado XML')
 
-                        if inv.company_id.frm_ws_ambiente == 'stag':
-                            env = 'api-stag'
-                        else:
-                            env = 'api-prod'
+                        env = inv.company_id.frm_ws_ambiente
 
                         response_json = functions.token_hacienda(inv, env, url)
-                        _logger.info('Token MH')
+
                         token_m_h = response_json.get('resp').get('access_token')
 
                         response_json = functions.send_file(inv, token_m_h, date_cr, xml_firmado, env, url)
@@ -517,17 +508,14 @@ class AccountInvoiceElectronic(models.Model):
             new_invoices = self.browse()
             for invoice in self:
                 # create the new invoice
-                values = self._prepare_refund(invoice, date_invoice=date_invoice, date=date,
-                                              description=description, journal_id=journal_id)
-                values.update({'invoice_id': invoice_id,
-                               'reference_code_id': reference_code_id})
+                values = self._prepare_refund(invoice, date_invoice=date_invoice, date=date, description=description, journal_id=journal_id)
+                values.update({'invoice_id': invoice_id, 'reference_code_id': reference_code_id})
                 refund_invoice = self.create(values)
                 invoice_type = {
                     'out_invoice': ('customer invoices refund'),
                     'in_invoice': ('vendor bill refund')
                 }
-                message = _(
-                    "This %s has been created from: <a href=# data-oe-model=account.invoice data-oe-id=%d>%s</a>") % (
+                message = _("This %s has been created from: <a href=# data-oe-model=account.invoice data-oe-id=%d>%s</a>") % (
                               invoice_type[invoice.type], invoice.id, invoice.number)
                 refund_invoice.message_post(body=message)
                 new_invoices += refund_invoice
@@ -545,19 +533,16 @@ class AccountInvoiceElectronic(models.Model):
              ('state_tributacion', 'in', ('recibido', 'procesando'))])
         for i in invoices:
             url = i.company_id.frm_callback_url
-            if i.company_id.frm_ws_ambiente == 'stag':
-                env = 'api-stag'
-            else:
-                env = 'api-prod'
-            response_json = functions.token_hacienda(i, env, url)
-            _logger.info('Token MH')
+
+            response_json = functions.token_hacienda(i, i.company_id.frm_ws_ambiente, url)
+
             token_m_h = response_json.get('resp').get('access_token')
             if i.number_electronic and len(i.number_electronic) == 50:
                 headers = {}
                 payload = {}
                 payload['w'] = 'consultar'
                 payload['r'] = 'consultarCom'
-                payload['client_id'] = env
+                payload['client_id'] = i.company_id.frm_ws_ambiente
                 payload['token'] = token_m_h
                 payload['clave'] = i.number_electronic
                 response = requests.request("POST", url, data=payload, headers=headers)
@@ -590,90 +575,94 @@ class AccountInvoiceElectronic(models.Model):
     @api.multi
     def action_invoice_open(self):
         super(AccountInvoiceElectronic, self).action_invoice_open()
-        _logger.error('MAB - entrando action_invoice_open')
-        for inv in self:
-            if inv.company_id.frm_ws_ambiente != 'disabled':
-                url = self.company_id.frm_callback_url
-                tipo_documento = ''
-                FacturaReferencia = ''
-                now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                tipo_documento_referencia = ''
-                numero_documento_referencia = ''
-                fecha_emision_referencia = ''
-                codigo_referencia = ''
-                razon_referencia = ''
-                medio_pago = inv.payment_methods_id.sequence or '01'
-                numeracion_consecutiva_trib = format(inv.journal_id.sucursal, '03d')
-                numeracion_consecutiva_trib += format(inv.journal_id.terminal, '05d')
-                if inv.type == 'out_invoice':  # FC Y ND
-                    if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
-                        tipo_documento = 'ND'
-                        next_number = inv.number
-                        tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]  # 50625011800011436041700100001 01 0000000154112345678
+
+        # Revisamos si el ambiente para Hacienda está habilitado
+        if self.company_id.frm_ws_ambiente != 'disabled':
+
+            url = self.company_id.frm_callback_url
+            now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+            now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+            date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+
+            for inv in self:
+                if inv.number.isdigit() and (len(inv.number) <= 10):
+                    tipo_documento = ''
+                    tipo_documento_referencia = ''
+                    numero_documento_referencia = ''
+                    fecha_emision_referencia = ''
+                    codigo_referencia = ''
+                    razon_referencia = ''
+                    medio_pago = inv.payment_methods_id.sequence or '01'
+                    next_number = inv.number
+                    # Es Factura de cliente o nota de débito
+                    if inv.type == 'out_invoice':
+                        if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
+                            tipo_documento = 'ND'
+                            tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]  # 50625011800011436041700100001 01 0000000154112345678
+                            numero_documento_referencia = inv.invoice_id.number_electronic
+                            fecha_emision_referencia = inv.invoice_id.date_issuance
+                            codigo_referencia = inv.reference_code_id.code
+                            razon_referencia = inv.reference_code_id.name
+                            medio_pago = ''
+                        else:
+                            tipo_documento = 'FE'
+
+                    # Si es Nota de Crédito
+                    elif inv.type == 'out_refund':
+                        if inv.invoice_id.journal_id.nd:
+                            tipo_documento_referencia = '02'
+                        else:
+                            tipo_documento_referencia = '01'
+
+                        tipo_documento = 'NC'
                         numero_documento_referencia = inv.invoice_id.number_electronic
                         fecha_emision_referencia = inv.invoice_id.date_issuance
                         codigo_referencia = inv.reference_code_id.code
                         razon_referencia = inv.reference_code_id.name
-                        medio_pago = ''
-                        numeracion_consecutiva_trib += "02"
-                    else:
-                        tipo_documento = 'FE'
-                        next_number = inv.number
-                        numeracion_consecutiva_trib += "01"
-                        
-                if inv.type == 'out_refund':  # NC
-                    if inv.invoice_id.journal_id.nd:
-                        tipo_documento_referencia = '02'
-                    else:
-                        tipo_documento_referencia = '01'
-                    tipo_documento = 'NC'
-                    numeracion_consecutiva_trib += "03"
-                    next_number = inv.number
-                    numero_documento_referencia = inv.invoice_id.number_electronic
-                    fecha_emision_referencia = inv.invoice_id.date_issuance
-                    codigo_referencia = inv.reference_code_id.code
-                    razon_referencia = inv.reference_code_id.name
-                    if inv.origin :
-                        FacturaReferencia = (inv.origin)
-                    else:
-                        FacturaReferencia = 0
 
-                if inv.payment_term_id:
-                    if inv.payment_term_id.id:
-                        sale_conditions = '0' + str(inv.payment_term_id.id) or '01'
+                    if inv.payment_term_id:
+                        if inv.payment_term_id.id:
+                            sale_conditions = '0' + str(inv.payment_term_id.id) or '01'
+                        else:
+                            raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para ' +
+                                            inv.partner_id.name)
                     else:
-                        raise UserError(
-                            'No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para %s',
-                            inv.payment_term_id.id)
-                else:
-                    sale_conditions = '01'
-                    
-                if inv.number.isdigit() and (len(inv.number) <= 10) and tipo_documento:
-                    currency_rate = inv.currency_id.rate
-                    if (inv.currency_id.rate < 1):
-                        currency_rate = inv.currency_id.rate_ids[0].original_rate
+                        sale_conditions = '01'
 
+                    # Validate if invoice currency is the same as the company currency
+                    if inv.currency_id.name == self.company_id.currency_id.name:
+                        currency_rate = 1
+                    else:
+                        # If the invoice currency is different it is going to use exchnge rate
+                        # for Costa Rica exchange rate uses the value of 1 USD. But, Odoo uses the value of 1 CRC in USD.
+                        # So the Module Currency Costa Rica Adapter adds some fields to store the original rate value and use it where it is needed.
+                        if inv.currency_id.rate_ids and (len(inv.currency_id.rate_ids) > 0):
+                            currency_rate = inv.currency_id.rate_ids[0].original_rate
+                        else:
+                            raise UserError('No hay tipo de cambio registrado para la moneda ' + inv.currency_id.name)
+
+
+                    # Generando la clave como la especifica Hacienda
+                    response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
+                                                        inv.journal_id.terminal)
+
+                    inv.number_electronic = response_json.get('resp').get('clave')
+                    consecutivo = response_json.get('resp').get('consecutivo')
+
+                    # Generamos las líneas de la factura
                     lines = '{'
                     base_total = 0.0
                     numero = 0
-                    indextax = 0
                     total_servicio_gravado = 0.0
                     total_servicio_exento = 0.0
                     total_mercaderia_gravado = 0.0
                     total_mercaderia_exento = 0.0
-
-                    response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal, inv.journal_id.terminal)
-
-                    _logger.debug('Clave Documento')
-                    inv.number_electronic = response_json.get('resp').get('clave')
-                    consecutivo = response_json.get('resp').get('consecutivo')
-
                     for inv_line in inv.invoice_line_ids:
                         impuestos_acumulados = 0.0
                         numero += 1
                         base_total += inv_line.price_unit * inv_line.quantity
+
+                        # Se generan los impuestos
                         impuestos = '{'
                         if inv_line.invoice_line_tax_ids:
                             indextax = 0
@@ -681,16 +670,17 @@ class AccountInvoiceElectronic(models.Model):
                                 indextax += 1
                                 if i.tax_code != '00':
                                     monto_impuesto = round(i.amount / 100 * inv_line.price_subtotal, 2)
-                                    impuestos = (impuestos + '"' + str(indextax) + '":' + '{"codigo": "'
-                                                 + str(i.tax_code or '01') + '",' + '"tarifa": "' + str(i.amount) + '",' +
-                                                 '"monto": "' + str(monto_impuesto))
+                                    impuestos = (impuestos + '"' + str(indextax) + '":' +
+                                                 '{"codigo": "' + str(i.tax_code or '01') + '",' +
+                                                 '"tarifa": "' + str(round(i.amount, 2)) + '",' +
+                                                 '"monto": "' + str(round(monto_impuesto, 2)))
+                                    # Se genera la exoneración si existe para este impuesto
                                     if inv_line.exoneration_id:
-                                        monto_exonerado = round(monto_impuesto * inv_line.exoneration_id.percentage_exoneration / 100)
+                                        monto_exonerado = round(monto_impuesto * inv_line.exoneration_id.percentage_exoneration / 100, 2)
                                         impuestos = (impuestos + ', ' +
-                                                     '"exoneracion": {'
-                                                     '"tipoDocumento": "' + inv_line.exoneration_id.type + '",' +
-                                                     '"numeroDocumento": "' + str(
-                                                    inv_line.exoneration_id.exoneration_number) + '",' +
+                                                     '"exoneracion": { '+
+                                                     '"tipoDocumento": "'+ inv_line.exoneration_id.type + '",' +
+                                                     '"numeroDocumento": "' + str(inv_line.exoneration_id.exoneration_number) + '",' +
                                                      '"nombreInstitucion": "' + inv_line.exoneration_id.name_institution + '",' +
                                                      '"fechaEmision": "' + str(inv_line.exoneration_id.date) + '",' +
                                                      '"montoImpuesto": " -' + monto_exonerado + '",' +
@@ -701,6 +691,7 @@ class AccountInvoiceElectronic(models.Model):
                         else:
                             impuestos += '}'
 
+                        # Todo: analizar bien esta lógica de impuestos acumulados, parece que todos los if hacen lo mismo
                         if inv_line.product_id:
                             if inv_line.product_id.type == 'service':
                                 if impuestos_acumulados:
@@ -717,67 +708,58 @@ class AccountInvoiceElectronic(models.Model):
                                 total_mercaderia_gravado += inv_line.quantity * inv_line.price_unit
                             else:
                                 total_mercaderia_exento += inv_line.quantity * inv_line.price_unit
+
                         unidad_medida = inv_line.product_id.uom_id.code or 'Sp'
-                        total = inv_line.quantity * inv_line.price_unit
-                        total_linea = inv_line.price_subtotal + impuestos_acumulados
-                        descuento = (round(inv_line.quantity * inv_line.price_unit, 2)
-                                     - round(inv_line.price_subtotal, 2)) or 0
-                        natu_descuento = inv_line.discount_note or ''
-                        _logger.info(impuestos)
+                        total = round(inv_line.quantity * inv_line.price_unit, 2)
+                        total_linea = round(inv_line.price_subtotal + impuestos_acumulados, 2)
+                        descuento = round((inv_line.quantity * inv_line.price_unit - inv_line.price_subtotal), 2)
+                        natu_descuento = round(inv_line.discount_note, 2) or ''
+
                         line = ('{' +
                                 '"cantidad": "' + str(int(inv_line.quantity)) + '",' +
                                 '"unidadMedida": "' + unidad_medida + '",' +
                                 '"detalle": "' + inv_line.product_id.display_name + '",' +
-                                '"precioUnitario": "' + str(inv_line.price_unit) + '",' +
+                                '"precioUnitario": "' + str(round(inv_line.price_unit, 2)) + '",' +
                                 '"montoTotal": "' + str(total) + '",' +
-                                '"subtotal": "' + str(inv_line.price_subtotal) + '",')
+                                '"subtotal": "' + str(round(inv_line.price_subtotal,2)) + '",')
                         if descuento != 0:
                             line = (line + '"montoDescuento": "' + str(descuento) + '",' +
                                     '"naturalezaDescuento": "' + natu_descuento + '",')
+
                         line = (line + '"impuesto": ' + str(impuestos) + ',' +
-                                '"montoTotalLinea": "' + str(total_linea) + '"' +
-                                '}'
-                                )
+                                '"montoTotalLinea": "' + str(total_linea) + '"' + '}')
 
                         lines = lines + '"' + str(numero) + '":' + line + ","
                     lines = lines[:-1] + "}"
 
-                    _logger.error('MAB - formando payload')
                     response_json = functions.make_xml_invoice(inv, tipo_documento, consecutivo, date_cr,
-                                                               sale_conditions, medio_pago, total_servicio_gravado,
-                                                               total_servicio_exento, total_mercaderia_gravado,
-                                                               total_mercaderia_exento, base_total, lines,
+                                                               sale_conditions, medio_pago, round(total_servicio_gravado,2),
+                                                               round(total_servicio_exento,2), round(total_mercaderia_gravado,2),
+                                                               round(total_mercaderia_exento,2), base_total, lines,
                                                                tipo_documento_referencia, numero_documento_referencia,
                                                                fecha_emision_referencia,
                                                                codigo_referencia, razon_referencia, url, currency_rate)
-                    _logger.info('XML Sin Firmar')
                     xml = response_json.get('resp').get('xml')
 
                     response_json = functions.sign_xml(inv, tipo_documento, url, xml)
 
                     xml_firmado = response_json.get('resp').get('xmlFirmado')
-                    _logger.info('Firmado XML')
-
-                    if inv.company_id.frm_ws_ambiente == 'stag':
-                        env = 'api-stag'
-                    else:
-                        env = 'api-prod'
 
                     # get token
-                    response_json = functions.token_hacienda(inv, env, url)
-                    _logger.info('Token MH')
+                    response_json = functions.token_hacienda(inv, inv.company_id.frm_ws_ambiente, url)
                     token_m_h = response_json.get('resp').get('access_token')
 
-                    inv.number = numeracion_consecutiva_trib + inv.number
+                    response_json = functions.send_file(inv, token_m_h, date_cr, xml_firmado, inv.company_id.frm_ws_ambiente, url)
 
-                    response_json = functions.send_file(inv, token_m_h, date_cr, xml_firmado, env, url)
+                    # If everything went fine assign the consecutive number to the invoice
+                    inv.number = consecutivo
 
                     if response_json.get('resp').get('Status') == 202:
-                        functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
+                        functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
                     else:
                         raise UserError(
                             'No se pudo Crear la factura electrónica: \n' + str(response_json.get('resp').get('text')))
 
                 else:
-                    raise UserError('El consecutivo del documento debe ser un número con un máximo de 10 dígitos')
+                    raise UserError('El consecutivo del documento debe ser un número con un máximo de 10 dígitos, por favor revise la secuencia en la configuración')
 
