@@ -173,7 +173,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
+        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
             inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
@@ -190,18 +190,10 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
                                                                                             raise_exception=False,
                                                                                             force_send=True)  # default_type='binary'
                 email_template.attachment_ids = [(3, attachment.id)]
-    elif estado_m_h == 'recibido':
+    elif estado_m_h == 'procesando' or estado_m_h == 'recibido':
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
-            inv.state_tributacion = estado_m_h
-            inv.date_issuance = date_cr
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-    elif estado_m_h == 'procesando':
-        if inv.type == 'in_invoice':
-            inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
+        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
             inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
@@ -209,7 +201,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     elif estado_m_h == 'rechazado':
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
+        elif inv.type == 'out_invoice'  or inv.type == 'out_refund':
             inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'

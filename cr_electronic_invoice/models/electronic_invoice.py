@@ -629,13 +629,13 @@ class AccountInvoiceElectronic(models.Model):
                     else:
                         tipo_documento_referencia = '01'
                     tipo_documento = 'NC'
-                    numeracion_consecutiva_trib += "01"
+                    numeracion_consecutiva_trib += "03"
                     next_number = inv.number
                     numero_documento_referencia = inv.invoice_id.number_electronic
                     fecha_emision_referencia = inv.invoice_id.date_issuance
                     codigo_referencia = inv.reference_code_id.code
                     razon_referencia = inv.reference_code_id.name
-                    if inv.origin and inv.origin.isdigit():
+                    if inv.origin :
                         FacturaReferencia = (inv.origin)
                     else:
                         FacturaReferencia = 0
