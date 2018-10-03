@@ -476,7 +476,7 @@ class AccountInvoiceElectronic(models.Model):
                         payload['numero_consecutivo_receptor'] = consecutivo_receptor
 
                         response = requests.request("POST", url, data=payload, headers=headers)
-                        response_json = json.loads(response._content)
+                        response_json = response.json()
 
                         xml = response_json.get('resp').get('xml')
 
@@ -546,7 +546,7 @@ class AccountInvoiceElectronic(models.Model):
                 payload['token'] = token_m_h
                 payload['clave'] = i.number_electronic
                 response = requests.request("POST", url, data=payload, headers=headers)
-                responsejson = json.loads(response._content)
+                responsejson = response.json()
                 estado_m_h = responsejson.get('resp').get('ind-estado')
                 if estado_m_h == 'aceptado':
                     i.state_tributacion = estado_m_h
