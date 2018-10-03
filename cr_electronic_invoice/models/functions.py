@@ -21,7 +21,7 @@ def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload['codigoSeguridad'] = self.company_id.frm_pin
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
@@ -93,7 +93,7 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['infoRefeRazon'] = razon_referencia
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response.content)
+    response_json = response.json()
     return response_json
 
 
@@ -108,7 +108,7 @@ def token_hacienda(inv, env, url):
     payload['password'] = inv.company_id.frm_ws_password
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
@@ -123,7 +123,7 @@ def sign_xml(inv, tipo_documento, url, xml):
     payload['tipodoc'] = tipo_documento
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
@@ -143,7 +143,7 @@ def send_file(inv, token, date, xml, env, url):
     payload['client_id'] = env
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
@@ -156,7 +156,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     payload['token'] = token_m_h
     payload['clave'] = inv.number_electronic
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     estado_m_h = response_json.get('resp').get('ind-estado')
 
     # Se actualiza el estado con el que devuelve Hacienda

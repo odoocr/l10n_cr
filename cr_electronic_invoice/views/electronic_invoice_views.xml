@@ -218,15 +218,12 @@
 					</div>
 				</xpath>
 				
-				
+
 				<field name="partner_id" position="after">
 					<field name="commercial_name"/>
 				</field>
 				<field name="vat" position="replace"/>
-				<!-- <field name="fax" position="before">
-					<field name="fax_code"/>
-				</field> -->
-				
+
 				<field name="country_id" position="attributes">
 					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
 				</field>
@@ -293,12 +290,6 @@
 			<field name="model">res.partner</field>
 			<field name="inherit_id" ref="base.view_partner_form"/>
 			<field name="arch" type="xml">
-				<xpath expr="//field[@name='name']" position="after">
-					<group>
-						<field name="commercial_name"/>
-					</group>
-				</xpath>
-
 				<field name="phone" position="before">
 					<field name="phone_code"/>
 				</field>
@@ -306,13 +297,11 @@
 				<field name="website" position="before">
 					<field name="identification_id" widget="selection"/>
 					<field name="vat" string="Cédula"/>
+					<field name="commercial_name"/>
 					<field name="county_id" domain="[('state_id', '=', state_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 				</field>
-				<!-- <field name="fax" position="before">
-					<field name="fax_code"/>
-				</field> -->
 				<field name="property_payment_term_id" position="before">
 					<field name="payment_methods_id"/>
 				</field>
