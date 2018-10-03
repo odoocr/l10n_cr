@@ -2,6 +2,7 @@ from odoo.exceptions import UserError
 import json
 import requests
 import re
+import random
 
 def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload = {}
@@ -18,7 +19,7 @@ def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload['codigoPais'] = self.company_id.phone_code
     payload['consecutivo'] = next_number
     payload['situacion'] = 'normal'
-    payload['codigoSeguridad'] = self.company_id.frm_pin
+    payload['codigoSeguridad'] = str(random.randint(1, 99999999))
 
     response = requests.request("POST", url, data=payload, headers=headers)
     response_json = response.json()

@@ -38,7 +38,7 @@ class CompanyElectronic(models.Model):
     neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
     frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False, )
     frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False, )
-    security_code = fields.Char(string="Código de seguridad para Factura Electrónica", size=8, required=False, )
+
     frm_ws_ambiente = fields.Selection(
         selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'), ('api-prod', 'Producción'), ], string="Ambiente",
         required=True, default='disabled',
