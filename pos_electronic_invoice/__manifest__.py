@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
 
 {
-	'name': 'Tiquete Electronico Costa Rica',
-	'version': '0.1',
-	'author': 'JackDevelopers',
-	'license': 'OPL-1',
-	'website': 'https://www.jackdevelopers.com',
-	'category': 'pos',
-	'description':
-		'''
-		Tiquete Electronico Costa Rica.
-		''',
-	'depends': ['base', 'cr_electronic_invoice', 'point_of_sale'],
-	'data': [],
-    'qweb': [],
-	'installable': True,
+    "name": "Punto de venta adaptado Costa Rica",
+    "category": "Point Of Sale",
+    "author": "Jason Ulloa Hernandez, "
+              "Techmicro Inc, "
+              "Techmicro International Company S.A., "
+              "Odoo Community Association (OCA)",
+    "website": "https://github.com/OCA/l10n-spain",
+    "license": "AGPL-3",
+    "version": "11.0.1.0.1",
+    "depends": [
+        "point_of_sale","base", "cr_electronic_invoice",
+    ],
+    "data": [
+        "views/pos_templates.xml",
+        "views/pos_views.xml",
+    ],
+    "qweb": [
+        "static/src/xml/pos.xml",
+    ],
+    "installable": True
 }
