@@ -12,6 +12,9 @@
 				<xpath expr="//button[@name='action_invoice_cancel']" position="attributes">
 					<attribute name="invisible">True</attribute>
 				</xpath>
+				<xpath expr="//button[@name='action_invoice_sent']" position="attributes">
+					<attribute name="invisible">True</attribute>
+				</xpath>
 			</field>
 		</record>
 
@@ -215,15 +218,12 @@
 					</div>
 				</xpath>
 				
-				
+
 				<field name="partner_id" position="after">
 					<field name="commercial_name"/>
 				</field>
 				<field name="vat" position="replace"/>
-				<field name="fax" position="before">
-					<field name="fax_code"/>
-				</field>
-				
+
 				<field name="country_id" position="attributes">
 					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
 				</field>
@@ -272,7 +272,6 @@
 								<field name="frm_callback_url"/>
 								<field name="activated" readonly="True" />
 								<field name="frm_ws_ambiente"  widget="radio"/>
-								<field name="security_code"/>
                                 <field name="frm_apicr_signaturecode"/>
 								<!--<field name="frm_tipo_id"/>-->
 							</group>
@@ -291,19 +290,16 @@
 			<field name="inherit_id" ref="base.view_partner_form"/>
 			<field name="arch" type="xml">
 				<field name="phone" position="before">
-					<field name="commercial_name"/>
 					<field name="phone_code"/>
 				</field>
 				<!--field name="vat" position="replace"/-->
 				<field name="website" position="before">
 					<field name="identification_id" widget="selection"/>
 					<field name="vat" string="Cédula"/>
+					<field name="commercial_name"/>
 					<field name="county_id" domain="[('state_id', '=', state_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
-				</field>
-				<field name="fax" position="before">
-					<field name="fax_code"/>
 				</field>
 				<field name="property_payment_term_id" position="before">
 					<field name="payment_methods_id"/>
@@ -350,9 +346,9 @@
 				<field name="type" position="after">
 					<field name="code_type_id" required="1"/>
 				</field>
-				<field name="uom_po_id" position="after">
+				<!-- <field name="uom_po_id" position="after">
 					<field name="commercial_measurement"/>
-				</field>
+				</field> -->
 			</field>
 		</record>
 
@@ -430,7 +426,7 @@
 						</group>
 					</group>
 				</xpath>
-				<xpath expr="//field[@name='amount_total']" position="after">
+				<xpath expr="(//field[@name='amount_total'])[last()]" position="after">
 					<field name="amount_tax_electronic_invoice"/>
 					<field name="amount_total_electronic_invoice"/>
 				</xpath>

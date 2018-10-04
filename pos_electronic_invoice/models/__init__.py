@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import pos_electronic_invoice
+from . import pos_electronic_invoice

@@ -12,7 +12,7 @@
 		Tiquete Electronico Costa Rica.
 		''',
 	'depends': ['base', 'cr_electronic_invoice', 'point_of_sale'],
-	'data': ['views/pos_electronic_invoice.xml'],
-    'qweb': ['static/src/xml/*.xml'],
+	'data': [],
+    'qweb': [],
 	'installable': True,
 }

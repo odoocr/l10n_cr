@@ -247,7 +247,7 @@
                             <span t-if="l.invoice_line_tax_ids" t-esc="', '.join(map(lambda x: (x.description or x.name), l.invoice_line_tax_ids))"/>
                             <span t-if="not l.invoice_line_tax_ids">EXE</span>
                         </td>
-                        <td class="text-right">
+                        <td class="text-right" id="subtotal">
                             <span t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                         </td>
                     </tr>

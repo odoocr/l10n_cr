@@ -101,12 +101,8 @@
 			<field name="view_mode">tree,form</field>
 		</record>
 
-
-		<menuitem id="menu_res_country_county" name="Cantones" parent="sales_team.menu_localisation"
-				  sequence="2" action="action_res_country_county"/>
-		<menuitem id="menu_res_country_district" name="Distritos" parent="sales_team.menu_localisation"
-				  sequence="2" action="action_res_country_district"/>
-		<menuitem id="menu_res_country_neighborhood" name="Barrios" parent="sales_team.menu_localisation"
-				  sequence="2" action="action_res_country_neighborhood"/>
+		<menuitem id="menu_res_country_county" name="Cantones" parent="account.account_management_menu" sequence="2" action="action_res_country_county"/>
+		<menuitem id="menu_res_country_district" name="Distritos" parent="account.account_management_menu" sequence="2" action="action_res_country_district"/>
+		<menuitem id="menu_res_country_neighborhood" name="Barrios" parent="account.account_management_menu" sequence="2" action="action_res_country_neighborhood"/>
 	</data>
 </odoo>

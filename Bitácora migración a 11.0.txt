@@ -32,4 +32,8 @@ Pendientes
   - Generar usuario y subir la llave criptográfica.
 - Agregar tiquete electrónico al punto de ventas
 - Revisar notas de crédito
+- Revisar si el manejo de Unidades de Medida de Odoo y el campo de texto que se agregó para la FE
 
+
+API para pruebas
+http://ec2-52-36-200-181.us-west-2.compute.amazonaws.com/api.php

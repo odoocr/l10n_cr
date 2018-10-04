@@ -3,8 +3,8 @@
 {
     'name': 'Codigos Pais para Facturación electrónica Costa Rica',
     'version': '0.1',
-    'author': 'DelfixCR',
-    'license': 'OPL-1',
+    'author': 'CRLibre.org',
+    'license': 'AGPL-3',
     'website': 'https://www.delfixcr.com',
     'category': 'Account',
     'description':'''Codigos Pais para Facturación electronica Costa Rica.''',
