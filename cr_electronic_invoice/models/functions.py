@@ -1,19 +1,16 @@
 import json
 import requests
 import logging
+import random
 import re
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-from odoo.tools.safe_eval import safe_eval
-import datetime
-import pytz
-import base64
-import xml.etree.ElementTree as ET
+
 
 _logger = logging.getLogger(__name__)
 
 
-def get_clave(self, url, tipo_documento, next_number):
+def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload = {}
     headers = {}
     # get Clave MH
@@ -28,7 +25,9 @@ def get_clave(self, url, tipo_documento, next_number):
     payload['codigoPais'] = self.company_id.phone_code
     payload['consecutivo'] = next_number
     payload['situacion'] = 'normal'
-    payload['codigoSeguridad'] = self.company_id.security_code
+    payload['codigoSeguridad'] = str(random.randint(1, 99999999))
+    payload['terminal'] = terminal_id
+    payload['sucursal'] = sucursal_id
 
     response = requests.request("POST", url, data=payload, headers=headers)
     response_json = json.loads(response._content)
@@ -181,6 +180,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     payload['clave'] = inv.number_electronic
     response = requests.request("POST", url, data=payload, headers=headers)
     response_json = json.loads(response._content)
+
     estado_m_h = response_json.get('resp').get('ind-estado')
 
     _logger.error('MAB - MH response:%s', response_json)
@@ -190,35 +190,43 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
+        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
             inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-            if not inv.partner_id.opt_out:
-                email_template = self.env.ref('account.email_template_edi_invoice', False)
+            if not inv.partner_id.opt_out and inv.type == 'out_invoice':
+                email_template = self.env.ref( 'account.email_template_edi_invoice', False )
                 attachment = self.env['ir.attachment'].search(
                     [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
-                     ('res_field', '=', 'xml_comprobante')], limit=1)
+                     ('res_field', '=', 'xml_comprobante')], limit=1 )
                 attachment.name = inv.fname_xml_comprobante
                 attachment.datas_fname = inv.fname_xml_comprobante
-                email_template.attachment_ids = [(6, 0, [attachment.id])]  # [(4, attachment.id)]
-                email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
-                                                                                            raise_exception=False,
-                                                                                            force_send=True)  # default_type='binary'
+
+                attachment_resp = self.env['ir.attachment'].search(
+                    [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+                     ('res_field', '=', 'xml_respuesta_tributacion')], limit=1 )
+                attachment_resp.name = inv.fname_xml_respuesta_tributacion
+                attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+
+                email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]  # [(4, attachment.id)]
+                email_template.with_context( type='binary', default_type='binary' ).send_mail( inv.id,
+                                                                                               raise_exception=False,
+                                                                                               force_send=True )  # default_type='binary'
                 email_template.attachment_ids = [(3, attachment.id)]
+                email_template.attachment_ids = [(4, attachment_resp.id)]
     elif estado_m_h == 'recibido':
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
-            inv.state_tributacion = estado_m_h;
+        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
+            inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif estado_m_h == 'procesando':
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
+        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
             inv.state_tributacion = estado_m_h;
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
@@ -226,7 +234,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     elif estado_m_h == 'rechazado':
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
+        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
             inv.state_tributacion = estado_m_h;
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
@@ -236,7 +244,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     elif estado_m_h == 'error':
         if inv.type == 'in_invoice':
             inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice':
+        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
             inv.state_tributacion = estado_m_h
             inv.date_issuance = date_cr
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'

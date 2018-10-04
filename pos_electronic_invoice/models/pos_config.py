@@ -13,10 +13,8 @@ class PosConfig(models.Model):
     def _compute_ticket_hacienda_sequence(self):
         for pos in self:
             seq = pos.ticket_hacienda_sequence_id
-            pos.ticket_hacienda_number = (
-                seq.next_by_code('pos.config.ticket_hacienda'))
-            pos.ticket_hacienda_prefix = (
-                seq.prefix)
+            pos.ticket_hacienda_number = seq.number_next_actual
+            pos.ticket_hacienda_prefix = seq.prefix
             pos.ticket_hacienda_padding = seq.padding
 
     iface_ticket_hacienda = fields.Boolean(

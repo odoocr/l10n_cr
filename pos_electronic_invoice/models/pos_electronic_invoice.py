@@ -57,11 +57,10 @@ class OrderElectronic(models.Model):
 
     @api.model
     def _process_order(self, order):
-        pos_order = super(OrderElectronic, self)._process_order(order)
-        if pos_order.company_id.frm_ws_ambiente != 'disabled':
-
+        pos_order = super( OrderElectronic, self)._process_order(order)
+        to_invoice = order['to_invoice']
+        if not to_invoice and pos_order.company_id.frm_ws_ambiente != 'disabled':
             url = pos_order.company_id.frm_callback_url
-            payload = {}
             headers = {}
             now_utc = datetime.datetime.now(pytz.timezone('UTC'))
             now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
@@ -139,7 +138,6 @@ class OrderElectronic(models.Model):
             lines = lines[:-1] + "}"
             amount_untaxed = pos_order.amount_total - pos_order.amount_tax
             payload = {}
-            # Generar FE payload
             payload['w'] = 'genXML'
             if tipo_documento == 'TE':
                 payload['r'] = 'gen_xml_te'
@@ -192,7 +190,6 @@ class OrderElectronic(models.Model):
             response_json = json.loads(response._content)
             _logger.info('XML Sin Firmar')
 
-            # firmar Comprobante
             payload = {}
             payload['w'] = 'signXML'
             payload['r'] = 'signFE'
@@ -210,7 +207,6 @@ class OrderElectronic(models.Model):
                 env = 'api-stag'
             else:
                 env = 'api-prod'
-            # get token
             payload = {}
             payload['w'] = 'token'
             payload['r'] = 'gettoken'

@@ -442,10 +442,10 @@
 			<field name="inherit_id" ref="account.view_invoice_line_form"/>
 			<field name="arch" type="xml">
 				<field name="invoice_line_tax_ids" position="after">
-					<field name="total_amount" invisible="1"/>
-					<field name="total_discount" invisible="1"/>
-					<field name="discount_note" invisible="1"/>
-					<field name="total_tax" invisible="1"/>
+					<field name="total_amount"/>
+					<field name="total_discount" />
+					<field name="discount_note"/>
+					<field name="total_tax"/>
 					<!--<field name="exoneration_total"/>
 					<field name="total_line_exoneration"/>-->
 					<field name="exoneration_id" />

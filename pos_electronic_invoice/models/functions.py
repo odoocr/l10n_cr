@@ -13,28 +13,6 @@ import xml.etree.ElementTree as ET
 _logger = logging.getLogger(__name__)
 
 
-def get_clave(self, url, tipo_documento, next_number):
-    payload = {}
-    headers = {}
-    # get Clave MH
-    payload['w'] = 'clave'
-    payload['r'] = 'clave'
-    if self.company_id.identification_id.id == 1:
-        payload['tipoCedula'] = 'fisico'
-    elif self.company_id.identification_id.id == 2:
-        payload['tipoCedula'] = 'juridico'
-    payload['tipoDocumento'] = tipo_documento
-    payload['cedula'] = self.company_id.vat
-    payload['codigoPais'] = self.company_id.phone_code
-    payload['consecutivo'] = next_number
-    payload['situacion'] = 'normal'
-    payload['codigoSeguridad'] = self.company_id.security_code
-
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
-    return response_json
-
-
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
                      total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total, lines,
                      tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,

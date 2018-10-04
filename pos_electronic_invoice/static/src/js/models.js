@@ -11,9 +11,22 @@ odoo.define('pos_electronic_invoice.models', function (require) {
             return this
         },
         get_simple_inv_next_number: function () {
-            console.log(this.config.ticket_hacienda_prefix);
             ++this.config.ticket_hacienda_number;
-            return this.config.ticket_hacienda_number;
+            console.log(this.config.ticket_hacienda_number);
+            return this.config.ticket_hacienda_prefix+this.get_padding_simple_inv(this.config.ticket_hacienda_number);
+        },
+        get_padding_simple_inv: function (number) {
+            var diff = this.config.ticket_hacienda_padding - number.toString().length;
+            var result = '';
+            if (diff <= 0) {
+                result = number;
+            } else {
+                for (var i = 0; i < diff; i++) {
+                    result += '0';
+                }
+                result += number;
+            }
+            return result;
         },
         formatDate: function(d){
             var month = d.getMonth();
@@ -37,8 +50,7 @@ odoo.define('pos_electronic_invoice.models', function (require) {
             var fullDate = new Date();
             this.dni = this.pos.company.vat;
             var next = this.pos.get_simple_inv_next_number();
-            var zeros = '0000000000';
-            this.consecutivo = '0010000104'+zeros.substr(next.toString().length)+ next;
+            this.consecutivo = '00'+next;
             var clave = '506'+this.pos.formatDate(fullDate)+'000'+this.dni+this.consecutivo+'100006645';
             console.log(clave);
             this.ticket_hacienda = clave;

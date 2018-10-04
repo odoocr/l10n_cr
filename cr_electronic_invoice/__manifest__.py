@@ -11,7 +11,7 @@
 		'''
 		Facturación electronica Costa Rica.
 		''',
-	'depends': ['base', 'account','product','sales_team','l10n_cr_country_codes','account_cancel','point_of_sale'],
+	'depends': ['base', 'account','product','sales_team','l10n_cr_country_codes','account_cancel'],
 	'data': ['views/account_journal_views.xml',
 			 'views/electronic_invoice_views.xml',
 	         'data/data.xml',
