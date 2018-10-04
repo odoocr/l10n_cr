@@ -397,6 +397,7 @@
 					<field name="discount_note"/>
 					<field name="exoneration_id" />
 				</xpath>
+
 				<button name="action_invoice_cancel" position="attributes">
 					<attribute name="invisible">1</attribute>
 				</button>
