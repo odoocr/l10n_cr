@@ -86,6 +86,8 @@
 				</form>
 			</field>
 		</record>
+
+
 		<record id="view_reference_document_tree" model="ir.ui.view">
 			<field name="name">reference.document.tree</field>
 			<field name="model">reference.document</field>
@@ -494,6 +496,73 @@
 				</field>
 			</field>
 		</record>
+
+		<record id="res_config_settings_view_form_inherit_account_invoicing_fecr" model="ir.ui.view">
+			<field name="name">res.config.settings.view.form.inherit.account.invoicing.fecr</field>
+			<field name="model">res.config.settings</field>
+			<field name="inherit_id" ref="account.res_config_settings_view_form"/>
+			<field name="arch" type="xml">
+                <xpath expr="//div[@data-key='account_invoicing']" position="inside">
+					<h2>Product Catalog</h2>
+					<div class="row mt16 o_settings_container">
+                        <div class="col-xs-12 col-md-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="group_product_variant"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="group_product_variant"/>
+                                <div class="text-muted">
+                                    Set product attributes (e.g. color, size) to sell variants
+                                </div>
+                                <div class="content-group" attrs="{'invisible': [('group_product_variant','=',False)]}">
+                                    <div class="mt16">
+                                        <button name="%(product.attribute_action)d" icon="fa-arrow-right" type="action" string="Attributes" class="btn-link"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="group_uom"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="group_uom"/>
+                                <div class="text-muted">
+                                    Sell and purchase products in different units of measure
+                                </div>
+                                <div class="content-group" attrs="{'invisible': [('group_uom','=',False)]}">
+                                    <div class="mt16">
+                                        <button name="%(product.product_uom_form_action)d" icon="fa-arrow-right" type="action" string="Units of Measure" class="btn-link"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6 o_setting_box" title="Sending an email is useful if you need to share specific information or content about a product (instructions, rules, links, media, etc.). Create and set the email template from the product detail form (in Sales tab).">
+                            <div class="o_setting_left_pane">
+                                <field name="module_product_email_template"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="module_product_email_template"/>
+                                <div class="text-muted">
+                                    Send a product-specific email once the invoice is paid
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6 o_setting_box" title="Ability to select a package type in sales orders and to force a quantity that is a multiple of the number of units per package.">
+                            <div class="o_setting_left_pane">
+                                <field name="group_stock_packaging"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="group_stock_packaging"/>
+                                <div class="text-muted">
+                                    Sell products by multiple of unit # per package
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+				</xpath>
+			</field>
+    	</record>
 
 		<record id="action_payment_methods" model="ir.actions.act_window">
 			<field name="name">Métodos de pago</field>

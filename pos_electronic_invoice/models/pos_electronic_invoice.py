@@ -48,10 +48,8 @@ class OrderElectronic(models.Model):
     def _order_fields(self, ui_order):
         res = super(OrderElectronic, self)._order_fields(ui_order)
         res.update({
-            'ticket_hacienda_number': ui_order.get(
-                'ticket_hacienda', ''),
-            'consecutivo_number': ui_order.get(
-                'consecutivo', ''),
+            'ticket_hacienda_number': ui_order.get('ticket_hacienda', ''),
+            'consecutivo_number': ui_order.get('consecutivo', ''),
         })
         return res
 
@@ -68,7 +66,6 @@ class OrderElectronic(models.Model):
             date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
             medio_pago = '01'
             tipo_documento = 'TE'
-            currency_rate = 1
             lines = '{'
             base_total = 0.0
             numero = 0
@@ -77,6 +74,17 @@ class OrderElectronic(models.Model):
             total_servicio_exento = 0.0
             total_mercaderia_gravado = 0.0
             total_mercaderia_exento = 0.0
+
+            currency_rate = 1
+            # Validate if invoice currency is the same as the company currency
+            if pos_order.currency_id.name != self.company_id.currency_id.name:
+                # If the invoice currency is different it is going to use exchnge rate
+                # for Costa Rica exchange rate uses the value of 1 USD. But, Odoo uses the value of 1 CRC in USD.
+                # So the Module Currency Costa Rica Adapter adds some fields to store the original rate value and use it where it is needed.
+                if pos_order.currency_id.rate_ids and (len(pos_order.currency_id.rate_ids) > 0):
+                    currency_rate = pos_order.currency_id.rate_ids[0].original_rate
+                else:
+                    raise UserError('No hay tipo de cambio registrado para la moneda ' + order.currency_id.name)
 
             clave = str(pos_order.ticket_hacienda_number)
             consecutivo = pos_order.consecutivo_number
@@ -282,13 +290,11 @@ class OrderElectronic(models.Model):
         invoices = self.env['pos.order'].search([('state_tributacion', 'in', ('recibido', 'procesando'))])
         for i in invoices:
             url = i.company_id.frm_callback_url
-            if i.company_id.frm_ws_ambiente == 'stag':
-                env = 'api-stag'
-            else:
-                env = 'api-prod'
+            env = i.company_id.frm_ws_ambiente
+
             response_json = functions.token_hacienda(i, env, url)
-            _logger.info('Token MH')
             token_m_h = response_json.get('resp').get('access_token')
+
             if i.ticket_hacienda_number and len(i.ticket_hacienda_number) == 50:
                 headers = {}
                 payload = {}
@@ -298,7 +304,7 @@ class OrderElectronic(models.Model):
                 payload['token'] = token_m_h
                 payload['clave'] = i.ticket_hacienda_number
                 response = requests.request("POST", url, data=payload, headers=headers)
-                responsejson = json.loads(response._content)
+                responsejson = response.json()
                 estado_m_h = responsejson.get('resp').get('ind-estado')
                 if estado_m_h == 'aceptado':
                     i.state_tributacion = estado_m_h
