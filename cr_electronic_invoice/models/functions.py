@@ -20,6 +20,9 @@ def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload['consecutivo'] = next_number
     payload['situacion'] = 'normal'
     payload['codigoSeguridad'] = str(random.randint(1, 99999999))
+    payload['sucursal'] = sucursal_id
+    payload['terminal'] = terminal_id
+
 
     response = requests.request("POST", url, data=payload, headers=headers)
     response_json = response.json()
@@ -178,7 +181,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
             email_template = self.env.ref('account.email_template_edi_invoice', False)
             attachment = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
-                 ('res_field', '=', 'xml_comprobante')], limit=1)
+                 ('res_field', '=', 'xml_comprobante'), ('res_field', '=', 'xml_comprobante')], limit=1)
             attachment.name = inv.fname_xml_comprobante
             attachment.datas_fname = inv.fname_xml_comprobante
             email_template.attachment_ids = [(6, 0, [attachment.id])]  # [(4, attachment.id)]

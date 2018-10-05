@@ -3,7 +3,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 from . import functions
-import json
+
 import requests
 import logging
 import re
@@ -11,7 +11,7 @@ import datetime
 import pytz
 import base64
 import xml.etree.ElementTree as ET
-
+from dateutil.parser import parse
 
 _logger = logging.getLogger(__name__)
 
@@ -383,8 +383,8 @@ class AccountInvoiceElectronic(models.Model):
     @api.onchange('xml_supplier_approval')
     def _onchange_xml_supplier_approval(self):
         if self.xml_supplier_approval:
-            root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_supplier_approval),
-                                        count=1))  # quita el namespace de los elementos
+            root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_supplier_approval).decode("utf-8"), count=1))  # quita el namespace de los elementos
+
             if not root.findall('Clave'):
                 return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
                                                                                'message': 'El archivo xml no contiene el nodo Clave. Por favor cargue un archivo con el formato correcto.'}}
@@ -414,10 +414,12 @@ class AccountInvoiceElectronic(models.Model):
     @api.multi
     def charge_xml_data(self):
         if self.xml_supplier_approval:
-            root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_supplier_approval),
+            root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_supplier_approval).decode("utf-8"),
                                         count=1))  # quita el namespace de los elementos
             self.number_electronic = root.findall('Clave')[0].text
             self.date_issuance = root.findall('FechaEmision')[0].text
+            self.date_invoice = parse(self.date_issuance)
+
             partner = self.env['res.partner'].search(
                 [('vat', '=', root.findall('Emisor')[0].find('Identificacion')[1].text)])
             if partner:
@@ -426,6 +428,7 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError('El proveedor con identificación ' + root.findall('Emisor')[0].find('Identificacion')[
                     1].text + ' no existe. Por favor creelo primero en el sistema.')
 
+            self.reference = self.number_electronic[21:41]
             self.amount_tax_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalImpuesto')[0].text
             self.amount_total_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
 
@@ -585,181 +588,182 @@ class AccountInvoiceElectronic(models.Model):
             date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
 
             for inv in self:
-                if inv.number.isdigit() and (len(inv.number) <= 10):
-                    tipo_documento = ''
-                    tipo_documento_referencia = ''
-                    numero_documento_referencia = ''
-                    fecha_emision_referencia = ''
-                    codigo_referencia = ''
-                    razon_referencia = ''
-                    medio_pago = inv.payment_methods_id.sequence or '01'
-                    next_number = inv.number
-                    # Es Factura de cliente o nota de débito
-                    if inv.type == 'out_invoice':
-                        if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
-                            tipo_documento = 'ND'
-                            tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]  # 50625011800011436041700100001 01 0000000154112345678
+                if(inv.journal_id.type == 'sale'):
+                    if inv.number.isdigit() and (len(inv.number) <= 10):
+                        tipo_documento = ''
+                        tipo_documento_referencia = ''
+                        numero_documento_referencia = ''
+                        fecha_emision_referencia = ''
+                        codigo_referencia = ''
+                        razon_referencia = ''
+                        medio_pago = inv.payment_methods_id.sequence or '01'
+                        next_number = inv.number
+                        # Es Factura de cliente o nota de débito
+                        if inv.type == 'out_invoice':
+                            if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
+                                tipo_documento = 'ND'
+                                tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]  # 50625011800011436041700100001 01 0000000154112345678
+                                numero_documento_referencia = inv.invoice_id.number_electronic
+                                fecha_emision_referencia = inv.invoice_id.date_issuance
+                                codigo_referencia = inv.reference_code_id.code
+                                razon_referencia = inv.reference_code_id.name
+                                medio_pago = ''
+                            else:
+                                tipo_documento = 'FE'
+
+                        # Si es Nota de Crédito
+                        elif inv.type == 'out_refund':
+                            if inv.invoice_id.journal_id.nd:
+                                tipo_documento_referencia = '02'
+                            else:
+                                tipo_documento_referencia = '01'
+
+                            tipo_documento = 'NC'
                             numero_documento_referencia = inv.invoice_id.number_electronic
                             fecha_emision_referencia = inv.invoice_id.date_issuance
                             codigo_referencia = inv.reference_code_id.code
                             razon_referencia = inv.reference_code_id.name
-                            medio_pago = ''
-                        else:
-                            tipo_documento = 'FE'
 
-                    # Si es Nota de Crédito
-                    elif inv.type == 'out_refund':
-                        if inv.invoice_id.journal_id.nd:
-                            tipo_documento_referencia = '02'
-                        else:
-                            tipo_documento_referencia = '01'
-
-                        tipo_documento = 'NC'
-                        numero_documento_referencia = inv.invoice_id.number_electronic
-                        fecha_emision_referencia = inv.invoice_id.date_issuance
-                        codigo_referencia = inv.reference_code_id.code
-                        razon_referencia = inv.reference_code_id.name
-
-                    if inv.payment_term_id:
-                        if inv.payment_term_id.id:
-                            sale_conditions = '0' + str(inv.payment_term_id.id) or '01'
-                        else:
-                            raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para ' +
-                                            inv.partner_id.name)
-                    else:
-                        sale_conditions = '01'
-
-                    # Validate if invoice currency is the same as the company currency
-                    if inv.currency_id.name == self.company_id.currency_id.name:
-                        currency_rate = 1
-                    else:
-                        # If the invoice currency is different it is going to use exchnge rate
-                        # for Costa Rica exchange rate uses the value of 1 USD. But, Odoo uses the value of 1 CRC in USD.
-                        # So the Module Currency Costa Rica Adapter adds some fields to store the original rate value and use it where it is needed.
-                        if inv.currency_id.rate_ids and (len(inv.currency_id.rate_ids) > 0):
-                            currency_rate = inv.currency_id.rate_ids[0].original_rate
-                        else:
-                            raise UserError('No hay tipo de cambio registrado para la moneda ' + inv.currency_id.name)
-
-
-                    # Generando la clave como la especifica Hacienda
-                    response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
-                                                        inv.journal_id.terminal)
-
-                    inv.number_electronic = response_json.get('resp').get('clave')
-                    consecutivo = response_json.get('resp').get('consecutivo')
-
-                    # Generamos las líneas de la factura
-                    lines = '{'
-                    base_total = 0.0
-                    numero = 0
-                    total_servicio_gravado = 0.0
-                    total_servicio_exento = 0.0
-                    total_mercaderia_gravado = 0.0
-                    total_mercaderia_exento = 0.0
-                    for inv_line in inv.invoice_line_ids:
-                        impuestos_acumulados = 0.0
-                        numero += 1
-                        base_total += inv_line.price_unit * inv_line.quantity
-
-                        # Se generan los impuestos
-                        impuestos = '{'
-                        if inv_line.invoice_line_tax_ids:
-                            indextax = 0
-                            for i in inv_line.invoice_line_tax_ids:
-                                indextax += 1
-                                if i.tax_code != '00':
-                                    monto_impuesto = round(i.amount / 100 * inv_line.price_subtotal, 2)
-                                    impuestos = (impuestos + '"' + str(indextax) + '":' +
-                                                 '{"codigo": "' + str(i.tax_code or '01') + '",' +
-                                                 '"tarifa": "' + str(round(i.amount, 2)) + '",' +
-                                                 '"monto": "' + str(round(monto_impuesto, 2)))
-                                    # Se genera la exoneración si existe para este impuesto
-                                    if inv_line.exoneration_id:
-                                        monto_exonerado = round(monto_impuesto * inv_line.exoneration_id.percentage_exoneration / 100, 2)
-                                        impuestos = (impuestos + ', ' +
-                                                     '"exoneracion": { '+
-                                                     '"tipoDocumento": "'+ inv_line.exoneration_id.type + '",' +
-                                                     '"numeroDocumento": "' + str(inv_line.exoneration_id.exoneration_number) + '",' +
-                                                     '"nombreInstitucion": "' + inv_line.exoneration_id.name_institution + '",' +
-                                                     '"fechaEmision": "' + str(inv_line.exoneration_id.date) + '",' +
-                                                     '"montoImpuesto": " -' + monto_exonerado + '",' +
-                                                     '"porcentajeCompra": "' + str(inv_line.exoneration_id.percentage_exoneration) + '"}')
-                                    impuestos_acumulados += round(i.amount / 100 * inv_line.price_subtotal, 2)
-                                    impuestos = impuestos + '"},'
-                            impuestos = impuestos[:-1] + '}'
-                        else:
-                            impuestos += '}'
-
-                        # Todo: analizar bien esta lógica de impuestos acumulados, parece que todos los if hacen lo mismo
-                        if inv_line.product_id:
-                            if inv_line.product_id.type == 'service':
-                                if impuestos_acumulados:
-                                    total_servicio_gravado += inv_line.quantity * inv_line.price_unit
-                                else:
-                                    total_servicio_exento += inv_line.quantity * inv_line.price_unit
+                        if inv.payment_term_id:
+                            if inv.payment_term_id.id:
+                                sale_conditions = '0' + str(inv.payment_term_id.id) or '01'
                             else:
-                                if impuestos_acumulados == 0.0:
+                                raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para ' +
+                                                inv.partner_id.name)
+                        else:
+                            sale_conditions = '01'
+
+                        # Validate if invoice currency is the same as the company currency
+                        if inv.currency_id.name == self.company_id.currency_id.name:
+                            currency_rate = 1
+                        else:
+                            # If the invoice currency is different it is going to use exchnge rate
+                            # for Costa Rica exchange rate uses the value of 1 USD. But, Odoo uses the value of 1 CRC in USD.
+                            # So the Module Currency Costa Rica Adapter adds some fields to store the original rate value and use it where it is needed.
+                            if inv.currency_id.rate_ids and (len(inv.currency_id.rate_ids) > 0):
+                                currency_rate = inv.currency_id.rate_ids[0].original_rate
+                            else:
+                                raise UserError('No hay tipo de cambio registrado para la moneda ' + inv.currency_id.name)
+
+
+                        # Generando la clave como la especifica Hacienda
+                        response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
+                                                            inv.journal_id.terminal)
+
+                        inv.number_electronic = response_json.get('resp').get('clave')
+                        consecutivo = response_json.get('resp').get('consecutivo')
+
+                        # Generamos las líneas de la factura
+                        lines = '{'
+                        base_total = 0.0
+                        numero = 0
+                        total_servicio_gravado = 0.0
+                        total_servicio_exento = 0.0
+                        total_mercaderia_gravado = 0.0
+                        total_mercaderia_exento = 0.0
+                        for inv_line in inv.invoice_line_ids:
+                            impuestos_acumulados = 0.0
+                            numero += 1
+                            base_total += inv_line.price_unit * inv_line.quantity
+
+                            # Se generan los impuestos
+                            impuestos = '{'
+                            if inv_line.invoice_line_tax_ids:
+                                indextax = 0
+                                for i in inv_line.invoice_line_tax_ids:
+                                    indextax += 1
+                                    if i.tax_code != '00':
+                                        monto_impuesto = round(i.amount / 100 * inv_line.price_subtotal, 2)
+                                        impuestos = (impuestos + '"' + str(indextax) + '":' +
+                                                     '{"codigo": "' + str(i.tax_code or '01') + '",' +
+                                                     '"tarifa": "' + str(round(i.amount, 2)) + '",' +
+                                                     '"monto": "' + str(round(monto_impuesto, 2)))
+                                        # Se genera la exoneración si existe para este impuesto
+                                        if inv_line.exoneration_id:
+                                            monto_exonerado = round(monto_impuesto * inv_line.exoneration_id.percentage_exoneration / 100, 2)
+                                            impuestos = (impuestos + ', ' +
+                                                         '"exoneracion": { '+
+                                                         '"tipoDocumento": "'+ inv_line.exoneration_id.type + '",' +
+                                                         '"numeroDocumento": "' + str(inv_line.exoneration_id.exoneration_number) + '",' +
+                                                         '"nombreInstitucion": "' + inv_line.exoneration_id.name_institution + '",' +
+                                                         '"fechaEmision": "' + str(inv_line.exoneration_id.date) + '",' +
+                                                         '"montoImpuesto": " -' + monto_exonerado + '",' +
+                                                         '"porcentajeCompra": "' + str(inv_line.exoneration_id.percentage_exoneration) + '"}')
+                                        impuestos_acumulados += round(i.amount / 100 * inv_line.price_subtotal, 2)
+                                        impuestos = impuestos + '"},'
+                                impuestos = impuestos[:-1] + '}'
+                            else:
+                                impuestos += '}'
+
+                            # Todo: analizar bien esta lógica de impuestos acumulados, parece que todos los if hacen lo mismo
+                            if inv_line.product_id:
+                                if inv_line.product_id.type == 'service':
+                                    if impuestos_acumulados:
+                                        total_servicio_gravado += inv_line.quantity * inv_line.price_unit
+                                    else:
+                                        total_servicio_exento += inv_line.quantity * inv_line.price_unit
+                                else:
+                                    if impuestos_acumulados == 0.0:
+                                        total_mercaderia_gravado += inv_line.quantity * inv_line.price_unit
+                                    else:
+                                        total_mercaderia_exento += inv_line.quantity * inv_line.price_unit
+                            else:  # se asume que si no tiene producto se trata como un type product
+                                if impuestos_acumulados:
                                     total_mercaderia_gravado += inv_line.quantity * inv_line.price_unit
                                 else:
                                     total_mercaderia_exento += inv_line.quantity * inv_line.price_unit
-                        else:  # se asume que si no tiene producto se trata como un type product
-                            if impuestos_acumulados:
-                                total_mercaderia_gravado += inv_line.quantity * inv_line.price_unit
-                            else:
-                                total_mercaderia_exento += inv_line.quantity * inv_line.price_unit
 
-                        unidad_medida = inv_line.product_id.uom_id.code or 'Sp'
-                        total = round(inv_line.quantity * inv_line.price_unit, 2)
-                        total_linea = round(inv_line.price_subtotal + impuestos_acumulados, 2)
-                        descuento = round((inv_line.quantity * inv_line.price_unit - inv_line.price_subtotal), 2)
-                        natu_descuento = round(inv_line.discount_note, 2) or ''
+                            unidad_medida = inv_line.product_id.uom_id.code or 'Sp'
+                            total = round(inv_line.quantity * inv_line.price_unit, 2)
+                            total_linea = round(inv_line.price_subtotal + impuestos_acumulados, 2)
+                            descuento = round((inv_line.quantity * inv_line.price_unit - inv_line.price_subtotal), 2)
+                            natu_descuento = round(inv_line.discount_note, 2) or ''
 
-                        line = ('{' +
-                                '"cantidad": "' + str(int(inv_line.quantity)) + '",' +
-                                '"unidadMedida": "' + unidad_medida + '",' +
-                                '"detalle": "' + inv_line.product_id.display_name + '",' +
-                                '"precioUnitario": "' + str(round(inv_line.price_unit, 2)) + '",' +
-                                '"montoTotal": "' + str(total) + '",' +
-                                '"subtotal": "' + str(round(inv_line.price_subtotal,2)) + '",')
-                        if descuento != 0:
-                            line = (line + '"montoDescuento": "' + str(descuento) + '",' +
-                                    '"naturalezaDescuento": "' + natu_descuento + '",')
+                            line = ('{' +
+                                    '"cantidad": "' + str(int(inv_line.quantity)) + '",' +
+                                    '"unidadMedida": "' + unidad_medida + '",' +
+                                    '"detalle": "' + inv_line.product_id.display_name + '",' +
+                                    '"precioUnitario": "' + str(round(inv_line.price_unit, 2)) + '",' +
+                                    '"montoTotal": "' + str(total) + '",' +
+                                    '"subtotal": "' + str(round(inv_line.price_subtotal,2)) + '",')
+                            if descuento != 0:
+                                line = (line + '"montoDescuento": "' + str(descuento) + '",' +
+                                        '"naturalezaDescuento": "' + natu_descuento + '",')
 
-                        line = (line + '"impuesto": ' + str(impuestos) + ',' +
-                                '"montoTotalLinea": "' + str(total_linea) + '"' + '}')
+                            line = (line + '"impuesto": ' + str(impuestos) + ',' +
+                                    '"montoTotalLinea": "' + str(total_linea) + '"' + '}')
 
-                        lines = lines + '"' + str(numero) + '":' + line + ","
-                    lines = lines[:-1] + "}"
+                            lines = lines + '"' + str(numero) + '":' + line + ","
+                        lines = lines[:-1] + "}"
 
-                    response_json = functions.make_xml_invoice(inv, tipo_documento, consecutivo, date_cr,
-                                                               sale_conditions, medio_pago, round(total_servicio_gravado,2),
-                                                               round(total_servicio_exento,2), round(total_mercaderia_gravado,2),
-                                                               round(total_mercaderia_exento,2), base_total, lines,
-                                                               tipo_documento_referencia, numero_documento_referencia,
-                                                               fecha_emision_referencia,
-                                                               codigo_referencia, razon_referencia, url, currency_rate)
-                    xml = response_json.get('resp').get('xml')
+                        response_json = functions.make_xml_invoice(inv, tipo_documento, consecutivo, date_cr,
+                                                                   sale_conditions, medio_pago, round(total_servicio_gravado,2),
+                                                                   round(total_servicio_exento,2), round(total_mercaderia_gravado,2),
+                                                                   round(total_mercaderia_exento,2), base_total, lines,
+                                                                   tipo_documento_referencia, numero_documento_referencia,
+                                                                   fecha_emision_referencia,
+                                                                   codigo_referencia, razon_referencia, url, currency_rate)
+                        xml = response_json.get('resp').get('xml')
 
-                    response_json = functions.sign_xml(inv, tipo_documento, url, xml)
+                        response_json = functions.sign_xml(inv, tipo_documento, url, xml)
 
-                    xml_firmado = response_json.get('resp').get('xmlFirmado')
+                        xml_firmado = response_json.get('resp').get('xmlFirmado')
 
-                    # get token
-                    response_json = functions.token_hacienda(inv, inv.company_id.frm_ws_ambiente, url)
-                    token_m_h = response_json.get('resp').get('access_token')
+                        # get token
+                        response_json = functions.token_hacienda(inv, inv.company_id.frm_ws_ambiente, url)
+                        token_m_h = response_json.get('resp').get('access_token')
 
-                    response_json = functions.send_file(inv, token_m_h, date_cr, xml_firmado, inv.company_id.frm_ws_ambiente, url)
+                        response_json = functions.send_file(inv, token_m_h, date_cr, xml_firmado, inv.company_id.frm_ws_ambiente, url)
 
-                    # If everything went fine assign the consecutive number to the invoice
-                    inv.number = consecutivo
+                        # If everything went fine assign the consecutive number to the invoice
+                        inv.number = consecutivo
 
-                    if response_json.get('resp').get('Status') == 202:
-                        functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
+                        if response_json.get('resp').get('Status') == 202:
+                            functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
+                        else:
+                            raise UserError(
+                                'No se pudo Crear la factura electrónica: \n' + str(response_json.get('resp').get('text')))
+
                     else:
-                        raise UserError(
-                            'No se pudo Crear la factura electrónica: \n' + str(response_json.get('resp').get('text')))
-
-                else:
-                    raise UserError('El consecutivo del documento debe ser un número con un máximo de 10 dígitos, por favor revise la secuencia en la configuración')
+                        raise UserError('El consecutivo del documento debe ser un número con un máximo de 10 dígitos, por favor revise la secuencia en la configuración')
 

@@ -21,8 +21,7 @@ class PosConfig(models.Model):
             pos.ticket_hacienda_number = (
                 seq.next_by_code('pos.config.ticket_hacienda'))
 
-            pos.ticket_hacienda_prefix = (
-                seq.prefix)
+            pos.ticket_hacienda_prefix = seq.prefix
             pos.ticket_hacienda_padding = seq.padding
 
     iface_ticket_hacienda = fields.Boolean(
@@ -77,17 +76,16 @@ class PosConfig(models.Model):
     def write(self, vals):
         if not self._context.get('copy_pos_config') and 'name' not in vals:
             for pos in self:
-                pos.ticket_hacienda_sequence_id\
-                    .check_ticket_hacienda_unique_prefix()
+                pos.ticket_hacienda_sequence_id.check_ticket_hacienda_unique_prefix()
         if 'name' in vals:
-            prefix = self.ticket_hacienda_prefix.replace(
-                self.name, vals['name'])
-            if prefix != self.ticket_hacienda_prefix:
-                self.ticket_hacienda_sequence_id.update({
-                    'prefix': prefix,
-                    'name': (self.ticket_hacienda_sequence_id
-                             .name.replace(self.name, vals['name'])),
-                })
+            if self.ticket_hacienda_prefix :
+                prefix = self.ticket_hacienda_prefix.replace(self.name, vals['name'])
+                if prefix != self.ticket_hacienda_prefix:
+                    self.ticket_hacienda_sequence_id.update({
+                        'prefix': prefix,
+                        'name': (self.ticket_hacienda_sequence_id
+                                 .name.replace(self.name, vals['name'])),
+                    })
         return super(PosConfig, self).write(vals)
 
     def unlink(self):
