@@ -179,11 +179,19 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
             attachment = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
                  ('res_field', '=', 'xml_comprobante')], limit=1)
+
             attachment.name = inv.fname_xml_comprobante
             attachment.datas_fname = inv.fname_xml_comprobante
+
+            attachment_resp = self.env['ir.attachment'].search(
+                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+                 ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+            attachment_resp.name = inv.fname_xml_respuesta_tributacion
+            attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+
             email_template.attachment_ids = [(6, 0, [attachment.id])]  # [(4, attachment.id)]
             email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
                                                                                         raise_exception=False,
                                                                                         force_send=True)  # default_type='binary'
             email_template.attachment_ids = [(3, attachment.id)]
-
+            email_template.attachment_ids = [(4, attachment_resp.id)]
