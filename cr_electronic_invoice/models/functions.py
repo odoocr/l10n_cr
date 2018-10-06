@@ -4,7 +4,7 @@ import requests
 import re
 import random
 
-def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
+def get_clave(self, url, tipo_documento, consecutivo, sucursal_id, terminal_id):
     payload = {}
     headers = {}
     # get Clave MH
@@ -17,7 +17,7 @@ def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload['tipoDocumento'] = tipo_documento
     payload['cedula'] = self.company_id.vat
     payload['codigoPais'] = self.company_id.phone_code
-    payload['consecutivo'] = next_number
+    payload['consecutivo'] = consecutivo
     payload['situacion'] = 'normal'
     payload['codigoSeguridad'] = str(random.randint(1, 99999999))
     payload['sucursal'] = sucursal_id

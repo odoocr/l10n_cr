@@ -437,7 +437,7 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             if inv.xml_supplier_approval:
                 url = self.company_id.frm_callback_url
-                root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(inv.xml_supplier_approval), count=1))
+                root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(inv.xml_supplier_approval).decode("utf-8"), count=1))
                 if not inv.state_invoice_partner:
                     raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
                 if float(root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text) == inv.amount_total:
@@ -446,11 +446,12 @@ class AccountInvoiceElectronic(models.Model):
                             detalle_mensaje = 'Aceptado'
                             tipo = 1
                             tipo_documento = 'CCE'
-                        if inv.state_invoice_partner == '2':
+                        elif inv.state_invoice_partner == '2':
                             detalle_mensaje = 'Aceptado parcial'
                             tipo = 2
                             tipo_documento = 'CPCE'
-                        if inv.state_invoice_partner == '3':
+                        #if inv.state_invoice_partner == '3':
+                        else:
                             detalle_mensaje = 'Rechazado'
                             tipo = 3
                             tipo_documento = 'RCE'
@@ -458,11 +459,10 @@ class AccountInvoiceElectronic(models.Model):
                         now_utc = datetime.datetime.now(pytz.timezone('UTC'))
                         now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
                         date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                        next_number = self.env['ir.sequence'].next_by_code('acceptance_message')
                         payload = {}
                         headers = {}
 
-                        response_json = self.get_clave(url, tipo_documento, next_number)
+                        response_json = functions.get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
                         consecutivo_receptor = response_json.get('resp').get('consecutivo')
 
                         payload['w'] = 'genXML'
@@ -472,8 +472,7 @@ class AccountInvoiceElectronic(models.Model):
                         payload['fecha_emision_doc'] = root.findall('FechaEmision')[0].text
                         payload['mensaje'] = tipo
                         payload['detalle_mensaje'] = detalle_mensaje
-                        payload['monto_total_impuesto'] = root.findall('ResumenFactura')[0].findall('TotalImpuesto')[
-                            0].text
+                        payload['monto_total_impuesto'] = root.findall('ResumenFactura')[0].findall('TotalImpuesto')[0].text
                         payload['total_factura'] = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
                         payload['numero_cedula_receptor'] = inv.company_id.vat
                         payload['numero_consecutivo_receptor'] = consecutivo_receptor
@@ -562,11 +561,20 @@ class AccountInvoiceElectronic(models.Model):
                              ('res_field', '=', 'xml_comprobante')], limit=1)
                         attachment.name = i.fname_xml_comprobante
                         attachment.datas_fname = i.fname_xml_comprobante
-                        email_template.attachment_ids = [(6, 0, [attachment.id])]  # [(4, attachment.id)]
+
+                        attachment_resp = self.env['ir.attachment'].search(
+                            [('res_model', '=', 'account.invoice'), ('res_id', '=', i.id),
+                             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+                        attachment_resp.name = i.fname_xml_respuesta_tributacion
+                        attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
+
+                        email_template.attachment_ids = [(6, 0, [attachment.id])]
+                        email_template.attachment_ids = [(3, attachment.id)]
+                        email_template.attachment_ids = [(4, attachment_resp.id)]
+
                         email_template.with_context(type='binary', default_type='binary').send_mail(i.id,
                                                                                                     raise_exception=False,
                                                                                                     force_send=True)  # default_type='binary'
-                        email_template.attachment_ids = [(3, attachment.id)]
 
                 elif estado_m_h == 'rechazado':
                     i.state_tributacion = estado_m_h
@@ -589,6 +597,7 @@ class AccountInvoiceElectronic(models.Model):
 
             for inv in self:
                 if(inv.journal_id.type == 'sale'):
+
                     if inv.number.isdigit() and (len(inv.number) <= 10):
                         tipo_documento = ''
                         tipo_documento_referencia = ''
