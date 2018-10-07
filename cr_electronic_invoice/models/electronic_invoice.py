@@ -450,7 +450,6 @@ class AccountInvoiceElectronic(models.Model):
                             detalle_mensaje = 'Aceptado parcial'
                             tipo = 2
                             tipo_documento = 'CPCE'
-                        #if inv.state_invoice_partner == '3':
                         else:
                             detalle_mensaje = 'Rechazado'
                             tipo = 3
@@ -491,7 +490,23 @@ class AccountInvoiceElectronic(models.Model):
 
                         token_m_h = response_json.get('resp').get('access_token')
 
-                        response_json = functions.send_file(inv, token_m_h, date_cr, xml_firmado, env, url)
+                        headers = {}
+                        payload = {}
+                        payload['w'] = 'send'
+                        payload['r'] = 'sendMensaje'
+                        payload['token'] = token_m_h
+                        payload['clave'] = inv.number_electronic
+                        payload['fecha'] = date_cr
+                        payload['emi_tipoIdentificacion'] = inv.company_id.identification_id.code
+                        payload['emi_numeroIdentificacion'] = inv.company_id.vat
+                        payload['recp_tipoIdentificacion'] = inv.partner_id.identification_id.code
+                        payload['recp_numeroIdentificacion'] = inv.partner_id.vat
+                        payload['comprobanteXml'] = xml
+                        payload['client_id'] = env
+                        payload['consecutivoReceptor'] = consecutivo_receptor
+
+                        response = requests.request("POST", url, data=payload, headers=headers)
+                        response_json = response.json()
 
                         if response_json.get('resp').get('Status') == 202:
                             functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
