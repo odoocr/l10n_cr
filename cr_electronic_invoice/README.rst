@@ -6,7 +6,7 @@
 Facturación electrónica Costa Rica
 ==================================
 
-This module includes these functionalities to adapt Odoo for Costa Rica Electronic Invoice regulations 
+This module includes these functions to adapt Odoo for Costa Rica Electronic Invoice regulations
 
 
 Installation

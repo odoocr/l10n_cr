@@ -160,8 +160,6 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     response_json = response.json()
     estado_m_h = response_json.get('resp').get('ind-estado')
 
-
-
     # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
     # se carga el xml devuelto por Hacienda
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
@@ -183,13 +181,10 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
     if estado_m_h == 'aceptado':
         if not inv.partner_id.opt_out:
-            email_template = self.env.ref('account.email_template_edi_invoice', False)
-
-            attachment = self.env['ir.attachment'].search(
-                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
-                 ('res_field', '=', 'xml_comprobante')], limit=1)
-            attachment.name = inv.fname_xml_comprobante
-            attachment.datas_fname = inv.fname_xml_comprobante
+            if inv.type == 'in_invoice' or inv.type == 'in_refund':
+                email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
+            else:
+                email_template = self.env.ref('account.email_template_edi_invoice', False)
 
             attachment_resp = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
@@ -197,10 +192,17 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
             attachment_resp.name = inv.fname_xml_respuesta_tributacion
             attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
 
-            email_template.attachment_ids = [(6, 0, [attachment.id])]  # [(4, attachment.id)]
-            email_template.attachment_ids = [(4, 0, [attachment_resp.id])]
+            attachment = self.env['ir.attachment'].search(
+                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+                 ('res_field', '=', 'xml_comprobante')], limit=1)
+            attachment.name = inv.fname_xml_comprobante
+            attachment.datas_fname = inv.fname_xml_comprobante
+
+            email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
 
             email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
                                                                                         raise_exception=False,
                                                                                         force_send=True)  # default_type='binary'
 
+            # limpia el template de los attachments
+            email_template.attachment_ids = [(6, 0, [])]
