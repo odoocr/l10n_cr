@@ -423,6 +423,8 @@
 							<field name="state_invoice_partner"/>
 							<field name="date_issuance" readonly="1"/>
 							<field name="number_electronic" readonly="1"/>
+							<field name="fname_xml_comprobante" invisible="1" readonly="1"/>
+							<field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
 							<field name="state_send_invoice" readonly="1"/>
 							<field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
 							<field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
