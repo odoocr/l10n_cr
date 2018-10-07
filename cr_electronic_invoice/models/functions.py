@@ -160,15 +160,20 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     response_json = response.json()
     estado_m_h = response_json.get('resp').get('ind-estado')
 
-    # Se actualiza el estado con el que devuelve Hacienda
-    inv.state_tributacion = estado_m_h
+
 
     # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
     # se carga el xml devuelto por Hacienda
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
+        # Se actualiza el estado con el que devuelve Hacienda
+        inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
         inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
         inv.xml_comprobante = xml_firmado
+    elif inv.type == 'in_invoice' or inv.type == 'in_refund':
+        inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
+        inv.xml_comprobante = xml_firmado
+        inv.state_send_invoice = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (inv.type == 'out_invoice'  or inv.type == 'out_refund'):
@@ -176,9 +181,10 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
-    if estado_m_h == 'aceptado' and (inv.type == 'out_invoice' or inv.type == 'out_refund'):
+    if estado_m_h == 'aceptado':
         if not inv.partner_id.opt_out:
             email_template = self.env.ref('account.email_template_edi_invoice', False)
+
             attachment = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
                  ('res_field', '=', 'xml_comprobante')], limit=1)
@@ -192,8 +198,9 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
             attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
 
             email_template.attachment_ids = [(6, 0, [attachment.id])]  # [(4, attachment.id)]
+            email_template.attachment_ids = [(4, 0, [attachment_resp.id])]
+
             email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
                                                                                         raise_exception=False,
                                                                                         force_send=True)  # default_type='binary'
-            email_template.attachment_ids = [(3, attachment.id)]
-            email_template.attachment_ids = [(4, attachment_resp.id)]
+
