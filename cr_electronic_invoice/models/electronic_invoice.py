@@ -583,13 +583,13 @@ class AccountInvoiceElectronic(models.Model):
                         attachment_resp.name = i.fname_xml_respuesta_tributacion
                         attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
 
-                        email_template.attachment_ids = [(6, 0, [attachment.id])]
-                        email_template.attachment_ids = [(3, attachment.id)]
-                        email_template.attachment_ids = [(4, attachment_resp.id)]
+                        email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
 
                         email_template.with_context(type='binary', default_type='binary').send_mail(i.id,
                                                                                                     raise_exception=False,
                                                                                                     force_send=True)  # default_type='binary'
+
+                        email_template.attachment_ids = [(5)]
 
                 elif estado_m_h == 'rechazado':
                     i.state_tributacion = estado_m_h
