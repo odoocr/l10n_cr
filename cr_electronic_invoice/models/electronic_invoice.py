@@ -535,6 +535,7 @@ class AccountInvoiceElectronic(models.Model):
                 message = _("This %s has been created from: <a href=# data-oe-model=account.invoice data-oe-id=%d>%s</a>") % (
                               invoice_type[invoice.type], invoice.id, invoice.number)
                 refund_invoice.message_post(body=message)
+                refund_invoice.payment_methods_id = invoice.payment_methods_id
                 new_invoices += refund_invoice
             return new_invoices
 
