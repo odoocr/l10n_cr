@@ -493,11 +493,34 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_tree"/>
 			<field name="arch" type="xml">
+				<tree position="attributes">
+					<attribute name="decoration-danger">
+					 	state_tributacion == 'rechazado'
+					</attribute>
+				</tree>
 				<field name="state" position="before">
 					<field name="state_tributacion"/>
 				</field>
 			</field>
 		</record>
+
+		<record id="invoice_supplier_tree_tree_inherit" model="ir.ui.view">
+			<field name="name">account.invoice.tree.inherit</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_supplier_tree"/>
+			<field name="arch" type="xml">
+				<tree position="attributes">
+					<attribute name="decoration-danger">
+					 	state_send_invoice == 'rechazado'
+					</attribute>
+				</tree>
+				<field name="state" position="before">
+					<field name="state_send_invoice" string="Estado FE"/>
+				</field>
+			</field>
+		</record>
+
+
 
 		<record id="res_config_settings_view_form_inherit_account_invoicing_fecr" model="ir.ui.view">
 			<field name="name">res.config.settings.view.form.inherit.account.invoicing.fecr</field>
