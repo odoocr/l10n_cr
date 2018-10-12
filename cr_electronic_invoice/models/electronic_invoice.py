@@ -440,79 +440,79 @@ class AccountInvoiceElectronic(models.Model):
                 root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(inv.xml_supplier_approval).decode("utf-8"), count=1))
                 if not inv.state_invoice_partner:
                     raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
-                if float(root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text) == inv.amount_total:
-                    if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
-                        if inv.state_invoice_partner == '1':
-                            detalle_mensaje = 'Aceptado'
-                            tipo = 1
-                            tipo_documento = 'CCE'
-                        elif inv.state_invoice_partner == '2':
-                            detalle_mensaje = 'Aceptado parcial'
-                            tipo = 2
-                            tipo_documento = 'CPCE'
-                        else:
-                            detalle_mensaje = 'Rechazado'
-                            tipo = 3
-                            tipo_documento = 'RCE'
+#                if float(root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text) == inv.amount_total:
+                if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
+                    if inv.state_invoice_partner == '1':
+                        detalle_mensaje = 'Aceptado'
+                        tipo = 1
+                        tipo_documento = 'CCE'
+                    elif inv.state_invoice_partner == '2':
+                        detalle_mensaje = 'Aceptado parcial'
+                        tipo = 2
+                        tipo_documento = 'CPCE'
+                    else:
+                        detalle_mensaje = 'Rechazado'
+                        tipo = 3
+                        tipo_documento = 'RCE'
 
-                        now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                        now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                        date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                        payload = {}
-                        headers = {}
+                    now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+                    now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+                    date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+                    payload = {}
+                    headers = {}
 
-                        response_json = functions.get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
-                        consecutivo_receptor = response_json.get('resp').get('consecutivo')
+                    response_json = functions.get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
+                    consecutivo_receptor = response_json.get('resp').get('consecutivo')
 
-                        payload['w'] = 'genXML'
-                        payload['r'] = 'gen_xml_mr'
-                        payload['clave'] = inv.number_electronic
-                        payload['numero_cedula_emisor'] = root.findall('Emisor')[0].find('Identificacion')[1].text
-                        payload['fecha_emision_doc'] = root.findall('FechaEmision')[0].text
-                        payload['mensaje'] = tipo
-                        payload['detalle_mensaje'] = detalle_mensaje
-                        payload['monto_total_impuesto'] = root.findall('ResumenFactura')[0].findall('TotalImpuesto')[0].text
-                        payload['total_factura'] = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
-                        payload['numero_cedula_receptor'] = inv.company_id.vat
-                        payload['numero_consecutivo_receptor'] = consecutivo_receptor
+                    payload['w'] = 'genXML'
+                    payload['r'] = 'gen_xml_mr'
+                    payload['clave'] = inv.number_electronic
+                    payload['numero_cedula_emisor'] = root.findall('Emisor')[0].find('Identificacion')[1].text
+                    payload['fecha_emision_doc'] = root.findall('FechaEmision')[0].text
+                    payload['mensaje'] = tipo
+                    payload['detalle_mensaje'] = detalle_mensaje
+                    payload['monto_total_impuesto'] = root.findall('ResumenFactura')[0].findall('TotalImpuesto')[0].text
+                    payload['total_factura'] = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
+                    payload['numero_cedula_receptor'] = inv.company_id.vat
+                    payload['numero_consecutivo_receptor'] = consecutivo_receptor
 
-                        response = requests.request("POST", url, data=payload, headers=headers)
-                        response_json = response.json()
+                    response = requests.request("POST", url, data=payload, headers=headers)
+                    response_json = response.json()
 
-                        xml = response_json.get('resp').get('xml')
+                    xml = response_json.get('resp').get('xml')
 
-                        response_json = functions.sign_xml(inv, tipo_documento, url, xml)
-                        xml_firmado = response_json.get('resp').get('xmlFirmado')
+                    response_json = functions.sign_xml(inv, tipo_documento, url, xml)
+                    xml_firmado = response_json.get('resp').get('xmlFirmado')
 
-                        env = inv.company_id.frm_ws_ambiente
+                    env = inv.company_id.frm_ws_ambiente
 
-                        response_json = functions.token_hacienda(inv, env, url)
+                    response_json = functions.token_hacienda(inv, env, url)
 
-                        token_m_h = response_json.get('resp').get('access_token')
+                    token_m_h = response_json.get('resp').get('access_token')
 
-                        headers = {}
-                        payload = {}
-                        payload['w'] = 'send'
-                        payload['r'] = 'sendMensaje'
-                        payload['token'] = token_m_h
-                        payload['clave'] = inv.number_electronic
-                        payload['fecha'] = date_cr
-                        payload['emi_tipoIdentificacion'] = inv.company_id.identification_id.code
-                        payload['emi_numeroIdentificacion'] = inv.company_id.vat
-                        payload['recp_tipoIdentificacion'] = inv.partner_id.identification_id.code
-                        payload['recp_numeroIdentificacion'] = inv.partner_id.vat
-                        payload['comprobanteXml'] = xml
-                        payload['client_id'] = env
-                        payload['consecutivoReceptor'] = consecutivo_receptor
+                    headers = {}
+                    payload = {}
+                    payload['w'] = 'send'
+                    payload['r'] = 'sendMensaje'
+                    payload['token'] = token_m_h
+                    payload['clave'] = inv.number_electronic
+                    payload['fecha'] = date_cr
+                    payload['emi_tipoIdentificacion'] = inv.company_id.identification_id.code
+                    payload['emi_numeroIdentificacion'] = inv.company_id.vat
+                    payload['recp_tipoIdentificacion'] = inv.partner_id.identification_id.code
+                    payload['recp_numeroIdentificacion'] = inv.partner_id.vat
+                    payload['comprobanteXml'] = xml
+                    payload['client_id'] = env
+                    payload['consecutivoReceptor'] = consecutivo_receptor
 
-                        response = requests.request("POST", url, data=payload, headers=headers)
-                        response_json = response.json()
+                    response = requests.request("POST", url, data=payload, headers=headers)
+                    response_json = response.json()
 
-                        if response_json.get('resp').get('Status') == 202:
-                            functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
-                else:
-                    raise UserError(
-                        'Error!.\nEl monto total de la factura no coincide con el monto total del archivo XML')
+                    if response_json.get('resp').get('Status') == 202:
+                        functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
+#                else:
+#                    raise UserError(
+#                        'Error!.\nEl monto total de la factura no coincide con el monto total del archivo XML')
 
     @api.multi
     @api.returns('self')
