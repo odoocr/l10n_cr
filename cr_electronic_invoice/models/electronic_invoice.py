@@ -510,6 +510,8 @@ class AccountInvoiceElectronic(models.Model):
 
                     if response_json.get('resp').get('Status') == 202:
                         functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
+                    elif response_json.get('resp').get('Status') == 400:
+                        raise UserError('Error!.\n'+response_json.get('resp').get('X-Error-Cause'))
 #                else:
 #                    raise UserError(
 #                        'Error!.\nEl monto total de la factura no coincide con el monto total del archivo XML')
@@ -790,5 +792,5 @@ class AccountInvoiceElectronic(models.Model):
                                 'No se pudo Crear la factura electrónica: \n' + str(response_json.get('resp').get('text')))
 
                     else:
-                        raise UserError('El consecutivo del documento debe ser un número con un máximo de 10 dígitos, por favor revise la secuencia en la configuración')
+                        raise UserError('Debe configurar correctamente la secuencia del documento')
 
