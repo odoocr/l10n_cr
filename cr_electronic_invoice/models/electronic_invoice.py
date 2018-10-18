@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
-from odoo.tools.safe_eval import safe_eval
-from . import functions
-
 import requests
 import logging
 import re
 import datetime
 import pytz
 import base64
+import json
 import xml.etree.ElementTree as ET
 from dateutil.parser import parse
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
+from . import functions
+
 
 _logger = logging.getLogger(__name__)
 
@@ -173,7 +174,6 @@ class Exoneration(models.Model):
     name_institution = fields.Char(string="Nombre de institución", required=False, )
     date = fields.Date(string="Fecha", required=False, )
     percentage_exoneration = fields.Float(string="Porcentaje de exoneración", required=False, )
-
 
 class PaymentMethods(models.Model):
     _name = "payment.methods"
@@ -625,6 +625,7 @@ class AccountInvoiceElectronic(models.Model):
                         razon_referencia = ''
                         medio_pago = inv.payment_methods_id.sequence or '01'
                         next_number = inv.number
+
                         # Es Factura de cliente o nota de débito
                         if inv.type == 'out_invoice':
                             if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
@@ -681,46 +682,63 @@ class AccountInvoiceElectronic(models.Model):
                         consecutivo = response_json.get('resp').get('consecutivo')
 
                         # Generamos las líneas de la factura
-                        lines = '{'
+                        lines = dict()
                         base_total = 0.0
-                        numero = 0
+                        line_number = 0
                         total_servicio_gravado = 0.0
                         total_servicio_exento = 0.0
                         total_mercaderia_gravado = 0.0
                         total_mercaderia_exento = 0.0
+
                         for inv_line in inv.invoice_line_ids:
                             impuestos_acumulados = 0.0
-                            numero += 1
+                            line_number += 1
                             base_total += inv_line.price_unit * inv_line.quantity
+                            descuento = round((inv_line.quantity * inv_line.price_unit - inv_line.price_subtotal), 2)
+
+                            line = dict()
+                            line["cantidad"] = str(int(inv_line.quantity))
+                            line["unidadMedida"] = inv_line.product_id.uom_id.code or 'Sp'
+                            line["detalle"] = inv_line.product_id.display_name
+                            line["precioUnitario"] = str(round(inv_line.price_unit, 2))
+                            line["montoTotal"] = str(round(inv_line.quantity * inv_line.price_unit, 2))
+                            line["subtotal"] = str(round(inv_line.price_subtotal,2))
+
+                            if descuento != 0:
+                                line["montoDescuento"] = str(descuento)
+                                line["naturalezaDescuento"] = round(inv_line.discount_note, 2) or ''
 
                             # Se generan los impuestos
-                            impuestos = '{'
+                            taxes = dict()
                             if inv_line.invoice_line_tax_ids:
-                                indextax = 0
+                                tax_index = 0
                                 for i in inv_line.invoice_line_tax_ids:
-                                    indextax += 1
                                     if i.tax_code != '00':
-                                        monto_impuesto = round(i.amount / 100 * inv_line.price_subtotal, 2)
-                                        impuestos = (impuestos + '"' + str(indextax) + '":' +
-                                                     '{"codigo": "' + str(i.tax_code or '01') + '",' +
-                                                     '"tarifa": "' + str(round(i.amount, 2)) + '",' +
-                                                     '"monto": "' + str(round(monto_impuesto, 2)))
+                                        tax_index += 1
+                                        tax_amount = round(i.amount / 100 * inv_line.price_subtotal, 2)
+
+                                        tax = dict()
+                                        tax["codigo"] = str(i.tax_code or '01')
+                                        tax["tarifa"] = str(round(i.amount, 2))
+                                        tax["monto"] = str(tax_amount)
+
                                         # Se genera la exoneración si existe para este impuesto
                                         if inv_line.exoneration_id:
-                                            monto_exonerado = round(monto_impuesto * inv_line.exoneration_id.percentage_exoneration / 100, 2)
-                                            impuestos = (impuestos + ', ' +
-                                                         '"exoneracion": { '+
-                                                         '"tipoDocumento": "'+ inv_line.exoneration_id.type + '",' +
-                                                         '"numeroDocumento": "' + str(inv_line.exoneration_id.exoneration_number) + '",' +
-                                                         '"nombreInstitucion": "' + inv_line.exoneration_id.name_institution + '",' +
-                                                         '"fechaEmision": "' + str(inv_line.exoneration_id.date) + '",' +
-                                                         '"montoImpuesto": " -' + monto_exonerado + '",' +
-                                                         '"porcentajeCompra": "' + str(inv_line.exoneration_id.percentage_exoneration) + '"}')
-                                        impuestos_acumulados += round(i.amount / 100 * inv_line.price_subtotal, 2)
-                                        impuestos = impuestos + '"},'
-                                impuestos = impuestos[:-1] + '}'
-                            else:
-                                impuestos += '}'
+                                            exoneration = dict()
+                                            exoneration["tipoDocumento"] = inv_line.exoneration_id.type
+                                            exoneration["numeroDocumento"] = str(inv_line.exoneration_id.exoneration_number)
+                                            exoneration["nombreInstitucion"] = inv_line.exoneration_id.name_institution
+                                            exoneration["fechaEmision"] = str(inv_line.exoneration_id.date) + 'T00:00:00-06:00'
+                                            exoneration["montoImpuesto"] = str(round(tax_amount * inv_line.exoneration_id.percentage_exoneration / 100, 2))
+                                            exoneration["porcentajeCompra"] = str(int(inv_line.exoneration_id.percentage_exoneration))
+
+                                            tax["exoneracion"] = exoneration
+
+                                        taxes[str(tax_index)] = tax
+
+                                        impuestos_acumulados += i.amount / 100 * inv_line.price_subtotal
+
+                            line["impuesto"] = taxes
 
                             # Todo: analizar bien esta lógica de impuestos acumulados, parece que todos los if hacen lo mismo
                             if inv_line.product_id:
@@ -740,40 +758,19 @@ class AccountInvoiceElectronic(models.Model):
                                 else:
                                     total_mercaderia_exento += inv_line.quantity * inv_line.price_unit
 
-                            unidad_medida = inv_line.product_id.uom_id.code or 'Sp'
-                            total = round(inv_line.quantity * inv_line.price_unit, 2)
-                            total_linea = round(inv_line.price_subtotal + impuestos_acumulados, 2)
-                            descuento = round((inv_line.quantity * inv_line.price_unit - inv_line.price_subtotal), 2)
-                            natu_descuento = round(inv_line.discount_note, 2) or ''
+                            line["montoTotalLinea"] = str(round(inv_line.price_subtotal + impuestos_acumulados, 2))
 
-                            line = ('{' +
-                                    '"cantidad": "' + str(int(inv_line.quantity)) + '",' +
-                                    '"unidadMedida": "' + unidad_medida + '",' +
-                                    '"detalle": "' + inv_line.product_id.display_name + '",' +
-                                    '"precioUnitario": "' + str(round(inv_line.price_unit, 2)) + '",' +
-                                    '"montoTotal": "' + str(total) + '",' +
-                                    '"subtotal": "' + str(round(inv_line.price_subtotal,2)) + '",')
-                            if descuento != 0:
-                                line = (line + '"montoDescuento": "' + str(descuento) + '",' +
-                                        '"naturalezaDescuento": "' + natu_descuento + '",')
-
-                            line = (line + '"impuesto": ' + str(impuestos) + ',' +
-                                    '"montoTotalLinea": "' + str(total_linea) + '"' + '}')
-
-                            lines = lines + '"' + str(numero) + '":' + line + ","
-                        lines = lines[:-1] + "}"
+                            lines[str(line_number)] = line
 
                         response_json = functions.make_xml_invoice(inv, tipo_documento, consecutivo, date_cr,
-                                                                   sale_conditions, medio_pago, round(total_servicio_gravado,2),
-                                                                   round(total_servicio_exento,2), round(total_mercaderia_gravado,2),
-                                                                   round(total_mercaderia_exento,2), base_total, lines,
+                                                                   sale_conditions, medio_pago, round(total_servicio_gravado, 2),
+                                                                   round(total_servicio_exento, 2), round(total_mercaderia_gravado, 2),
+                                                                   round(total_mercaderia_exento, 2), base_total, json.dumps(lines, ensure_ascii=False),
                                                                    tipo_documento_referencia, numero_documento_referencia,
                                                                    fecha_emision_referencia,
                                                                    codigo_referencia, razon_referencia, url, currency_rate)
                         xml = response_json.get('resp').get('xml')
-
                         response_json = functions.sign_xml(inv, tipo_documento, url, xml)
-
                         xml_firmado = response_json.get('resp').get('xmlFirmado')
 
                         # get token

@@ -596,42 +596,49 @@
 			<field name="view_mode">tree,form</field>
 			<!--<field name="search_view_id" ref="view_account_invoice_filter"/>-->
 		</record>
+
 		<record id="action_sale_conditions" model="ir.actions.act_window">
 			<field name="name">Condiciones de Venta</field>
 			<field name="res_model">sale.conditions</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_reference_document" model="ir.actions.act_window">
 			<field name="name">Documentos de referencia</field>
 			<field name="res_model">reference.document</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_reference_code" model="ir.actions.act_window">
 			<field name="name">Código de Referencia</field>
 			<field name="res_model">reference.code</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_resolution" model="ir.actions.act_window">
 			<field name="name">Resoluciones</field>
 			<field name="res_model">resolution</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_identification_type" model="ir.actions.act_window">
 			<field name="name">Tipo de identificación</field>
 			<field name="res_model">identification.type</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_exoneration" model="ir.actions.act_window">
 			<field name="name">Exoneración</field>
 			<field name="res_model">exoneration</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_code_type_product" model="ir.actions.act_window">
 			<field name="name">Tipos de códigos</field>
 			<field name="res_model">code.type.product</field>
