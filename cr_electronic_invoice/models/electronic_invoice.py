@@ -403,9 +403,9 @@ class AccountInvoiceElectronic(models.Model):
             if not root.findall('Emisor')[0].findall('Identificacion')[0].findall('Numero'):
                 return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
                                                                                'message': 'El archivo xml no contiene el nodo Numero. Por favor cargue un archivo con el formato correcto.'}}
-            if not (root.findall('ResumenFactura') and root.findall('ResumenFactura')[0].findall('TotalImpuesto')):
-                return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-                                                                               'message': 'No se puede localizar el nodo TotalImpuesto. Por favor cargue un archivo con el formato correcto.'}}
+            # if not (root.findall('ResumenFactura') and root.findall('ResumenFactura')[0].findall('TotalImpuesto')):
+            #     return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
+            #                                                                    'message': 'No se puede localizar el nodo TotalImpuesto. Por favor cargue un archivo con el formato correcto.'}}
             if not (root.findall('ResumenFactura') and root.findall('ResumenFactura')[0].findall('TotalComprobante')):
                 return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
                                                                                'message': 'No se puede localizar el nodo TotalComprobante. Por favor cargue un archivo con el formato correcto.'}}
@@ -429,7 +429,9 @@ class AccountInvoiceElectronic(models.Model):
                     1].text + ' no existe. Por favor creelo primero en el sistema.')
 
             self.reference = self.number_electronic[21:41]
-            self.amount_tax_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalImpuesto')[0].text
+            tax_node = root.findall('ResumenFactura')[0].findall('TotalImpuesto')
+            if tax_node:
+                self.amount_tax_electronic_invoice = tax_node[0].text
             self.amount_total_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
 
     @api.multi
@@ -471,7 +473,9 @@ class AccountInvoiceElectronic(models.Model):
                     payload['fecha_emision_doc'] = root.findall('FechaEmision')[0].text
                     payload['mensaje'] = tipo
                     payload['detalle_mensaje'] = detalle_mensaje
-                    payload['monto_total_impuesto'] = root.findall('ResumenFactura')[0].findall('TotalImpuesto')[0].text
+                    tax_node = root.findall('ResumenFactura')[0].findall('TotalImpuesto')
+                    if tax_node:
+                        payload['monto_total_impuesto'] = tax_node[0].text
                     payload['total_factura'] = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
                     payload['numero_cedula_receptor'] = inv.company_id.vat
                     payload['numero_consecutivo_receptor'] = consecutivo_receptor
@@ -510,8 +514,10 @@ class AccountInvoiceElectronic(models.Model):
 
                     if response_json.get('resp').get('Status') == 202:
                         functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
+                    elif response_json.get('resp').get('Status') == 200:
+                        raise UserError('Error!.\n' + response_json.get('resp').get('text'))
                     elif response_json.get('resp').get('Status') == 400:
-                        raise UserError('Error!.\n'+response_json.get('resp').get('X-Error-Cause'))
+                        raise UserError('Error!.\n'+response_json.get('resp').get('text')[17])
 #                else:
 #                    raise UserError(
 #                        'Error!.\nEl monto total de la factura no coincide con el monto total del archivo XML')
@@ -600,6 +606,17 @@ class AccountInvoiceElectronic(models.Model):
                     i.xml_respuesta_tributacion = responsejson.get('resp').get('respuesta-xml')
                 elif estado_m_h == 'error':
                     i.state_tributacion = estado_m_h
+
+    @api.multi
+    def action_consultar_hacienda(self):
+        if self.company_id.frm_ws_ambiente != 'disabled':
+
+            for inv in self:
+
+                response_json = functions.token_hacienda(inv, inv.company_id.frm_ws_ambiente, self.company_id.frm_callback_url)
+                token_m_h = response_json.get('resp').get('access_token')
+
+                functions.consulta_documentos(self, inv, self.company_id.frm_ws_ambiente, token_m_h, self.company_id.frm_callback_url, False, False)
 
     @api.multi
     def action_invoice_open(self):
