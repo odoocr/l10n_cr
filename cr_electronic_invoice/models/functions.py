@@ -165,13 +165,17 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
         inv.state_tributacion = estado_m_h
-        inv.date_issuance = date_cr
-        inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-        inv.xml_comprobante = xml_firmado
+        if date_cr:
+            inv.date_issuance = date_cr
+        if xml_firmado:
+            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
+            inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
-        inv.xml_comprobante = xml_firmado
         inv.state_send_invoice = estado_m_h
+        if xml_firmado:
+            inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
+            inv.xml_comprobante = xml_firmado
+
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (inv.type == 'out_invoice'  or inv.type == 'out_refund'):
@@ -179,7 +183,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
-    if estado_m_h == 'aceptado':
+    if estado_m_h == 'aceptado' and xml_firmado:
         if not inv.partner_id.opt_out:
             if inv.type == 'in_invoice' or inv.type == 'in_refund':
                 email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)

@@ -418,6 +418,7 @@
 							<field name="xml_supplier_approval" filename="fname_xml_supplier_approval"/>
 							<button name="charge_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':[('state','!=','draft')]}"/>
 							<button name="send_xml" type="object" string="Enviar XML" colspan="2" attrs="{'invisible':[('state','!=','open')]}"/>
+							<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
 						</group>
 						<group>
 							<field name="state_invoice_partner"/>
