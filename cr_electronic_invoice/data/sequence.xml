@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="seq_electronic_doc_confirmation" model="ir.sequence">
+            <field name="name">Secuencia de Confirmacion de Aceptacion Comprobante Electrónico</field>
+            <field name="code">sequece.electronic.doc.confirmation</field>
+            <field name="prefix"></field>
+            <field name="padding">10</field>
+        </record>
+        <record id="seq_electronic_doc_partial_confirmation" model="ir.sequence">
+            <field name="name">Secuencia de Confirmacion de Aceptacion Parcial Comprobante Electrónico</field>
+            <field name="code">sequece.electronic.doc.partial.confirmation</field>
+            <field name="prefix"></field>
+            <field name="padding">10</field>
+        </record>
+        <record id="seq_electronic_doc_reject" model="ir.sequence">
+            <field name="name">Secuencia de Rechazo Comprobante Electrónico</field>
+            <field name="code">sequece.electronic.doc.reject</field>
+            <field name="prefix"></field>
+            <field name="padding">10</field>
+        </record>
+    </data>
+</odoo>

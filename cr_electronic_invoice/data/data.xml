@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
 	<data noupdate="1">
 		<record id="ir_cron_consultahacienda" model="ir.cron">
 			<field name="name">Consulta Hacienda</field>
-			<field eval="True" name="active"/>
+			<field eval="False" name="active"/>
 			<field name="user_id" ref="base.user_root"/>
 			<field name="interval_number">5</field>
 			<field name="interval_type">minutes</field>
@@ -14,4 +14,30 @@
 			<field name="args">()</field>
 		</record>
 	</data>
-</openerp>
+	<data>
+		<record id="ir_cron_valida_hacienda_invoice" model="ir.cron">
+			<field name="name">Valida Facturas Hacienda</field>
+			<field eval="False" name="active"/>
+			<field name="user_id" ref="base.user_root"/>
+			<field name="interval_number">5</field>
+			<field name="interval_type">minutes</field>
+			<field name="numbercall">-1</field>
+			<field eval="True" name="doall"/>
+			<field name="model">account_invoice</field>
+			<field name="function">_validahacienda</field>
+			<field name="args">()</field>
+		</record>
+		<record id="ir_cron_reenvia_correos" model="ir.cron">
+			<field name="name">Reenvia Correos</field>
+			<field eval="False" name="active"/>
+			<field name="user_id" ref="base.user_root"/>
+			<field name="interval_number">5</field>
+			<field name="interval_type">minutes</field>
+			<field name="numbercall">-1</field>
+			<field eval="True" name="doall"/>
+			<field name="model">account.invoice</field>
+			<field name="function">_reenviacorreos</field>
+			<field name="args">()</field>
+		</record>
+	</data>
+</odoo>
