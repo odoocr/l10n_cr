@@ -12,6 +12,9 @@
 				<xpath expr="//button[@name='action_invoice_cancel']" position="attributes">
 					<attribute name="invisible">True</attribute>
 				</xpath>
+				<xpath expr="//button[@name='action_invoice_sent']" position="attributes">
+					<attribute name="invisible">True</attribute>
+				</xpath>
 			</field>
 		</record>
 
@@ -83,6 +86,8 @@
 				</form>
 			</field>
 		</record>
+
+
 		<record id="view_reference_document_tree" model="ir.ui.view">
 			<field name="name">reference.document.tree</field>
 			<field name="model">reference.document</field>
@@ -215,15 +220,12 @@
 					</div>
 				</xpath>
 				
-				
+
 				<field name="partner_id" position="after">
 					<field name="commercial_name"/>
 				</field>
 				<field name="vat" position="replace"/>
-				<field name="fax" position="before">
-					<field name="fax_code"/>
-				</field>
-				
+
 				<field name="country_id" position="attributes">
 					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
 				</field>
@@ -272,7 +274,6 @@
 								<field name="frm_callback_url"/>
 								<field name="activated" readonly="True" />
 								<field name="frm_ws_ambiente"  widget="radio"/>
-								<field name="security_code"/>
                                 <field name="frm_apicr_signaturecode"/>
 								<!--<field name="frm_tipo_id"/>-->
 							</group>
@@ -291,19 +292,16 @@
 			<field name="inherit_id" ref="base.view_partner_form"/>
 			<field name="arch" type="xml">
 				<field name="phone" position="before">
-					<field name="commercial_name"/>
 					<field name="phone_code"/>
 				</field>
 				<!--field name="vat" position="replace"/-->
 				<field name="website" position="before">
 					<field name="identification_id" widget="selection"/>
 					<field name="vat" string="Cédula"/>
+					<field name="commercial_name"/>
 					<field name="county_id" domain="[('state_id', '=', state_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
-				</field>
-				<field name="fax" position="before">
-					<field name="fax_code"/>
 				</field>
 				<field name="property_payment_term_id" position="before">
 					<field name="payment_methods_id"/>
@@ -350,9 +348,9 @@
 				<field name="type" position="after">
 					<field name="code_type_id" required="1"/>
 				</field>
-				<field name="uom_po_id" position="after">
+				<!-- <field name="uom_po_id" position="after">
 					<field name="commercial_measurement"/>
-				</field>
+				</field> -->
 			</field>
 		</record>
 
@@ -401,6 +399,7 @@
 					<field name="discount_note"/>
 					<field name="exoneration_id" />
 				</xpath>
+
 				<button name="action_invoice_cancel" position="attributes">
 					<attribute name="invisible">1</attribute>
 				</button>
@@ -419,18 +418,21 @@
 							<field name="xml_supplier_approval" filename="fname_xml_supplier_approval"/>
 							<button name="charge_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':[('state','!=','draft')]}"/>
 							<button name="send_xml" type="object" string="Enviar XML" colspan="2" attrs="{'invisible':[('state','!=','open')]}"/>
+							<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
 						</group>
 						<group>
 							<field name="state_invoice_partner"/>
 							<field name="date_issuance" readonly="1"/>
 							<field name="number_electronic" readonly="1"/>
+							<field name="fname_xml_comprobante" invisible="1" readonly="1"/>
+							<field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
 							<field name="state_send_invoice" readonly="1"/>
 							<field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
 							<field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
 						</group>
 					</group>
 				</xpath>
-				<xpath expr="//field[@name='amount_total']" position="after">
+				<xpath expr="(//field[@name='amount_total'])[last()]" position="after">
 					<field name="amount_tax_electronic_invoice"/>
 					<field name="amount_total_electronic_invoice"/>
 				</xpath>
@@ -442,10 +444,10 @@
 			<field name="inherit_id" ref="account.view_invoice_line_form"/>
 			<field name="arch" type="xml">
 				<field name="invoice_line_tax_ids" position="after">
-					<field name="total_amount"/>
-					<field name="total_discount" />
-					<field name="discount_note"/>
-					<field name="total_tax"/>
+					<field name="total_amount" invisible="1"/>
+					<field name="total_discount" invisible="1"/>
+					<field name="discount_note" invisible="1"/>
+					<field name="total_tax" invisible="1"/>
 					<!--<field name="exoneration_total"/>
 					<field name="total_line_exoneration"/>-->
 					<field name="exoneration_id" />
@@ -492,11 +494,33 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_tree"/>
 			<field name="arch" type="xml">
+				<tree position="attributes">
+					<attribute name="decoration-danger">
+					 	state_tributacion == 'rechazado'
+					</attribute>
+				</tree>
 				<field name="state" position="before">
 					<field name="state_tributacion"/>
 				</field>
 			</field>
 		</record>
+
+		<record id="invoice_supplier_tree_tree_inherit" model="ir.ui.view">
+			<field name="name">account.invoice.tree.inherit</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_supplier_tree"/>
+			<field name="arch" type="xml">
+				<tree position="attributes">
+					<attribute name="decoration-danger">
+					 	state_send_invoice == 'rechazado'
+					</attribute>
+				</tree>
+				<field name="state" position="before">
+					<field name="state_send_invoice" string="Estado FE"/>
+				</field>
+			</field>
+		</record>
+
 
 		<record id="action_payment_methods" model="ir.actions.act_window">
 			<field name="name">Métodos de pago</field>
@@ -505,42 +529,49 @@
 			<field name="view_mode">tree,form</field>
 			<!--<field name="search_view_id" ref="view_account_invoice_filter"/>-->
 		</record>
+
 		<record id="action_sale_conditions" model="ir.actions.act_window">
 			<field name="name">Condiciones de Venta</field>
 			<field name="res_model">sale.conditions</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_reference_document" model="ir.actions.act_window">
 			<field name="name">Documentos de referencia</field>
 			<field name="res_model">reference.document</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_reference_code" model="ir.actions.act_window">
 			<field name="name">Código de Referencia</field>
 			<field name="res_model">reference.code</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_resolution" model="ir.actions.act_window">
 			<field name="name">Resoluciones</field>
 			<field name="res_model">resolution</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_identification_type" model="ir.actions.act_window">
 			<field name="name">Tipo de identificación</field>
 			<field name="res_model">identification.type</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_exoneration" model="ir.actions.act_window">
 			<field name="name">Exoneración</field>
 			<field name="res_model">exoneration</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
+
 		<record id="action_code_type_product" model="ir.actions.act_window">
 			<field name="name">Tipos de códigos</field>
 			<field name="res_model">code.type.product</field>

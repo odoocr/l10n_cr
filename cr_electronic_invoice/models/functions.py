@@ -1,16 +1,10 @@
-import json
+# -*- coding: utf-8 -*-
+
 import requests
-import logging
-import random
 import re
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+import random
 
-
-_logger = logging.getLogger(__name__)
-
-
-def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
+def get_clave(self, url, tipo_documento, consecutivo, sucursal_id, terminal_id):
     payload = {}
     headers = {}
     # get Clave MH
@@ -23,21 +17,21 @@ def get_clave(self, url, tipo_documento, next_number,sucursal_id,terminal_id):
     payload['tipoDocumento'] = tipo_documento
     payload['cedula'] = self.company_id.vat
     payload['codigoPais'] = self.company_id.phone_code
-    payload['consecutivo'] = next_number
+    payload['consecutivo'] = consecutivo
     payload['situacion'] = 'normal'
     payload['codigoSeguridad'] = str(random.randint(1, 99999999))
-    payload['terminal'] = terminal_id
     payload['sucursal'] = sucursal_id
+    payload['terminal'] = terminal_id
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
-                     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total, lines,
-                     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-                     codigo_referencia, razon_referencia, url):
+                     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_subtotal,
+                     total_impuestos, total_descuento, lines, tipo_documento_referencia, numero_documento_referencia,
+                     fecha_emision_referencia, codigo_referencia, razon_referencia, url, currency_rate):
     headers = {}
     payload = {}
     # Generar FE payload
@@ -56,58 +50,40 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['emisor_provincia'] = inv.company_id.state_id.code
     payload['emisor_canton'] = inv.company_id.county_id.code
     payload['emisor_distrito'] = inv.company_id.district_id.code
-    payload['emisor_barrio'] = inv.company_id.neighborhood_id.code
+    payload['emisor_barrio'] = inv.company_id.neighborhood_id and inv.company_id.neighborhood_id.code or ''
     payload['emisor_otras_senas'] = inv.company_id.street
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
-    payload['emisor_tel'] = inv.company_id.phone
-    if inv.company_id.fax_code:
-        payload['emisor_cod_pais_fax'] = inv.company_id.fax_code
-    else:
-        payload['emisor_cod_pais_fax'] = ''
-    if inv.company_id.fax:
-        payload['emisor_fax'] = inv.company_id.fax
-    else:
-        payload['emisor_fax'] = ''
+    payload['emisor_tel'] = re.sub('[^0-9]+', '', inv.company_id.phone)
     payload['emisor_email'] = inv.company_id.email
     payload['receptor_nombre'] = inv.partner_id.name[:80]
     payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
     payload['receptor_num_identif'] = inv.partner_id.vat
-    payload['receptor_provincia'] = inv.partner_id.state_id.code
-    payload['receptor_canton'] = inv.partner_id.county_id.code
-    payload['receptor_distrito'] = inv.partner_id.district_id.code
-    payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code
+    payload['receptor_provincia'] = inv.partner_id.state_id.code or ''
+    payload['receptor_canton'] = inv.partner_id.county_id.code or ''
+    payload['receptor_distrito'] = inv.partner_id.district_id.code or ''
+    payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
     payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
-    payload['receptor_tel'] = inv.partner_id.phone
-    if inv.partner_id.fax_code:
-        payload['receptor_cod_pais_fax'] = inv.partner_id.fax_code
-    else:
-        payload['receptor_cod_pais_fax'] = ''
-    if inv.partner_id.fax:
-        payload['receptor_fax'] = inv.partner_id.fax
-    else:
-        payload['receptor_fax'] = ''
+    payload['receptor_tel'] = inv.partner_id.phone and re.sub('[^0-9]+', '', inv.partner_id.phone) or ''
     payload['receptor_email'] = inv.partner_id.email
     payload['condicion_venta'] = sale_conditions
-    payload['plazo_credito'] = ''
+    payload['plazo_credito'] = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0'
     payload['medio_pago'] = medio_pago
     payload['cod_moneda'] = inv.currency_id.name
-    payload['tipo_cambio'] = 1
+    payload['tipo_cambio'] = currency_rate
     payload['total_serv_gravados'] = total_servicio_gravado
     payload['total_serv_exentos'] = total_servicio_exento
     payload['total_merc_gravada'] = total_mercaderia_gravado
     payload['total_merc_exenta'] = total_mercaderia_exento
     payload['total_gravados'] = total_servicio_gravado + total_mercaderia_gravado
     payload['total_exentos'] = total_servicio_exento + total_mercaderia_exento
-    payload[
-        'total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
-    payload['total_descuentos'] = round(base_total, 2) - round(inv.amount_untaxed, 2)
-    payload['total_ventas_neta'] = (total_servicio_gravado + total_mercaderia_gravado
-                                    + total_servicio_exento + total_mercaderia_exento) \
-                                   - (base_total - inv.amount_untaxed)
-    payload['total_impuestos'] = inv.amount_tax
-    payload['total_comprobante'] = inv.amount_total
+    payload['total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
+    payload['total_descuentos'] = total_descuento
+    payload['total_ventas_neta'] = base_subtotal
+    payload['total_impuestos'] = total_impuestos
+    payload['total_comprobante'] = base_subtotal + total_impuestos
     payload['otros'] = ''
     payload['detalles'] = lines
+
     if tipo_documento == 'NC':
         payload['infoRefeTipoDoc'] = tipo_documento_referencia
         payload['infoRefeNumero'] = numero_documento_referencia
@@ -116,7 +92,7 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['infoRefeRazon'] = razon_referencia
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
@@ -131,7 +107,7 @@ def token_hacienda(inv, env, url):
     payload['password'] = inv.company_id.frm_ws_password
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
@@ -146,7 +122,7 @@ def sign_xml(inv, tipo_documento, url, xml):
     payload['tipodoc'] = tipo_documento
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
@@ -166,7 +142,7 @@ def send_file(inv, token, date, xml, env, url):
     payload['client_id'] = env
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
+    response_json = response.json()
     return response_json
 
 
@@ -179,75 +155,56 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     payload['token'] = token_m_h
     payload['clave'] = inv.number_electronic
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = json.loads(response._content)
-
+    response_json = response.json()
     estado_m_h = response_json.get('resp').get('ind-estado')
 
-    _logger.error('MAB - MH response:%s', response_json)
+    # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
+    # se carga el xml devuelto por Hacienda
+    if inv.type == 'out_invoice' or inv.type == 'out_refund':
+        # Se actualiza el estado con el que devuelve Hacienda
+        inv.state_tributacion = estado_m_h
+        if date_cr:
+            inv.date_issuance = date_cr
+        if xml_firmado:
+            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
+            inv.xml_comprobante = xml_firmado
+    elif inv.type == 'in_invoice' or inv.type == 'in_refund':
+        inv.state_send_invoice = estado_m_h
+        if xml_firmado:
+            inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
+            inv.xml_comprobante = xml_firmado
 
-    if estado_m_h == 'aceptado':
+
+    # Si fue aceptado o rechazado por haciendo se carga la respuesta
+    if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (inv.type == 'out_invoice'  or inv.type == 'out_refund'):
         inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
         inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
-        if inv.type == 'in_invoice':
-            inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
-            inv.state_tributacion = estado_m_h
-            inv.date_issuance = date_cr
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-            if not inv.partner_id.opt_out and inv.type == 'out_invoice':
-                email_template = self.env.ref( 'account.email_template_edi_invoice', False )
-                attachment = self.env['ir.attachment'].search(
-                    [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
-                     ('res_field', '=', 'xml_comprobante')], limit=1 )
-                attachment.name = inv.fname_xml_comprobante
-                attachment.datas_fname = inv.fname_xml_comprobante
 
-                attachment_resp = self.env['ir.attachment'].search(
-                    [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
-                     ('res_field', '=', 'xml_respuesta_tributacion')], limit=1 )
-                attachment_resp.name = inv.fname_xml_respuesta_tributacion
-                attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+    # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
+    if estado_m_h == 'aceptado' and xml_firmado:
+        if not inv.partner_id.opt_out:
+            if inv.type == 'in_invoice' or inv.type == 'in_refund':
+                email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
+            else:
+                email_template = self.env.ref('account.email_template_edi_invoice', False)
 
-                email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]  # [(4, attachment.id)]
-                email_template.with_context( type='binary', default_type='binary' ).send_mail( inv.id,
-                                                                                               raise_exception=False,
-                                                                                               force_send=True )  # default_type='binary'
-                email_template.attachment_ids = [(3, attachment.id)]
-                email_template.attachment_ids = [(4, attachment_resp.id)]
-    elif estado_m_h == 'recibido':
-        if inv.type == 'in_invoice':
-            inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
-            inv.state_tributacion = estado_m_h
-            inv.date_issuance = date_cr
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-    elif estado_m_h == 'procesando':
-        if inv.type == 'in_invoice':
-            inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
-            inv.state_tributacion = estado_m_h;
-            inv.date_issuance = date_cr
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-    elif estado_m_h == 'rechazado':
-        if inv.type == 'in_invoice':
-            inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
-            inv.state_tributacion = estado_m_h;
-            inv.date_issuance = date_cr
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-            inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
-            inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
-    elif estado_m_h == 'error':
-        if inv.type == 'in_invoice':
-            inv.state_send_invoice = estado_m_h
-        elif inv.type == 'out_invoice' or inv.type == 'out_refund':
-            inv.state_tributacion = estado_m_h
-            inv.date_issuance = date_cr
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-    else:
-        raise UserError('No se pudo crear el documento: \n' + str(response_json))
+            attachment_resp = self.env['ir.attachment'].search(
+                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+                 ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+            attachment_resp.name = inv.fname_xml_respuesta_tributacion
+            attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+
+            attachment = self.env['ir.attachment'].search(
+                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+                 ('res_field', '=', 'xml_comprobante')], limit=1)
+            attachment.name = inv.fname_xml_comprobante
+            attachment.datas_fname = inv.fname_xml_comprobante
+
+            email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
+
+            email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
+                                                                                        raise_exception=False,
+                                                                                        force_send=True)  # default_type='binary'
+
+            # limpia el template de los attachments
+            email_template.attachment_ids = [(6, 0, [])]
