@@ -655,6 +655,7 @@ class AccountInvoiceElectronic(models.Model):
                         razon_referencia = ''
                         medio_pago = inv.payment_methods_id.sequence or '01'
                         next_number = inv.number
+                        currency = inv.currency_id
                         # Es Factura de cliente o nota de débito
                         if inv.type == 'out_invoice':
                             if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
@@ -685,17 +686,17 @@ class AccountInvoiceElectronic(models.Model):
                             sale_conditions = '01'
 
                         # Validate if invoice currency is the same as the company currency
-                        if inv.currency_id.name == self.company_id.currency_id.name:
+                        if currency.name == self.company_id.currency_id.name:
                             currency_rate = 1
                         else:
                             # If the invoice currency is different it is going to use exchnge rate
                             # for Costa Rica exchange rate uses the value of 1 USD. But, Odoo uses the value of 1 CRC in USD.
                             # So the Module Currency Costa Rica Adapter adds some fields to store the original rate value and use it where it is needed.
-                            if inv.currency_id.rate_ids and (len(inv.currency_id.rate_ids) > 0):
-                                #currency_rate = inv.currency_id.rate_ids[0].original_rate
-                                currency_rate = 1 / inv.currency_id.rate
+                            if currency.rate_ids and (len(currency.rate_ids) > 0):
+                                #currency_rate = currency.rate_ids[0].original_rate
+                                currency_rate = 1 / currency.rate
                             else:
-                                raise UserError('No hay tipo de cambio registrado para la moneda ' + inv.currency_id.name)
+                                raise UserError('No hay tipo de cambio registrado para la moneda ' + currency.name)
 
                         # Generando la clave como la especifica Hacienda
                         response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
@@ -706,44 +707,71 @@ class AccountInvoiceElectronic(models.Model):
 
                         # Generamos las líneas de la factura
                         lines = dict()
-                        base_total = 0.0
                         line_number = 0
                         total_servicio_gravado = 0.0
                         total_servicio_exento = 0.0
                         total_mercaderia_gravado = 0.0
                         total_mercaderia_exento = 0.0
+                        total_descuento = 0.0
+                        total_impuestos = 0.0
+                        base_subtotal = 0.0
                         for inv_line in inv.invoice_line_ids:
-                            impuestos_acumulados = 0.0
                             line_number += 1
-                            base_total += inv_line.price_unit * inv_line.quantity
-                            descuento = round((inv_line.quantity * inv_line.price_unit - inv_line.price_subtotal), 2)
-                            natu_descuento = inv_line.discount_note or ''
+                            price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
+                            quantity = inv_line.quantity
+                            if not quantity:
+                                continue
+
+                            line_taxes = inv_line.invoice_line_tax_ids.compute_all(price, currency, 1, product=inv_line.product_id, partner=inv_line.invoice_id.partner_id)
+                            price_unit = round(line_taxes['total_excluded'] / (1 - inv_line.discount / 100.0), 5)  #ajustar para IVI
+
+                            base_line = round(price_unit * quantity, 5)
+                            subtotal_line = round(price_unit * quantity * (1 - inv_line.discount / 100.0), 5)
 
                             line = {
-                                "cantidad": inv_line.quantity,
-                                "unidadMedida": inv_line.product_id.uom_id.code or 'Sp',
-                                "detalle": inv_line.product_id.display_name,
-                                "precioUnitario": round(inv_line.price_unit, 2),
-                                "montoTotal": round(inv_line.quantity * inv_line.price_unit, 2),
-                                "subtotal": round(inv_line.price_subtotal,2)
+                                "cantidad": quantity,
+                                "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
+                                "detalle": inv_line.name[:159],
+                                "precioUnitario": price_unit,
+                                "montoTotal": base_line,
+                                "subtotal": subtotal_line,
                             }
-                            if descuento != 0:
+                            if inv_line.discount:
+                                descuento = base_line - subtotal_line
+                                total_descuento += descuento
                                 line["montoDescuento"] = descuento
-                                line["naturalezaDescuento"] = natu_descuento
+                                line["naturalezaDescuento"] = 'Descuento Comercial'
 
                             # Se generan los impuestos
                             taxes = dict()
                             if inv_line.invoice_line_tax_ids:
                                 tax_index = 0
+                                impuesto_linea = 0.0
+
+                                taxes_lookup = {}
+                                for i in inv_line.invoice_line_tax_ids:
+                                    taxes_lookup[i.id] = {'tax_code': i.tax_code, 'tarifa': i.amount}
+                                """
                                 for i in inv_line.invoice_line_tax_ids:
                                     if i.tax_code != '00':
                                         tax_index += 1
                                         tax_amount = round(i.amount / 100 * inv_line.price_subtotal, 2)
-
+                                        impuesto_linea += tax_amount
                                         tax = {
                                             "codigo": i.tax_code or '01',
                                             "tarifa": round(i.amount, 2),
                                             "monto": tax_amount
+                                        }
+                                """
+                                for i in line_taxes['taxes']:
+                                    if taxes_lookup[i['id']]['tax_code'] <> '00':
+                                        tax_index += 1
+                                        tax_amount = round(i['amount'], 5)*quantity
+                                        impuesto_linea += tax_amount
+                                        tax = {
+                                            'codigo': taxes_lookup[i['id']]['tax_code'],
+                                            'tarifa': taxes_lookup[i['id']]['tarifa'],
+                                            'monto': tax_amount,
                                         }
                                         # Se genera la exoneración si existe para este impuesto
                                         if inv_line.exoneration_id:
@@ -758,39 +786,37 @@ class AccountInvoiceElectronic(models.Model):
 
                                         taxes[tax_index] = tax
 
-                                        impuestos_acumulados += tax_amount
-
                             line["impuesto"] = taxes
 
-                            # Todo: analizar bien esta lógica de impuestos acumulados, parece que todos los if hacen lo mismo
-                            if inv_line.product_id:
-                                if inv_line.product_id.type == 'service':
-                                    if impuestos_acumulados:
-                                        total_servicio_gravado += inv_line.quantity * inv_line.price_unit
-                                    else:
-                                        total_servicio_exento += inv_line.quantity * inv_line.price_unit
+                            # Si no hay product_id se asume como mercaderia
+                            if inv_line.product_id and inv_line.product_id.type == 'service':
+                                if taxes:
+                                    total_servicio_gravado += base_line
+                                    total_impuestos += impuesto_linea
                                 else:
-                                    if impuestos_acumulados == 0.0:
-                                        total_mercaderia_gravado += inv_line.quantity * inv_line.price_unit
-                                    else:
-                                        total_mercaderia_exento += inv_line.quantity * inv_line.price_unit
-                            else:  # se asume que si no tiene producto se trata como un type product
-                                if impuestos_acumulados:
-                                    total_mercaderia_gravado += inv_line.quantity * inv_line.price_unit
+                                    total_servicio_exento += base_line
+                            else:
+                                if taxes:
+                                    total_mercaderia_gravado += base_line
+                                    total_impuestos += impuesto_linea
                                 else:
-                                    total_mercaderia_exento += inv_line.quantity * inv_line.price_unit
+                                    total_mercaderia_exento += base_line
 
-                            line["montoTotalLinea"] = round(inv_line.price_subtotal + impuestos_acumulados, 2)
+                            base_subtotal += subtotal_line
+
+                            line["montoTotalLinea"] = subtotal_line + impuesto_linea
 
                             lines[line_number] = line
 
                         response_json = functions.make_xml_invoice(inv, tipo_documento, consecutivo, date_cr,
-                                                                   sale_conditions, medio_pago, round(total_servicio_gravado, 2),
-                                                                   round(total_servicio_exento, 2), round(total_mercaderia_gravado, 2),
-                                                                   round(total_mercaderia_exento, 2), base_total, json.dumps(lines, ensure_ascii=False),
+                                                                   sale_conditions, medio_pago, total_servicio_gravado,
+                                                                   total_servicio_exento, total_mercaderia_gravado,
+                                                                   total_mercaderia_exento, base_subtotal,
+                                                                   total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
                                                                    tipo_documento_referencia, numero_documento_referencia,
                                                                    fecha_emision_referencia,
                                                                    codigo_referencia, razon_referencia, url, currency_rate)
+
                         xml = response_json.get('resp').get('xml')
                         response_json = functions.sign_xml(inv, tipo_documento, url, xml)
                         xml_firmado = response_json.get('resp').get('xmlFirmado')

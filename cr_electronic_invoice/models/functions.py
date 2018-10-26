@@ -29,9 +29,9 @@ def get_clave(self, url, tipo_documento, consecutivo, sucursal_id, terminal_id):
 
 
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
-                     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total, lines,
-                     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-                     codigo_referencia, razon_referencia, url, currency_rate):
+                     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_subtotal,
+                     total_impuestos, total_descuento, lines, tipo_documento_referencia, numero_documento_referencia,
+                     fecha_emision_referencia, codigo_referencia, razon_referencia, url, currency_rate):
     headers = {}
     payload = {}
     # Generar FE payload
@@ -77,11 +77,10 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['total_gravados'] = total_servicio_gravado + total_mercaderia_gravado
     payload['total_exentos'] = total_servicio_exento + total_mercaderia_exento
     payload['total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
-    payload['total_descuentos'] = round(base_total - inv.amount_untaxed, 2)
-    payload['total_ventas_neta'] = round((total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) - \
-                                   (base_total - inv.amount_untaxed), 2)
-    payload['total_impuestos'] = round(inv.amount_tax, 2)
-    payload['total_comprobante'] = round(inv.amount_total, 2)
+    payload['total_descuentos'] = total_descuento
+    payload['total_ventas_neta'] = base_subtotal
+    payload['total_impuestos'] = total_impuestos
+    payload['total_comprobante'] = base_subtotal + total_impuestos
     payload['otros'] = ''
     payload['detalles'] = lines
 
