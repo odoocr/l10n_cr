@@ -4,6 +4,9 @@ import requests
 import re
 import random
 import logging
+import os
+import subprocess
+import base64
 
 _logger = logging.getLogger(__name__)
 
@@ -124,18 +127,36 @@ def token_hacienda(inv, env, url):
 
 
 def sign_xml(inv, tipo_documento, url, xml):
-    payload = {}
-    headers = {}
-    payload['w'] = 'signXML'
-    payload['r'] = 'signFE'
-    payload['p12Url'] = inv.company_id.frm_apicr_signaturecode
-    payload['inXml'] = xml
-    payload['pinP12'] = inv.company_id.frm_pin
-    payload['tipodoc'] = tipo_documento
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    return response_json
+    xml = base64.b64decode(xml).decode('utf-8')
+
+    # directorio donde se encuentra el firmador de johann04 https://github.com/johann04/xades-signer-cr
+    path = os.path.dirname(os.path.realpath(__file__))[:-6] + 'bin/'
+    # nombres de archivos
+    signer_filename = 'xadessignercr.jar'
+    firma_filename = 'firma.p12'
+    factura_filename = 'factura.xml'
+
+    # El firmador es un ejecutable de java que necesita la firma y la factura en un archivo
+    # 1) escribimos el xml de la factura en un archivo
+    with open(path + factura_filename, 'w+') as file:
+        file.write(xml)
+
+    # 2) escribimos la firma en un archivo
+    with open(path + firma_filename, 'w+b') as file:
+        file.write(base64.b64decode(inv.company_id.signature))
+
+    # 3) firmamos el archivo con el signer
+    subprocess.check_output(['java', '-jar', path + signer_filename, 'sign', path + firma_filename, inv.company_id.frm_pin, path + factura_filename, path + factura_filename])
+
+    # 4) leemos el archivo firmado
+    with open(path + factura_filename, 'r') as file:
+        xml = file.read()
+
+    # quitamos la codificación del archivo
+    xml = xml.replace('<?xml version="1.0" encoding="UTF-8" standalone="no"?>', '')
+
+    return {'resp': {'xmlFirmado': base64.b64encode(bytes(xml, 'utf-8')).decode('utf-8')}}
 
 
 def send_file(inv, token, date, xml, env, url):
