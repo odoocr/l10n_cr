@@ -3,6 +3,10 @@ import json
 import requests
 import re
 import random
+import logging
+
+_logger = logging.getLogger(__name__)
+
 
 def get_clave(self, url, tipo_documento, consecutivo, sucursal_id, terminal_id):
     payload = {}
@@ -99,18 +103,24 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
 
 
 def token_hacienda(inv, env, url):
-    payload = {}
-    headers = {}
-    payload['w'] = 'token'
-    payload['r'] = 'gettoken'
-    payload['grant_type'] = 'password'
-    payload['client_id'] = env
-    payload['username'] = inv.company_id.frm_ws_identificador
-    payload['password'] = inv.company_id.frm_ws_password
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    return response_json
+    url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
+
+    data = {
+        'client_id': env,
+        'client_secret': '',
+        'grant_type': 'password',
+        'username': inv.company_id.frm_ws_identificador,
+        'password': inv.company_id.frm_ws_password}
+
+    try:
+        response = requests.post(url, data=data)
+
+    except requests.exceptions.RequestException as e:
+        _logger.error('Exception %s' % e)
+        raise Exception(e)
+
+    return {'resp': response.json()}
 
 
 def sign_xml(inv, tipo_documento, url, xml):
