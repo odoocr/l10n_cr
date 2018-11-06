@@ -82,32 +82,28 @@ class PartnerElectronic(models.Model):
 
     @api.onchange('phone')
     def _onchange_phone(self):
-        numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-        if self.phone:
-            for p in str(self.phone):
-                if p not in numbers:
-                    alert = {
-                        'title': 'Atención',
-                        'message': 'Favor no introducir letras, espacios ni guiones en los números telefónicos.'
-                    }
-                    return {'value': {'phone': ''}, 'warning': alert}
+        self.phone = re.sub(r"[^0-9]+", "", self.phone)
+        if not self.phone.isdigit():
+            alert = {
+                'title': 'Atención',
+                'message': 'Favor no introducir letras, espacios ni guiones en los números telefónicos.'
+            }
+            return {'value': {'phone': ''}, 'warning': alert}
 
     @api.onchange('mobile')
     def _onchange_mobile(self):
-        numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-        if self.mobile:
-            for p in str(self.mobile):
-                if p not in numbers:
-                    alert = {
-                        'title': 'Atención',
-                        'message': 'Favor no introducir letras, espacios ni guiones en los números telefónicos.'
-                    }
-                    return {'value': {'mobile': ''}, 'warning': alert}
+        self.mobile = re.sub(r"[^0-9]+", "", self.mobile)
+        if not self.mobile.isdigit():
+            alert = {
+                'title': 'Atención',
+                'message': 'Favor no introducir letras, espacios ni guiones en los números telefónicos.'
+            }
+            return {'value': {'mobile': ''}, 'warning': alert}
 
     @api.onchange('email')
     def _onchange_email(self):
         if self.email:
-            if not re.match('^[(a-z0-9\_\-\.)]+@[(a-z0-9\_\-\.)]+\.[(a-z)]{2,15}$', self.email.lower()):
+            if not re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', self.email.lower()):
                 vals = {'email': False}
                 alerta = {
                     'title': 'Atención',
@@ -117,25 +113,30 @@ class PartnerElectronic(models.Model):
 
     @api.onchange('vat')
     def _onchange_vat(self):
-        if self.identification_id and self.identification_id.code == '01':
-            if len(self.vat) != 9:
-                raise UserError(
-                    'La identificación tipo Cédula física debe de contener 9 dígitos, sin cero al inicio y sin guiones.')
-        if self.identification_id and self.identification_id.code == '02':
-            if len(self.vat) != 10:
-                raise UserError(
-                    'La identificación tipo Cédula jurídica debe contener 10 dígitos, sin cero al inicio y sin guiones.')
-        if self.identification_id and self.identification_id.code == '03':
-            if len(self.vat) < 11 or len(self.vat) > 12:
-                raise UserError(
-                    'La identificación tipo DIMEX debe contener 11 o 12 dígitos, sin ceros al inicio y sin guiones.')
-        if self.identification_id and self.identification_id.code == '04':
-            if len(self.vat) != 9:
-                raise UserError(
-                    'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
-        if self.identification_id and self.identification_id.code == '05':
-            if len(self.vat) == 0:
-                raise UserError('La identificación debe ser ingresada.')
+        if self.identification_id and self.vat:
+            if self.identification_id.code == '05':
+                if len(self.vat) == 0 or len(self.vat) > 20:
+                    raise UserError('La identificación debe tener menos de 20 carateres.')
+            else:
+                # Remove leters, dashes, dots or any other special character.
+                self.vat = re.sub(r"[^0-9]+", "", self.vat)
+                if self.identification_id.code == '01':
+                    if self.vat.isdigit() and len(self.vat) != 9:
+                        raise UserError(
+                            'La identificación tipo Cédula física debe de contener 9 dígitos, sin cero al inicio y sin guiones.')
+                elif self.identification_id.code == '02':
+                    if self.vat.isdigit() and len(self.vat) != 10:
+                        raise UserError(
+                            'La identificación tipo Cédula jurídica debe contener 10 dígitos, sin cero al inicio y sin guiones.')
+                elif self.identification_id.code == '03' and self.vat.isdigit() :
+                    if self.vat.isdigit() and len(self.vat) < 11 or len(self.vat) > 12:
+                        raise UserError(
+                            'La identificación tipo DIMEX debe contener 11 o 12 dígitos, sin ceros al inicio y sin guiones.')
+                elif self.identification_id.code == '04' and self.vat.isdigit():
+                    if self.vat.isdigit() and len(self.vat) != 9:
+                        raise UserError(
+                            'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
+        
 
 
 class CodeTypeProduct(models.Model):
@@ -345,6 +346,61 @@ class InvoiceLineElectronic(models.Model):
     #   total_line_exoneration = fields.Float(string="Exoneración total de la línea", required=False, )
     exoneration_id = fields.Many2one(comodel_name="exoneration", string="Exoneración", required=False, )
 
+    #TODO: Move this to AK-Project
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        domain = {}
+        if not self.invoice_id:
+            return
+
+        part = self.invoice_id.partner_id
+        fpos = self.invoice_id.fiscal_position_id
+        company = self.invoice_id.company_id
+        currency = self.invoice_id.currency_id
+        type = self.invoice_id.type
+
+        if not part:
+            warning = {
+                    'title': _('Warning!'),
+                    'message': _('You must first select a partner!'),
+                }
+            return {'warning': warning}
+
+        if not self.product_id:
+            if type not in ('in_invoice', 'in_refund'):
+                self.price_unit = 0.0
+            domain['uom_id'] = []
+        else:
+            if part.lang:
+                product = self.product_id.with_context(lang=part.lang)
+            else:
+                product = self.product_id
+
+            if not self.name:
+                self.name = product.partner_ref
+
+            account = self.get_invoice_line_account(type, product, fpos, company)
+            if account:
+                self.account_id = account.id
+            self._set_taxes()
+
+            if type in ('in_invoice', 'in_refund'):
+                if product.description_purchase and (not self.name):
+                    self.name += '\n' + product.description_purchase
+            else:
+                if product.description_sale:
+                    self.name += '\n' + product.description_sale
+
+            if not self.uom_id or product.uom_id.category_id.id != self.uom_id.category_id.id:
+                self.uom_id = product.uom_id.id
+            domain['uom_id'] = [('category_id', '=', product.uom_id.category_id.id)]
+
+            if company and currency:
+
+                if self.uom_id and self.uom_id.id != product.uom_id.id:
+                    self.price_unit = product.uom_id._compute_price(self.price_unit, self.uom_id)
+        return {'domain': domain}
+
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -406,6 +462,7 @@ class AccountInvoiceElectronic(models.Model):
             # if not (root.findall('ResumenFactura') and root.findall('ResumenFactura')[0].findall('TotalImpuesto')):
             #     return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
             #                                                                    'message': 'No se puede localizar el nodo TotalImpuesto. Por favor cargue un archivo con el formato correcto.'}}
+
             if not (root.findall('ResumenFactura') and root.findall('ResumenFactura')[0].findall('TotalComprobante')):
                 return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
                                                                                'message': 'No se puede localizar el nodo TotalComprobante. Por favor cargue un archivo con el formato correcto.'}}
@@ -413,15 +470,41 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.multi
     def charge_xml_data(self):
-        if self.xml_supplier_approval:
+        if (self.type == 'out_invoice' or  self.type == 'out_refund') and self.xml_comprobante:
+            #remove any character not a number digit in the invoice number
+            self.number = re.sub(r"[^0-9]+", "", self.number)
+
+            root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_comprobante).decode("utf-8"),
+                                        count=1))  # quita el namespace de los elementos
+            
+            partner_id = root.findall('Receptor')[0].find('Identificacion')[1].text
+            date_issuance = root.findall('FechaEmision')[0].text
+            consecutive = root.findall('NumeroConsecutivo')[0].text
+            partner = self.env['res.partner'].search(
+                [('vat', '=', partner_id)])
+            if partner and self.partner_id.id != partner.id:
+                raise UserError('El cliente con identificación ' + partner_id + ' no coincide con el cliente de esta factura: ' + self.partner_id.vat)
+            elif str(self.date_invoice) != date_issuance:
+                raise UserError('La fecha del XML () ' + date_issuance + ' no coincide con la fecha de esta factura')
+            elif self.number != consecutive:
+                raise UserError('El número cosecutivo ' + consecutive + ' no coincide con el de esta factura')
+            else:
+                self.number_electronic = root.findall('Clave')[0].text
+                self.date_issuance = date_issuance
+                self.date_invoice = date_issuance
+               
+            
+        elif self.xml_supplier_approval:
             root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_supplier_approval).decode("utf-8"),
                                         count=1))  # quita el namespace de los elementos
+
             self.number_electronic = root.findall('Clave')[0].text
             self.date_issuance = root.findall('FechaEmision')[0].text
             self.date_invoice = parse(self.date_issuance)
 
             partner = self.env['res.partner'].search(
                 [('vat', '=', root.findall('Emisor')[0].find('Identificacion')[1].text)])
+
             if partner:
                 self.partner_id = partner.id
             else:
@@ -429,13 +512,15 @@ class AccountInvoiceElectronic(models.Model):
                     1].text + ' no existe. Por favor creelo primero en el sistema.')
 
             self.reference = self.number_electronic[21:41]
+
             tax_node = root.findall('ResumenFactura')[0].findall('TotalImpuesto')
             if tax_node:
                 self.amount_tax_electronic_invoice = tax_node[0].text
             self.amount_total_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
 
+
     @api.multi
-    def send_xml(self):
+    def send_acceptance_message(self):
         for inv in self:
             if inv.xml_supplier_approval:
                 url = self.company_id.frm_callback_url
@@ -511,6 +596,8 @@ class AccountInvoiceElectronic(models.Model):
 
                     response = requests.request("POST", url, data=payload, headers=headers)
                     response_json = response.json()
+
+                    inv.number = consecutivo_receptor
 
                     if response_json.get('resp').get('Status') == 202:
                         functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)

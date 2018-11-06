@@ -23,7 +23,6 @@
 			 'data/mail_template_data.xml',
 			 'views/account_journal_views.xml',
 			 'views/electronic_invoice_views.xml',
-			 'views/report_sales_invoice_qweb.xml',
 	         'security/ir.model.access.csv',
 	         ],
 	'installable': True,
