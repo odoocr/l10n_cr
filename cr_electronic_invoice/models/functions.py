@@ -1,8 +1,8 @@
-from odoo.exceptions import UserError
 import json
 import requests
 import re
 import random
+from odoo.exceptions import UserError
 
 def get_clave(self, url, tipo_documento, consecutivo, sucursal_id, terminal_id):
     payload = {}
@@ -165,17 +165,13 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
         inv.state_tributacion = estado_m_h
-        if date_cr:
-            inv.date_issuance = date_cr
-        if xml_firmado:
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
+        inv.date_issuance = date_cr
+        inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
+        inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
+        inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
+        inv.xml_comprobante = xml_firmado
         inv.state_send_invoice = estado_m_h
-        if xml_firmado:
-            inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (inv.type == 'out_invoice'  or inv.type == 'out_refund'):
@@ -183,30 +179,37 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
-    if estado_m_h == 'aceptado' and xml_firmado:
+    if estado_m_h == 'aceptado':
         if not inv.partner_id.opt_out:
             if inv.type == 'in_invoice' or inv.type == 'in_refund':
                 email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
             else:
                 email_template = self.env.ref('account.email_template_edi_invoice', False)
 
-            attachment_resp = self.env['ir.attachment'].search(
-                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
-                 ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
-            attachment_resp.name = inv.fname_xml_respuesta_tributacion
-            attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+            attachments = []
 
             attachment = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
                  ('res_field', '=', 'xml_comprobante')], limit=1)
-            attachment.name = inv.fname_xml_comprobante
-            attachment.datas_fname = inv.fname_xml_comprobante
+            if attachment.id:
+                attachment.name = inv.fname_xml_comprobante
+                attachment.datas_fname = inv.fname_xml_comprobante
+                attachments.append(attachment.id)
 
-            email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
+            attachment_resp = self.env['ir.attachment'].search(
+                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+                 ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+            if attachment_resp.id:
+                attachment_resp.name = inv.fname_xml_respuesta_tributacion
+                attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+                attachments.append(attachment_resp.id)
 
-            email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
-                                                                                        raise_exception=False,
-                                                                                        force_send=True)  # default_type='binary'
+            if len(attachments) == 2:
+                email_template.attachment_ids = [(6, 0, attachments)]
 
-            # limpia el template de los attachments
-            email_template.attachment_ids = [(6, 0, [])]
+                email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
+                                                                                            raise_exception=False,
+                                                                                            force_send=True)  # default_type='binary'
+
+                # limpia el template de los attachments
+                email_template.attachment_ids = [(5)]
