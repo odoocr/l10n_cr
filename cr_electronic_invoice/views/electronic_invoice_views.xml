@@ -404,9 +404,6 @@
 					<button name="charge_xml_data" type="object" string="Cargar datos desde XMLs" colspan="2" attrs="{'invisible':['|', ('state_tributacion','!=', False), '|', ('xml_comprobante', '=', False), ('xml_respuesta_tributacion', '=', False)]}" />
 					<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" attrs="{'invisible':[('state_tributacion','=', False)]}"/>
 				</xpath>
-				<button name="190" position="attributes">
-					<attribute name="invisible">1</attribute>
-				</button>
 			</field>
 		</record>
 
