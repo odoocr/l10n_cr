@@ -113,7 +113,10 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
 
 
 def token_hacienda(inv, env, url):
-    url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
+    if env == 'api-stag':
+        url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
+    elif env == 'api-prod':
+        url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
 
     data = {
         'client_id': env,
