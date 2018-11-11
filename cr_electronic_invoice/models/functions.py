@@ -4,6 +4,8 @@ import re
 import random
 import logging
 from odoo.exceptions import UserError
+import base64
+from lxml import etree
 
 _logger = logging.getLogger(__name__)
 
@@ -138,23 +140,45 @@ def sign_xml(inv, tipo_documento, url, xml):
 
 
 def send_file(inv, token, date, xml, env, url):
-    headers = {}
-    payload = {}
-    payload['w'] = 'send'
-    payload['r'] = 'json'
-    payload['token'] = token
-    payload['clave'] = inv.number_electronic
-    payload['fecha'] = date
-    payload['emi_tipoIdentificacion'] = inv.company_id.identification_id.code
-    payload['emi_numeroIdentificacion'] = inv.company_id.vat
-    payload['recp_tipoIdentificacion'] = inv.partner_id.identification_id.code
-    payload['recp_numeroIdentificacion'] = inv.partner_id.vat
-    payload['comprobanteXml'] = xml
-    payload['client_id'] = env
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    return response_json
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
+
+    xml = base64.b64decode(xml)
+
+    factura = etree.tostring(etree.fromstring(xml)).decode()
+    factura = etree.fromstring(re.sub(' xmlns="[^"]+"', '', factura, count=1))
+
+    Clave = factura.find('Clave')
+    FechaEmision = factura.find('FechaEmision')
+    Emisor = factura.find('Emisor')
+    Receptor = factura.find('Receptor')
+
+    comprobante = {}
+    comprobante['clave'] = Clave.text
+    comprobante["fecha"] = FechaEmision.text
+    comprobante['emisor'] = {}
+    comprobante['emisor']['tipoIdentificacion'] = Emisor.find('Identificacion').find('Tipo').text
+    comprobante['emisor']['numeroIdentificacion'] = Emisor.find('Identificacion').find('Numero').text
+    if Receptor is not None:
+        comprobante['receptor'] = {}
+        comprobante['receptor']['tipoIdentificacion'] = Receptor.find('Identificacion').find('Tipo').text
+        comprobante['receptor']['numeroIdentificacion'] = Receptor.find('Identificacion').find('Numero').text
+
+    comprobante['comprobanteXml'] = base64.b64encode(xml).decode('utf-8')
+
+    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
+
+    try:
+        response = requests.post(url, data=json.dumps(comprobante), headers=headers)
+
+    except requests.exceptions.RequestException as e:
+        _logger.info('Exception %s' % e)
+        raise Exception(e)
+
+    return {'resp': {'Status': response.status_code, 'text': response.text}}
 
 
 def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
