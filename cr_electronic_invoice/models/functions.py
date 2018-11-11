@@ -4,32 +4,87 @@ import re
 import random
 import logging
 from odoo.exceptions import UserError
+import datetime
+import pytz
 
 _logger = logging.getLogger(__name__)
 
-def get_clave(self, url, tipo_documento, consecutivo, sucursal_id, terminal_id):
-    payload = {}
-    headers = {}
-    # get Clave MH
-    payload['w'] = 'clave'
-    payload['r'] = 'clave'
-    if self.company_id.identification_id.id == 1:
-        payload['tipoCedula'] = 'fisico'
-    elif self.company_id.identification_id.id == 2:
-        payload['tipoCedula'] = 'juridico'
-    payload['tipoDocumento'] = tipo_documento
-    payload['cedula'] = self.company_id.vat
-    payload['codigoPais'] = self.company_id.phone_code
-    payload['consecutivo'] = consecutivo
-    payload['situacion'] = 'normal'
-    payload['codigoSeguridad'] = str(random.randint(1, 99999999))
-    payload['sucursal'] = sucursal_id
-    payload['terminal'] = terminal_id
 
+def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    return response_json
+    # tipo de documento
+    tipos_de_documento = { 'FE'  : '01', # Factura Electrónica
+                           'ND'  : '02', # Nota de Débito
+                           'NC'  : '03', # Nota de Crédito
+                           'TE'  : '04', # Tiquete Electrónico
+                           'CCE' : '05', # Confirmación Comprobante Electrónico
+                           'CPCE': '06', # Confirmación Parcial Comprobante Electrónico
+                           'RCE' : '07'} # Rechazo Comprobante Electrónico
+
+    if tipo_documento not in tipos_de_documento:
+        raise UserError('No se encuentra tipo de documento')
+
+    tipo_documento = tipos_de_documento[tipo_documento]
+
+    # numeracion
+    numeracion = re.sub('[^0-9]', '', numeracion)
+
+    if len(numeracion) != 10:
+        raise UserError('La numeración debe de tener 10 dígitos')
+
+    # sucursal
+    sucursal = re.sub('[^0-9]', '', str(sucursal)).zfill(3)
+
+    # terminal
+    terminal = re.sub('[^0-9]', '', str(terminal)).zfill(5)
+
+    # tipo de identificación
+    if not self.company_id.identification_id:
+        raise UserError('Seleccione el tipo de identificación del emisor en el perfil de la compañía')
+
+    # identificación
+    identificacion = re.sub('[^0-9]', '', self.company_id.vat)
+
+    if self.company_id.identification_id.code == '01' and len(identificacion) != 9:
+        raise UserError('La Cédula Física del emisor debe de tener 9 dígitos')
+    elif self.company_id.identification_id.code == '02' and len(identificacion) != 10:
+        raise UserError('La Cédula Jurídica del emisor debe de tener 10 dígitos')
+    elif self.company_id.identification_id.code == '03' and (len(identificacion) != 11 or len(identificacion) != 12):
+        raise UserError('La identificación DIMEX del emisor debe de tener 11 o 12 dígitos')
+    elif self.company_id.identification_id.code == '04' and len(identificacion) != 10:
+        raise UserError('La identificación NITE del emisor debe de tener 10 dígitos')
+
+    identificacion = identificacion.zfill(12)
+
+    # situación
+    situaciones = { 'normal': '1', 'contingencia': '2', 'sininternet': '3'}
+
+    if situacion not in situaciones:
+        raise UserError('No se encuentra tipo de situación')
+
+    situacion = situaciones[situacion]
+
+    # código de pais
+    codigo_de_pais = '506'
+
+    # fecha
+    now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+    now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+
+    dia = now_cr.strftime('%d')
+    mes = now_cr.strftime('%m')
+    anio = now_cr.strftime('%y')
+
+    # código de seguridad
+    codigo_de_seguridad = str(random.randint(1, 99999999)).zfill(8)
+
+    # consecutivo
+    consecutivo = sucursal + terminal + tipo_documento + numeracion
+
+    # clave
+    clave = codigo_de_pais + dia + mes + anio + identificacion + consecutivo + situacion + codigo_de_seguridad
+
+    return {'resp': {'length': len(clave), 'clave': clave, 'consecutivo': consecutivo}}
 
 
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
@@ -103,10 +158,7 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
 
 def token_hacienda(inv, env, url):
 
-    if env == 'api-stag':
-        url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
-    elif env == 'api-prod':
-        url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
+    url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
 
     data = {
         'client_id': env,
