@@ -162,7 +162,7 @@ def send_file(inv, token, date, xml, env, url):
     comprobante['emisor'] = {}
     comprobante['emisor']['tipoIdentificacion'] = Emisor.find('Identificacion').find('Tipo').text
     comprobante['emisor']['numeroIdentificacion'] = Emisor.find('Identificacion').find('Numero').text
-    if Receptor is not None:
+    if Receptor is not None and Receptor.find('Identificacion') is not None:
         comprobante['receptor'] = {}
         comprobante['receptor']['tipoIdentificacion'] = Receptor.find('Identificacion').find('Tipo').text
         comprobante['receptor']['numeroIdentificacion'] = Receptor.find('Identificacion').find('Numero').text
