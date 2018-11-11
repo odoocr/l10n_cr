@@ -47,11 +47,11 @@ def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situaci
 
     if self.company_id.identification_id.code == '01' and len(identificacion) != 9:
         raise UserError('La Cédula Física del emisor debe de tener 9 dígitos')
-    elif self.company_id.identification_id.code == '02' and len(identificacion) == 10:
+    elif self.company_id.identification_id.code == '02' and len(identificacion) != 10:
         raise UserError('La Cédula Jurídica del emisor debe de tener 10 dígitos')
-    elif self.company_id.identification_id.code == '03' and (len(identificacion) == 11 or len(identificacion) == 12):
+    elif self.company_id.identification_id.code == '03' and (len(identificacion) != 11 or len(identificacion) != 12):
         raise UserError('La identificación DIMEX del emisor debe de tener 11 o 12 dígitos')
-    elif self.company_id.identification_id.code == '04' and len(identificacion) == 10:
+    elif self.company_id.identification_id.code == '04' and len(identificacion) != 10:
         raise UserError('La identificación NITE del emisor debe de tener 10 dígitos')
 
     identificacion = identificacion.zfill(12)
