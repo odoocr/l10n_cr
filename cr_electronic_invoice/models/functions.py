@@ -7,7 +7,6 @@ from odoo.exceptions import UserError
 
 import base64
 from lxml import etree
-=======
 import datetime
 import pytz
 
