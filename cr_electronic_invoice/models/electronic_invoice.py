@@ -685,7 +685,7 @@ class AccountInvoiceElectronic(models.Model):
                 codigo_referencia = inv.reference_code_id.code
                 razon_referencia = inv.reference_code_id.name
 
-                if doc.invoice_id.number_electronic:
+                if inv.invoice_id.number_electronic:
                     numero_documento_referencia = inv.invoice_id.number_electronic
                     fecha_emision_referencia = inv.invoice_id.date_issuance
                 else:
