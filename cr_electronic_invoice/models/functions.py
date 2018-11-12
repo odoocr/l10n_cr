@@ -5,31 +5,90 @@ import random
 import logging
 from odoo.exceptions import UserError
 
+import base64
+from lxml import etree
+import datetime
+import pytz
+
+
 _logger = logging.getLogger(__name__)
 
-def get_clave(self, url, tipo_documento, consecutivo, sucursal_id, terminal_id):
-    payload = {}
-    headers = {}
-    # get Clave MH
-    payload['w'] = 'clave'
-    payload['r'] = 'clave'
-    if self.company_id.identification_id.id == 1:
-        payload['tipoCedula'] = 'fisico'
-    elif self.company_id.identification_id.id == 2:
-        payload['tipoCedula'] = 'juridico'
-    payload['tipoDocumento'] = tipo_documento
-    payload['cedula'] = self.company_id.vat
-    payload['codigoPais'] = self.company_id.phone_code
-    payload['consecutivo'] = consecutivo
-    payload['situacion'] = 'normal'
-    payload['codigoSeguridad'] = str(random.randint(1, 99999999))
-    payload['sucursal'] = sucursal_id
-    payload['terminal'] = terminal_id
 
+def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    return response_json
+    # tipo de documento
+    tipos_de_documento = { 'FE'  : '01', # Factura Electrónica
+                           'ND'  : '02', # Nota de Débito
+                           'NC'  : '03', # Nota de Crédito
+                           'TE'  : '04', # Tiquete Electrónico
+                           'CCE' : '05', # Confirmación Comprobante Electrónico
+                           'CPCE': '06', # Confirmación Parcial Comprobante Electrónico
+                           'RCE' : '07'} # Rechazo Comprobante Electrónico
+
+    if tipo_documento not in tipos_de_documento:
+        raise UserError('No se encuentra tipo de documento')
+
+    tipo_documento = tipos_de_documento[tipo_documento]
+
+    # numeracion
+    numeracion = re.sub('[^0-9]', '', numeracion)
+
+    if len(numeracion) != 10:
+        raise UserError('La numeración debe de tener 10 dígitos')
+
+    # sucursal
+    sucursal = re.sub('[^0-9]', '', str(sucursal)).zfill(3)
+
+    # terminal
+    terminal = re.sub('[^0-9]', '', str(terminal)).zfill(5)
+
+    # tipo de identificación
+    if not self.company_id.identification_id:
+        raise UserError('Seleccione el tipo de identificación del emisor en el perfil de la compañía')
+
+    # identificación
+    identificacion = re.sub('[^0-9]', '', self.company_id.vat)
+
+    if self.company_id.identification_id.code == '01' and len(identificacion) != 9:
+        raise UserError('La Cédula Física del emisor debe de tener 9 dígitos')
+    elif self.company_id.identification_id.code == '02' and len(identificacion) != 10:
+        raise UserError('La Cédula Jurídica del emisor debe de tener 10 dígitos')
+    elif self.company_id.identification_id.code == '03' and (len(identificacion) != 11 or len(identificacion) != 12):
+        raise UserError('La identificación DIMEX del emisor debe de tener 11 o 12 dígitos')
+    elif self.company_id.identification_id.code == '04' and len(identificacion) != 10:
+        raise UserError('La identificación NITE del emisor debe de tener 10 dígitos')
+
+    identificacion = identificacion.zfill(12)
+
+    # situación
+    situaciones = { 'normal': '1', 'contingencia': '2', 'sininternet': '3'}
+
+    if situacion not in situaciones:
+        raise UserError('No se encuentra tipo de situación')
+
+    situacion = situaciones[situacion]
+
+    # código de pais
+    codigo_de_pais = '506'
+
+    # fecha
+    now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+    now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+
+    dia = now_cr.strftime('%d')
+    mes = now_cr.strftime('%m')
+    anio = now_cr.strftime('%y')
+
+    # código de seguridad
+    codigo_de_seguridad = str(random.randint(1, 99999999)).zfill(8)
+
+    # consecutivo
+    consecutivo = sucursal + terminal + tipo_documento + numeracion
+
+    # clave
+    clave = codigo_de_pais + dia + mes + anio + identificacion + consecutivo + situacion + codigo_de_seguridad
+
+    return {'resp': {'length': len(clave), 'clave': clave, 'consecutivo': consecutivo}}
 
 
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
@@ -60,15 +119,15 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['emisor_tel'] = re.sub('[^0-9]+', '', inv.company_id.phone)
     payload['emisor_email'] = inv.company_id.email
     payload['receptor_nombre'] = inv.partner_id.name[:80]
-    payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
-    payload['receptor_num_identif'] = inv.partner_id.vat
+    payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code or ''
+    payload['receptor_num_identif'] = inv.partner_id.vat or ''
     payload['receptor_provincia'] = inv.partner_id.state_id.code or ''
     payload['receptor_canton'] = inv.partner_id.county_id.code or ''
     payload['receptor_distrito'] = inv.partner_id.district_id.code or ''
     payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
-    payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
-    payload['receptor_tel'] = re.sub('[^0-9]+', '', inv.partner_id.phone)
-    payload['receptor_email'] = inv.partner_id.email
+    payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code or ''
+    payload['receptor_tel'] = re.sub('[^0-9]+', '', inv.partner_id.phone or '')
+    payload['receptor_email'] = inv.partner_id.email or ''
     payload['condicion_venta'] = sale_conditions
     payload['plazo_credito'] = inv.partner_id.property_payment_term_id.line_ids[0].days or '0'
     payload['medio_pago'] = medio_pago
@@ -138,23 +197,45 @@ def sign_xml(inv, tipo_documento, url, xml):
 
 
 def send_file(inv, token, date, xml, env, url):
-    headers = {}
-    payload = {}
-    payload['w'] = 'send'
-    payload['r'] = 'json'
-    payload['token'] = token
-    payload['clave'] = inv.number_electronic
-    payload['fecha'] = date
-    payload['emi_tipoIdentificacion'] = inv.company_id.identification_id.code
-    payload['emi_numeroIdentificacion'] = inv.company_id.vat
-    payload['recp_tipoIdentificacion'] = inv.partner_id.identification_id.code
-    payload['recp_numeroIdentificacion'] = inv.partner_id.vat
-    payload['comprobanteXml'] = xml
-    payload['client_id'] = env
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    return response_json
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
+
+    xml = base64.b64decode(xml)
+
+    factura = etree.tostring(etree.fromstring(xml)).decode()
+    factura = etree.fromstring(re.sub(' xmlns="[^"]+"', '', factura, count=1))
+
+    Clave = factura.find('Clave')
+    FechaEmision = factura.find('FechaEmision')
+    Emisor = factura.find('Emisor')
+    Receptor = factura.find('Receptor')
+
+    comprobante = {}
+    comprobante['clave'] = Clave.text
+    comprobante["fecha"] = FechaEmision.text
+    comprobante['emisor'] = {}
+    comprobante['emisor']['tipoIdentificacion'] = Emisor.find('Identificacion').find('Tipo').text
+    comprobante['emisor']['numeroIdentificacion'] = Emisor.find('Identificacion').find('Numero').text
+    if Receptor is not None and Receptor.find('Identificacion') is not None:
+        comprobante['receptor'] = {}
+        comprobante['receptor']['tipoIdentificacion'] = Receptor.find('Identificacion').find('Tipo').text
+        comprobante['receptor']['numeroIdentificacion'] = Receptor.find('Identificacion').find('Numero').text
+
+    comprobante['comprobanteXml'] = base64.b64encode(xml).decode('utf-8')
+
+    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
+
+    try:
+        response = requests.post(url, data=json.dumps(comprobante), headers=headers)
+
+    except requests.exceptions.RequestException as e:
+        _logger.info('Exception %s' % e)
+        raise Exception(e)
+
+    return {'resp': {'Status': response.status_code, 'text': response.text}}
 
 
 def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
