@@ -346,61 +346,6 @@ class InvoiceLineElectronic(models.Model):
     #   total_line_exoneration = fields.Float(string="Exoneración total de la línea", required=False, )
     exoneration_id = fields.Many2one(comodel_name="exoneration", string="Exoneración", required=False, )
 
-    #TODO: Move this to AK-Project
-    @api.onchange('product_id')
-    def _onchange_product_id(self):
-        domain = {}
-        if not self.invoice_id:
-            return
-
-        part = self.invoice_id.partner_id
-        fpos = self.invoice_id.fiscal_position_id
-        company = self.invoice_id.company_id
-        currency = self.invoice_id.currency_id
-        type = self.invoice_id.type
-
-        if not part:
-            warning = {
-                    'title': _('Warning!'),
-                    'message': _('You must first select a partner!'),
-                }
-            return {'warning': warning}
-
-        if not self.product_id:
-            if type not in ('in_invoice', 'in_refund'):
-                self.price_unit = 0.0
-            domain['uom_id'] = []
-        else:
-            if part.lang:
-                product = self.product_id.with_context(lang=part.lang)
-            else:
-                product = self.product_id
-
-            if not self.name:
-                self.name = product.partner_ref
-
-            account = self.get_invoice_line_account(type, product, fpos, company)
-            if account:
-                self.account_id = account.id
-            self._set_taxes()
-
-            if type in ('in_invoice', 'in_refund'):
-                if product.description_purchase and (not self.name):
-                    self.name += '\n' + product.description_purchase
-            else:
-                if product.description_sale:
-                    self.name += '\n' + product.description_sale
-
-            if not self.uom_id or product.uom_id.category_id.id != self.uom_id.category_id.id:
-                self.uom_id = product.uom_id.id
-            domain['uom_id'] = [('category_id', '=', product.uom_id.category_id.id)]
-
-            if company and currency:
-
-                if self.uom_id and self.uom_id.id != product.uom_id.id:
-                    self.price_unit = product.uom_id._compute_price(self.price_unit, self.uom_id)
-        return {'domain': domain}
-
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -473,6 +418,7 @@ class AccountInvoiceElectronic(models.Model):
         if (self.type == 'out_invoice' or  self.type == 'out_refund') and self.xml_comprobante:
             #remove any character not a number digit in the invoice number
             self.number = re.sub(r"[^0-9]+", "", self.number)
+            self.currency_id = self.env['res.currency'].search([('name', '=', root.find('ResumenFactura').find('CodigoMoneda').text)], limit=1).id
 
             root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_comprobante).decode("utf-8"),
                                         count=1))  # quita el namespace de los elementos
@@ -480,6 +426,7 @@ class AccountInvoiceElectronic(models.Model):
             partner_id = root.findall('Receptor')[0].find('Identificacion')[1].text
             date_issuance = root.findall('FechaEmision')[0].text
             consecutive = root.findall('NumeroConsecutivo')[0].text
+            
             partner = self.env['res.partner'].search(
                 [('vat', '=', partner_id)])
             if partner and self.partner_id.id != partner.id:
