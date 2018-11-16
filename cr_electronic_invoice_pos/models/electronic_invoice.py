@@ -460,7 +460,7 @@ class PosOrder(models.Model):
                     _logger.error('MAB - SIGNED XML:%s', xml_firmado)
 
                     # get token
-                    response_json = functions.token_hacienda(doc, doc.company_id.frm_ws_ambiente, url)
+                    response_json = functions.token_hacienda(doc, doc.company_id.frm_ws_ambiente)
                     token_m_h = response_json.get('resp').get('access_token')
 
                     _logger.error('MAB 002 - enviando documento')

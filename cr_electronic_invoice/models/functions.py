@@ -6,30 +6,91 @@ import random
 import logging
 from odoo.exceptions import UserError
 
+import base64
+from lxml import etree
+import datetime
+import time
+import pytz
+
+
 _logger = logging.getLogger(__name__)
 
-def get_clave(self, url, tipo_documento, consecutivo, sucursal_id, terminal_id):
-    payload = {}
-    headers = {}
-    # get Clave MH
-    payload['w'] = 'clave'
-    payload['r'] = 'clave'
-    if self.company_id.identification_id.id == 1:
-        payload['tipoCedula'] = 'fisico'
-    elif self.company_id.identification_id.id == 2:
-        payload['tipoCedula'] = 'juridico'
-    payload['tipoDocumento'] = tipo_documento
-    payload['cedula'] = self.company_id.vat
-    payload['codigoPais'] = '506'
-    payload['consecutivo'] = consecutivo
-    payload['situacion'] = 'normal'
-    payload['codigoSeguridad'] = str(random.randint(1, 99999999))
-    payload['sucursal'] = sucursal_id
-    payload['terminal'] = terminal_id
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    return response_json
+def get_clave(self, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
+
+    # tipo de documento
+    tipos_de_documento = { 'FE'  : '01', # Factura Electrónica
+                           'ND'  : '02', # Nota de Débito
+                           'NC'  : '03', # Nota de Crédito
+                           'TE'  : '04', # Tiquete Electrónico
+                           'CCE' : '05', # Confirmación Comprobante Electrónico
+                           'CPCE': '06', # Confirmación Parcial Comprobante Electrónico
+                           'RCE' : '07'} # Rechazo Comprobante Electrónico
+
+    if tipo_documento not in tipos_de_documento:
+        raise UserError('No se encuentra tipo de documento')
+
+    tipo_documento = tipos_de_documento[tipo_documento]
+
+    # numeracion
+    numeracion = re.sub('[^0-9]', '', numeracion)
+
+    if len(numeracion) != 10:
+        raise UserError('La numeración debe de tener 10 dígitos')
+
+    # sucursal
+    sucursal = re.sub('[^0-9]', '', str(sucursal)).zfill(3)
+
+    # terminal
+    terminal = re.sub('[^0-9]', '', str(terminal)).zfill(5)
+
+    # tipo de identificación
+    if not self.company_id.identification_id:
+        raise UserError('Seleccione el tipo de identificación del emisor en el perfil de la compañía')
+
+    # identificación
+    identificacion = re.sub('[^0-9]', '', self.company_id.vat)
+
+    if self.company_id.identification_id.code == '01' and len(identificacion) != 9:
+        raise UserError('La Cédula Física del emisor debe de tener 9 dígitos')
+    elif self.company_id.identification_id.code == '02' and len(identificacion) != 10:
+        raise UserError('La Cédula Jurídica del emisor debe de tener 10 dígitos')
+    elif self.company_id.identification_id.code == '03' and (len(identificacion) != 11 or len(identificacion) != 12):
+        raise UserError('La identificación DIMEX del emisor debe de tener 11 o 12 dígitos')
+    elif self.company_id.identification_id.code == '04' and len(identificacion) != 10:
+        raise UserError('La identificación NITE del emisor debe de tener 10 dígitos')
+
+    identificacion = identificacion.zfill(12)
+
+    # situación
+    situaciones = { 'normal': '1', 'contingencia': '2', 'sininternet': '3'}
+
+    if situacion not in situaciones:
+        raise UserError('No se encuentra tipo de situación')
+
+    situacion = situaciones[situacion]
+
+    # código de pais
+    codigo_de_pais = '506'
+
+    # fecha
+    now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+    now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+
+    dia = now_cr.strftime('%d')
+    mes = now_cr.strftime('%m')
+    anio = now_cr.strftime('%y')
+
+    # código de seguridad
+    codigo_de_seguridad = str(random.randint(1, 99999999)).zfill(8)
+
+    # consecutivo
+    consecutivo = sucursal + terminal + tipo_documento + numeracion
+
+    # clave
+    clave = codigo_de_pais + dia + mes + anio + identificacion + consecutivo + situacion + codigo_de_seguridad
+
+    return {'length': len(clave), 'clave': clave, 'consecutivo': consecutivo}
 
 
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
@@ -108,32 +169,54 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['infoRefeRazon'] = razon_referencia
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
+    if 200 <= response.status_code <= 299:
+        response_json = {'status': 200, 'xml': response.json().get('resp').get('xml')}
+    else:
+        response_json = {'status': response.status_code, 'text': 'make_xml_invoice failed: %s' % response.reason}
+
     return response_json
 
 
-def token_hacienda(inv, env, url):
-    if env == 'api-stag':
-        url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
-    elif env == 'api-prod':
-        url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
+last_tokens = {}
+last_tokens_time = {}
 
-    data = {
-        'client_id': env,
-        'client_secret': '',
-        'grant_type': 'password',
-        'username': inv.company_id.frm_ws_identificador,
-        'password': inv.company_id.frm_ws_password}
+def token_hacienda(inv, env):
+    token = last_tokens.get(inv.company_id.id,False)
+    token_time = last_tokens_time.get(inv.company_id.id,False)
 
-    try:
-        response = requests.post(url, data=data)
+    current_time = time.time()
 
-    except requests.exceptions.RequestException as e:
-        _logger.error('Exception %s' % e)
-        raise Exception(e)
+    if token and (current_time - token_time < 280):
+        response_json = {'status': 200, 'token': token}
+    else:
+        if env == 'api-prod':
+            url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
+        else:    #if env == 'api-stag':
+            url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
 
-    return {'resp': response.json()}
+        data = {
+            'client_id': env,
+            'client_secret': '',
+            'grant_type': 'password',
+            'username': inv.company_id.frm_ws_identificador,
+            'password': inv.company_id.frm_ws_password}
 
+        try:
+            response = requests.post(url, data=data)
+        except requests.exceptions.RequestException as e:
+            _logger.error('Exception %s' % e)
+            return {'status': -1, 'text': 'Excepcion %s' % e}
+
+        if 200 <= response.status_code <= 299:
+            token = response.json().get('access_token')
+            last_tokens[inv.company_id.id] = token
+            last_tokens_time[inv.company_id.id] = time.time()
+            response_json = {'status': 200, 'token': token}
+        else:
+            _logger.error('MAB - token_hacienda failed.  error: %s', response.status_code)
+            response_json = {'status': response.status_code, 'text': 'token_hacienda failed: %s' % response.reason}
+
+    return response_json
 
 def sign_xml(inv, tipo_documento, url, xml):
     payload = {}
@@ -146,29 +229,159 @@ def sign_xml(inv, tipo_documento, url, xml):
     payload['tipodoc'] = tipo_documento
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
+    if 200 <= response.status_code <= 299:
+        response_json = {'status': 200, 'xmlFirmado': response.json().get('resp').get('xmlFirmado')}
+    else:
+        response_json = {'status': response.status_code, 'text': 'make_xml_invoice failed: %s' % response.reason}
+
     return response_json
 
 
-def send_file(inv, token, date, xml, env, url):
-    headers = {}
-    payload = {}
-    payload['w'] = 'send'
-    payload['r'] = 'json'
-    payload['token'] = token
-    payload['clave'] = inv.number_electronic
-    payload['fecha'] = date
-    payload['emi_tipoIdentificacion'] = inv.company_id.identification_id.code
-    payload['emi_numeroIdentificacion'] = inv.company_id.vat
-    payload['recp_tipoIdentificacion'] = inv.partner_id.identification_id.code
-    payload['recp_numeroIdentificacion'] = inv.partner_id.vat
-    payload['comprobanteXml'] = xml
-    payload['client_id'] = env
+def send_file(inv, token, xml, env):
 
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
+    else:
+        _logger.error('MAB - Ambiente no definido')
+        return
+
+    xml_decoded = base64.b64decode(xml)
+
+    factura = etree.tostring(etree.fromstring(xml_decoded)).decode()
+    factura = etree.fromstring(re.sub(' xmlns="[^"]+"', '', factura, count=1))
+
+    Clave = factura.find('Clave')
+    FechaEmision = factura.find('FechaEmision')
+    Emisor = factura.find('Emisor')
+    Receptor = factura.find('Receptor')
+
+    comprobante = {}
+    comprobante['clave'] = Clave.text
+    comprobante["fecha"] = FechaEmision.text
+    comprobante['emisor'] = {}
+    comprobante['emisor']['tipoIdentificacion'] = Emisor.find('Identificacion').find('Tipo').text
+    comprobante['emisor']['numeroIdentificacion'] = Emisor.find('Identificacion').find('Numero').text
+    if Receptor is not None and Receptor.find('Identificacion') is not None:
+        comprobante['receptor'] = {}
+        comprobante['receptor']['tipoIdentificacion'] = Receptor.find('Identificacion').find('Tipo').text
+        comprobante['receptor']['numeroIdentificacion'] = Receptor.find('Identificacion').find('Numero').text
+
+    #comprobante['comprobanteXml'] = base64.b64encode(xml).decode('utf-8')
+    comprobante['comprobanteXml'] = xml
+
+    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
+
+    try:
+        response = requests.post(url, data=json.dumps(comprobante), headers=headers)
+
+    except requests.exceptions.RequestException as e:
+        _logger.info('Exception %s' % e)
+        raise Exception(e)
+
+    return {'status': response.status_code, 'text': response.text}
+
+
+def consulta_clave(clave, token, env):
+
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/' + clave
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/' + clave
+    else:
+        _logger.error('MAB - Ambiente no definido')
+        return
+
+    headers = {'Authorization': 'Bearer {}'.format(token),
+               'Cache-Control': 'no-cache',
+               'Content-Type': 'application/x-www-form-urlencoded',
+               'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
+    }
+
+    try:
+        #response = requests.request("GET", url, headers=headers)
+        response = requests.get(url, headers=headers)
+        ############################
+    except requests.exceptions.RequestException as e:
+        _logger.error('Exception %s' % e)
+        return {'status': -1, 'text': 'Excepcion %s' % e}
+
+    if 200 <= response.status_code <= 299:
+        response_json = {
+            'status': 200,
+            'ind-estado': response.json().get('ind-estado'),
+            'respuesta-xml': response.json().get('respuesta-xml')
+        }
+    elif 400 <= response.status_code <= 499:
+        response_json = {'status': 400, 'ind-estado': 'error'}
+    else:
+        _logger.error('MAB - consulta_clave failed.  error: %s', response.status_code)
+        response_json = {'status': response.status_code, 'text': 'token_hacienda failed: %s' % response.reason}
     return response_json
 
+"""
+def consulta_lista(clave, token, env):
+
+import json
+import requests
+import re
+import random
+import logging
+from odoo.exceptions import UserError
+
+import base64
+from lxml import etree
+import datetime
+import time
+import pytz
+
+#env == 'api-prod'
+#url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
+envi = 'api-stag'
+url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
+
+cia = env['res.company'].browse(1)
+
+
+data = {
+    'client_id': envi,
+    'client_secret': '',
+    'grant_type': 'password',
+    'username': cia.frm_ws_identificador,
+    'password': cia.frm_ws_password}
+response = requests.post(url, data=data)
+
+if 200 <= response.status_code <= 299:
+    token = response.json().get('access_token')
+else:
+    print 'error token'
+    print response.reason
+    
+
+if envi == 'api-stag':
+    url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/comprobantes/?offset=1&limit=50'
+    url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/comprobantes/?offset=1&limit=50&emisor=0200' + cia.vat
+    url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/comprobantes/50613111800310103790200100001010000000009139220851'
+    url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/50615111800310103790209900099010000000010165340485'
+elif envi == 'api-prod':
+    url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/comprobantes/?offset=1&limit=50'
+
+headers = {'Authorization': 'Bearer {}'.format(token),
+}
+
+#           'Cache-Control': 'no-cache',
+#           'Content-Type': 'application/x-www-form-urlencoded',
+#           'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
+
+response = requests.get(url, headers=headers)
+if 200 <= response.status_code <= 299:
+    response_json = response.json()
+else:
+    print 'error obteniendo lista comprobantes'
+    print response.reason
+    
+"""
 
 def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     payload = {}
