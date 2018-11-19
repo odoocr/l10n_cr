@@ -503,6 +503,7 @@
 					</attribute>
 				</tree>
 				<field name="state" position="before">
+					<field name="tipo_comprobante" string="Doc Elect."/>
 					<field name="state_tributacion"/>
 				</field>
 			</field>
