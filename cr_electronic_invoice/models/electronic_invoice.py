@@ -376,6 +376,7 @@ class AccountInvoiceElectronic(models.Model):
                                               copy=False, attachment=True)
     amount_tax_electronic_invoice = fields.Monetary(string='Total de impuestos FE', readonly=True, )
     amount_total_electronic_invoice = fields.Monetary(string='Total FE', readonly=True, )
+    tipo_comprobante = fields.Char(string='Tipo Comprobante', readonly=True, )
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),
@@ -724,6 +725,8 @@ class AccountInvoiceElectronic(models.Model):
                             else:
                                 raise UserError('No hay tipo de cambio registrado para la moneda ' + inv.currency_id.name)
 
+			# campo nuevo para poder identificar que es FE y que ND
+                        inv.tipo_comprobante = tipo_documento
 
                         # Generando la clave como la especifica Hacienda
                         response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
