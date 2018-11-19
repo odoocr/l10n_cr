@@ -747,10 +747,15 @@ class AccountInvoiceElectronic(models.Model):
                             base_total += inv_line.price_unit * inv_line.quantity
                             descuento = round((inv_line.quantity * inv_line.price_unit - inv_line.price_subtotal), 2)
 
+			    #Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
+                            #Esto no debería suceder, pero, si sucede, lo corregimos
+                            if functions.findwholeword(inv_line.product_id.display_name, '"'):
+                                detalle_linea = inv_line.product_id.display_name.replace('"', '')
+
                             line = dict()
                             line["cantidad"] = str(int(inv_line.quantity))
                             line["unidadMedida"] = inv_line.product_id.uom_id.code or 'Sp'
-                            line["detalle"] = inv_line.product_id.display_name
+                            line["detalle"] = detalle_linea, #inv_line.product_id.display_name
                             line["precioUnitario"] = str(round(inv_line.price_unit, 2))
                             line["montoTotal"] = str(round(inv_line.quantity * inv_line.price_unit, 2))
                             line["subtotal"] = str(round(inv_line.price_subtotal,2))

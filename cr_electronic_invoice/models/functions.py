@@ -306,3 +306,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
 
                 # limpia el template de los attachments
                 email_template.attachment_ids = [(5)]
+
+
+def findwholeword(word, search):
+    return word.find(search)
