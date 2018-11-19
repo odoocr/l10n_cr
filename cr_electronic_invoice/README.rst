@@ -5,46 +5,42 @@
 ==================================
 Facturación electrónica Costa Rica
 ==================================
+Módulo para Odoo que implementa la Facturacion Electronica para Costa Rica
 
-This module includes these functions to adapt Odoo for Costa Rica Electronic Invoice regulations
-
-
-Installation
+Instalacion
 ============
 
-To install this module, you need to:
+Para instalar este modulo, siga los siguientes pasos:
 
-1.  Clone the branch according to your Odoo version from the repository https://github.com/CRLibre/fe-hacienda-cr-odoo.git
-2.  Add the path to this repository in your configuration (addons-path)
-3.  Update the module list
-4.  Go to menu *Apps*
-5.  Search For *Facturación electrónica Costa Rica*
-6.  Install the module
+1.  Clone el branch de acuerdo a su version de odoo desde https://github.com/CRLibre/fe-hacienda-cr-odoo.git
+2.  Agregue este modulo en su repositorio de addons de odoo (addons-path)
+3.  Actualice la lista de modulos
+4.  Dirijase al menu Aplicaciones (Apps)
+5.  En el dialogo de busqueda digite *Facturación electrónica Costa Rica*
+6.  Instale el modulo
 
 Usage
 =====
 
 
-
-Bug Tracker
-===========
+Reporte de Problemas
+====================
 
 Bugs are tracked on `GitHub Issues <https://github.com/CRLibre/fe-hacienda-cr-odoo/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed feedback.
 
 
-Credits
-=======
-
-Contributors
-------------
+Contribuidores
+============
 * AKUREY S.A. <odoo@akurey.com>
 * Carlos Wong <cwong@akurey.com>
 * Charlie Monge <charlit02390@gmail.com>
 * Walner Borbon - walner1borbon on GitHub.com
 * Delfix S.A.
-
+* TechMicro Inc S.A.
+* Jason Ulloa <jason.ulloa@techmicrocr.com>
+* Nehemias Herrera
 
 
 Maintainer
@@ -53,8 +49,5 @@ Maintainer
    :alt: Odoo Community Association
    :target: https://crlibre.org/
 
-This module is maintained by CRLibre Community.
+Este modulo es mantenido por Comunidad de Software Libre de Costa Rica CRLibre.
 
-Delfix and Akurey, are a private company whose mission is to support
-the collaborative development of Odoo features and
-promote its widespread use.
