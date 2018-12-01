@@ -23,7 +23,7 @@
 			<field name="interval_type">minutes</field>
 			<field name="numbercall">-1</field>
 			<field eval="True" name="doall"/>
-			<field name="model">account_invoice</field>
+			<field name="model">account.invoice</field>
 			<field name="function">_validahacienda</field>
 			<field name="args">(10,)</field>
 		</record>
