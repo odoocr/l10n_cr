@@ -618,7 +618,7 @@ class AccountInvoiceElectronic(models.Model):
 
                 elif estado_m_h == 'rechazado':
                     i.fname_xml_respuesta_tributacion = 'respuesta_' + i.number_electronic + '.xml'
-                    i.xml_respuesta_tributacion = responsejson.get('respuesta-xml')
+                    i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
 
     @api.multi
     def action_consultar_hacienda(self):
@@ -654,7 +654,6 @@ class AccountInvoiceElectronic(models.Model):
                 date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
 
                 tipo_documento = ''
-                tipo_documento_referencia = ''
                 numero_documento_referencia = ''
                 fecha_emision_referencia = ''
                 codigo_referencia = ''
@@ -662,24 +661,19 @@ class AccountInvoiceElectronic(models.Model):
                 medio_pago = inv.payment_methods_id.sequence or '01'
                 currency = inv.currency_id
                 # Es Factura de cliente o nota de débito
+                tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]
                 if inv.type == 'out_invoice':
                     if inv.invoice_id and inv.journal_id and inv.journal_id.nd:
                         tipo_documento = 'ND'
-                        tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]
                         numero_documento_referencia = inv.invoice_id.number_electronic
                         fecha_emision_referencia = inv.invoice_id.date_issuance
                         codigo_referencia = inv.reference_code_id.code
                         razon_referencia = inv.reference_code_id.name
-                        medio_pago = ''
                     else:
                         tipo_documento = 'FE'
 
                 # Si es Nota de Crédito
                 elif inv.type == 'out_refund':
-                    if inv.invoice_id.journal_id.nd:
-                        tipo_documento_referencia = '02'
-                    else:
-                        tipo_documento_referencia = '01'
                     tipo_documento = 'NC'
                     codigo_referencia = inv.reference_code_id.code
                     razon_referencia = inv.reference_code_id.name
@@ -743,9 +737,9 @@ class AccountInvoiceElectronic(models.Model):
 
                     # Se generan los impuestos
                     taxes = dict()
+                    impuesto_linea = 0.0
                     if inv_line.invoice_line_tax_ids:
                         tax_index = 0
-                        impuesto_linea = 0.0
 
                         taxes_lookup = {}
                         for i in inv_line.invoice_line_tax_ids:

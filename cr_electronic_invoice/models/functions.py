@@ -105,6 +105,8 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['r'] = 'gen_xml_fe'
     elif tipo_documento == 'NC':
         payload['r'] = 'gen_xml_nc'
+    elif tipo_documento == 'ND':
+        payload['r'] = 'gen_xml_nd'
     payload['clave'] = inv.number_electronic
     payload['consecutivo'] = consecutivo
     payload['fecha_emision'] = date
@@ -161,7 +163,7 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['otros'] = ''
     payload['detalles'] = lines
 
-    if tipo_documento == 'NC':
+    if tipo_documento in ('NC', 'ND'):
         payload['infoRefeTipoDoc'] = tipo_documento_referencia
         payload['infoRefeNumero'] = numero_documento_referencia
         payload['infoRefeFechaEmision'] = fecha_emision_referencia
@@ -169,8 +171,11 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['infoRefeRazon'] = razon_referencia
 
     response = requests.request("POST", url, data=payload, headers=headers)
+    xresponse_json = response.json()
+    _logger.error('MAB - create_xml_file PAYLOAD: %s' % payload)
+    _logger.error('MAB - create_xml_file response: %s' % xresponse_json)
     if 200 <= response.status_code <= 299:
-        response_json = {'status': 200, 'xml': response.json().get('resp').get('xml')}
+        response_json = {'status': 200, 'xml': xresponse_json.get('resp').get('xml')}
     else:
         response_json = {'status': response.status_code, 'text': 'make_xml_invoice failed: %s' % response.reason}
 
