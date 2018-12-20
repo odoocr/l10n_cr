@@ -765,7 +765,7 @@ class AccountInvoiceElectronic(models.Model):
 
                             if descuento != 0:
                                 line["montoDescuento"] = str(descuento)
-                                line["naturalezaDescuento"] = round(inv_line.discount_note, 2) or ''
+                                line["naturalezaDescuento"] = inv_line.discount_note or 'Descuento Comercial'
 
                             # Se generan los impuestos
                             taxes = dict()
