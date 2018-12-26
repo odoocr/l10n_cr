@@ -12,12 +12,9 @@ import datetime
 import time
 import pytz
 
-
 _logger = logging.getLogger(__name__)
 
-
 def get_clave(self, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
-
     # tipo de documento
     tipos_de_documento = { 'FE'  : '01', # Factura Electrónica
                            'ND'  : '02', # Nota de Débito
@@ -28,7 +25,7 @@ def get_clave(self, tipo_documento, numeracion, sucursal, terminal, situacion='n
                            'RCE' : '07'} # Rechazo Comprobante Electrónico
 
     if tipo_documento not in tipos_de_documento:
-        raise UserError('No se encuentra tipo de documento')
+        raise UserError('No se encuentra tipo de documento ' + tipo_documento)
 
     tipo_documento = tipos_de_documento[tipo_documento]
 
@@ -134,7 +131,7 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
         payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
         payload['receptor_tel'] = inv.partner_id.phone and re.sub('[^0-9]+', '', inv.partner_id.phone) or ''
-        match = re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
+        match = inv.partner_id.email and re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
         if match:
             payload['receptor_email'] = inv.partner_id.email
         else:
@@ -164,6 +161,8 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['detalles'] = lines
 
     if tipo_documento in ('NC', 'ND'):
+        if not fecha_emision_referencia:
+            return {'status': 500, 'text': 'make_xml_invoice failed: NULL Invoice Reference Date'}
         payload['infoRefeTipoDoc'] = tipo_documento_referencia
         payload['infoRefeNumero'] = numero_documento_referencia
         payload['infoRefeFechaEmision'] = fecha_emision_referencia
@@ -174,7 +173,9 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     xresponse_json = response.json()
     _logger.error('MAB - create_xml_file PAYLOAD: %s' % payload)
     _logger.error('MAB - create_xml_file response: %s' % xresponse_json)
-    if 200 <= response.status_code <= 299:
+    if isinstance(xresponse_json.get('resp'), int):
+        response_json = {'status': 500, 'text': 'make_xml_invoice failed: %s' % response.reason}
+    elif (200 <= response.status_code <= 299):
         response_json = {'status': 200, 'xml': xresponse_json.get('resp').get('xml')}
     else:
         response_json = {'status': response.status_code, 'text': 'make_xml_invoice failed: %s' % response.reason}
@@ -185,26 +186,26 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
 last_tokens = {}
 last_tokens_time = {}
 
-def token_hacienda(inv, env):
-    token = last_tokens.get(inv.company_id.id,False)
-    token_time = last_tokens_time.get(inv.company_id.id,False)
+def token_hacienda(company):
+    token = last_tokens.get(company.id,False)
+    token_time = last_tokens_time.get(company.id,False)
 
     current_time = time.time()
 
     if token and (current_time - token_time < 280):
         response_json = {'status': 200, 'token': token}
     else:
-        if env == 'api-prod':
+        if company.frm_ws_ambiente == 'api-prod':
             url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
         else:    #if env == 'api-stag':
             url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
 
         data = {
-            'client_id': env,
+            'client_id': company.frm_ws_ambiente,
             'client_secret': '',
             'grant_type': 'password',
-            'username': inv.company_id.frm_ws_identificador,
-            'password': inv.company_id.frm_ws_password}
+            'username': company.frm_ws_identificador,
+            'password': company.frm_ws_password}
 
         try:
             response = requests.post(url, data=data)
@@ -214,8 +215,8 @@ def token_hacienda(inv, env):
 
         if 200 <= response.status_code <= 299:
             token = response.json().get('access_token')
-            last_tokens[inv.company_id.id] = token
-            last_tokens_time[inv.company_id.id] = time.time()
+            last_tokens[company.id] = token
+            last_tokens_time[company.id] = time.time()
             response_json = {'status': 200, 'token': token}
         else:
             _logger.error('MAB - token_hacienda failed.  error: %s', response.status_code)
@@ -283,7 +284,8 @@ def send_file(inv, token, xml, env):
 
     except requests.exceptions.RequestException as e:
         _logger.info('Exception %s' % e)
-        raise Exception(e)
+        return {'status': 400, 'text': 'Excepción de envio XML'}
+        #raise Exception(e)
 
     return {'status': response.status_code, 'text': response.text}
 
@@ -303,6 +305,8 @@ def consulta_clave(clave, token, env):
                'Content-Type': 'application/x-www-form-urlencoded',
                'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
     }
+
+    _logger.error('MAB - consulta_clave - url: %s' % url)
 
     try:
         #response = requests.request("GET", url, headers=headers)
@@ -341,7 +345,7 @@ import datetime
 import time
 import pytz
 
-#env == 'api-prod'
+#envi = 'api-prod'
 #url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
 envi = 'api-stag'
 url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
@@ -368,9 +372,11 @@ if envi == 'api-stag':
     url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/comprobantes/?offset=1&limit=50'
     url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/comprobantes/?offset=1&limit=50&emisor=0200' + cia.vat
     url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/comprobantes/50613111800310103790200100001010000000009139220851'
-    url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/50615111800310103790209900099010000000010165340485'
+    url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/50626121800010835040800100001010000001020191916747-00100001050000000005'
 elif envi == 'api-prod':
     url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/comprobantes/?offset=1&limit=50'
+    url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/50609101800310127328900100001010000000714101000714-00100001050000000004'
+    url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/50609101800310127328900100001010000000714101000714'
 
 headers = {'Authorization': 'Bearer {}'.format(token),
 }
@@ -388,6 +394,7 @@ else:
     
 """
 
+"""
 def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     payload = {}
     headers = {}
@@ -409,8 +416,6 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
         inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
-        inv.xml_comprobante = xml_firmado
         inv.state_send_invoice = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
@@ -453,3 +458,4 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
 
                 # limpia el template de los attachments
                 email_template.attachment_ids = [(5)]
+"""

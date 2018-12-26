@@ -7,8 +7,8 @@
 			<field name="inherit_id" ref="account.view_account_journal_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='refund_sequence_id']" position="after">
-					<field name="terminal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
-					<field name="sucursal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
+					<field name="sucursal" attrs="{'invisible':[('type','!=','sale'),('type','!=','purchase')],'required':[('type','=','sale')]}"/>
+					<field name="terminal" attrs="{'invisible':[('type','!=','sale'),('type','!=','purchase')],'required':[('type','=','sale')]}"/>
 				</xpath>
 			</field>
 		</record>

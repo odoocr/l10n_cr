@@ -123,7 +123,8 @@ class AccountInvoiceImport(models.TransientModel):
         number_electronic = xml_root.xpath("inv:Clave", namespaces=namespaces)[0].text
         reference = number_electronic[21:41]
         date_issuance = xml_root.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
-        currency = xml_root.xpath("inv:ResumenFactura/inv:CodigoMoneda", namespaces=namespaces)[0].text
+        currency_xpath = xml_root.xpath("inv:ResumenFactura/inv:CodigoMoneda", namespaces=namespaces)
+        currency = currency_xpath and currency_xpath[0].text or 'CRC'
         currency_id = self.env['res.currency'].search([('name', '=', currency)], limit=1).id
         date_invoice = parse(date_issuance)
 

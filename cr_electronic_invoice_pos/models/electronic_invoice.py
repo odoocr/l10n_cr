@@ -149,27 +149,28 @@ class PosOrder(models.Model):
         for doc in pos_orders:
             current_order+=1
             _logger.error('MAB - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
-            url = doc.company_id.frm_callback_url
 
+            response_json = functions.token_hacienda(doc, doc.company_id.frm_ws_ambiente)
+            if response_json['status'] != 200:
+                _logger.error('MAB - Consulta Hacienda - HALTED - Failed to get token')
+                return
 
-            response_json = functions.token_hacienda(doc, doc.company_id.frm_ws_ambiente, url)
-
-            token_m_h = response_json.get('resp').get('access_token')
             if doc.number_electronic and len(doc.number_electronic) == 50:
-                headers = {}
-                payload = {}
-                payload['w'] = 'consultar'
-                payload['r'] = 'consultarCom'
-                payload['client_id'] = doc.company_id.frm_ws_ambiente
-                payload['token'] = token_m_h
-                payload['clave'] = doc.number_electronic
-                response = requests.request("POST", url, data=payload, headers=headers)
-                responsejson = response.json()
-                estado_m_h = responsejson.get('resp').get('ind-estado')
+                response_json = functions.consulta_clave(doc.number_electronic, response_json['token'], doc.company_id.frm_ws_ambiente)
+                status = response_json['status']
+                if status == 200:
+                    estado_m_h = response_json.get('ind-estado')
+                elif status == 400:
+                    estado_m_h = response_json.get('ind-estado')
+                    _logger.error('MAB - Documento:%s no encontrado en Hacienda', doc.number_electronic)
+                else:
+                    _logger.error('MAB - Error inesperado en Consulta Hacienda - Abortando')
+                    return
+
                 if estado_m_h == 'aceptado':
                     doc.state_tributacion = estado_m_h
                     doc.fname_xml_respuesta_tributacion = 'AHC_' + doc.number_electronic + '.xml'
-                    doc.xml_respuesta_tributacion = responsejson.get('resp').get('respuesta-xml')
+                    doc.xml_respuesta_tributacion = response_json.get('respuesta-xml')
                     if doc.partner_id and doc.partner_id.email and not doc.partner_id.opt_out:
                         #email_template = self.env.ref('account.email_template_edi_invoice', False)
                         email_template = self.env.ref(
@@ -199,8 +200,8 @@ class PosOrder(models.Model):
                         _logger.info('email no enviado - cliente no definido')
                 elif estado_m_h in ('rechazado', 'rejected'):
                     doc.state_tributacion = estado_m_h
-                    doc.fname_xml_respuesta_tributacion = 'respuesta_' + doc.number_electronic + '.xml'
-                    doc.xml_respuesta_tributacion = responsejson.get('resp').get('respuesta-xml')
+                    doc.fname_xml_respuesta_tributacion = 'AHC_' + doc.number_electronic + '.xml'
+                    doc.xml_respuesta_tributacion = response_json.get('respuesta-xml')
                     doc.state_email = 'fe_error'
                     _logger.info('email no enviado - factura rechazada')
                 elif estado_m_h == 'error':
@@ -287,10 +288,16 @@ class PosOrder(models.Model):
 
                 docName = doc.name
 
-                if doc.company_id.frm_ws_ambiente != 'disabled' and docName.isdigit():
+                #if doc.company_id.frm_ws_ambiente != 'disabled' and docName.isdigit():
+
+                if not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
+                    _logger.error('MAB - Valida Hacienda - skipped Invoice %s', docName)
+                    continue
+
+                if not doc.xml_comprobante:
                     url = doc.company_id.frm_callback_url
                     if doc.amount_total >= 0:
-                        tipo_documento = 'FE'
+                        tipo_documento = 'TE'
                         tipo_documento_referencia = ''
                         numero_documento_referencia = ''
                         fecha_emision_referencia = ''
@@ -440,7 +447,7 @@ class PosOrder(models.Model):
                         lines[line_number] = dline
                     consecutivo = docName[21:41]
                     doc.number_electronic = docName
-                    response_json = functions.make_xml_invoice(doc, 'TE', consecutivo, date_cr,
+                    response_json = functions.make_xml_invoice(doc, tipo_documento, consecutivo, date_cr,
                                                                sale_conditions, medio_pago,
                                                                total_servicio_gravado,
                                                                total_servicio_exento, total_mercaderia_gravado,
@@ -453,37 +460,40 @@ class PosOrder(models.Model):
                                                                codigo_referencia, razon_referencia, url,
                                                                currency_rate)
 
-                    _logger.error('MAB - unsigned JSON DATA:%s', response_json)
-                    xml = response_json.get('resp').get('xml')
+                    if response_json['status'] != 200:
+                        _logger.error('MAB - API Error creating XML:%s', response_json['text'])
+                        doc.state_tributacion = 'error'
+                        continue
+
+                    xml = response_json.get('xml')
                     response_json = functions.sign_xml(doc, tipo_documento, url, xml)
-                    xml_firmado = response_json.get('resp').get('xmlFirmado')
-                    _logger.error('MAB - SIGNED XML:%s', xml_firmado)
+                    if response_json['status'] != 200:
+                        _logger.error('MAB - API Error signing XML:%s', response_json['text'])
+                        inv.state_tributacion = 'error'
+                        continue
 
-                    # get token
-                    response_json = functions.token_hacienda(doc, doc.company_id.frm_ws_ambiente)
-                    token_m_h = response_json.get('resp').get('access_token')
+                    doc.date_issuance = date_cr
+                    doc.fname_xml_comprobante = tipo_documento + '_' + doc.number_electronic + '.xml'
+                    doc.xml_comprobante = response_json.get('xmlFirmado')
+                    _logger.error('MAB - SIGNED XML:%s', doc.fname_xml_comprobante)
 
-                    _logger.error('MAB 002 - enviando documento')
-                    response_json = functions.send_file(doc, token_m_h, date_cr, xml_firmado,
-                                                        doc.company_id.frm_ws_ambiente, url)
-
-                    _logger.error('MAB 003 - respuesta recibida')
-                    if response_json.get('resp').get('Status') == 202:
-                        #functions.consulta_documentos(self, doc, 'TE', doc.company_id.frm_ws_ambiente, token_m_h, url,
-                        #                              date_cr, xml_firmado)
+                # get token
+                response_json = functions.token_hacienda(doc, doc.company_id.frm_ws_ambiente)
+                if response_json['status'] == 200:
+                    response_json = functions.send_file(doc, response_json['token'], inv.xml_comprobante,
+                                                        doc.company_id.frm_ws_ambiente)
+                    response_status = response_json.get('status')
+                    if 200 <= response_status <= 299:
                         doc.state_tributacion = 'procesando'
-                        doc.date_issuance = date_cr
-                        doc.fname_xml_comprobante = 'comprobante_' + doc.number_electronic + '.xml'
-                        doc.xml_comprobante = xml_firmado
+                        # functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
                     else:
-                        _logger.error(
-                            'No se pudo Crear la factura electrónica: \n' + str(
-                                response_json.get('resp').get('text')))
-                        number_electronic = '-1--' + docName + 'text :' + str(
-                                response_json.get('resp').get('text'))
+                        doc.state_tributacion = 'error'
+                        # inv.number_electronic = inv.number_electronic + ' - ' + response_json.get('text')
+                        _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.number_electronic,
+                                      response_status, response_json['text'])
                 else:
-                    _logger.error('MAB 013 - Pos Order:%s skipped.  FE disabled', doc.name)
+                    _logger.error('MAB - Error obteniendo token_hacienda')
+
             _logger.error('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
         finally:
             lock.release()
-

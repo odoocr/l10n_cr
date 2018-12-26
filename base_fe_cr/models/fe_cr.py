@@ -581,7 +581,7 @@ class BaseCRFe(models.AbstractModel):
     @api.model
     def fe_cr_parse_party(self, party_node, ns):
         partner_vat = party_node.find('inv:Identificacion/inv:Numero', ns).text
-        partner = self.env['res.partner'].search([('vat', '=', partner_vat)])
+        partner = self.env['res.partner'].search([('vat', '=', partner_vat), ('supplier', '=', True)], limit=1)
         if partner:
             self.partner_id = partner.id
             partner_dict = {

@@ -377,6 +377,8 @@ class BusinessDocumentImport(models.AbstractModel):
             supplier_taxes = [x.id for x in self._match_taxes(product_dict['taxes'], "", type_tax_use='purchase', price_include=None)]
             new_vals['taxes_id'] = [(6, 0, sales_taxes)]
             new_vals['supplier_taxes_id'] = [(6, 0, supplier_taxes)]
+        logger.error('MAB - New Product: %s ',new_vals)
+
         return self.env['product.product'].create(new_vals)
 
         #####################

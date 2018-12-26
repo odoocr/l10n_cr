@@ -6,7 +6,6 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-
 class AccountJournalInherit(models.Model):
     _name = 'account.journal'
     _inherit = ['account.journal']
