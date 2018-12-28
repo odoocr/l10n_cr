@@ -15,6 +15,18 @@
 		</record>
 	</data>
 	<data>
+		<record id="ir_cron_confirma_hacienda" model="ir.cron">
+			<field name="name">Confirma Hacienda</field>
+			<field eval="False" name="active"/>
+			<field name="user_id" ref="base.user_root"/>
+			<field name="interval_number">5</field>
+			<field name="interval_type">minutes</field>
+			<field name="numbercall">-1</field>
+			<field eval="False" name="doall"/>
+			<field name="model">account.invoice</field>
+			<field name="function">_confirmahacienda</field>
+			<field name="args">(1,)</field>
+		</record>
 		<record id="ir_cron_valida_hacienda_invoice" model="ir.cron">
 			<field name="name">Valida Facturas Hacienda</field>
 			<field eval="False" name="active"/>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
-
-
 		<!-- Quitar el boton de Cancelar Factura -->
 		<record id="inherit_invoice_form_cancel_inherit" model="ir.ui.view">
 		    <field name="name">account.invoice.cancel.inherit.inherit</field>
@@ -207,11 +205,11 @@
 			<field name="inherit_id" ref="base.view_company_form"/>
 			<field name="arch" type="xml">
 				
-				<xpath expr="/form/*" position="before">
+				<!--xpath expr="/form/*" position="before">
 					<header>
 						<field name="state" widget="statusbar"  nolabel="1" readonly="1" />
 					</header>
-				</xpath>
+				</xpath-->
 				
 				<xpath expr="//sheet[1]" position="after">
 					<div class="oe_chatter">
@@ -220,7 +218,6 @@
 					</div>
 				</xpath>
 				
-
 				<field name="partner_id" position="after">
 					<field name="commercial_name"/>
 				</field>
@@ -265,6 +262,7 @@
 								<field name="frm_ws_identificador"/>
 								<field name="frm_ws_password" password="True"/>
 								<field name="frm_pin" password="True"/>
+								<field name="template_email_fe"/>
 								<field name="frm_apicr_username" />
 								<field name="frm_apicr_password" password="True"/>
 								<!--<field name="pciaid"/>-->
@@ -272,7 +270,7 @@
 							</group>
 							<group cols="2" >
 								<field name="frm_callback_url"/>
-								<field name="activated" readonly="True" />
+								<!--field name="activated" readonly="True" /-->
 								<field name="frm_ws_ambiente"  widget="radio"/>
                                 <field name="frm_apicr_signaturecode"/>
 								<!--<field name="frm_tipo_id"/>-->
@@ -280,8 +278,6 @@
 						</group>
 					</page>
 				</xpath>
-
-
 
 			</field>
 		</record>
@@ -303,7 +299,7 @@
 					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 				</field>
-				<field name="property_payment_term_id" position="before">
+				<field name="lang" position="after">
 					<field name="payment_methods_id"/>
 				</field>
 				<field name="country_id" position="attributes">
@@ -385,7 +381,7 @@
 				</field>
 				<field name="fiscal_position_id" position="after">
 					<field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
-					<field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
+					<field name="invoice_id" attrs="{'readonly':[('state','!=','draft')]}"/>
 					<field name="state_tributacion" readonly="1"/>
 					<field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
 					<field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
@@ -417,7 +413,7 @@
 							<field name="fname_xml_supplier_approval" invisible="1"/>
 							<field name="xml_supplier_approval" filename="fname_xml_supplier_approval"/>
 							<button name="charge_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':[('state','!=','draft')]}"/>
-							<button name="send_xml" type="object" string="Enviar XML" colspan="2" attrs="{'invisible':[('state','!=','open')]}"/>
+							<button name="send_acceptance_message" type="object" string="Enviar XML" colspan="2" />
 							<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
 						</group>
 						<group>
@@ -444,11 +440,7 @@
 			<field name="inherit_id" ref="account.view_invoice_line_form"/>
 			<field name="arch" type="xml">
 				<field name="invoice_line_tax_ids" position="after">
-					<!--field name="total_amount" invisible="1"/>
-					<field name="total_discount" invisible="1"/>
-					<field name="discount_note" invisible="1"/>
-					<field name="total_tax" invisible="1"/-->
-					<field name="exoneration_id" />
+					<field name="exoneration_id"/>
 				</field>
 			</field>
 		</record>

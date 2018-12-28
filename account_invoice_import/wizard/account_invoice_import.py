@@ -724,18 +724,24 @@ class AccountInvoiceImport(models.TransientModel):
                 invoice.amount_total, parsed_inv['amount_total'],
                 precision_rounding=prec):
             if not invoice.tax_line_ids:
-                raise UserError(_(
-                    "The total amount is different from the untaxed amount, "
-                    "but no tax has been configured !"))
-            initial_tax_amount = invoice.tax_line_ids[0].amount
-            tax_amount = parsed_inv['amount_total'] -\
-                parsed_inv['amount_untaxed']
-            invoice.tax_line_ids[0].amount = tax_amount
-            cur_symbol = invoice.currency_id.symbol
-            invoice.message_post(_(
-                'The total tax amount has been forced to %s %s '
-                '(amount computed by Odoo was: %s %s).')
-                % (tax_amount, cur_symbol, initial_tax_amount, cur_symbol))
+                tax_amount = parsed_inv['amount_total'] -\
+                    parsed_inv['amount_untaxed']
+                invoice.message_post(_(
+                    'The total tax amount has been forced to %s %s ')
+                                     % (tax_amount, cur_symbol))
+                #raise UserError(_(
+                #    "The total amount is different from the untaxed amount, "
+                #    "but no tax has been configured !"))
+            else:
+                initial_tax_amount = invoice.tax_line_ids[0].amount
+                tax_amount = parsed_inv['amount_total'] -\
+                    parsed_inv['amount_untaxed']
+                invoice.tax_line_ids[0].amount = tax_amount
+                cur_symbol = invoice.currency_id.symbol
+                invoice.message_post(_(
+                    'The total tax amount has been forced to %s %s '
+                    '(amount computed by Odoo was: %s %s).')
+                    % (tax_amount, cur_symbol, initial_tax_amount, cur_symbol))
 
     @api.multi
     def update_invoice_lines(self, parsed_inv, invoice, seller):
@@ -855,13 +861,18 @@ class AccountInvoiceImport(models.TransientModel):
                 'You must select a supplier invoice or refund to update'))
         parsed_inv = self.parse_invoice(
             self.invoice_file, self.invoice_filename)
+        logger.error('MAB - 01 - parsed_inv: %s', parsed_inv)
+
         if self.partner_id:
             # True if state='update' ; False when state='update-from-invoice'
             parsed_inv['partner']['recordset'] = self.partner_id
+            logger.error('MAB - 02 - parsed_inv: %s', parsed_inv['partner'])
         partner = bdio._match_partner(
             parsed_inv['partner'], parsed_inv['chatter_msg'],
             partner_type='supplier')
+        logger.error('MAB - 03 - parsed_inv: %s', partner)
         partner = partner.commercial_partner_id
+        logger.error('MAB - 04 - parsed_inv: %s', partner)
         if partner != invoice.commercial_partner_id:
             raise UserError(_(
                 "The supplier of the imported invoice (%s) is different from "

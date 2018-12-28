@@ -41,7 +41,7 @@
                     domain="[('partner_id', '=', partner_id)]"
                     attrs="{'required': [('state', 'in', ('config', 'update-from-invoice', 'update'))]}" />
                 <field name="invoice_id" states="update,update-from-invoice"
-                    domain="[('state', '=', 'draft'), ('type', 'in', ('in_invoice', 'in_refund')), ('commercial_partner_id', '=', partner_id), ('type', '=', invoice_type)]"
+                    domain="[('state', '=', 'draft'), ('type', 'in', ('in_invoice', 'in_refund')), ('partner_id', '=', partner_id), ('type', '=', invoice_type)]"
                     context="{'invoice_show_amount': True}"
                     attrs="{'readonly': [('state', '=', 'update-from-invoice')]}"/>
             </group>
