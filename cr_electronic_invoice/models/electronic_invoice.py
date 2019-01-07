@@ -533,10 +533,10 @@ class AccountInvoiceElectronic(models.Model):
                     payload['token'] = token_m_h
                     payload['clave'] = inv.number_electronic
                     payload['fecha'] = date_cr
-                    payload['emi_tipoIdentificacion'] = inv.company_id.identification_id.code
-                    payload['emi_numeroIdentificacion'] = inv.company_id.vat
-                    payload['recp_tipoIdentificacion'] = inv.partner_id.identification_id.code
-                    payload['recp_numeroIdentificacion'] = inv.partner_id.vat
+                    payload['emi_tipoIdentificacion'] = inv.partner_id.identification_id.code
+                    payload['emi_numeroIdentificacion'] = inv.partner_id.vat
+                    payload['recp_tipoIdentificacion'] = inv.company_id.identification_id.code
+                    payload['recp_numeroIdentificacion'] = inv.company_id.vat
                     payload['comprobanteXml'] = xml
                     payload['client_id'] = env
                     payload['consecutivoReceptor'] = consecutivo_receptor
