@@ -23,11 +23,11 @@ except(ImportError, IOError) as err:
     logging.info(err)
 
 #TEST DE LA CLASE GENERADA
-from . import fe
-import tempfile
+#from . import fe
+#import tempfile
 
 #ESTO ES PARA TEST DE LA FIRMA USANDO EL CODIGO DE LA CARPETA XADES
-from .. xades import XAdESContext, PolicyId, template
+#from .. xades import XAdESContext, PolicyId, template
 
 
 def sign_test(cert, password, xml_firma):
