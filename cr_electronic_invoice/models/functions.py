@@ -2,17 +2,11 @@ import json
 import requests
 import re
 import random
-import logging
-from odoo.exceptions import UserError
-
 import base64
 from lxml import etree
 import datetime
 import pytz
-
-
-_logger = logging.getLogger(__name__)
-
+from odoo.exceptions import UserError
 
 def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
 
@@ -119,15 +113,15 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['emisor_tel'] = re.sub('[^0-9]+', '', inv.company_id.phone)
     payload['emisor_email'] = inv.company_id.email
     payload['receptor_nombre'] = inv.partner_id.name[:80]
-    payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code or ''
-    payload['receptor_num_identif'] = inv.partner_id.vat or ''
+    payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
+    payload['receptor_num_identif'] = inv.partner_id.vat
     payload['receptor_provincia'] = inv.partner_id.state_id.code or ''
     payload['receptor_canton'] = inv.partner_id.county_id.code or ''
     payload['receptor_distrito'] = inv.partner_id.district_id.code or ''
     payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
-    payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code or ''
-    payload['receptor_tel'] = re.sub('[^0-9]+', '', inv.partner_id.phone or '')
-    payload['receptor_email'] = inv.partner_id.email or ''
+    payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
+    payload['receptor_tel'] = re.sub('[^0-9]+', '', inv.partner_id.phone)
+    payload['receptor_email'] = inv.partner_id.email
     payload['condicion_venta'] = sale_conditions
     payload['plazo_credito'] = inv.partner_id.property_payment_term_id.line_ids[0].days or '0'
     payload['medio_pago'] = medio_pago
