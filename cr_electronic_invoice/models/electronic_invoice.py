@@ -376,6 +376,7 @@ class AccountInvoiceElectronic(models.Model):
                                               copy=False, attachment=True)
     amount_tax_electronic_invoice = fields.Monetary(string='Total de impuestos FE', readonly=True, )
     amount_total_electronic_invoice = fields.Monetary(string='Total FE', readonly=True, )
+    tipo_comprobante = fields.Char(string='Tipo Comprobante', readonly=True, )
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),
@@ -724,6 +725,8 @@ class AccountInvoiceElectronic(models.Model):
                             else:
                                 raise UserError('No hay tipo de cambio registrado para la moneda ' + inv.currency_id.name)
 
+			# campo nuevo para poder identificar que es FE y que ND
+                        inv.tipo_comprobante = tipo_documento
 
                         # Generando la clave como la especifica Hacienda
                         response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
@@ -747,17 +750,22 @@ class AccountInvoiceElectronic(models.Model):
                             base_total += inv_line.price_unit * inv_line.quantity
                             descuento = round((inv_line.quantity * inv_line.price_unit - inv_line.price_subtotal), 2)
 
+			    #Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
+                            #Esto no debería suceder, pero, si sucede, lo corregimos
+                            if functions.findwholeword(inv_line.product_id.display_name, '"'):
+                                detalle_linea = inv_line.product_id.display_name.replace('"', '')
+
                             line = dict()
                             line["cantidad"] = str(int(inv_line.quantity))
                             line["unidadMedida"] = inv_line.product_id.uom_id.code or 'Sp'
-                            line["detalle"] = inv_line.product_id.display_name
+                            line["detalle"] = detalle_linea, #inv_line.product_id.display_name
                             line["precioUnitario"] = str(round(inv_line.price_unit, 2))
                             line["montoTotal"] = str(round(inv_line.quantity * inv_line.price_unit, 2))
                             line["subtotal"] = str(round(inv_line.price_subtotal,2))
 
                             if descuento != 0:
                                 line["montoDescuento"] = str(descuento)
-                                line["naturalezaDescuento"] = round(inv_line.discount_note, 2) or ''
+                                line["naturalezaDescuento"] = inv_line.discount_note or 'Descuento Comercial'
 
                             # Se generan los impuestos
                             taxes = dict()
