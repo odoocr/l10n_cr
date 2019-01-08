@@ -7,6 +7,7 @@ import pytz
 import base64
 import json
 import xml.etree.ElementTree as ET
+from xml.sax.saxutils import escape
 from dateutil.parser import parse
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -808,7 +809,7 @@ class AccountInvoiceElectronic(models.Model):
                     line = {
                         "cantidad": quantity,
                         "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
-                        "detalle": inv_line.name[:159],
+                        "detalle": escape(inv_line.name[:159]),
                         "precioUnitario": price_unit,
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
