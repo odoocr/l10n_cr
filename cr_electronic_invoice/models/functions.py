@@ -255,7 +255,6 @@ def send_file(inv, token, xml, env):
         return
 
     xml_decoded = base64.b64decode(xml)
-
     try:
         factura = etree.fromstring(xml_decoded)
     except Exception, e:
