@@ -11,6 +11,7 @@
 			<field name="arch" type="xml">
 				<xpath expr="//button[@name='action_invoice_cancel']" position="attributes">
 					<attribute name="invisible">True</attribute>
+					<attribute name="attrs">{'invisible': [('state_tributacion','!=', False)]}</attribute>
 				</xpath>
 				<xpath expr="//button[@name='action_invoice_sent']" position="attributes">
 					<attribute name="invisible">True</attribute>
@@ -413,7 +414,7 @@
 			<field name="inherit_id" ref="account.invoice_supplier_form"/>
 			<field name="arch" type="xml">
 				<xpath expr="//button[@name='action_invoice_cancel']" position="after">
-					<button name="send_acceptance_message" type="object" string="Enviar Mensaje Receptor" colspan="2" attrs="{'invisible':[('state_send_invoice','!=', False)]}"/>
+					<button name="send_acceptance_message" type="object" string="Enviar Mensaje Receptor" colspan="2" attrs="{'invisible':[('state_send_invoice','!=', False), ('state_send_invoice','!=','rechazado'),('state_send_invoice','!=','error')]}"/>
 					<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
 				</xpath>
 				<xpath expr="//group[1]" position="after">

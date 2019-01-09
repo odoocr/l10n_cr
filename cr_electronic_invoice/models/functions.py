@@ -5,8 +5,12 @@ import random
 import base64
 from lxml import etree
 import datetime
+import time
 import pytz
+import logging
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
 
@@ -142,7 +146,9 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['otros'] = ''
     payload['detalles'] = lines
 
-    if tipo_documento == 'NC':
+    if tipo_documento in ('NC', 'ND'):
+        if not fecha_emision_referencia:
+            return {'status': 500, 'text': 'make_xml_invoice failed: NULL Invoice Reference Date'}
         payload['infoRefeTipoDoc'] = tipo_documento_referencia
         payload['infoRefeNumero'] = numero_documento_referencia
         payload['infoRefeFechaEmision'] = fecha_emision_referencia
@@ -153,29 +159,46 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     response_json = response.json()
     return response_json
 
+last_tokens = {}
+last_tokens_time = {}
 
-def token_hacienda(inv, env, url):
-    
-    if env == 'api-stag':
-        url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
-    elif env == 'api-prod':
-        url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
+def token_hacienda(company):
+    token = last_tokens.get(company.id,False)
+    token_time = last_tokens_time.get(company.id,False)
 
-    data = {
-        'client_id': env,
-        'client_secret': '',
-        'grant_type': 'password',
-        'username': inv.company_id.frm_ws_identificador,
-        'password': inv.company_id.frm_ws_password}
+    current_time = time.time()
 
-    try:
-        response = requests.post(url, data=data)
+    if token and (current_time - token_time < 280):
+        response_json = {'status': 200, 'token': token}
+    else:
+        if company.frm_ws_ambiente == 'api-prod':
+            url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
+        else:    #if env == 'api-stag':
+            url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
 
-    except requests.exceptions.RequestException as e:
-        _logger.error('Exception %s' % e)
-        raise Exception(e)
+        data = {
+            'client_id': company.frm_ws_ambiente,
+            'client_secret': '',
+            'grant_type': 'password',
+            'username': company.frm_ws_identificador,
+            'password': company.frm_ws_password}
 
-    return {'resp': response.json()}
+        try:
+            response = requests.post(url, data=data)
+        except requests.exceptions.RequestException as e:
+            _logger.error('Exception %s' % e)
+            return {'status': -1, 'text': 'Excepcion %s' % e}
+
+        if 200 <= response.status_code <= 299:
+            token = response.json().get('access_token')
+            last_tokens[company.id] = token
+            last_tokens_time[company.id] = time.time()
+            response_json = {'status': 200, 'token': token}
+        else:
+            _logger.error('MAB - token_hacienda failed.  error: %s', response.status_code)
+            response_json = {'status': response.status_code, 'text': 'token_hacienda failed: %s' % response.reason}
+
+    return response_json
 
 
 def sign_xml(inv, tipo_documento, url, xml):
@@ -189,7 +212,11 @@ def sign_xml(inv, tipo_documento, url, xml):
     payload['tipodoc'] = tipo_documento
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
+    if 200 <= response.status_code <= 299:
+        response_json = {'status': 200, 'xmlFirmado': response.json().get('resp').get('xmlFirmado')}
+    else:
+        response_json = {'status': response.status_code, 'text': 'make_xml_invoice failed: %s' % response.reason}
+
     return response_json
 
 
@@ -242,23 +269,28 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     payload['r'] = 'consultarCom'
     payload['client_id'] = env
     payload['token'] = token_m_h
-    payload['clave'] = inv.number_electronic
+    if inv.type == 'in_invoice' or inv.type == 'in_refund':
+        payload['clave'] = inv.number_electronic + "-" + inv.consecutive_number_receiver
+    else:
+        payload['clave'] = inv.number_electronic
     response = requests.request("POST", url, data=payload, headers=headers)
     response_json = response.json()
     estado_m_h = response_json.get('resp').get('ind-estado')
 
     # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
     # se carga el xml devuelto por Hacienda
-    if inv.type == 'out_invoice' or inv.type == 'out_refund':
-        # Se actualiza el estado con el que devuelve Hacienda
+    
+    if inv.type == 'out_invoice' or inv.type == 'out_refund' :
         inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
-        inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-        inv.xml_comprobante = xml_firmado
+        if xml_firmado:
+            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
+            inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
-        inv.xml_comprobante = xml_firmado
         inv.state_send_invoice = estado_m_h
+        if xml_firmado:
+            inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
+            inv.xml_comprobante = xml_firmado
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (inv.type == 'out_invoice'  or inv.type == 'out_refund'):
