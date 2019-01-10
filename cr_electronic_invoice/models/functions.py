@@ -270,16 +270,34 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     payload['client_id'] = env
     payload['token'] = token_m_h
     if inv.type == 'in_invoice' or inv.type == 'in_refund':
+        if not inv.consecutive_number_receiver:
+            if len(inv.number) == 20:
+                inv.consecutive_number_receiver = inv.number
+            else:
+                if inv.state_invoice_partner == '1':
+                    tipo_documento = 'CCE'
+                elif inv.state_invoice_partner == '2':
+                    tipo_documento = 'CPCE'
+                else:
+                    tipo_documento = 'RCE'
+                response_json = get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
+                inv.consecutive_number_receiver = response_json.get('resp').get('consecutivo')
+
         payload['clave'] = inv.number_electronic + "-" + inv.consecutive_number_receiver
     else:
         payload['clave'] = inv.number_electronic
+    
     response = requests.request("POST", url, data=payload, headers=headers)
     response_json = response.json()
     estado_m_h = response_json.get('resp').get('ind-estado')
-
-    # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
-    # se carga el xml devuelto por Hacienda
     
+    if (not xml_firmado) and (not date_cr):
+        self.message_post(body='<p>Ha realizado la consulta a Haciendo de:'
+                                +'<br /><b>Documento: </b>'+payload['clave']
+                                +'<br /><b>Estado del documento: </b>'+ estado_m_h +'</p>', 
+                            subtype='mail.mt_note', 
+                            content_subtype='html')
+
     if inv.type == 'out_invoice' or inv.type == 'out_refund' :
         inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
@@ -293,7 +311,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
             inv.xml_comprobante = xml_firmado
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
-    if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (inv.type == 'out_invoice'  or inv.type == 'out_refund'):
+    if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (inv.type == 'out_invoice' or inv.type == 'out_refund'):
         inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
         inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
 

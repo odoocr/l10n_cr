@@ -422,7 +422,16 @@ class AccountInvoiceElectronic(models.Model):
             if not (root.findall('ResumenFactura') and root.findall('ResumenFactura')[0].findall('TotalComprobante')):
                 return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
                                                                                'message': 'No se puede localizar el nodo TotalComprobante. Por favor cargue un archivo con el formato correcto.'}}
-        # self.fname_xml_supplier_approval = 'comrpobante_proveedor.xml'
+        else:
+            self.state_tributacion = False
+            self.state_send_invoice = False
+            self.xml_supplier_approval = False
+            self.fname_xml_supplier_approval = False
+            self.xml_respuesta_tributacion = False
+            self.fname_xml_respuesta_tributacion = False
+            self.date_issuance = False
+            self.number_electronic = False
+            self.state_invoice_partner = False
 
     @api.multi
     def charge_xml_data(self):
@@ -477,104 +486,128 @@ class AccountInvoiceElectronic(models.Model):
             self.amount_total_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
 
 
+
     @api.multi
     def send_acceptance_message(self):
         for inv in self:
             if inv.xml_supplier_approval:
-                url = self.company_id.frm_callback_url
-                root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(inv.xml_supplier_approval).decode("utf-8"), count=1))
-                if not inv.state_invoice_partner:
-                    raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
-
-               
-                #if the AcceptanceMessage was rejected, we need to generate a new message id
-                if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error':
-                    inv.number = inv.journal_id.sequence_id._next()
-
-                if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
-                    if inv.state_invoice_partner == '1':
-                        detalle_mensaje = 'Aceptado'
-                        tipo = 1
-                        tipo_documento = 'CCE'
-                    elif inv.state_invoice_partner == '2':
-                        detalle_mensaje = 'Aceptado parcial'
-                        tipo = 2
-                        tipo_documento = 'CPCE'
-                    else:
-                        detalle_mensaje = 'Rechazado'
-                        tipo = 3
-                        tipo_documento = 'RCE'
-
-                    now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                    now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                    date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                    payload = {}
-                    headers = {}
-
-                    response_json = functions.get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
-                    inv.consecutive_number_receiver = response_json.get('resp').get('consecutivo')
-
-                    payload['w'] = 'genXML'
-                    payload['r'] = 'gen_xml_mr'
-                    payload['clave'] = inv.number_electronic
-                    payload['numero_cedula_emisor'] = inv.partner_id.vat
-                    payload['fecha_emision_doc'] = inv.date_issuance
-                    payload['mensaje'] = tipo
-                    payload['detalle_mensaje'] = detalle_mensaje
-                    payload['total_factura'] = inv.amount_total_electronic_invoice
-                    payload['numero_cedula_receptor'] = inv.company_id.vat
-                    payload['numero_consecutivo_receptor'] = inv.consecutive_number_receiver
-
-                    if inv.amount_tax_electronic_invoice:
-                        payload['monto_total_impuesto'] = inv.amount_tax_electronic_invoice
-
-                    response = requests.request("POST", url, data=payload, headers=headers)
-                    response_json = response.json()
-
-                    xml = response_json.get('resp').get('xml')
-
-                    response_json = functions.sign_xml(inv, tipo_documento, url, xml)
-                    if response_json['status'] != 200:
-                        _logger.error('MAB - API Error signing XML:%s', response_json['text'])
-                        inv.state_send_invoice = 'error'
-                        continue
-
-                    xml_firmado = response_json.get('xmlFirmado')
+                
+                # check if the message was already sent and we are waiting for the answer
+                if inv.state_send_invoice == 'procesando':
 
                     response_json = functions.token_hacienda(inv.company_id)
                     if response_json['status'] != 200:
                         _logger.error('MAB - Send Acceptance Message - HALTED - Failed to get token')
-                        return
+                        continue
                     
-                    token_m_h = response_json['token']
+                    now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+                    now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+                    date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+                    
+                    functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, response_json['token'], inv.company_id.frm_callback_url, date_cr, False)
+                else:
+                    url = inv.company_id.frm_callback_url
+                    root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(inv.xml_supplier_approval).decode("utf-8"), count=1))
+                    if not inv.state_invoice_partner:
+                        raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
 
-                    headers = {}
-                    payload = {}
-                    payload['w'] = 'send'
-                    payload['r'] = 'sendMensaje'
-                    payload['token'] = token_m_h
-                    payload['clave'] = inv.number_electronic
-                    payload['fecha'] = date_cr
-                    payload['emi_tipoIdentificacion'] = inv.partner_id.identification_id.code
-                    payload['emi_numeroIdentificacion'] = inv.partner_id.vat
-                    payload['recp_tipoIdentificacion'] = inv.company_id.identification_id.code
-                    payload['recp_numeroIdentificacion'] = inv.company_id.vat
-                    payload['comprobanteXml'] = xml_firmado
-                    payload['client_id'] = inv.company_id.frm_ws_ambiente
-                    payload['consecutivoReceptor'] = inv.consecutive_number_receiver
+                    message_description = "<p><b>Enviando Mensaje Receptor</b></p>"
+                    #if the AcceptanceMessage was rejected, we need to generate a new message id
+                    if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error' or (not inv.number.isdigit()):
+                        message_description +='<p><b>Cambiando consecutivo del Mensaje de Receptor</b> <br /><b>Consecutivo anterior: </b>'+ inv.number + '<br /><b>Estado anterior: </b>'+ inv.state_send_invoice +'</p>'
+                        inv.number = inv.journal_id.sequence_id._next()
 
-                    response = requests.request("POST", url, data=payload, headers=headers)
-                    response_json = response.json()
 
-                    status = response_json.get('resp').get('Status')
-                    if  status == 202:
-                        inv.state_send_invoice = 'procesando'
+                    if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
+                        if inv.state_invoice_partner == '1':
+                            detalle_mensaje = 'Aceptado'
+                            tipo = 1
+                            tipo_documento = 'CCE'
+                        elif inv.state_invoice_partner == '2':
+                            detalle_mensaje = 'Aceptado parcial'
+                            tipo = 2
+                            tipo_documento = 'CPCE'
+                        else:
+                            detalle_mensaje = 'Rechazado'
+                            tipo = 3
+                            tipo_documento = 'RCE'
+
+                        now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+                        now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+                        date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+                        payload = {}
+                        headers = {}
+
+                        response_json = functions.get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
+                        inv.consecutive_number_receiver = response_json.get('resp').get('consecutivo')
+
+                        payload['w'] = 'genXML'
+                        payload['r'] = 'gen_xml_mr'
+                        payload['clave'] = inv.number_electronic
+                        payload['numero_cedula_emisor'] = inv.partner_id.vat
+                        payload['fecha_emision_doc'] = inv.date_issuance
+                        payload['mensaje'] = tipo
+                        payload['detalle_mensaje'] = detalle_mensaje
+                        payload['total_factura'] = inv.amount_total_electronic_invoice
+                        payload['numero_cedula_receptor'] = inv.company_id.vat
+                        payload['numero_consecutivo_receptor'] = inv.consecutive_number_receiver
+
+                        if inv.amount_tax_electronic_invoice:
+                            payload['monto_total_impuesto'] = inv.amount_tax_electronic_invoice
+
+                        response = requests.request("POST", url, data=payload, headers=headers)
+                        response_json = response.json()
+
+                        xml = response_json.get('resp').get('xml')
+
+                        response_json = functions.sign_xml(inv, tipo_documento, url, xml)
+                        if response_json['status'] != 200:
+                            _logger.error('MAB - API Error signing XML:%s', response_json['text'])
+                            inv.state_send_invoice = 'error'
+                            continue
+
+                        xml_firmado = response_json.get('xmlFirmado')
+
+                        response_json = functions.token_hacienda(inv.company_id)
+                        if response_json['status'] != 200:
+                            _logger.error('MAB - Send Acceptance Message - HALTED - Failed to get token')
+                            return
                         
-                        functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
-                    else:
-                        inv.state_send_invoice = 'error'
-                        _logger.error('MAB - Invoice: %s  Error sending Acceptance Message: %s', inv.number_electronic,
-                                      response_json.get('resp').get('text'))
+                        token_m_h = response_json['token']
+
+                        headers = {}
+                        payload = {}
+                        payload['w'] = 'send'
+                        payload['r'] = 'sendMensaje'
+                        payload['token'] = token_m_h
+                        payload['clave'] = inv.number_electronic
+                        payload['fecha'] = date_cr
+                        payload['emi_tipoIdentificacion'] = inv.partner_id.identification_id.code
+                        payload['emi_numeroIdentificacion'] = inv.partner_id.vat
+                        payload['recp_tipoIdentificacion'] = inv.company_id.identification_id.code
+                        payload['recp_numeroIdentificacion'] = inv.company_id.vat
+                        payload['comprobanteXml'] = xml_firmado
+                        payload['client_id'] = inv.company_id.frm_ws_ambiente
+                        payload['consecutivoReceptor'] = inv.consecutive_number_receiver
+
+                        response = requests.request("POST", url, data=payload, headers=headers)
+                        response_json = response.json()
+
+                        status = response_json.get('resp').get('Status')
+                        if  status == 202:
+                            inv.state_send_invoice = 'procesando'
+                            inv.xml_comprobante = False
+                            inv.fname_xml_comprobante = False
+                            inv.number = inv.consecutive_number_receiver
+                            message_description += '<p><b>Ha enviado Mensaje de Receptor</b>' +'<br /><b>Documento: </b>'+inv.number_electronic +'<br /><b>Consecutivo de mensaje: </b>'+ inv.consecutive_number_receiver + '<br /><b>Mensaje indicado: </b>'+ detalle_mensaje +'</p>'
+                            self.message_post(body=message_description, 
+                                                subtype='mail.mt_note', 
+                                                content_subtype='html')
+                            functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
+                        else:
+                            inv.state_send_invoice = 'error'
+                            _logger.error('MAB - Invoice: %s  Error sending Acceptance Message: %s', inv.number_electronic,
+                                        response_json.get('resp').get('text'))
 
     @api.multi
     @api.returns('self')
@@ -627,6 +660,7 @@ class AccountInvoiceElectronic(models.Model):
                 response = requests.request("POST", url, data=payload, headers=headers)
                 responsejson = response.json()
                 estado_m_h = responsejson.get('resp').get('ind-estado')
+
                 if estado_m_h == 'aceptado':
                     i.state_tributacion = estado_m_h
                     i.fname_xml_respuesta_tributacion = 'respuesta_' + i.number_electronic + '.xml'
@@ -663,10 +697,29 @@ class AccountInvoiceElectronic(models.Model):
     @api.multi
     def action_consultar_hacienda(self):
         if self.company_id.frm_ws_ambiente != 'disabled':
-
             for inv in self:
                 response_json = functions.token_hacienda(inv.company_id)
                 functions.consulta_documentos(self, inv, self.company_id.frm_ws_ambiente, response_json['token'], self.company_id.frm_callback_url, False, False)
+
+    @api.model
+    def _confirmahacienda(self, max_invoices=10):  # cron
+        invoices = self.env['account.invoice'].search([('type', 'in', ('in_invoice', 'in_refund')),
+                                                       ('state', 'in', ('open', 'paid')),
+                                                       ('xml_supplier_approval', '!=', False),
+                                                       ('state_invoice_partner', '!=', False),
+                                                       ('state_send_invoice', 'not in', ('aceptado', 'rechazado', 'error'))],
+                                                      limit=max_invoices)
+        total_invoices=len(invoices)
+        current_invoice=0
+        _logger.debug('MAB - Confirma Hacienda - Invoices to check: %s', total_invoices)
+        for i in invoices:
+            current_invoice+=1
+            _logger.debug('MAB - Confirma Hacienda - Invoice %s / %s  -  number:%s', current_invoice, total_invoices, i.number_electronic)
+
+            if abs(i.amount_total_electronic_invoice - i.amount_total) > 1:
+                continue   # xml de proveedor no se ha procesado, debemos llamar la carga
+
+            i.send_acceptance_message()
 
     @api.multi
     def action_invoice_open(self):
@@ -744,7 +797,7 @@ class AccountInvoiceElectronic(models.Model):
                         inv.tipo_comprobante = tipo_documento
 
                         # Generando la clave como la especifica Hacienda
-                        response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
+                        response_json = functions.get_claveget_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
                                                             inv.journal_id.terminal)
 
                         inv.number_electronic = response_json.get('resp').get('clave')
