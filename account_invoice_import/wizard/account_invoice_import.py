@@ -374,10 +374,6 @@ class AccountInvoiceImport(models.TransientModel):
         if filetype and filetype[0] in ['application/xml', 'text/xml']:
             try:
                 xml_root = etree.fromstring(file_data)
-                #xml_root = etree.fromstring(re.sub(' xmlns="[^"]+"', '', file_data), count=1)
-                #root = ET.fromstring(
-                #    re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_supplier_approval).decode("utf-8"),
-                #           count=1))  # quita el namespace de los elementos
 
             except Exception, e:
                 raise UserError(_(
@@ -723,6 +719,7 @@ class AccountInvoiceImport(models.TransientModel):
         if float_compare(
                 invoice.amount_total, parsed_inv['amount_total'],
                 precision_rounding=prec):
+            cur_symbol = invoice.currency_id.symbol
             if not invoice.tax_line_ids:
                 tax_amount = parsed_inv['amount_total'] -\
                     parsed_inv['amount_untaxed']
@@ -737,7 +734,6 @@ class AccountInvoiceImport(models.TransientModel):
                 tax_amount = parsed_inv['amount_total'] -\
                     parsed_inv['amount_untaxed']
                 invoice.tax_line_ids[0].amount = tax_amount
-                cur_symbol = invoice.currency_id.symbol
                 invoice.message_post(_(
                     'The total tax amount has been forced to %s %s '
                     '(amount computed by Odoo was: %s %s).')
@@ -893,10 +889,10 @@ class AccountInvoiceImport(models.TransientModel):
         vals = self._prepare_update_invoice_vals(parsed_inv, partner)
         logger.debug('Updating supplier invoice with vals=%s', vals)
         self.invoice_id.write(vals)
-        if (
-                parsed_inv.get('lines') and
-                import_config['invoice_line_method'] == 'nline_auto_product'):
-            self.update_invoice_lines(parsed_inv, invoice, partner)
+        #if (
+        #        parsed_inv.get('lines') and
+        #        import_config['invoice_line_method'] == 'nline_auto_product'):
+        self.update_invoice_lines(parsed_inv, invoice, partner)
         self.post_process_invoice(parsed_inv, invoice, import_config)
         if import_config['account_analytic']:
             invoice.invoice_line_ids.write({

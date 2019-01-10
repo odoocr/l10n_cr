@@ -7,6 +7,8 @@ import pytz
 import base64
 import json
 import xml.etree.ElementTree as ET
+from lxml import etree
+from xml.sax.saxutils import escape
 from dateutil.parser import parse
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -401,26 +403,50 @@ class AccountInvoiceElectronic(models.Model):
     @api.multi
     def charge_xml_data(self):
         if self.xml_supplier_approval:
-            xml_file = base64.b64decode(self.xml_supplier_approval).decode("utf-8")
-            root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', xml_file,
-                                        count=1))  # quita el namespace de los elementos
-            self.number_electronic = root.findall('Clave')[0].text
-            self.date_issuance = root.findall('FechaEmision')[0].text
+
+            xml_decoded = base64.b64decode(self.xml_supplier_approval)
+            try:
+                factura = etree.fromstring(xml_decoded)
+            except Exception, e:
+                # raise UserError(_(
+                #    "This XML file is not XML-compliant. Error: %s") % e)
+                _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
+                return {'status': 400, 'text': 'Excepción de conversión de XML'}
+            pretty_xml_string = etree.tostring(
+                factura, pretty_print=True, encoding='UTF-8',
+                xml_declaration=True)
+
+            _logger.error('MAB - send_file XML: %s' % pretty_xml_string)
+
+            namespaces = factura.nsmap
+            inv_xmlns = namespaces.pop(None)
+            namespaces['inv'] = inv_xmlns
+
+            # factura = etree.tostring(etree.fromstring(xml_decoded)).decode()
+            # factura = etree.fromstring(re.sub(' xmlns="[^"]+"', '', factura, count=1))
+
+            self.number_electronic = factura.xpath("inv:Clave", namespaces=namespaces)[0].text
+            self.date_issuance = factura.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
+            emisor = factura.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+            receptor = factura.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+
+            if receptor != self.company_id.vat:
+                raise UserError('El receptor no corresponde con la compañía actual con identificación ' + receptor + '. Por favor active la compañía correcta.')
+
             self.date_invoice = parse(self.date_issuance)
 
             partner = self.env['res.partner'].search(
-                [('vat', '=', root.findall('Emisor')[0].find('Identificacion')[1].text)])
+                [('vat', '=', emisor)])
             if partner:
                 self.partner_id = partner.id
             else:
-                raise UserError('El proveedor con identificación ' + root.findall('Emisor')[0].find('Identificacion')[
-                    1].text + ' no existe. Por favor creelo primero en el sistema.')
+                raise UserError('El proveedor con identificación ' + emisor + ' no existe. Por favor creelo primero en el sistema.')
 
             self.reference = self.number_electronic[21:41]
-            tax_node = root.findall('ResumenFactura')[0].findall('TotalImpuesto')
+            tax_node = factura.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
             if tax_node:
                 self.amount_tax_electronic_invoice = tax_node[0].text
-            self.amount_total_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
+            self.amount_total_electronic_invoice = factura.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)[0].text
 
     @api.multi
     def send_acceptance_message(self):
@@ -808,7 +834,7 @@ class AccountInvoiceElectronic(models.Model):
                     line = {
                         "cantidad": quantity,
                         "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
-                        "detalle": inv_line.name[:159],
+                        "detalle": escape(inv_line.name[:159]),
                         "precioUnitario": price_unit,
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,

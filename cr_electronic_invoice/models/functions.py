@@ -4,6 +4,7 @@ import requests
 import re
 import random
 import logging
+from xml.sax.saxutils import escape
 from odoo.exceptions import UserError
 
 import base64
@@ -107,22 +108,22 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['clave'] = inv.number_electronic
     payload['consecutivo'] = consecutivo
     payload['fecha_emision'] = date
-    payload['emisor_nombre'] = inv.company_id.name
+    payload['emisor_nombre'] = escape(inv.company_id.name)
     payload['emisor_tipo_indetif'] = inv.company_id.identification_id.code
     payload['emisor_num_identif'] = inv.company_id.vat
-    payload['nombre_comercial'] = inv.company_id.commercial_name or ''
+    payload['nombre_comercial'] = escape(inv.company_id.commercial_name or '')
     payload['emisor_provincia'] = inv.company_id.state_id.code
     payload['emisor_canton'] = inv.company_id.county_id.code
     payload['emisor_distrito'] = inv.company_id.district_id.code
     payload['emisor_barrio'] = inv.company_id.neighborhood_id and inv.company_id.neighborhood_id.code or ''
-    payload['emisor_otras_senas'] = inv.company_id.street
+    payload['emisor_otras_senas'] = escape(inv.company_id.street)
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
     payload['emisor_tel'] = inv.company_id.phone and re.sub('[^0-9]+', '', inv.company_id.phone) or ''
     payload['emisor_email'] = inv.company_id.email
     if not inv.partner_id or not inv.partner_id.vat:
         payload['omitir_receptor'] = 'true'
     else:
-        payload['receptor_nombre'] = inv.partner_id.name[:80]
+        payload['receptor_nombre'] = escape(inv.partner_id.name[:80])
         payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
         payload['receptor_num_identif'] = inv.partner_id.vat
         payload['receptor_provincia'] = inv.partner_id.state_id.code or ''
@@ -254,27 +255,42 @@ def send_file(inv, token, xml, env):
         return
 
     xml_decoded = base64.b64decode(xml)
+    try:
+        factura = etree.fromstring(xml_decoded)
+    except Exception, e:
+        #raise UserError(_(
+        #    "This XML file is not XML-compliant. Error: %s") % e)
+        _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
+        return {'status': 400, 'text': 'Excepción de conversión de XML'}
+    pretty_xml_string = etree.tostring(
+        factura, pretty_print=True, encoding='UTF-8',
+        xml_declaration=True)
 
-    factura = etree.tostring(etree.fromstring(xml_decoded)).decode()
-    factura = etree.fromstring(re.sub(' xmlns="[^"]+"', '', factura, count=1))
+    _logger.error('MAB - send_file XML: %s' % pretty_xml_string)
 
-    Clave = factura.find('Clave')
-    FechaEmision = factura.find('FechaEmision')
-    Emisor = factura.find('Emisor')
-    Receptor = factura.find('Receptor')
+    namespaces = factura.nsmap
+    inv_xmlns = namespaces.pop(None)
+    namespaces['inv'] = inv_xmlns
+
+    #factura = etree.tostring(etree.fromstring(xml_decoded)).decode()
+    #factura = etree.fromstring(re.sub(' xmlns="[^"]+"', '', factura, count=1))
+
+    clave = factura.xpath("inv:Clave", namespaces=namespaces)[0].text
+    fechaEmision = factura.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
+    emisor = factura.xpath("inv:Emisor", namespaces=namespaces)[0]
+    receptor = factura.xpath("inv:Receptor", namespaces=namespaces)[0]
 
     comprobante = {}
-    comprobante['clave'] = Clave.text
-    comprobante["fecha"] = FechaEmision.text
+    comprobante['clave'] = clave
+    comprobante["fecha"] = fechaEmision
     comprobante['emisor'] = {}
-    comprobante['emisor']['tipoIdentificacion'] = Emisor.find('Identificacion').find('Tipo').text
-    comprobante['emisor']['numeroIdentificacion'] = Emisor.find('Identificacion').find('Numero').text
-    if Receptor is not None and Receptor.find('Identificacion') is not None:
+    comprobante['emisor']['tipoIdentificacion'] = emisor.xpath("inv:Identificacion/inv:Tipo", namespaces=namespaces)[0].text
+    comprobante['emisor']['numeroIdentificacion'] = emisor.xpath("inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+    if receptor is not None and receptor.find('Identificacion') is not None:
         comprobante['receptor'] = {}
-        comprobante['receptor']['tipoIdentificacion'] = Receptor.find('Identificacion').find('Tipo').text
-        comprobante['receptor']['numeroIdentificacion'] = Receptor.find('Identificacion').find('Numero').text
+        comprobante['receptor']['tipoIdentificacion'] = receptor.find('Identificacion').find('Tipo').text
+        comprobante['receptor']['numeroIdentificacion'] = receptor.find('Identificacion').find('Numero').text
 
-    #comprobante['comprobanteXml'] = base64.b64encode(xml).decode('utf-8')
     comprobante['comprobanteXml'] = xml
 
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
