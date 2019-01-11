@@ -504,21 +504,28 @@ class AccountInvoiceElectronic(models.Model):
                     now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
                     date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
                     
-                    functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, response_json['token'], inv.company_id.frm_callback_url, date_cr, False)
+                    functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, response_json['token'],
+                                                  inv.company_id.frm_callback_url, date_cr, False)
                 else:
-                    url = inv.company_id.frm_callback_url
-                    root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(inv.xml_supplier_approval).decode("utf-8"), count=1))
+
+                    if abs(self.amount_total_electronic_invoice - self.amount_total) > 1:
+                        continue
+                        raise UserError('Aviso!.\n Monto total no concuerda con monto del XML')
+
+                    elif not inv.xml_supplier_approval:
+                        raise UserError('Aviso!.\n No se ha cargado archivo XML')
+
+                    elif not inv.journal_id.sucursal or not inv.journal_id.terminal:
+                        raise UserError('Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
+
                     if not inv.state_invoice_partner:
-                        raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
-
-                    message_description = "<p><b>Enviando Mensaje Receptor</b></p>"
-                    #if the AcceptanceMessage was rejected, we need to generate a new message id
-                    if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error' or (not inv.number.isdigit()):
-                        message_description +='<p><b>Cambiando consecutivo del Mensaje de Receptor</b> <br /><b>Consecutivo anterior: </b>'+ inv.number + '<br /><b>Estado anterior: </b>'+ inv.state_send_invoice +'</p>'
-                        inv.number = inv.journal_id.sequence_id._next()
-
+                        raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para .'
+                                        'el archivo cargado.')
 
                     if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
+                        url = inv.company_id.frm_callback_url
+                        message_description = "<p><b>Enviando Mensaje Receptor</b></p>"
+
                         if inv.state_invoice_partner == '1':
                             detalle_mensaje = 'Aceptado'
                             tipo = 1
@@ -532,35 +539,53 @@ class AccountInvoiceElectronic(models.Model):
                             tipo = 3
                             tipo_documento = 'RCE'
 
+                        '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
+                        if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error':
+                            message_description += '<p><b>Cambiando consecutivo del Mensaje de Receptor</b> <br />' \
+                                                   '<b>Consecutivo anterior: </b>' + inv.consecutive_number_receiver + \
+                                                   '<br/>' \
+                                                   '<b>Estado anterior: </b>' + inv.state_send_invoice + '</p>'
+
+                            inv.number = inv.journal_id.sequence_id._next()
+
                         now_utc = datetime.datetime.now(pytz.timezone('UTC'))
                         now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
                         date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                        payload = {}
-                        headers = {}
+                        #payload = {}
+                        #headers = {}
 
-                        response_json = functions.get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
+                        response_json = functions.get_clave(self, url, tipo_documento, inv.number,
+                                                            inv.journal_id.sucursal, inv.journal_id.terminal)
+
                         inv.consecutive_number_receiver = response_json.get('resp').get('consecutivo')
 
-                        payload['w'] = 'genXML'
-                        payload['r'] = 'gen_xml_mr'
-                        payload['clave'] = inv.number_electronic
-                        payload['numero_cedula_emisor'] = inv.partner_id.vat
-                        payload['fecha_emision_doc'] = inv.date_issuance
-                        payload['mensaje'] = tipo
-                        payload['detalle_mensaje'] = detalle_mensaje
-                        payload['total_factura'] = inv.amount_total_electronic_invoice
-                        payload['numero_cedula_receptor'] = inv.company_id.vat
-                        payload['numero_consecutivo_receptor'] = inv.consecutive_number_receiver
+                        #payload['w'] = 'genXML'
+                        #payload['r'] = 'gen_xml_mr'
+                        #payload['clave'] = inv.number_electronic
+                        #payload['numero_cedula_emisor'] = inv.partner_id.vat
+                        #payload['fecha_emision_doc'] = inv.date_issuance
+                        #payload['mensaje'] = tipo
+                        #payload['detalle_mensaje'] = detalle_mensaje
+                        #payload['total_factura'] = inv.amount_total_electronic_invoice
+                        #payload['numero_cedula_receptor'] = inv.company_id.vat
+                        #payload['numero_consecutivo_receptor'] = inv.consecutive_number_receiver
 
-                        if inv.amount_tax_electronic_invoice:
-                            payload['monto_total_impuesto'] = inv.amount_tax_electronic_invoice
+                        #if inv.amount_tax_electronic_invoice:
+                        #    payload['monto_total_impuesto'] = inv.amount_tax_electronic_invoice
 
-                        response = requests.request("POST", url, data=payload, headers=headers)
-                        response_json = response.json()
+                        #response = requests.request("POST", url, data=payload, headers=headers)
+                        #response_json = response.json()
 
-                        xml = response_json.get('resp').get('xml')
+                        #xml = response_json.get('resp').get('xml')
+
+                        xml = functions.make_msj_receptor(url, inv.number_electronic, inv.partner_id.vat,
+                                                          inv.date_issuance, tipo, detalle_mensaje,
+                                                          inv.company_id.vat, inv.consecutive_number_receiver,
+                                                          inv.amount_tax_electronic_invoice,
+                                                          inv.amount_total_electronic_invoice)
 
                         response_json = functions.sign_xml(inv, tipo_documento, url, xml)
+
                         if response_json['status'] != 200:
                             _logger.error('MAB - API Error signing XML:%s', response_json['text'])
                             inv.state_send_invoice = 'error'
@@ -599,10 +624,17 @@ class AccountInvoiceElectronic(models.Model):
                             inv.xml_comprobante = False
                             inv.fname_xml_comprobante = False
                             inv.number = inv.consecutive_number_receiver
-                            message_description += '<p><b>Ha enviado Mensaje de Receptor</b>' +'<br /><b>Documento: </b>'+inv.number_electronic +'<br /><b>Consecutivo de mensaje: </b>'+ inv.consecutive_number_receiver + '<br /><b>Mensaje indicado: </b>'+ detalle_mensaje +'</p>'
+                            message_description += '<p><b>Ha enviado Mensaje de Receptor</b>' +\
+                                                   '<br /><b>Documento: </b>'+inv.number_electronic +\
+                                                   '<br /><b>Consecutivo de mensaje: </b>' + \
+                                                   inv.consecutive_number_receiver + '<br/>' \
+                                                   '<b>Mensaje indicado: </b>' + \
+                                                   detalle_mensaje + '</p>'
+
                             self.message_post(body=message_description, 
                                                 subtype='mail.mt_note', 
                                                 content_subtype='html')
+
                             functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
                         else:
                             inv.state_send_invoice = 'error'
