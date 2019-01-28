@@ -9,6 +9,7 @@ import time
 import pytz
 import logging
 from odoo.exceptions import UserError
+from xml.sax.saxutils import escape
 
 _logger = logging.getLogger(__name__)
 
@@ -176,19 +177,19 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['clave'] = inv.number_electronic
     payload['consecutivo'] = consecutivo
     payload['fecha_emision'] = date
-    payload['emisor_nombre'] = inv.company_id.name
+    payload['emisor_nombre'] = escape(inv.company_id.name)
     payload['emisor_tipo_indetif'] = inv.company_id.identification_id.code
     payload['emisor_num_identif'] = inv.company_id.vat
-    payload['nombre_comercial'] = inv.company_id.commercial_name or ''
+    payload['nombre_comercial'] = escape(inv.company_id.commercial_name or '')
     payload['emisor_provincia'] = inv.company_id.state_id.code
     payload['emisor_canton'] = inv.company_id.county_id.code
     payload['emisor_distrito'] = inv.company_id.district_id.code
     payload['emisor_barrio'] = inv.company_id.neighborhood_id.code or ''
-    payload['emisor_otras_senas'] = inv.company_id.street
+    payload['emisor_otras_senas'] = escape(inv.company_id.street)
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
     payload['emisor_tel'] = re.sub('[^0-9]+', '', inv.company_id.phone)
     payload['emisor_email'] = inv.company_id.email
-    payload['receptor_nombre'] = inv.partner_id.name[:80]
+    payload['receptor_nombre'] = escape(inv.partner_id.name[:80])
     payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
     payload['receptor_num_identif'] = inv.partner_id.vat
     payload['receptor_provincia'] = inv.partner_id.state_id.code or ''
@@ -426,3 +427,43 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
 
 def findwholeword(word, search):
     return word.find(search)
+
+
+def consulta_clave(clave, token, env):
+
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/' + clave
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/' + clave
+    else:
+        _logger.error('MAB - Ambiente no definido')
+        return
+
+    headers = {'Authorization': 'Bearer {}'.format(token),
+               'Cache-Control': 'no-cache',
+               'Content-Type': 'application/x-www-form-urlencoded',
+               'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
+    }
+
+    _logger.error('MAB - consulta_clave - url: %s' % url)
+
+    try:
+        #response = requests.request("GET", url, headers=headers)
+        response = requests.get(url, headers=headers)
+        ############################
+    except requests.exceptions.RequestException as e:
+        _logger.error('Exception %s' % e)
+        return {'status': -1, 'text': 'Excepcion %s' % e}
+
+    if 200 <= response.status_code <= 299:
+        response_json = {
+            'status': 200,
+            'ind-estado': response.json().get('ind-estado'),
+            'respuesta-xml': response.json().get('respuesta-xml')
+        }
+    elif 400 <= response.status_code <= 499:
+        response_json = {'status': 400, 'ind-estado': 'error'}
+    else:
+        _logger.error('MAB - consulta_clave failed.  error: %s', response.status_code)
+        response_json = {'status': response.status_code, 'text': 'token_hacienda failed: %s' % response.reason}
+    return response_json
