@@ -12,6 +12,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 from . import functions
+from . import api_facturae
 
 
 _logger = logging.getLogger(__name__)
@@ -797,7 +798,7 @@ class AccountInvoiceElectronic(models.Model):
                         inv.tipo_comprobante = tipo_documento
 
                         # Generando la clave como la especifica Hacienda
-                        response_json = functions.get_claveget_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
+                        response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
                                                             inv.journal_id.terminal)
 
                         inv.number_electronic = response_json.get('resp').get('clave')
@@ -898,13 +899,17 @@ class AccountInvoiceElectronic(models.Model):
                                                                    codigo_referencia, razon_referencia, url, currency_rate)
                         xml = response_json.get('resp').get('xml')
 
-                        response_json = functions.sign_xml(inv, tipo_documento, url, xml)
-                        if response_json['status'] != 200:
-                            _logger.error('MAB - API Error signing XML:%s', response_json['text'])
-                            inv.state_send_invoice = 'error'
-                            continue
+                        xml_firmado_bytes = api_facturae.sign_file2( inv.company_id.signature, inv.company_id.frm_pin, xml)
+                        mreceptor_bytes = xml_firmado_bytes.decode('utf-8')
+                        xml_firmado = base64.b64encode(mreceptor_bytes.encode('ascii'))
 
-                        xml_firmado = response_json.get('xmlFirmado')
+                        # response_json = functions.sign_xml(inv, tipo_documento, url, xml)
+                        # if response_json['status'] != 200:
+                        #     _logger.error('MAB - API Error signing XML:%s', response_json['text'])
+                        #     inv.state_send_invoice = 'error'
+                        #     continue
+
+                        # xml_firmado = response_json.get('xmlFirmado')
 
                         # get token
                         response_json = functions.token_hacienda(inv.company_id)
