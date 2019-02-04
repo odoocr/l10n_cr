@@ -293,7 +293,7 @@ def sign_xml(inv, tipo_documento, url, xml):
     return response_json
 
 
-def send_file(inv, token, date, xml, env, url):
+def send_file(inv, token, date, xml, env):
 
     if env == 'api-stag':
         url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
