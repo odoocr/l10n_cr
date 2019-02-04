@@ -6,12 +6,14 @@ import datetime
 import pytz
 import base64
 import json
-import xml.etree.ElementTree as ET
 from dateutil.parser import parse
+import xml.etree.ElementTree as ET
+from xml.sax.saxutils import escape
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 from . import functions
+from . import api_facturae
 
 
 _logger = logging.getLogger(__name__)
@@ -473,14 +475,14 @@ class AccountInvoiceElectronic(models.Model):
             except Exception as e:
                 # raise UserError(_(
                 #    "This XML file is not XML-compliant. Error: %s") % e)
-                _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
+                _logger.error('MAB - This XML file is not XML-compliant.  Exception %s' % e)
                 return {'status': 400, 'text': 'Excepción de conversión de XML'}
             
             pretty_xml_string = etree.tostring(
                 factura, pretty_print=True, encoding='UTF-8',
                 xml_declaration=True)
 
-            _logger.error('MAB - send_file XML: %s' % pretty_xml_string)
+            _logger.info('MAB - send_file XML: %s' % pretty_xml_string)
 
             namespaces = factura.nsmap
             inv_xmlns = namespaces.pop(None)
@@ -756,11 +758,11 @@ class AccountInvoiceElectronic(models.Model):
             
         total_invoices = len(invoices)
         current_invoice = 0
-        _logger.error('MAB - Consulta Hacienda - Facturas a Verificar: %s', total_invoices)
+        _logger.info('MAB - Consulta Hacienda - Facturas a Verificar: %s', total_invoices)
 
         for i in invoices:
             current_invoice+=1
-            _logger.error('MAB - Consulta Hacienda - Invoice %s / %s  -  number:%s', current_invoice, total_invoices, i.number_electronic)
+            _logger.info('MAB - Consulta Hacienda - Invoice %s / %s  -  number:%s', current_invoice, total_invoices, i.number_electronic)
             #url = i.company_id.frm_callback_url          
 
             response_json = functions.token_hacienda(i.company_id)
@@ -775,11 +777,11 @@ class AccountInvoiceElectronic(models.Model):
 
                 if status == 200:
                     estado_m_h = response_json.get('ind-estado')
-                    _logger.error('MAB - Estado Documento:%s', estado_m_h)
+                    _logger.info('MAB - Estado Documento:%s', estado_m_h)
                 elif status == 400:
                     estado_m_h = response_json.get('ind-estado')
                     i.state_tributacion = 'ne'
-                    _logger.error('MAB - Documento:%s no encontrado en Hacienda.  Estado: %s', i.number_electronic, estado_m_h)
+                    _logger.warning('MAB - Documento:%s no encontrado en Hacienda.  Estado: %s', i.number_electronic, estado_m_h)
                     continue
                 else:
                     _logger.error('MAB - Error inesperado en Consulta Hacienda - Abortando')
@@ -860,26 +862,28 @@ class AccountInvoiceElectronic(models.Model):
 
             i.send_acceptance_message()
 
-            if i.state_send_invoice == 'aceptado':
-                if i.partner_id and i.partner_id.email and not i.partner_id.opt_out:
-                    email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
-                    attachment = self.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.invoice'), ('res_id', '=', i.id),
-                         ('res_field', '=', 'xml_comprobante')], limit=1)
-                    attachment.name = i.fname_xml_comprobante
-                    attachment.datas_fname = i.fname_xml_comprobante
+            # Wong escribió: Esto se hace cuando se consulta el documento y fue aceptado con esto se enviaría dos veces.
+            #  
+            # if i.state_send_invoice == 'aceptado':
+            #     if i.partner_id and i.partner_id.email and not i.partner_id.opt_out:
+            #         email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
+            #         attachment = self.env['ir.attachment'].search(
+            #             [('res_model', '=', 'account.invoice'), ('res_id', '=', i.id),
+            #              ('res_field', '=', 'xml_comprobante')], limit=1)
+            #         attachment.name = i.fname_xml_comprobante
+            #         attachment.datas_fname = i.fname_xml_comprobante
 
-                    attachment_resp = self.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.invoice'), ('res_id', '=', i.id),
-                         ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
-                    attachment_resp.name = i.fname_xml_respuesta_tributacion
-                    attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
+            #         attachment_resp = self.env['ir.attachment'].search(
+            #             [('res_model', '=', 'account.invoice'), ('res_id', '=', i.id),
+            #              ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+            #         attachment_resp.name = i.fname_xml_respuesta_tributacion
+            #         attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
 
-                    email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
-                    email_template.with_context(type='binary', default_type='binary').send_mail(i.id,
-                                                                                                raise_exception=False,
-                                                                                                force_send=True)  # default_type='binary'
-                    email_template.attachment_ids = [(5)]
+            #         email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
+            #         email_template.with_context(type='binary', default_type='binary').send_mail(i.id,
+            #                                                                                     raise_exception=False,
+            #                                                                                     force_send=True)  # default_type='binary'
+            #         email_template.attachment_ids = [(5)]
 
 
     @api.model
@@ -894,12 +898,13 @@ class AccountInvoiceElectronic(models.Model):
                                                        limit=max_invoices)
         total_invoices = len(invoices)
         current_invoice = 0
-        _logger.error('MAB - Valida Hacienda - Invoices to check: %s', total_invoices)
+        _logger.info('MAB - Valida Hacienda - Invoices to check: %s', total_invoices)
+
         for inv in invoices:
             current_invoice += 1
-            _logger.error('MAB - Valida Hacienda - Invoice %s / %s  -  number:%s', current_invoice, total_invoices, inv.number_electronic)
+            _logger.info('MAB - Valida Hacienda - Invoice %s / %s  -  number:%s', current_invoice, total_invoices, inv.number_electronic)
             if not inv.number.isdigit(): # or (len(inv.number) == 10):
-                _logger.error('MAB - Valida Hacienda - skipped Invoice %s', inv.number)
+                _logger.info('MAB - Valida Hacienda - skipped Invoice %s', inv.number)
                 inv.state_tributacion = 'na'
                 continue
 
@@ -1004,7 +1009,7 @@ class AccountInvoiceElectronic(models.Model):
                         for i in inv_line.invoice_line_tax_ids:
                             taxes_lookup[i.id] = {'tax_code': i.tax_code, 'tarifa': i.amount}
                         for i in line_taxes['taxes']:
-                            if taxes_lookup[i['id']]['tax_code'] <> '00':
+                            if taxes_lookup[i['id']]['tax_code'] != '00':
                                 tax_index += 1
                                 tax_amount = round(i['amount'], 5)*quantity
                                 impuesto_linea += tax_amount
@@ -1049,19 +1054,13 @@ class AccountInvoiceElectronic(models.Model):
                     lines[line_number] = line
 
                 response_json = functions.make_xml_invoice(inv, tipo_documento, inv.number, date_cr,
-                                                           sale_conditions, medio_pago, total_servicio_gravado,
-                                                           total_servicio_exento, total_mercaderia_gravado,
-                                                           total_mercaderia_exento, base_subtotal,
-                                                           total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
-                                                           tipo_documento_referencia, numero_documento_referencia,
-                                                           fecha_emision_referencia,
-                                                           codigo_referencia, razon_referencia, url, currency_rate)
-                if response_json['status'] != 200:
-                    _logger.error('MAB - API Error creating XML:%s', response_json['text'])
-                    inv.state_tributacion = 'error'
-                    continue
-
-                xml = response_json.get('xml')
+                                                                   sale_conditions, medio_pago, round(total_servicio_gravado, 2),
+                                                                   round(total_servicio_exento, 2), round(total_mercaderia_gravado, 2),
+                                                                   round(total_mercaderia_exento, 2), base_subtotal, json.dumps(lines, ensure_ascii=False),
+                                                                   tipo_documento_referencia, numero_documento_referencia,
+                                                                   fecha_emision_referencia,
+                                                                   codigo_referencia, razon_referencia, url, currency_rate)
+                xml = response_json.get('resp').get('xml')
                 response_json = functions.sign_xml(inv, tipo_documento, url, xml)
                 if response_json['status'] != 200:
                     _logger.error('MAB - API Error signing XML:%s', response_json['text'])
@@ -1071,23 +1070,24 @@ class AccountInvoiceElectronic(models.Model):
                 inv.date_issuance = date_cr
                 inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
                 inv.xml_comprobante = response_json.get('xmlFirmado')
-                _logger.error('MAB - SIGNED XML:%s', inv.fname_xml_comprobante)
+                _logger.info('MAB - SIGNED XML:%s', inv.fname_xml_comprobante)
 
             # get token
             response_json = functions.token_hacienda(inv.company_id)
+            token_m_h = response_json['token']
             if response_json['status'] == 200:
-                response_json = functions.send_file(inv, response_json['token'], inv.xml_comprobante, inv.company_id.frm_ws_ambiente)
-                response_status = response_json.get('status')
+                response_json = functions.send_file(inv, token_m_h, inv.date_issuance, inv.xml_comprobante, inv.company_id.frm_ws_ambiente)
+                response_status = response_json.get('resp').get('Status')
                 if 200 <=  response_status <= 299:
                     inv.state_tributacion = 'procesando'
                     #functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
                 else:
                     inv.state_tributacion = 'error'
                     #inv.number_electronic = inv.number_electronic + ' - ' + response_json.get('text')
-                    _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', inv.number_electronic, response_status, response_json['text'])
+                    _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', inv.number_electronic, response_status, response_json.get('resp').get('text'))
             else:
                 _logger.error('MAB - Error obteniendo token_hacienda')
-        _logger.error('MAB - Valida Hacienda - Finalizado Exitosamente')
+        _logger.info('MAB - Valida Hacienda - Finalizado Exitosamente')
 
 
     @api.multi
@@ -1163,11 +1163,11 @@ class AccountInvoiceElectronic(models.Model):
                                 raise UserError('No hay tipo de cambio registrado para la moneda ' + currency.name)
 
                         # Generando la clave como la especifica Hacienda
-                        response_json = functions.get_claveget_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
+                        response_json = functions.get_clave(self, url, tipo_documento, next_number, inv.journal_id.terminal,
                                                             inv.journal_id.terminal)
 
                         inv.number_electronic = response_json.get('resp').get('clave')
-                        consecutivo = response_json.get('resp').get('consecutivo')
+                        inv.number = response_json.get('resp').get('consecutivo')
 
                     else:
                         raise UserError('Debe configurar correctamente la secuencia del documento')

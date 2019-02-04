@@ -13,6 +13,7 @@
         'data/currency_data.xml',
         'views/res_currency_rate_view.xml'
     ],
+    'external_dependencies': {'python': ['suds-py3']},
     'installable': True,
     'auto_install': False,
 }
