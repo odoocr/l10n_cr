@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="res_config_settings_view_form_ak_reimburse" model="ir.ui.view">
-        <field name="name">res.config.settings.view.form.inherit.ak.reimburse</field>
+    <record id="res_config_settings_view_form_fe_cr" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.fe.cr</field>
         <field name="model">res.config.settings</field>
-        <field name="priority" eval="10"/>
         <field name="inherit_id" ref="account.res_config_settings_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="//div[@id='asset_types']" position="after">
-                 <div class="col-xs-12 col-md-6 o_setting_box" id="fe-reimburse" title="Default expense account when importing Costa Rican electronic invoices automatically">
-                    <label class="o_form_label col-xs-12" for="default_expense_account_id" data-original-title="" title="">Default account for expenses when importing electronic invoice</label>
-					<field class="col-xs-12" name="default_expense_account_id" string="Default account for expenses when importing electronic invoice" />
-                    <label class="o_form_label col-xs-12" for="reimbursable_email" data-original-title="" title="">email to receive reimbursable electronic invoices</label>
-                    <field class="col-xs-12" name="reimbursable_email" string="email to receive reimbursable electronic invoices" />
-                    <label class="o_form_label col-xs-12" for="notification_email" data-original-title="" title="">email to notify any alert or problem CR electronic invoice related</label>
-                    <field class="col-xs-12" name="notification_email" string="email to notify any issue with electronic invoices procesing" />
+            <xpath expr="//field[@name='invoice_import_email']" position="after">
+                <div class="row mt16">
+                  <label class="o_form_label col-md-6 o_light_label" for="default_expense_account_id"/>
+                  <field class="col-xs-6" name="default_expense_account_id" string="Default account for expenses when importing electronic invoice" />
+                </div>
+                <div class="row mt16">
+                  <label class="o_form_label col-md-6 o_light_label" for="reimbursable_email"/>
+                  <field class="col-xs-6" name="reimbursable_email" string="email to receive reimbursable electronic invoices" />
+                </div>
+                <div class="row mt16">
+                  <label class="o_form_label col-md-6 o_light_label" for="notification_email"/>
+                  <field class="col-xs-6" name="notification_email" string="email to notify any issue with electronic invoices procesing" />
                 </div>
 			</xpath>
         </field>
