@@ -8,7 +8,6 @@ try:
 except ImportError:
     from xml.etree import ElementTree
 
-
 def get_time_hacienda():
     now_utc = datetime.datetime.now(pytz.timezone('UTC'))
     now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))

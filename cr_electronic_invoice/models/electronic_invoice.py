@@ -930,3 +930,4 @@ class AccountInvoiceElectronic(models.Model):
 
                     else:
                         raise UserError('Debe configurar correctamente la secuencia del documento')
+
