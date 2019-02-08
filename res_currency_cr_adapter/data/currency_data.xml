@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <record id="currency_rate_precision" model="decimal.precision">
+        <record forcecreate="True" id="currency_rate_precision" model="decimal.precision">
             <field name="name">Currency Rate Precision</field>
             <field name="digits">13</field>
         </record>
