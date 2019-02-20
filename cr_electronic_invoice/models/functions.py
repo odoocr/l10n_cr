@@ -246,7 +246,7 @@ def token_hacienda(company):
     else:
         if company.frm_ws_ambiente == 'api-prod':
             url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
-        else:    #if env == 'api-stag':
+        else:
             url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
 
         data = {
@@ -423,10 +423,6 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
 
                 # limpia el template de los attachments
                 email_template.attachment_ids = [(5)]
-
-
-def findwholeword(word, search):
-    return word.find(search)
 
 
 def consulta_clave(clave, token, env):
