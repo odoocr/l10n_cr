@@ -10,11 +10,15 @@ from dateutil.parser import parse
 from lxml import etree
 import logging
 import re
+import io
 import mimetypes
 import base64
+import PyPDF2
 
 logger = logging.getLogger(__name__)
 
+# Dictionary to store all the attachemnts until they are processed 
+invoices = dict()
 
 class AccountInvoiceImport(models.TransientModel):
     _name = 'account.invoice.import'
@@ -106,16 +110,6 @@ class AccountInvoiceImport(models.TransientModel):
         inv_xmlns = namespaces.pop(None)
         namespaces['inv'] = inv_xmlns
         logger.debug('XML file namespaces=%s', namespaces)
-        xml_string = etree.tostring(
-            xml_root, pretty_print=True, encoding='UTF-8',
-            xml_declaration=True)
-        #fe_cr_version_xpath = xml_root.xpath(
-        #    "//cbc:UBLVersionID", namespaces=namespaces)
-        #fe_cr_version = fe_cr_version_xpath and fe_cr_version_xpath[0].text or '2.1'
-        fe_cr_version = '4.2'
-        # Check XML schema to avoid headaches trying to import invalid files
-        # not working !
-        # self._fe_cr_check_xml_schema(xml_string, document_type, version=fe_cr_version)
         prec = self.env['decimal.precision'].precision_get('Account')
 
         document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda',
@@ -144,10 +138,7 @@ class AccountInvoiceImport(models.TransientModel):
             amount_total_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)
             amount_total = float(amount_total_xpath[0].text)
             total_line = amount_untaxed
-            #payment_type_code = xml_root.xpath(
-            #    "/inv:Invoice/cac:PaymentMeans/"
-            #    "cbc:PaymentMeansCode[@listAgencyID='6']",
-            #   namespaces=namespaces)
+
             res_lines = []
             counters = {'lines': 0.0}
             inv_line_xpath = xml_root.xpath('inv:DetalleServicio/inv:LineaDetalle', namespaces=namespaces)
@@ -391,9 +382,6 @@ class AccountInvoiceImport(models.TransientModel):
             pass
         return pp_parsed_inv
     
-    # Dictionary to store all the attachemnts until they are processed 
-    invoices = dict()
-
     @api.model
     def message_new(self, msg_dict, custom_values=None):
 
@@ -465,13 +453,7 @@ class AccountInvoiceImport(models.TransientModel):
             # clasify all the attachments because there could be several invoices in an email or it could be a response or pdf in one email and the invoice.xml in another email.
             for attachment in msg_dict['attachments']:
                 if attachment.fname.endswith('.xml'):
-                    invoice_file_b64 = base64.b64encode(attach.content)
-                    try:
-                        xml_root = etree.fromstring(invoice_file_b64)
-                    except Exception as e:
-                        raise UserError(_(
-                            "This XML file is not XML-compliant. Error: %s") % e)
-
+                    xml_root = etree.fromstring(attachment.content)
                     namespaces = xml_root.nsmap
                     inv_xmlns = namespaces.pop(None)
                     namespaces['inv'] = inv_xmlns
@@ -481,10 +463,22 @@ class AccountInvoiceImport(models.TransientModel):
                         if clave and clave not in invoices: 
                             invoices[clave] = dict()
                         invoices[clave]['invoice_attachment'] = attachment
-                    elif root.tag == 'MensajeHacienda':
+                    elif document_type == 'MensajeHacienda':
                         invoices[clave]['respuesta_hacienda'] = attachment
                 elif attachment.fname.endswith('.pdf'):
-                    pdfs_list.append(attachment)
+                    pdf_file = io.BytesIO(attachment.content)
+                    read_pdf = PyPDF2.PdfFileReader(pdf_file)
+                    number_of_pages = read_pdf.getNumPages()
+                    page = read_pdf.getPage(0)
+                    pdf_text = page.extractText()
+                    claves = re.findall(r'\d{50}', pdf_text)
+                    if claves and claves[0]:
+                        clave = claves[0]
+                        if clave and clave not in invoices: 
+                            invoices[clave] = dict()
+                        invoices[clave]['pdf_attachment'] = attachment
+                    else:
+                        pdfs_list.append(attachment)
 
             i += 1
             for clave in invoices:
