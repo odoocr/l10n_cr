@@ -11,6 +11,9 @@
     'author': 'Costa Rica Odoo Community',
     'website': 'http://www.crlibre.org',
     'depends': ['account_invoice_import', 'base_fe_cr'],
-    'data': ['wizard/account_invoice_import_view.xml'],
+    'data': [
+            'views/res_config_settings_views.xml',
+            'wizard/account_invoice_import_view.xml'
+        ],
     'installable': True,
 }

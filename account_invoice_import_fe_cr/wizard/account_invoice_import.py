@@ -10,11 +10,15 @@ from dateutil.parser import parse
 from lxml import etree
 import logging
 import re
+import io
 import mimetypes
 import base64
+import PyPDF2
 
 logger = logging.getLogger(__name__)
 
+# Dictionary to store all the attachemnts until they are processed 
+invoices = dict()
 
 class AccountInvoiceImport(models.TransientModel):
     _name = 'account.invoice.import'
@@ -100,21 +104,12 @@ class AccountInvoiceImport(models.TransientModel):
 
     @api.model
     def parse_fe_cr_invoice(self, xml_root, document_type):
+        
         """Parse FE CR Invoice XML file"""
         namespaces = xml_root.nsmap
         inv_xmlns = namespaces.pop(None)
         namespaces['inv'] = inv_xmlns
         logger.debug('XML file namespaces=%s', namespaces)
-        xml_string = etree.tostring(
-            xml_root, pretty_print=True, encoding='UTF-8',
-            xml_declaration=True)
-        #fe_cr_version_xpath = xml_root.xpath(
-        #    "//cbc:UBLVersionID", namespaces=namespaces)
-        #fe_cr_version = fe_cr_version_xpath and fe_cr_version_xpath[0].text or '2.1'
-        fe_cr_version = '4.2'
-        # Check XML schema to avoid headaches trying to import invalid files
-        # not working !
-        # self._fe_cr_check_xml_schema(xml_string, document_type, version=fe_cr_version)
         prec = self.env['decimal.precision'].precision_get('Account')
 
         document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda',
@@ -143,10 +138,7 @@ class AccountInvoiceImport(models.TransientModel):
             amount_total_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)
             amount_total = float(amount_total_xpath[0].text)
             total_line = amount_untaxed
-            #payment_type_code = xml_root.xpath(
-            #    "/inv:Invoice/cac:PaymentMeans/"
-            #    "cbc:PaymentMeansCode[@listAgencyID='6']",
-            #   namespaces=namespaces)
+
             res_lines = []
             counters = {'lines': 0.0}
             inv_line_xpath = xml_root.xpath('inv:DetalleServicio/inv:LineaDetalle', namespaces=namespaces)
@@ -364,15 +356,9 @@ class AccountInvoiceImport(models.TransientModel):
                 xml_declaration=True)
             logger.debug('Starting to import the following XML file:')
             logger.debug(pretty_xml_string)
-            parsed_inv = self.parse_xml_invoice(xml_root)
-            if parsed_inv == {}:
-                #xml-hacienda
-                pass
-            elif parsed_inv is False:
-                raise UserError(_(
-                    "This type of XML invoice is not supported. "
-                    "Did you install the module to support this type "
-                    "of file?"))
+
+            document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda', xml_root.tag).group(0)
+            
         # Fallback on PDF
         else:
             #pdf
@@ -398,6 +384,12 @@ class AccountInvoiceImport(models.TransientModel):
     
     @api.model
     def message_new(self, msg_dict, custom_values=None):
+
+        reimbursable_email = self.env['ir.config_parameter'].sudo().get_param('reimbursable_email')
+        
+        # Is it for reimburse
+        reimbursable = reimbursable_email in msg_dict['to']
+
         #TODO: Agregar una expresión regular para obtener el correo de configuración
         # del cual se van a importar las facturas electrónicas
         #TODO: Mergear la lógica de esta importación con la lectura del
@@ -447,69 +439,106 @@ class AccountInvoiceImport(models.TransientModel):
         else:  # mono-company setup
             company_id = all_companies[0]['id']
 
+        # Se identifican los XMLs por clave y por tipo y los PDFs se meten todos en una lista para adjuntarlos a todas las facturas en este email.
+        # Porque no tenemos un metodo seguro de buscar la clave dentro del PDF
+        
+        pdfs_list = list()
+
         self = self.with_context(force_company=company_id)
         aiico = self.env['account.invoice.import.config']
         bdio = self.env['business.document.import']
         i = 0
         attrs_inv = {}
         if msg_dict.get('attachments'):
-            i += 1
-            for attach in msg_dict['attachments']:
-                invoice_filename = attach.fname
-                invoice_file_b64 = base64.b64encode(attach.content)
-                filetype = mimetypes.guess_type(invoice_filename)
-                logger.info(
-                    'Attachment %d: %s. Trying to import it as an invoice',
-                    i, invoice_filename)
-                parsed_inv = self.parse_invoice(
-                    invoice_file_b64, invoice_filename)
-                if (filetype and 
-                        filetype[0] in ['application/xml', 'text/xml'] and
-                        parsed_inv != {}):
-                    partner = bdio._match_partner(
-                        parsed_inv['partner'], parsed_inv['chatter_msg'])
-
-                    existing_inv = self.invoice_already_exists(partner, parsed_inv)
-                    if existing_inv:
-                        logger.warning(
-                            "Mail import: this supplier invoice already exists "
-                            "in Odoo (ID %d number %s supplier number %s)",
-                            existing_inv.id, existing_inv.number,
-                            parsed_inv.get('invoice_number'))
-                        continue
-                    import_configs = aiico.search([
-                        ('partner_id', '=', partner.id),
-                        ('company_id', '=', company_id)])
-                    if not import_configs:
-                        logger.warning(
-                            "Mail import: missing Invoice Import Configuration "
-                            "for partner '%s'.", partner.display_name)
-                        #continue
-                        import_config = self._default_config(partner, company_id)
-                    elif len(import_configs) == 1:
-                        import_config = import_configs.convert_to_import_config()
+            # clasify all the attachments because there could be several invoices in an email or it could be a response or pdf in one email and the invoice.xml in another email.
+            for attachment in msg_dict['attachments']:
+                if attachment.fname.endswith('.xml'):
+                    xml_root = etree.fromstring(attachment.content)
+                    namespaces = xml_root.nsmap
+                    inv_xmlns = namespaces.pop(None)
+                    namespaces['inv'] = inv_xmlns
+                    document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda', xml_root.tag).group(0)
+                    if document_type != 'MensajeHacienda':
+                        clave = xml_root.xpath("inv:Clave", namespaces=namespaces)[0].text
+                        if clave and clave not in invoices: 
+                            invoices[clave] = dict()
+                        invoices[clave]['invoice_attachment'] = attachment
+                    elif document_type == 'MensajeHacienda':
+                        invoices[clave]['respuesta_hacienda'] = attachment
+                elif attachment.fname.endswith('.pdf'):
+                    pdf_file = io.BytesIO(attachment.content)
+                    read_pdf = PyPDF2.PdfFileReader(pdf_file)
+                    number_of_pages = read_pdf.getNumPages()
+                    page = read_pdf.getPage(0)
+                    pdf_text = page.extractText()
+                    claves = re.findall(r'\d{50}', pdf_text)
+                    if claves and claves[0]:
+                        clave = claves[0]
+                        if clave and clave not in invoices: 
+                            invoices[clave] = dict()
+                        invoices[clave]['pdf_attachment'] = attachment
                     else:
-                        logger.info(
-                            "There are %d invoice import configs for partner %s. "
-                            "Using the first one '%s''", len(import_configs),
-                            partner.display_name, import_configs[0].name)
-                        import_config =\
-                            import_configs[0].convert_to_import_config()
-                    attrs_inv['parsed_inv'] = parsed_inv
-                    attrs_inv['import_config'] = import_config 
-                    #invoice = self.create_invoice(parsed_inv, import_config)
-                    #logger.info('Invoice ID %d created from email', invoice.id)
-                    # invoice.message_post(_(
-                    #     "Invoice successfully imported from email sent by "
-                    #     "<b>%s</b> on %s with subject <i>%s</i>.") % (
-                    #         msg_dict.get('email_from'), msg_dict.get('date'),
-                    #         msg_dict.get('subject')))
-                else:
-                    #pdf
-                    pass
-                if 'attachments' not in attrs_inv:
-                    attrs_inv['attachments'] = {}
-                attrs_inv['attachments'][invoice_filename] = invoice_file_b64
+                        pdfs_list.append(attachment)
+
+            i += 1
+            for clave in invoices:
+                invoice = False
+                invoices[clave]['pdfs'] = pdfs_list
+                if 'invoice_attachment' in invoices[clave]:
+                    attach = invoices[clave]['invoice_attachment']
+                    invoice_filename = attach.fname
+                    invoice_file_b64 = base64.b64encode(attach.content)
+                    file_data = base64.b64decode(invoice_file_b64)
+                    filetype = mimetypes.guess_type(invoice_filename)
+                    logger.info('Attachment %d: %s. Trying to import it as an invoice', i, invoice_filename)
+                    parsed_inv = self.parse_invoice(invoice_file_b64, invoice_filename)
+                    if (filetype and filetype[0] in ['application/xml', 'text/xml'] and
+                            parsed_inv != {}):
+                        partner = bdio._match_partner(
+                            parsed_inv['partner'], parsed_inv['chatter_msg'])
+
+                        existing_inv = self.invoice_already_exists(partner, parsed_inv)
+                        if existing_inv:
+                            logger.warning(
+                                "Mail import: this supplier invoice already exists "
+                                "in Odoo (ID %d number %s supplier number %s)",
+                                existing_inv.id, existing_inv.number,
+                                parsed_inv.get('invoice_number'))
+                            continue
+                        import_configs = aiico.search([
+                            ('partner_id', '=', partner.id),
+                            ('company_id', '=', company_id)])
+                        if not import_configs:
+                            logger.warning(
+                                "Mail import: missing Invoice Import Configuration "
+                                "for partner '%s'.", partner.display_name)
+                            #continue
+                            import_config = self._default_config(partner, company_id)
+                        elif len(import_configs) == 1:
+                            import_config = import_configs.convert_to_import_config()
+                        else:
+                            logger.info(
+                                "There are %d invoice import configs for partner %s. "
+                                "Using the first one '%s''", len(import_configs),
+                                partner.display_name, import_configs[0].name)
+                            import_config =\
+                                import_configs[0].convert_to_import_config()
+                        attrs_inv['parsed_inv'] = parsed_inv
+                        attrs_inv['import_config'] = import_config 
+                        #invoice = self.create_invoice(parsed_inv, import_config)
+                        #logger.info('Invoice ID %d created from email', invoice.id)
+                        # invoice.message_post(_(
+                        #     "Invoice successfully imported from email sent by "
+                        #     "<b>%s</b> on %s with subject <i>%s</i>.") % (
+                        #         msg_dict.get('email_from'), msg_dict.get('date'),
+                        #         msg_dict.get('subject')))
+                    else:
+                        #pdf
+                        pass
+                    if 'attachments' not in attrs_inv:
+                        attrs_inv['attachments'] = {}
+                    attrs_inv['attachments'][invoice_filename] = invoice_file_b64
+                    
             if 'parsed_inv' in attrs_inv:
                 final_inv = {}
                 final_inv.update(attrs_inv['parsed_inv'])
