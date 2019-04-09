@@ -19,7 +19,7 @@
              'data/reference.code.csv',
              'data/reference.document.csv',
              'data/sale.conditions.csv',
-             'data/product.uom.csv',
+             'data/uom.uom.csv',
              'data/mail_template_data.xml',
              'data/aut.ex.csv',
              'views/uom_views.xml',
