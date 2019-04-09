@@ -2,7 +2,7 @@
 
 {
     'name': 'Facturación electrónica Costa Rica',
-	'version': '0.2',
+	'version': '12.0.0.1',
 	'author': 'CRLibre.org',
 	'license': 'AGPL-3',
 	'website': 'https://crlibre.org/',
@@ -11,7 +11,7 @@
 		'''
 		Facturación electronica Costa Rica.
 		''',
-	'depends': ['base', 'account', 'product', 'sale_management', 'sales_team', 'account_invoicing', 'l10n_cr_country_codes', 'account_cancel', 'res_currency_cr_adapter', ],
+	'depends': ['base', 'account', 'product', 'sale_management', 'sales_team', 'l10n_cr_country_codes', 'account_cancel', 'res_currency_cr_adapter', ],
 	'data': ['data/data.xml',
              'data/code.type.product.csv',
              'data/identification.type.csv',

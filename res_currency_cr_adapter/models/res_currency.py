@@ -77,15 +77,15 @@ class ResCurrencyRate(models.Model):
             buyingRate = 1/buyingOriginalRate # Odoo utiliza un valor inverso. Es decir a cuantos dólares equivale 1 colón. Por eso se divide 1 colon entre el tipo de cambio. 
 
         # Save the exchange rate in database
+        currency = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
         today = currentDate.strftime('%Y-%m-%d')
-
-        ratesIds = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
+        ratesIds = self.env['res.currency.rate'].search([('name', '=', today), ('currency_id', '=', currency.id)], limit=1)
 
         if len(ratesIds) > 0:
-            newRate = ratesIds.write({'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': 3})
-            _logger.info({'name': today, 'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': 3})
+            newRate = ratesIds.write({'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': currency.id})
+            _logger.info({'name': today, 'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': currency.id})
         else:
-            newRate = self.create({'name': today,'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': 3})
-            _logger.info({'name': today, 'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': 3})
+            newRate = self.create({'name': today,'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': currency.id})
+            _logger.info({'name': today, 'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': currency.id})
 
         _logger.info("=========================================================")
