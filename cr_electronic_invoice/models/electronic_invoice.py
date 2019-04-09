@@ -7,6 +7,7 @@ import pytz
 import base64
 import json
 from dateutil.parser import parse
+from num2words import num2words
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
 from odoo import models, fields, api, _
@@ -14,7 +15,6 @@ from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 from . import functions
 from lxml import etree
-from .. import extensions
 
 _logger = logging.getLogger(__name__)
 
@@ -173,7 +173,7 @@ class AccountInvoiceElectronic(models.Model):
     state_email = fields.Selection([('no_email', 'Sin cuenta de correo'), ('sent', 'Enviado'),
                                     ('fe_error', 'Error FE')], 'Estado email', copy=False)
 
-    invoice_amount_text = fields.Char(string='Monto en Letras', readonly=True, required=False, )
+    invoice_amount_text = fields.Char(string='Amount in words', readonly=True, required=False, )
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),
@@ -518,6 +518,7 @@ class AccountInvoiceElectronic(models.Model):
                               invoice_type[invoice.type], invoice.id, invoice.number)
                 refund_invoice.message_post(body=message)
                 refund_invoice.payment_methods_id = invoice.payment_methods_id
+                refund_invoice.payment_term_id = invoice.payment_term_id
                 new_invoices += refund_invoice
             return new_invoices
 
@@ -617,10 +618,10 @@ class AccountInvoiceElectronic(models.Model):
                                                       limit=max_invoices)
         total_invoices=len(invoices)
         current_invoice=0
-        _logger.debug('MAB - Confirma Hacienda - Invoices to check: %s', total_invoices)
+        _logger.info('MAB - Confirma Hacienda - Invoices to check: %s', total_invoices)
         for i in invoices:
             current_invoice+=1
-            _logger.debug('MAB - Confirma Hacienda - Invoice %s / %s  -  number:%s', current_invoice, total_invoices, i.number_electronic)
+            _logger.info('MAB - Confirma Hacienda - Invoice %s / %s  -  number:%s', current_invoice, total_invoices, i.number_electronic)
 
             if abs(i.amount_total_electronic_invoice - i.amount_total) > 1:
                 continue   # xml de proveedor no se ha procesado, debemos llamar la carga
@@ -634,7 +635,7 @@ class AccountInvoiceElectronic(models.Model):
                                                        ('state', 'in', ('open', 'paid')),
                                                        ('number_electronic', '!=', False),
                                                        ('date_invoice', '>=', '2018-10-01'),
-                                                       ('state_tributacion', '=', False)],
+                                                       '|', ('state_tributacion', '=', False), ('state_tributacion', 'in', ('ne', 'error'))],
                                                       order='number',
                                                       limit=max_invoices)
 
@@ -805,14 +806,11 @@ class AccountInvoiceElectronic(models.Model):
 
                     lines[line_number] = line
 
-                # convertir el monto de la factura a texto
-                inv.invoice_amount_text = extensions.text_converter.number_to_text_es(base_subtotal + total_impuestos)
-
                 response_json = functions.make_xml_invoice(inv, tipo_documento, inv.number, date_cr, sale_conditions,
                                                            medio_pago, round(total_servicio_gravado, 2),
                                                            round(total_servicio_exento, 2),
                                                            round(total_mercaderia_gravado, 2),
-                                                           round(total_mercaderia_exento, 2), base_subtotal,
+                                                       round(total_mercaderia_exento, 2), base_subtotal,
                                                            json.dumps(lines, ensure_ascii=False),
                                                            tipo_documento_referencia, numero_documento_referencia,
                                                            fecha_emision_referencia, codigo_referencia,
@@ -852,16 +850,18 @@ class AccountInvoiceElectronic(models.Model):
     @api.multi
     def action_invoice_open(self):
         super(AccountInvoiceElectronic, self).action_invoice_open()
-
+        
         # Revisamos si el ambiente para Hacienda está habilitado
         if self.company_id.frm_ws_ambiente != 'disabled':
-
             url = self.company_id.frm_callback_url
             now_utc = datetime.datetime.now(pytz.timezone('UTC'))
             now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
             date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
 
             for inv in self:
+                
+                #inv.invoice_amount_text = _("Total amount in words: ")+num2words(inv.amount_total , lang=self.partner_id.lang)
+
                 if(inv.journal_id.type == 'sale'):
 
                     if inv.number.isdigit() and (len(inv.number) <= 10):
@@ -927,6 +927,8 @@ class AccountInvoiceElectronic(models.Model):
 
                         inv.number_electronic = response_json.get('resp').get('clave')
                         inv.number = response_json.get('resp').get('consecutivo')
+
+                        inv.state_tributacion = 'procesando'
 
                     else:
                         raise UserError('Debe configurar correctamente la secuencia del documento')

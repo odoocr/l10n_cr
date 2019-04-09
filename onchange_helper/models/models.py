@@ -46,6 +46,6 @@ class Base(models.AbstractModel):
             all_values.update(new_values)
 
         return {
-            f: v for f, v in all_values.iteritems()
+            f: v for f, v in all_values.items()
             if not self._fields[f].compute
             and (f in values or f in new_values)}

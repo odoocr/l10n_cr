@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import models
+from . import test_fe_cr
