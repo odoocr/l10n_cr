@@ -302,6 +302,11 @@ class AccountInvoiceImport(models.TransientModel):
                 uom = bdio._match_uom(
                     line.get('uom'), parsed_inv['chatter_msg'])
                 il_vals['uom_id'] = uom.id
+                
+                taxes = bdio._match_taxes(
+                        line.get('taxes'), parsed_inv['chatter_msg'])
+                il_vals['invoice_line_tax_ids'] = [(6, 0, taxes.ids)]
+
                 il_vals.update({
                     'quantity': line['qty'],
                     'price_unit': line['price_unit'],  # TODO fix for tax incl

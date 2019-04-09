@@ -18,7 +18,7 @@ import PyPDF2
 logger = logging.getLogger(__name__)
 
 # Dictionary to store all the attachemnts until they are processed 
-invoices = dict()
+invoices = {}
 
 class AccountInvoiceImport(models.TransientModel):
     _name = 'account.invoice.import'
@@ -28,7 +28,7 @@ class AccountInvoiceImport(models.TransientModel):
     def parse_xml_invoice(self, xml_root):
         if xml_root.tag:
             try:
-                document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda', xml_root.tag).group(0)
+                document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica', xml_root.tag).group(0)
                 return self.parse_fe_cr_invoice(xml_root, document_type)
             except AttributeError:
                 return super(AccountInvoiceImport, self).parse_xml_invoice(xml_root)
@@ -49,10 +49,12 @@ class AccountInvoiceImport(models.TransientModel):
         name = name_xpath and name_xpath[0].text or '-'
         price_unit_xpath = iline.xpath("inv:PrecioUnitario", namespaces=namespaces)
         price_unit = float(price_unit_xpath[0].text)
+        MontoTotal = iline.xpath("inv:MontoTotal", namespaces=namespaces)
+        total_line = float(MontoTotal[0].text)
         discount_xpath = iline.xpath("inv:MontoDescuento", namespaces=namespaces)
         if discount_xpath:
             discount_amount = float(discount_xpath[0].text)
-            discount = discount_amount / qty / price_unit * 100
+            discount = discount_amount / total_line * 100
             discount_details_xpath = iline.xpath("inv:NaturalezaDescuento", namespaces=namespaces)
             discount_details = discount_details_xpath[0].text
         else:
@@ -104,282 +106,116 @@ class AccountInvoiceImport(models.TransientModel):
 
     @api.model
     def parse_fe_cr_invoice(self, xml_root, document_type):
-        
-        """Parse FE CR Invoice XML file"""
+        """Parse UBL Invoice XML file"""
         namespaces = xml_root.nsmap
         inv_xmlns = namespaces.pop(None)
         namespaces['inv'] = inv_xmlns
         logger.debug('XML file namespaces=%s', namespaces)
+        xml_string = etree.tostring(
+            xml_root, pretty_print=True, encoding='UTF-8',
+            xml_declaration=True)
+        #fe_cr_version_xpath = xml_root.xpath(
+        #    "//cbc:UBLVersionID", namespaces=namespaces)
+        #fe_cr_version = fe_cr_version_xpath and fe_cr_version_xpath[0].text or '2.1'
+        fe_cr_version = '4.2'
+        # Check XML schema to avoid headaches trying to import invalid files
+        # not working !
+        # self._fe_cr_check_xml_schema(xml_string, document_type, version=fe_cr_version)
         prec = self.env['decimal.precision'].precision_get('Account')
 
-        document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda',
+        document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica',
                                   xml_root.tag).group(0)
-        if document_type != 'MensajeHacienda':
-            inv_type = 'in_invoice'
-            if document_type == 'NotaCreditoElectronica':
-                inv_type = 'in_refund'
-            number_electronic = xml_root.xpath("inv:Clave", namespaces=namespaces)[0].text
-            reference = number_electronic[21:41]
-            date_issuance = xml_root.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
-            currency = xml_root.xpath("inv:ResumenFactura/inv:CodigoMoneda", namespaces=namespaces)[0].text or "CRC"
-            currency_id = self.env['res.currency'].search([('name', '=', currency)], limit=1).id
-            date_invoice = parse(date_issuance)
+        inv_type = 'in_invoice'
+        if document_type == 'NotaCreditoElectronica':
+            inv_type = 'in_refund'
+        number_electronic = xml_root.xpath("inv:Clave", namespaces=namespaces)[0].text
+        reference = number_electronic[21:41]
+        date_issuance = xml_root.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
+        currency_xpath = xml_root.xpath("inv:ResumenFactura/inv:CodigoMoneda", namespaces=namespaces)
+        currency = currency_xpath and currency_xpath[0].text or 'CRC'
+        currency_id = self.env['res.currency'].search([('name', '=', currency)], limit=1).id
+        date_invoice = parse(date_issuance)
 
-            origin = False
-            supplier_dict = self.fe_cr_parse_party(xml_root.xpath('inv:Emisor',namespaces=namespaces)[0], namespaces)
-            company_dict_full = self.fe_cr_parse_party(xml_root.xpath('inv:Receptor',namespaces=namespaces)[0], namespaces)
-            company_dict = {}
-            # We only take the "official references" for company_dict
-            if company_dict_full.get('vat'):
-                company_dict = {'vat': company_dict_full['vat']}
+        origin = False
+        supplier_dict = self.fe_cr_parse_party(xml_root.xpath('inv:Emisor',namespaces=namespaces)[0], namespaces)
+        company_dict_full = self.fe_cr_parse_party(xml_root.xpath('inv:Receptor',namespaces=namespaces)[0], namespaces)
+        company_dict = {}
+        # We only take the "official references" for company_dict
+        if company_dict_full.get('vat'):
+            company_dict = {'vat': company_dict_full['vat']}
 
-            total_untaxed_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalVentaNeta", namespaces=namespaces)
-            amount_untaxed = float(total_untaxed_xpath[0].text)
-            amount_total_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)
-            amount_total = float(amount_total_xpath[0].text)
-            total_line = amount_untaxed
+        total_untaxed_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalVentaNeta", namespaces=namespaces)
+        amount_untaxed = float(total_untaxed_xpath[0].text)
+        amount_total_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)
+        amount_total = float(amount_total_xpath[0].text)
+        amount_total_tax_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
+        amount_total_tax = float(amount_total_tax_xpath[0].text)
+        total_line = amount_untaxed
+        #payment_type_code = xml_root.xpath(
+        #    "/inv:Invoice/cac:PaymentMeans/"
+        #    "cbc:PaymentMeansCode[@listAgencyID='6']",
+        #   namespaces=namespaces)
+        res_lines = []
+        counters = {'lines': 0.0}
+        inv_line_xpath = xml_root.xpath('inv:DetalleServicio/inv:LineaDetalle', namespaces=namespaces)
+        for iline in inv_line_xpath:
+            line_vals = self.parse_fe_cr_invoice_line(
+                iline, counters, namespaces)
+            if line_vals is False:
+                continue
+            res_lines.append(line_vals)
 
-            res_lines = []
-            counters = {'lines': 0.0}
-            inv_line_xpath = xml_root.xpath('inv:DetalleServicio/inv:LineaDetalle', namespaces=namespaces)
-            for iline in inv_line_xpath:
-                line_vals = self.parse_fe_cr_invoice_line(
-                    iline, counters, namespaces)
-                if line_vals is False:
-                    continue
-                res_lines.append(line_vals)
+        if float_compare(
+                total_line, counters['lines'], precision_digits=prec):
+            logger.warning(
+                "The gloabl LineExtensionAmount (%s) doesn't match the "
+                "sum of the amounts of each line (%s). It can "
+                "have a diff of a few cents due to sum of rounded values vs "
+                "rounded sum policies.", total_line, counters['lines'])
 
-            if float_compare(
-                    total_line, counters['lines'], precision_digits=prec):
-                logger.warning(
-                    "The gloabl LineExtensionAmount (%s) doesn't match the "
-                    "sum of the amounts of each line (%s). It can "
-                    "have a diff of a few cents due to sum of rounded values vs "
-                    "rounded sum policies.", total_line, counters['lines'])
-
-            attachments = {}
-            res = {
-                'type': inv_type,
-                'partner': supplier_dict,
-                'company': company_dict,
-                'number_electronic': number_electronic,
-                'invoice_number': reference,
-                'reference': reference,
-                'origin': origin,
-                #'date': fields.Date.to_string(date_issuance),
-                'date': date_issuance,
-                'date_issuance': date_issuance,
-                #'date_due': date_due_str,
-                'currency': {'iso': currency},
-                'amount_total': amount_total,
-                'amount_untaxed': amount_untaxed,
-                'amount_total_electronic_invoice': amount_total,
-                'lines': res_lines,
-                'attachments': attachments,
-                }
-            logger.info('Result of CR FE XML parsing: %s', res)
-            return res
-        else:
-            #xml-hacienda
-            return {}
+        attachments = {}
+        res = {
+            'type': inv_type,
+            'partner': supplier_dict,
+            'company': company_dict,
+            'number_electronic': number_electronic,
+            'invoice_number': reference,
+            'reference': reference,
+            'origin': origin,
+            #'date': fields.Date.to_string(date_issuance),
+            'date': date_issuance,
+            'date_issuance': date_issuance,
+            #'date_due': date_due_str,
+            'currency': {'iso': currency},
+            'amount_total': amount_total,
+            'amount_total_tax': amount_total_tax,
+            'amount_untaxed': amount_untaxed,
+            'amount_total_electronic_invoice': amount_total,
+            'lines': res_lines,
+            'attachments': attachments,
+            }
+        logger.info('Result of CR FE XML parsing: %s', res)
+        return res
 
 
     @api.model
     def _prepare_create_invoice_vals(self, parsed_inv, import_config=False):
-        assert parsed_inv.get('pre-processed'), 'pre-processing not done'
-        # WARNING: on future versions, import_config will probably become
-        # a required argument
-        aio = self.env['account.invoice']
-        ailo = self.env['account.invoice.line']
-        bdio = self.env['business.document.import']
-        rpo = self.env['res.partner']
-        company_id = self._context.get('force_company') or\
-            self.env.user.company_id.id
-        start_end_dates_installed = hasattr(ailo, 'start_date') and\
-            hasattr(ailo, 'end_date')
-        if parsed_inv['type'] in ('out_invoice', 'out_refund'):
-            partner_type = 'customer'
-        else:
-            partner_type = 'supplier'
-        partner = bdio._match_partner(
-            parsed_inv['partner'], parsed_inv['chatter_msg'],
-            partner_type=partner_type)
-        partner = partner.commercial_partner_id
-        currency = bdio._match_currency(
-            parsed_inv.get('currency'), parsed_inv['chatter_msg'])
-        journal_id = aio.with_context(
-            type=parsed_inv['type'],
-            company_id=company_id)._default_journal().id
-        vals = {
-            'partner_id': partner.id,
-            'currency_id': currency.id,
-            'type': parsed_inv['type'],
-            'company_id': company_id,
-            'origin': parsed_inv.get('origin'),
-            'reference': parsed_inv.get('invoice_number'),
-            'date_invoice': parsed_inv.get('date'),
-            'journal_id': journal_id,
-            'invoice_line_ids': [],
-        }
-        #vals = aio.play_onchanges(vals, ['partner_id'])
-        vals['invoice_line_ids'] = []
-        # Force due date of the invoice
-        if parsed_inv.get('date_due'):
-            vals['date_due'] = parsed_inv.get('date_due')
-        # Bank info
-        if parsed_inv.get('iban'):
-            partner = rpo.browse(vals['partner_id'])
-            partner_bank = bdio._match_partner_bank(
-                partner, parsed_inv['iban'], parsed_inv.get('bic'),
-                parsed_inv['chatter_msg'], create_if_not_found=True)
-            if partner_bank:
-                vals['partner_bank_id'] = partner_bank.id
-        config = import_config  # just to make variable name shorter
-        if not config:
-            if not partner.invoice_import_ids:
-                raise UserError(_(
-                    "Missing Invoice Import Configuration on partner '%s'.")
-                    % partner.display_name)
-            else:
-                import_config_obj = partner.invoice_import_ids[0]
-                config = import_config_obj.convert_to_import_config()
-
-        if config['invoice_line_method'].startswith('1line'):
-            if config['invoice_line_method'] == '1line_no_product':
-                if config['taxes']:
-                    invoice_line_tax_ids = [(6, 0, config['taxes'].ids)]
-                else:
-                    invoice_line_tax_ids = False
-                il_vals = {
-                    'account_id': config['account'].id,
-                    'invoice_line_tax_ids': invoice_line_tax_ids,
-                    'price_unit': parsed_inv.get('amount_untaxed'),
-                    }
-            elif config['invoice_line_method'] == '1line_static_product':
-                product = config['product']
-                il_vals = {'product_id': product.id, 'invoice_id': vals}
-                il_vals = ailo.play_onchanges(il_vals, ['product_id'])
-                il_vals.pop('invoice_id')
-            if config.get('label'):
-                il_vals['name'] = config['label']
-            elif parsed_inv.get('description'):
-                il_vals['name'] = parsed_inv['description']
-            elif not il_vals.get('name'):
-                il_vals['name'] = _('MISSING DESCRIPTION')
-            self.set_1line_price_unit_and_quantity(il_vals, parsed_inv)
-            self.set_1line_start_end_dates(il_vals, parsed_inv)
-            vals['invoice_line_ids'].append((0, 0, il_vals))
-        elif config['invoice_line_method'].startswith('nline'):
-            if not parsed_inv.get('lines'):
-                raise UserError(_(
-                    "You have selected a Multi Line method for this import "
-                    "but Odoo could not extract/read any XML file inside "
-                    "the PDF invoice."))
-            if config['invoice_line_method'] == 'nline_no_product':
-                static_vals = {
-                    'account_id': config['account'].id,
-                    }
-            elif config['invoice_line_method'] == 'nline_static_product':
-                sproduct = config['product']
-                static_vals = {'product_id': sproduct.id, 'invoice_id': vals}
-                static_vals = ailo.play_onchanges(static_vals, ['product_id'])
-                static_vals.pop('invoice_id')
-            else:
-                static_vals = {}
-            for line in parsed_inv['lines']:
-                il_vals = static_vals.copy()
-                if config['invoice_line_method'] == 'nline_auto_product':
-                    product = bdio._match_product(
-                        line['product'], parsed_inv['chatter_msg'],
-                        seller=partner)
-                    il_vals = {'product_id': product.id, 'invoice_id': vals}
-                    il_vals = ailo.play_onchanges(il_vals, ['product_id'])
-                    il_vals.pop('invoice_id')
-                elif config['invoice_line_method'] == 'nline_no_product':
-                    taxes = bdio._match_taxes(
-                        line.get('taxes'), parsed_inv['chatter_msg'])
-                    il_vals['invoice_line_tax_ids'] = [(6, 0, taxes.ids)]
-                if not il_vals.get('account_id') and il_vals.get('product_id'):
-                    product = self.env['product.product'].browse(
-                        il_vals['product_id'])
-                    raise UserError(_(
-                        "Account missing on product '%s' or on it's related "
-                        "category '%s'.") % (product.display_name,
-                                             product.categ_id.display_name))
-                if line.get('name'):
-                    il_vals['name'] = line['name']
-                elif not il_vals.get('name'):
-                    il_vals['name'] = _('MISSING DESCRIPTION')
-                if start_end_dates_installed:
-                    il_vals['start_date'] =\
-                        line.get('date_start') or parsed_inv.get('date_start')
-                    il_vals['end_date'] =\
-                        line.get('date_end') or parsed_inv.get('date_end')
-                uom = bdio._match_uom(
-                    line.get('uom'), parsed_inv['chatter_msg'])
-                il_vals['uom_id'] = uom.id
-                il_vals.update({
-                    'quantity': line['qty'],
-                    'price_unit': line['price_unit'],  # TODO fix for tax incl
-                    })
-                vals['invoice_line_ids'].append((0, 0, il_vals))
-        # Write analytic account + fix syntax for taxes
-        aacount_id = config.get('account_analytic') and\
-            config['account_analytic'].id or False
-        if aacount_id:
-            for line in vals['invoice_line_ids']:
-                line[2]['account_analytic_id'] = aacount_id
+        (vals, import_config) = super(AccountInvoiceImport, self)._prepare_create_invoice_vals(parsed_inv, import_config)
         vals['number_electronic']=parsed_inv['number_electronic']
         vals['date_issuance']=parsed_inv['date_issuance']
         vals['amount_total_electronic_invoice']=parsed_inv['amount_total_electronic_invoice']
         vals['xml_supplier_approval']=parsed_inv['xml_supplier_approval']
         vals['fname_xml_supplier_approval']=parsed_inv['fname_xml_supplier_approval']
-        return (vals,config)
+        vals['amount_tax_electronic_invoice']=parsed_inv['amount_total_tax'] 
+        return (vals,import_config)
+
 
     @api.model
     def parse_invoice(self, invoice_file_b64, invoice_filename):
-        assert invoice_file_b64, 'No invoice file'
-        logger.info('Starting to import invoice %s', invoice_filename)
-        file_data = base64.b64decode(invoice_file_b64)
-        parsed_inv = {}
-        pp_parsed_inv = {}
-        filetype = mimetypes.guess_type(invoice_filename)
-        logger.debug('Invoice mimetype: %s', filetype)
-        if filetype and filetype[0] in ['application/xml', 'text/xml']:
-            try:
-                xml_root = etree.fromstring(file_data)
-            except Exception as e:
-                raise UserError(_(
-                    "This XML file is not XML-compliant. Error: %s") % e)
-            pretty_xml_string = etree.tostring(
-                xml_root, pretty_print=True, encoding='UTF-8',
-                xml_declaration=True)
-            logger.debug('Starting to import the following XML file:')
-            logger.debug(pretty_xml_string)
-
-            document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda', xml_root.tag).group(0)
-            
-        # Fallback on PDF
-        else:
-            #pdf
-            #We cant define a common structure for PDFs
-            #parsed_inv = self.parse_pdf_invoice(file_data)
-            pass
-        # pre_process_parsed_inv() will be called again a second time,
-        # but it's OK
-        if 'number_electronic' in parsed_inv:
-            pp_parsed_inv = self.pre_process_parsed_inv(parsed_inv)
-        else:
-            #xml-hacienda
-            #pdf
-            pass
+        pp_parsed_inv = super(AccountInvoiceImport, self).parse_invoice(invoice_file_b64, invoice_filename)
         if pp_parsed_inv != {}:
-                pp_parsed_inv['xml_supplier_approval'] = invoice_file_b64
-                pp_parsed_inv['fname_xml_supplier_approval'] = invoice_filename
-        else:
-            #xml-hacienda
-            #pdf
-            pass
+            pp_parsed_inv['xml_supplier_approval'] = invoice_file_b64
+            pp_parsed_inv['fname_xml_supplier_approval'] = invoice_filename
         return pp_parsed_inv
     
     @api.model
