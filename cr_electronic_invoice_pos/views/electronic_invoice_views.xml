@@ -47,6 +47,12 @@
 					<field name="fname_xml_comprobante" invisible="1" readonly="1"/>
 					<field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
 				</field>
+				<xpath expr="//sheet[1]" position="after">
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</xpath>
 			</field>
 		</record>
 		<record id="view_pos_order_electronic_invoice_tree" model="ir.ui.view">

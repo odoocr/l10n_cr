@@ -11,6 +11,7 @@ from StringIO import StringIO
 import mimetypes
 from urlparse import urlparse
 import logging
+import re
 logger = logging.getLogger(__name__)
 
 try:
@@ -332,13 +333,20 @@ class BusinessDocumentImport(models.AbstractModel):
                 ('barcode', '=', product_dict['barcode'])])
             if products:
                 return products[0]
-        if product_dict.get('code'):
+        product_name = product_dict.get('name')
+        code = product_dict.get('code')
+        if not code:
+            code = re.search('(\[)(.*)(\](.*))', product_name)
+        if code:
+            product_name = code.group(4)
+            code = code.group(2)
+        if code:
             products = ppo.search([
                 '|', ('company_id', '=', False),
                 ('company_id', '=', company_id),
                 '|',
-                ('barcode', '=', product_dict['code']),
-                ('default_code', '=', product_dict['code'])])
+                ('barcode', '=', code),
+                ('default_code', '=', code)])
             if products:
                 return products[0]
             # WARNING: Won't work for multi-variant products
@@ -348,7 +356,7 @@ class BusinessDocumentImport(models.AbstractModel):
                     '|', ('company_id', '=', False),
                     ('company_id', '=', company_id),
                     ('name', '=', seller.id),
-                    ('product_code', '=', product_dict['code']),
+                    ('product_code', '=', code),
                     ])
                 if (
                         sinfo and
@@ -362,9 +370,8 @@ class BusinessDocumentImport(models.AbstractModel):
 
         new_vals = {
             'company_id': company_id,
-            'default_code': product_dict.get('code'),
-            'name': '**' + product_dict.get('name'),
-            'display_name': '**' + product_dict.get('name'),
+            'name': '**' + product_name,
+            'display_name': '**' + product_name,
             'type': 'product',
             #'list_price': product_dict.get('price'),
             'sale_ok': True,
@@ -372,6 +379,9 @@ class BusinessDocumentImport(models.AbstractModel):
             'uom_id': uom_id.id,
             'uom_po_id': uom_id.id
         }
+        if code:
+            new_vals['default_code'] = code
+
         if product_dict.get('taxes'):
             sales_taxes = [x.id for x in self._match_taxes(product_dict['taxes'], "", type_tax_use='sale', price_include=None)]
             supplier_taxes = [x.id for x in self._match_taxes(product_dict['taxes'], "", type_tax_use='purchase', price_include=None)]

@@ -67,12 +67,23 @@ class AccountInvoiceImport(models.TransientModel):
             #categ_code = 'S'
             percent_xpath = tax.xpath("inv:Tarifa", namespaces=namespaces)
             percentage = percent_xpath[0].text and float(percent_xpath[0].text)
-            tax_dict = {
-                'amount_type': 'percent',
-                'amount': percentage,
-                'tax_code': tax_code,
-                }
-            taxes.append(tax_dict)
+            tax_amount_xpath = tax.xpath("inv:Tarifa", namespaces=namespaces)
+            tax_amount = tax_amount_xpath[0].text and float(tax_amount_xpath[0].text)
+            if percentage != 0.0 and tax_amount != 0.0:
+                tax_dict = {
+                    'amount_type': 'percent',
+                    'amount': percentage,
+                    'tax_code': tax_code,
+                    }
+                taxes.append(tax_dict)
+            elif tax_amount != 0.0:
+                tax_dict = {
+                    'amount_type': 'fixed',
+                    'amount': tax_amount,
+                    'tax_code': tax_code,
+                    }
+                taxes.append(tax_dict)
+
         product_code_xpath = iline.xpath("inv:Codigo/inv:Codigo", namespaces=namespaces)
         product_dict = {
             'barcode': False,

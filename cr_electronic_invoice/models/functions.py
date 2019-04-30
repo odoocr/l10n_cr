@@ -68,10 +68,10 @@ def make_msj_receptor(url, clave, cedula_emisor, fecha_emision, id_mensaje, deta
     payload['mensaje'] = mr_mensaje_id
     payload['detalle_mensaje'] = mr_detalle_mensaje
 
-    if mr_monto_impuesto is not None and mr_monto_impuesto > 0:
+    if mr_monto_impuesto is not None and mr_monto_impuesto != 0:
         payload['monto_total_impuesto'] = mr_monto_impuesto
 
-    if mr_total_factura is not None and mr_total_factura > 0:
+    if mr_total_factura is not None and mr_total_factura != 0:
         payload['total_factura'] = mr_total_factura
     else:
         raise UserError('El monto Total de la Factura para el Mensaje Receptor es inválido')
@@ -80,11 +80,18 @@ def make_msj_receptor(url, clave, cedula_emisor, fecha_emision, id_mensaje, deta
     payload['numero_consecutivo_receptor'] = mr_consecutivo_receptor
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    xml = response_json.get('resp').get('xml')
 
-    return xml
+    xresponse_json = response.json()
+    _logger.error('MAB - make_msj_receptor PAYLOAD: %s' % payload)
+    _logger.error('MAB - make_msj_receptor response: %s' % xresponse_json)
+    if isinstance(xresponse_json.get('resp'), int):
+        response_json = {'status': 500, 'text': 'make_msj_receptor failed: %s' % response.reason}
+    elif (200 <= response.status_code <= 299):
+        response_json = {'status': 200, 'xml': xresponse_json.get('resp').get('xml')}
+    else:
+        response_json = {'status': response.status_code, 'text': 'make_msj_receptor failed: %s' % response.reason}
 
+    return response_json
 
 def get_clave(self, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
     # tipo de documento
@@ -194,21 +201,45 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     if not inv.partner_id or not inv.partner_id.vat:
         payload['omitir_receptor'] = 'true'
     else:
-        payload['receptor_nombre'] = escape(inv.partner_id.name[:80])
-        payload['receptor_tipo_identif'] = inv.partner_id.identification_id.code
-        payload['receptor_num_identif'] = inv.partner_id.vat
-        payload['receptor_provincia'] = inv.partner_id.state_id.code or ''
-        payload['receptor_canton'] = inv.partner_id.county_id.code or ''
-        payload['receptor_distrito'] = inv.partner_id.district_id.code or ''
-        payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
-        payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
-        payload['receptor_tel'] = inv.partner_id.phone and re.sub('[^0-9]+', '', inv.partner_id.phone) or ''
-        match = inv.partner_id.email and re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
-        if match:
-            payload['receptor_email'] = inv.partner_id.email
-        else:
-            payload['receptor_email'] = 'indefinido@indefinido.com'
-    if tipo_documento == 'TE':
+        vat = re.sub('[^0-9]', '', inv.partner_id.vat)
+        if inv.partner_id and vat:  # and doc.partner_id.email:
+            if not inv.partner_id.identification_id:
+                if len(vat) == 9:  # cedula fisica
+                    id_code = '01'
+                elif len(vat) == 10:  # cedula juridica
+                    id_code = '02'
+                elif len(vat) == 11 or len(vat) == 12:  # dimex
+                    id_code = '03'
+                else:
+                    id_code = '05'
+            else:
+                id_code = inv.partner_id.identification_id.code
+
+            if id_code == '05':
+                payload['omitir_receptor'] = 'true'
+            else:
+                payload['receptor_nombre'] = escape(inv.partner_id.name[:80])
+                payload['receptor_tipo_identif'] = id_code
+                payload['receptor_num_identif'] = vat
+                payload['receptor_provincia'] = inv.partner_id.state_id.code or ''
+                payload['receptor_canton'] = inv.partner_id.county_id.code or ''
+                payload['receptor_distrito'] = inv.partner_id.district_id.code or ''
+                payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
+
+                #if inv.partner_id.phone:
+                #    payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code or '506'
+                #    payload['receptor_tel'] = re.sub('[^0-9]+', '', inv.partner_id.phone)[:19]
+                #else:
+                payload['receptor_cod_pais_tel'] = ''
+                payload['receptor_tel'] = ''
+
+                match = inv.partner_id.email and re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
+                if match:
+                    payload['receptor_email'] = inv.partner_id.email
+                else:
+                    payload['receptor_email'] = 'indefinido@indefinido.com'
+    #if tipo_documento == 'TE':
+    if inv._name == 'pos.order':
         payload['condicion_venta'] = sale_conditions
         payload['plazo_credito'] = '0'
         payload['cod_moneda'] = inv.company_id.currency_id.name
@@ -292,6 +323,8 @@ def token_hacienda(company):
             response_json = {'status': 200, 'token': token}
         else:
             _logger.error('MAB - token_hacienda failed.  error: %s', response.status_code)
+            _logger.error('MAB - token_hacienda - Headers:%s' % response.headers)
+            _logger.error('MAB - token_hacienda - Text:%s' % response.text)
             response_json = {'status': response.status_code, 'text': 'token_hacienda failed: %s' % response.reason}
 
     return response_json
@@ -307,6 +340,8 @@ def sign_xml(inv, tipo_documento, url, xml):
     payload['tipodoc'] = tipo_documento
 
     response = requests.request("POST", url, data=payload, headers=headers)
+    _logger.error('MAB response.text: %s' % response.text)
+
     if 200 <= response.status_code <= 299:
         response_json = {'status': 200, 'xmlFirmado': response.json().get('resp').get('xmlFirmado')}
     else:
@@ -349,7 +384,8 @@ def send_file(inv, token, xml, env):
     clave = factura.xpath("inv:Clave", namespaces=namespaces)[0].text
     fechaEmision = factura.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
     emisor = factura.xpath("inv:Emisor", namespaces=namespaces)[0]
-    receptor = factura.xpath("inv:Receptor", namespaces=namespaces)[0]
+    receptor_xpath = factura.xpath("inv:Receptor", namespaces=namespaces)
+    receptor = receptor_xpath and receptor_xpath[0]
 
     comprobante = {}
     comprobante['clave'] = clave
@@ -357,10 +393,10 @@ def send_file(inv, token, xml, env):
     comprobante['emisor'] = {}
     comprobante['emisor']['tipoIdentificacion'] = emisor.xpath("inv:Identificacion/inv:Tipo", namespaces=namespaces)[0].text
     comprobante['emisor']['numeroIdentificacion'] = emisor.xpath("inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
-    if receptor is not None and receptor.find('Identificacion') is not None:
+    if receptor and inv.partner_id.identification_id.code != '05':
         comprobante['receptor'] = {}
-        comprobante['receptor']['tipoIdentificacion'] = receptor.find('Identificacion').find('Tipo').text
-        comprobante['receptor']['numeroIdentificacion'] = receptor.find('Identificacion').find('Numero').text
+        comprobante['receptor']['tipoIdentificacion'] = receptor.xpath("inv:Identificacion/inv:Tipo", namespaces=namespaces)[0].text
+        comprobante['receptor']['numeroIdentificacion'] = receptor.xpath("inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
     comprobante['comprobanteXml'] = xml
 
@@ -374,8 +410,53 @@ def send_file(inv, token, xml, env):
         return {'status': 400, 'text': 'Excepción de envio XML'}
         #raise Exception(e)
 
-    return {'status': response.status_code, 'text': response.text}
+    if not (200 <= response.status_code <= 299):
+        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' % response.headers.get('X-Error-Cause','Unknown'))
+        return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause','Unknown')}
+    else:
+        return {'status': response.status_code, 'text': response.text}
 
+def send_message(inv, date_cr, token,  env):
+
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
+    else:
+        _logger.error('MAB - Ambiente no definido')
+        return
+
+    comprobante = {}
+    comprobante['clave'] = inv.number_electronic
+    comprobante['consecutivoReceptor'] = inv.consecutive_number_receiver
+    comprobante["fecha"] = date_cr
+    vat = re.sub('[^0-9]', '', inv.partner_id.vat)
+    comprobante['emisor'] = {}
+    comprobante['emisor']['tipoIdentificacion'] = inv.partner_id.identification_id.code
+    comprobante['emisor']['numeroIdentificacion'] = vat
+    comprobante['receptor'] = {}
+    comprobante['receptor']['tipoIdentificacion'] = inv.company_id.identification_id.code
+    comprobante['receptor']['numeroIdentificacion'] = inv.company_id.vat
+
+    comprobante['comprobanteXml'] = inv.xml_comprobante
+    _logger.info('MAB - Comprobante : %s' % comprobante)
+    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
+    _logger.info('MAB - URL : %s' % url)
+    _logger.info('MAB - Headers : %s' % headers)
+
+    try:
+        response = requests.post(url, data=json.dumps(comprobante), headers=headers)
+
+    except requests.exceptions.RequestException as e:
+        _logger.info('Exception %s' % e)
+        return {'status': 400, 'text': u'Excepción de envio XML'}
+        #raise Exception(e)
+
+    if not (200 <= response.status_code <= 299):
+        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' % response.headers.get('X-Error-Cause','Unknown'))
+        return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause','Unknown')}
+    else:
+        return {'status': response.status_code, 'text': response.text}
 
 def consulta_clave(clave, token, env):
 
@@ -404,11 +485,51 @@ def consulta_clave(clave, token, env):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
-        response_json = {
-            'status': 200,
-            'ind-estado': response.json().get('ind-estado'),
-            'respuesta-xml': response.json().get('respuesta-xml')
-        }
+        respuesta_xml = response.json().get('respuesta-xml')
+        ind_estado = response.json().get('ind-estado')
+
+        if ind_estado in ( 'rechazado', 'error'):
+            xml_decoded = base64.b64decode(respuesta_xml)
+            try:
+                respuesta = etree.fromstring(xml_decoded)
+            except Exception, e:
+                # raise UserError(_(
+                #    "This XML file is not XML-compliant. Error: %s") % e)
+                _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
+                return {'status': 400, 'text': 'Excepción de conversión de XML'}
+            #pretty_xml_string = etree.tostring(
+            #    respuesta, pretty_print=True, encoding='UTF-8',
+            #    xml_declaration=True)
+
+            #_logger.error(u'MAB - send_file XML: %s' % pretty_xml_string)
+
+            namespaces = respuesta.nsmap
+            resp_xmlns = namespaces.pop(None)
+            namespaces['resp'] = resp_xmlns
+
+            resp_xml_xpath = respuesta.xpath("resp:DetalleMensaje", namespaces=namespaces)
+            if resp_xml_xpath:
+                texto_respuesta = resp_xml_xpath[0].text
+                if texto_respuesta.find(u'La firma del comprobante electrónico no es válida') != -1:
+                    response_json = {
+                        'status': 200,
+                        'ind-estado': 'firma_invalida',
+                        'respuesta-xml': respuesta_xml
+                    }
+                else:
+                    response_json = {
+                        'status': 200,
+                        'ind-estado': ind_estado,
+                        'respuesta-xml': respuesta_xml
+                    }
+        else:
+            response_json = {
+                'status': 200,
+                'ind-estado': ind_estado,
+                'respuesta-xml': respuesta_xml
+            }
+    elif response.status_code == 400:
+        response_json = {'status': 400, 'ind-estado': 'no_encontrado'}
     elif 400 <= response.status_code <= 499:
         response_json = {'status': 400, 'ind-estado': 'error'}
     else:
@@ -481,7 +602,7 @@ else:
     
 """
 
-
+"""
 def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
     payload = {}
     headers = {}
@@ -572,4 +693,4 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
 
                 # limpia el template de los attachments
                 email_template.attachment_ids = [(5)]
-
+"""

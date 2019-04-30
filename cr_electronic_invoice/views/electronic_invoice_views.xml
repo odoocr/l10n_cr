@@ -85,7 +85,6 @@
 			</field>
 		</record>
 
-
 		<record id="view_reference_document_tree" model="ir.ui.view">
 			<field name="name">reference.document.tree</field>
 			<field name="model">reference.document</field>
@@ -125,6 +124,7 @@
 				</form>
 			</field>
 		</record>
+
 		<record id="view_resolution_tree" model="ir.ui.view">
 			<field name="name">resolution.tree</field>
 			<field name="model">resolution</field>
