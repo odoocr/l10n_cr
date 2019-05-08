@@ -14,6 +14,7 @@ __pycache__/
 *~
 # hg stuff
 *.orig
+
 status
 # odoo filestore
 odoo/filestore
@@ -38,3 +39,6 @@ setup/win32/static/postgresql*.exe
 /man/
 /share/
 /src/
+=======
+status
+
