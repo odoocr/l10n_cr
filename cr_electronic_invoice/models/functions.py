@@ -1,3 +1,4 @@
+from odoo.exceptions import UserError
 import json
 import requests
 import re
@@ -7,9 +8,13 @@ from lxml import etree
 import datetime
 import time
 import pytz
+from . import fe_enums
+from . import api_facturae
 import logging
+import time
 from odoo.exceptions import UserError
 from xml.sax.saxutils import escape
+
 
 _logger = logging.getLogger(__name__)
 
@@ -162,10 +167,12 @@ def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situaci
     return {'resp': {'length': len(clave), 'clave': clave, 'consecutivo': consecutivo}}
 
 
+
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
-                     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total, lines,
+                     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_subtotal,
+                     total_impuestos, total_descuento, lines,
                      tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-                     codigo_referencia, razon_referencia, url, currency_rate):
+                     codigo_referencia, razon_referencia, url, currency_rate, invoice_comments):
     headers = {}
     payload = {}
     # Generar FE payload
@@ -174,17 +181,21 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['r'] = 'gen_xml_fe'
     elif tipo_documento == 'NC':
         payload['r'] = 'gen_xml_nc'
+    elif tipo_documento == 'ND':
+        payload['r'] = 'gen_xml_nd'
+
     payload['clave'] = inv.number_electronic
     payload['consecutivo'] = consecutivo
     payload['fecha_emision'] = date
     payload['emisor_nombre'] = escape(inv.company_id.name)
     payload['emisor_tipo_indetif'] = inv.company_id.identification_id.code
-    payload['emisor_num_identif'] = inv.company_id.vat
+    payload['emisor_num_identif'] = api_facturae.limit(inv.company_id.vat, 20)
     payload['nombre_comercial'] = escape(inv.company_id.commercial_name or '')
     payload['emisor_provincia'] = inv.company_id.state_id.code
     payload['emisor_canton'] = inv.company_id.county_id.code
     payload['emisor_distrito'] = inv.company_id.district_id.code
-    payload['emisor_barrio'] = inv.company_id.neighborhood_id.code or ''
+    payload[
+        'emisor_barrio'] = inv.company_id.neighborhood_id and inv.company_id.neighborhood_id.code or ''  # inv.company_id.neighborhood_id.code or ''
     payload['emisor_otras_senas'] = escape(inv.company_id.street)
     payload['emisor_cod_pais_tel'] = inv.company_id.phone_code
     payload['emisor_tel'] = re.sub('[^0-9]+', '', inv.company_id.phone)
@@ -197,7 +208,8 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['receptor_distrito'] = inv.partner_id.district_id.code or ''
     payload['receptor_barrio'] = inv.partner_id.neighborhood_id.code or ''
     payload['receptor_cod_pais_tel'] = inv.partner_id.phone_code
-    payload['receptor_tel'] = re.sub('[^0-9]+', '', inv.partner_id.phone)
+    payload['receptor_tel'] = inv.partner_id.phone and re.sub('[^0-9]+', '',
+                                                              inv.partner_id.phone) or ''  # re.sub('[^0-9]+', '', inv.partner_id.phone)
     payload['receptor_email'] = inv.partner_id.email
     payload['condicion_venta'] = sale_conditions
     payload['plazo_credito'] = inv.partner_id.property_payment_term_id.line_ids[0].days or '0'
@@ -210,18 +222,20 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
     payload['total_merc_exenta'] = total_mercaderia_exento
     payload['total_gravados'] = total_servicio_gravado + total_mercaderia_gravado
     payload['total_exentos'] = total_servicio_exento + total_mercaderia_exento
-    payload['total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
-    payload['total_descuentos'] = round(base_total - inv.amount_untaxed, 2)
-    payload['total_ventas_neta'] = round((total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) - \
-                                   (base_total - inv.amount_untaxed), 2)
-    payload['total_impuestos'] = round(inv.amount_tax, 2)
-    payload['total_comprobante'] = round(inv.amount_total, 2)
-    payload['otros'] = ''
+    payload[
+        'total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
+    payload['total_descuentos'] = total_descuento
+    payload['total_ventas_neta'] = base_subtotal
+    payload['total_impuestos'] = total_impuestos
+    payload['total_comprobante'] = base_subtotal + total_impuestos
+
+    payload['otros'] = invoice_comments
     payload['detalles'] = lines
 
     if tipo_documento in ('NC', 'ND'):
         if not fecha_emision_referencia:
             return {'status': 500, 'text': 'make_xml_invoice failed: NULL Invoice Reference Date'}
+
         payload['infoRefeTipoDoc'] = tipo_documento_referencia
         payload['infoRefeNumero'] = numero_documento_referencia
         payload['infoRefeFechaEmision'] = fecha_emision_referencia
@@ -229,11 +243,24 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['infoRefeRazon'] = razon_referencia
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
+    #response_json = response.json()
+    xresponse_json = response.json()
+    _logger.error('MAB - create_xml_file PAYLOAD: %s' % payload)
+    _logger.error('MAB - create_xml_file response: %s' % xresponse_json)
+
+    if isinstance(xresponse_json.get('resp'), int):
+        response_json = {'status': 500, 'text': 'make_xml_invoice failed: %s' % response.reason}
+    elif 200 <= response.status_code <= 299:
+        response_json = {'status': 200, 'xml': xresponse_json.get('resp').get('xml')}
+    else:
+        response_json = {'status': response.status_code, 'text': 'make_xml_invoice failed: %s' % response.reason}
+
     return response_json
+
 
 last_tokens = {}
 last_tokens_time = {}
+
 
 def token_hacienda(company):
     token = last_tokens.get(company.id,False)
@@ -285,10 +312,12 @@ def sign_xml(inv, tipo_documento, url, xml):
     payload['tipodoc'] = tipo_documento
 
     response = requests.request("POST", url, data=payload, headers=headers)
+    #response_json = response.json()
+
     if 200 <= response.status_code <= 299:
         response_json = {'status': 200, 'xmlFirmado': response.json().get('resp').get('xmlFirmado')}
     else:
-        response_json = {'status': response.status_code, 'text': 'make_xml_invoice failed: %s' % response.reason}
+        response_json = {'status': response.status_code, 'text': 'sign_xml_invoice failed: %s' % response.reason}
 
     return response_json
 
@@ -335,97 +364,6 @@ def send_file(inv, token, date, xml, env):
     return {'resp': {'Status': response.status_code, 'text': response.text}}
 
 
-def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
-    payload = {}
-    headers = {}
-    payload['w'] = 'consultar'
-    payload['r'] = 'consultarCom'
-    payload['client_id'] = env
-    payload['token'] = token_m_h
-    if inv.type == 'in_invoice' or inv.type == 'in_refund':
-        if not inv.consecutive_number_receiver:
-            if len(inv.number) == 20:
-                inv.consecutive_number_receiver = inv.number
-            else:
-                if inv.state_invoice_partner == '1':
-                    tipo_documento = 'CCE'
-                elif inv.state_invoice_partner == '2':
-                    tipo_documento = 'CPCE'
-                else:
-                    tipo_documento = 'RCE'
-                response_json = get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
-                inv.consecutive_number_receiver = response_json.get('resp').get('consecutivo')
-
-        payload['clave'] = inv.number_electronic + "-" + inv.consecutive_number_receiver
-    else:
-        payload['clave'] = inv.number_electronic
-    
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    estado_m_h = response_json.get('resp').get('ind-estado')
-    
-    if (not xml_firmado) and (not date_cr):
-        self.message_post(body='<p>Ha realizado la consulta a Haciendo de:'
-                                +'<br /><b>Documento: </b>'+payload['clave']
-                                +'<br /><b>Estado del documento: </b>'+ estado_m_h +'</p>', 
-                            subtype='mail.mt_note', 
-                            content_subtype='html')
-
-    last_state = inv.state_send_invoice
-    if inv.type == 'out_invoice' or inv.type == 'out_refund' :
-        inv.state_tributacion = estado_m_h
-        inv.date_issuance = date_cr
-        if xml_firmado:
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-    elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        inv.state_send_invoice = estado_m_h
-        if xml_firmado:
-            inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
-
-    # Si fue aceptado o rechazado por haciendo se carga la respuesta
-    if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (inv.type == 'out_invoice' or inv.type == 'out_refund'):
-        inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
-        inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
-
-    # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
-    if inv.state_send_invoice == 'aceptado' and (last_state == False or last_state == 'procesando'):
-        if not inv.partner_id.opt_out:
-            if inv.type == 'in_invoice' or inv.type == 'in_refund':
-                email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
-            else:
-                email_template = self.env.ref('account.email_template_edi_invoice', False)
-
-            attachments = []
-
-            attachment = self.env['ir.attachment'].search(
-                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
-                 ('res_field', '=', 'xml_comprobante')], limit=1)
-            if attachment.id:
-                attachment.name = inv.fname_xml_comprobante
-                attachment.datas_fname = inv.fname_xml_comprobante
-                attachments.append(attachment.id)
-
-            attachment_resp = self.env['ir.attachment'].search(
-                [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
-                 ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
-            if attachment_resp.id:
-                attachment_resp.name = inv.fname_xml_respuesta_tributacion
-                attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
-                attachments.append(attachment_resp.id)
-
-            if len(attachments) == 2:
-                email_template.attachment_ids = [(6, 0, attachments)]
-
-                email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
-                                                                                            raise_exception=False,
-                                                                                            force_send=True)  # default_type='binary'
-
-                # limpia el template de los attachments
-                email_template.attachment_ids = [(5)]
-
-
 def consulta_clave(clave, token, env):
 
     if env == 'api-stag':
@@ -464,3 +402,112 @@ def consulta_clave(clave, token, env):
         _logger.error('MAB - consulta_clave failed.  error: %s', response.status_code)
         response_json = {'status': response.status_code, 'text': 'token_hacienda failed: %s' % response.reason}
     return response_json
+
+
+def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
+
+    if inv.type == 'in_invoice' or inv.type == 'in_refund':
+        if not inv.consecutive_number_receiver:
+            if len(inv.number) == 20:
+                inv.consecutive_number_receiver = inv.number
+            else:
+                if inv.state_invoice_partner == '1':
+                    tipo_documento = 'CCE'
+                elif inv.state_invoice_partner == '2':
+                    tipo_documento = 'CPCE'
+                else:
+                    tipo_documento = 'RCE'
+                response_json = get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal,
+                                          inv.journal_id.terminal)
+                inv.consecutive_number_receiver = response_json.get('resp').get('consecutivo')
+
+        clave = inv.number_electronic + "-" + inv.consecutive_number_receiver
+    else:
+        clave = inv.number_electronic
+
+    response_json = consulta_clave(clave, token_m_h, env)
+    estado_m_h = response_json.get('ind-estado')
+
+    if (not xml_firmado) and (not date_cr):
+        self.message_post(body='<p>Ha realizado la consulta a Haciendo de:'
+                               + '<br /><b>Documento: </b>' + payload['clave']
+                               + '<br /><b>Estado del documento: </b>' + estado_m_h + '</p>',
+                          subtype='mail.mt_note',
+                          content_subtype='html')
+
+    # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
+    # se carga el xml devuelto por Hacienda
+    last_state = inv.state_send_invoice
+    if inv.type == 'out_invoice' or inv.type == 'out_refund':
+        # Se actualiza el estado con el que devuelve Hacienda
+        inv.state_tributacion = estado_m_h
+        inv.date_issuance = date_cr
+        inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
+        inv.xml_comprobante = xml_firmado
+    elif inv.type == 'in_invoice' or inv.type == 'in_refund':
+        inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
+        inv.xml_comprobante = xml_firmado
+        inv.state_send_invoice = estado_m_h
+
+    # Si fue aceptado o rechazado por haciendo se carga la respuesta
+    
+    if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
+            inv.type == 'out_invoice' or inv.type == 'out_refund'):
+        inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
+        inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+
+    # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
+    if inv.state_send_invoice == 'aceptado' and (last_state == False or last_state == 'procesando'):
+        #if not inv.partner_id.opt_out:
+        if inv.type == 'in_invoice' or inv.type == 'in_refund':
+            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
+        else:
+            email_template = self.env.ref('account.email_template_edi_invoice', False)
+
+            # attachment_resp = self.env['ir.attachment'].search(
+            #    [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+            #     ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+            # attachment_resp.name = inv.fname_xml_respuesta_tributacion
+            # attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+
+        attachments = []
+
+        attachment = self.env['ir.attachment'].search(
+            [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+             ('res_field', '=', 'xml_comprobante')], limit=1)
+
+        if attachment.id:
+            # attachment.name = inv.fname_xml_comprobante
+            # attachment.datas_fname = inv.fname_xml_comprobante
+            attachment.name = inv.fname_xml_comprobante
+            attachment.datas_fname = inv.fname_xml_comprobante
+            attachments.append(attachment.id)
+
+        attachment_resp = self.env['ir.attachment'].search(
+            [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+
+        if attachment_resp.id:
+            attachment_resp.name = inv.fname_xml_respuesta_tributacion
+            attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+            attachments.append(attachment_resp.id)
+
+        # email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
+        if len(attachments) == 2:
+            email_template.attachment_ids = [(6, 0, attachments)]
+
+                # email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
+                #                                                                            raise_exception=False,
+                #                                                                            force_send=True)  # default_type='binary'
+
+            email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
+                                                                                        raise_exception=False,
+                                                                                        force_send=True)  # default_type='binary'
+
+            # limpia el template de los attachments
+            # email_template.attachment_ids = [(6, 0, [])]
+            email_template.attachment_ids = [(5)]
+
+
+def findwholeword(word, search):
+    return word.find(search)

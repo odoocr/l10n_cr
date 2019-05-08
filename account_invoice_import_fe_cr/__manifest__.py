@@ -4,7 +4,7 @@
 
 {
     'name': 'Account Invoice Import FE Costa Rica',
-    'version': '10.0.1.0.0',
+    'version': '12.0.1.0.0',
     'category': 'Accounting & Finance',
     'license': 'AGPL-3',
     'summary': 'Import FE Costa Rica XML supplier invoices/refunds',

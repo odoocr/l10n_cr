@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <record id="invoice_form_inherit" model="ir.ui.view">
+	<data>
+
+		<record id="invoice_form_inherit" model="ir.ui.view">
 			<field name="name">account.invoice.form.inherit</field>
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_form"/>
 			<field name="arch" type="xml">
-                <field name="comment" position="before">
+				<field name="comment" position="before">
 					<field name="invoice_amount_text"/>
 				</field>
 				<field name="partner_id" position="before">
@@ -14,6 +15,7 @@
 				</field>
 				<field name="payment_term_id" position="after">
 					<field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+					<!--field name="sale_conditions_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/-->
 				</field>
 				<field name="date_invoice" position="attributes">
 					<attribute name="readonly">1</attribute>
@@ -31,6 +33,9 @@
 					<field name="state_send_invoice" invisible="1"/>
 					<field name="fname_xml_comprobante" invisible="1" readonly="1"/>
 					<field name="xml_comprobante" filename="fname_xml_comprobante"/>
+					<field name="electronic_invoice_return_message" readonly="1"/>
+					
+					<!--<field name="electronic_invoice_return_message" readonly="1"/>-->
 				</field>
 				<xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
 					<field name="discount_note"/>
@@ -40,6 +45,16 @@
 					<button name="charge_xml_data" type="object" string="Cargar datos desde XMLs" colspan="2" attrs="{'invisible':['|', ('state_tributacion','!=', False), '|', ('xml_comprobante', '=', False), ('xml_respuesta_tributacion', '=', False)]}" />
 					<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" attrs="{'invisible':[('state_tributacion','=', False)]}"/>
 				</xpath>
+
+				<!-- Verificar -->
+				<xpath expr="//button[@name='action_invoice_cancel']" position="attributes">
+					<attribute name="invisible">True</attribute>
+					<attribute name="attrs">{'invisible': [('state_tributacion','!=', False)]}</attribute>
+				</xpath>
+				<xpath expr="//button[@name='action_invoice_sent']" position="attributes">
+					<attribute name="invisible">True</attribute>
+				</xpath>
+
 			</field>
 		</record>
 
@@ -121,6 +136,8 @@
 					<field name="total_discount" invisible="1"/>
 					<field name="discount_note" invisible="1"/>
 					<field name="total_tax" invisible="1"/>
+					<!--<field name="exoneration_total"/>
+					<field name="total_line_exoneration"/>-->
 					<field name="exoneration_id" />
 				</field>
 			</field>
@@ -148,24 +165,5 @@
 				</field>
 			</field>
 		</record>
-
-			<!-- Quitar el boton de Cancelar Factura -->
-		<record id="inherit_invoice_form_cancel_inherit" model="ir.ui.view">
-		    <field name="name">account.invoice.cancel.inherit.inherit</field>
-		    <field name="model">account.invoice</field>
-			<field name="inherit_id" ref="account_cancel.invoice_form_cancel_inherit"/>
-			<field name="arch" type="xml">
-				<xpath expr="//button[@name='action_invoice_cancel']" position="attributes">
-					<attribute name="invisible">True</attribute>
-					<attribute name="attrs">{'invisible': [('state_tributacion','!=', False)]}</attribute>
-				</xpath>
-				<xpath expr="//button[@name='action_invoice_sent']" position="attributes">
-					<attribute name="invisible">True</attribute>
-				</xpath>
-			</field>
-		</record>
-
-    </data>
+	</data>
 </odoo>
-
-

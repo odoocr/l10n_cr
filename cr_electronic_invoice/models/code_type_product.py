@@ -1,4 +1,8 @@
-from odoo import models, fields, api
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api, _
+
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class CodeTypeProduct(models.Model):
@@ -6,3 +10,4 @@ class CodeTypeProduct(models.Model):
 
     code = fields.Char(string="Código", required=False, )
     name = fields.Char(string="Nombre", required=False, )
+

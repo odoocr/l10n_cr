@@ -4,7 +4,7 @@
 
 {
     'name': 'Base FE CR',
-    'version': '10.0.1.0.0',
+    'version': '12.0.1.0.0',
     'category': 'Hidden',
     'license': 'AGPL-3',
     'summary': 'Base module for Costa Rican Electronic Invoicing',

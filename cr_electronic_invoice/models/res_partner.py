@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 import re
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 import logging
@@ -77,4 +78,4 @@ class PartnerElectronic(models.Model):
                     if self.vat.isdigit() and len(self.vat) != 9:
                         raise UserError(
                             'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
-
+        
