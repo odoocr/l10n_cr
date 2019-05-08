@@ -49,6 +49,7 @@
 				</field>
 			</field>
 		</record>
+        
 		<record id="view_pos_order_electronic_invoice_tree" model="ir.ui.view">
 			<field name="name">pos.order.electronic.invoice.tree</field>
 			<field name="model">pos.order</field>
