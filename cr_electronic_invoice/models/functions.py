@@ -371,6 +371,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
                             subtype='mail.mt_note', 
                             content_subtype='html')
 
+    last_state = inv.state_send_invoice
     if inv.type == 'out_invoice' or inv.type == 'out_refund' :
         inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
@@ -389,7 +390,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.xml_respuesta_tributacion = response_json.get('resp').get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
-    if estado_m_h == 'aceptado':
+    if inv.state_send_invoice == 'aceptado' and (last_state == False or last_state == 'procesando'):
         if not inv.partner_id.opt_out:
             if inv.type == 'in_invoice' or inv.type == 'in_refund':
                 email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
