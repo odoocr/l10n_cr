@@ -1,6 +1,0 @@
-id,code,name
-CodeTypeProduct_01,01,Código del producto del vendedor
-CodeTypeProduct_02,02,Código del producto del comprador
-CodeTypeProduct_03,03,Código del producto asignado por la industria
-CodeTypeProduct_04,04,Código uso interno
-CodeTypeProduct_99,99,Otros
