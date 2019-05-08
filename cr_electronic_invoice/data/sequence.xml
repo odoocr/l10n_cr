@@ -2,13 +2,13 @@
 <odoo>
     <data>
         <record id="seq_electronic_doc_confirmation" model="ir.sequence">
-            <field name="name">Secuencia de Confirmacion de Aceptacion Comprobante Electrónico</field>
+            <field name="name">Secuencia de Confirmación de Aceptación Comprobante Electrónico</field>
             <field name="code">sequece.electronic.doc.confirmation</field>
             <field name="prefix"></field>
             <field name="padding">10</field>
         </record>
         <record id="seq_electronic_doc_partial_confirmation" model="ir.sequence">
-            <field name="name">Secuencia de Confirmacion de Aceptacion Parcial Comprobante Electrónico</field>
+            <field name="name">Secuencia de Confirmación de Aceptación Parcial Comprobante Electrónico</field>
             <field name="code">sequece.electronic.doc.partial.confirmation</field>
             <field name="prefix"></field>
             <field name="padding">10</field>

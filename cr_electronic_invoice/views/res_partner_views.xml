@@ -2,7 +2,7 @@
 <odoo>
 	<data>
 
-        <record id="view_partner_form_inherit" model="ir.ui.view">
+		<record id="view_partner_form_inherit" model="ir.ui.view">
 			<field name="name">res.partner.form.inherit</field>
 			<field name="model">res.partner</field>
 			<field name="inherit_id" ref="base.view_partner_form"/>
@@ -10,6 +10,7 @@
 				<field name="phone" position="before">
 					<field name="phone_code"/>
 				</field>
+				<!--field name="vat" position="replace"/-->
 				<field name="website" position="before">
 					<field name="identification_id" widget="selection"/>
 					<field name="vat" string="Cédula"/>
@@ -18,7 +19,7 @@
 					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
 				</field>
-				<field name="property_payment_term_id" position="before">
+				<field name="property_payment_term_id" position="after">
 					<field name="payment_methods_id"/>
 				</field>
 				<field name="country_id" position="attributes">
@@ -29,6 +30,5 @@
 				</field>
 			</field>
 		</record>
-
-    </data>
+	</data>
 </odoo>

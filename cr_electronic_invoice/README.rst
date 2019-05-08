@@ -33,13 +33,18 @@ If you spotted it first, help us smashing it by providing a detailed and welcome
 
 Contribuidores
 ============
-* AKUREY S.A. <odoo@akurey.com>
-* Carlos Wong <cwong@akurey.com>
+* `AKUREY S.A. <https://www.akurey.com>`_:
+  * Carlos Wong <cwong@akurey.com>
+  * Sergio Hidalgo <shidalgo@akurey.com>
+  * Joaquin Mena <jmena@akurey.com>
+  * Julio Barboza <jbarboza@akurey.com>
+  
+* `TechMicro Inc S.A. <https://www.techmicrocr.com>`_:
+  * Jason Ulloa <jason.ulloa@techmicrocr.com>
+
 * Charlie Monge <charlit02390@gmail.com>
 * Walner Borbon - walner1borbon on GitHub.com
 * Delfix S.A.
-* TechMicro Inc S.A.
-* Jason Ulloa <jason.ulloa@techmicrocr.com>
 * Nehemias Herrera
 
 

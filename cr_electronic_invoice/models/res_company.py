@@ -1,4 +1,8 @@
-from odoo import models, fields, api
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields, api, _
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class CompanyElectronic(models.Model):
@@ -21,25 +25,33 @@ class CompanyElectronic(models.Model):
     frm_ws_ambiente = fields.Selection(
         selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'), ('api-prod', 'Producción'), ], string="Ambiente",
         required=True, default='disabled',
-        help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente de calidad (stag) c3RhZw==, '
-             'para el ambiente de producción (prod) '
-             'cHJvZA==. Requerido.')
+        help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente de calidad (stag), '
+             'para el ambiente de producción (prod). Requerido.')
+
+    frm_ws_api = fields.Selection(
+        selection=[('api-interna', 'API Interna'), ('api-hacienda', 'API Hacienda')],
+        string="Procesar Utilizando",
+        required=True, default='api-interna',
+        help='Es la forma en la cual se procesarán las peticiones hacia el Ministerio de Hacienda. API Interna: signifca'
+             ' que las peticiones se realizarán utilizando el API definida en PYTHON, excepto el firmado. API Hacienda:'
+             'significa que todas las peticiones se procesarán con el API de CRLIBRE')
+
     frm_pin = fields.Char(string="Pin", required=False, help='Es el pin correspondiente al certificado. Requerido')
     frm_callback_url = fields.Char(string="Callback Url", required=False, default="https://url_callback/repuesta.php?",
                                    help='Es la URL en a la cual se reenviarán las respuestas de Hacienda.')
 
-    activated = fields.Boolean('Activado')
-    state = fields.Selection([
-        ('draft', 'Draft'),
-        ('started', 'Started'),
-        ('progress', 'In progress'),
-        ('finished', 'Done'),
-    ], default='draft')
+    #activated = fields.Boolean('Activado')
+    #state = fields.Selection([
+    #    ('draft', 'Draft'),
+    #    ('started', 'Started'),
+    #    ('progress', 'In progress'),
+    #    ('finished', 'Done'),
+    #], default='draft')
 
-    frm_apicr_username = fields.Char(string="Usuario de Api", required=False, )
-    frm_apicr_password = fields.Char(string="Password de Api", required=False, )
+    #frm_apicr_username = fields.Char(string="Usuario de Api", required=False, )
+    #frm_apicr_password = fields.Char(string="Password de Api", required=False, )
     frm_apicr_signaturecode = fields.Char(string="Codigo para Firmar API", required=False, )
 
-    @api.onchange('email')
-    def _onchange_email(self):
-        pass
+    #@api.onchange('email')
+    #def _onchange_email(self):
+    #    pass
