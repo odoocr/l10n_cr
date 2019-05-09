@@ -93,7 +93,6 @@ class PosOrder(models.Model):
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),
-        ('consecutive_number_receiver_uniq', 'unique (company_id,consecutive_number_receiver)', "Numero de FE repetido, por favor modifique el diario de compras"),
     ]
 
 
