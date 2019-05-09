@@ -337,9 +337,9 @@ class BusinessDocumentImport(models.AbstractModel):
         code = product_dict.get('code')
         if not code:
             code = re.search('(\[)(.*)(\](.*))', product_name)
-        if code:
-            product_name = code.group(4)
-            code = code.group(2)
+            if code:
+                product_name = code.group(4)
+                code = code.group(2)
         if code:
             products = ppo.search([
                 '|', ('company_id', '=', False),

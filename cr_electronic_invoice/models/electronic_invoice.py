@@ -463,7 +463,9 @@ class AccountInvoiceElectronic(models.Model):
             self.date_invoice = parse(self.date_issuance)
 
             partner = self.env['res.partner'].search(
-                [('vat', '=', emisor), ('supplier', '=', True)], limit=1)
+                [('vat', '=', emisor),
+                 ('supplier', '=', True),
+                 '|', ('company_id', '=', self.company_id.id), ('company_id', '=', False)], limit=1)
             if partner:
                 self.partner_id = partner.id
             else:
@@ -550,13 +552,13 @@ class AccountInvoiceElectronic(models.Model):
                     inv.consecutive_number_receiver = response_json.get('consecutivo')
                     _logger.error('MAB - send_acceptance_message - 06')
 
-                    response = functions.make_msj_receptor(url, inv.number_electronic, inv.partner_id.vat,
+                    response_json = functions.make_msj_receptor(url, inv.number_electronic, inv.partner_id.vat,
                                                       inv.date_issuance, tipo, detalle_mensaje,
                                                       inv.company_id.vat, inv.consecutive_number_receiver,
                                                       inv.amount_tax_electronic_invoice,
                                                       inv.amount_total_electronic_invoice)
 
-                    response_json = response.json()
+                     ##1= response.json()
                     if response_json['status'] != 200:
                         _logger.error('MAB - API Error creating XML:%s', response_json['text'])
                         inv.state_tributacion = 'error'
@@ -589,12 +591,12 @@ class AccountInvoiceElectronic(models.Model):
                         return
                     _logger.error('MAB - send_acceptance_message - 10')
 
-                    response = functions.send_message(inv, date_cr, token,  env)
+                    response_json = functions.send_message(inv, date_cr, response_json['token'],  env)
 
-                    response_json = response.json()
-                    status = response_json.get('Status')
+                    ##1response_json = response.json()
+                    status = response_json.get('status')
                     response_text = response_json.get('text')
-                    if 200 <=  status <= 299::
+                    if 200 <=  status <= 299:
                         inv.state_send_invoice = 'procesando'
                         #functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
                     else:
@@ -875,27 +877,35 @@ class AccountInvoiceElectronic(models.Model):
                 base_subtotal = 0.0
                 for inv_line in inv.invoice_line_ids:
                     line_number += 1
-                    price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
+                    ##1 price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
                     quantity = inv_line.quantity
                     if not quantity:
                         continue
 
-                    line_taxes = inv_line.invoice_line_tax_ids.compute_all(price, currency, 1, product=inv_line.product_id, partner=inv_line.invoice_id.partner_id)
-                    price_unit = round(line_taxes['total_excluded'] / (1 - inv_line.discount / 100.0), 5)  #ajustar para IVI
+                    ##1 line_taxes = inv_line.invoice_line_tax_ids.compute_all(price, currency, 1, product=inv_line.product_id, partner=inv_line.invoice_id.partner_id)
+                    line_taxes = inv_line.invoice_line_tax_ids.compute_all(inv_line.price_unit, currency, 1, product=inv_line.product_id, partner=inv_line.invoice_id.partner_id)
+
+                    #price_unit = round(line_taxes['total_excluded'] / (1 - inv_line.discount / 100.0), 5)  #ajustar para IVI
+                    price_unit = round(line_taxes['total_excluded'], 5)  #ajustar para IVI
 
                     base_line = round(price_unit * quantity, 5)
-                    subtotal_line = round(price_unit * quantity * (1 - inv_line.discount / 100.0), 5)
+                    descuento = inv_line.discount and round(price_unit * quantity * inv_line.discount / 100.0, 5) or 0.0
+                    ##1 subtotal_line = round(price_unit * quantity * (1 - inv_line.discount / 100.0), 5)
+                    subtotal_line = round(base_line - descuento, 5)
 
                     line = {
                         "cantidad": quantity,
-                        "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
                         "detalle": escape(inv_line.name[:159]),
                         "precioUnitario": price_unit,
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
                     }
+                    if inv_line.product_id:
+                        line["unidadMedida"] = inv_line.product_id.uom_id.code or 'Sp'
+                        line["codigo"] = inv_line.product_id.default_code or ''
+
                     if inv_line.discount:
-                        descuento = round(base_line - subtotal_line,5)
+                        ##1 descuento = round(base_line - subtotal_line,5)
                         total_descuento += descuento
                         line["montoDescuento"] = descuento
                         line["naturalezaDescuento"] = 'Descuento Comercial'
@@ -912,7 +922,8 @@ class AccountInvoiceElectronic(models.Model):
                         for i in line_taxes['taxes']:
                             if taxes_lookup[i['id']]['tax_code'] <> '00':
                                 tax_index += 1
-                                tax_amount = round(i['amount'], 5)*quantity
+                                ##1 tax_amount = round(i['amount'], 5)*quantity
+                                tax_amount = round(subtotal_line*taxes_lookup[i['id']]['tarifa']/100, 5)
                                 impuesto_linea += tax_amount
                                 tax = {
                                     'codigo': taxes_lookup[i['id']]['tax_code'],
