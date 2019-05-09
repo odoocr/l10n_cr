@@ -155,7 +155,9 @@ class AccountInvoiceElectronic(models.Model):
     state_invoice_partner = fields.Selection([('1', 'Aceptado'), ('3', 'Rechazado'), ('2', 'Aceptacion parcial')],
                                              'Respuesta del Cliente')
     reference_code_id = fields.Many2one(comodel_name="reference.code", string="Código de referencia", required=False, )
+
     payment_methods_id = fields.Many2one(comodel_name="payment.methods", string="Métodos de Pago", required=False, )
+
     invoice_id = fields.Many2one(comodel_name="account.invoice", string="Documento de referencia", required=False,
                                  copy=False)
     xml_respuesta_tributacion = fields.Binary(string="Respuesta Tributación XML", required=False, copy=False,
