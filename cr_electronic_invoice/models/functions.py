@@ -336,12 +336,6 @@ def send_file(inv, token, date, xml, env):
 
 
 def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
-    payload = {}
-    headers = {}
-    payload['w'] = 'consultar'
-    payload['r'] = 'consultarCom'
-    payload['client_id'] = env
-    payload['token'] = token_m_h
     if inv.type == 'in_invoice' or inv.type == 'in_refund':
         if not inv.consecutive_number_receiver:
             if len(inv.number) == 20:
@@ -353,16 +347,16 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
                     tipo_documento = 'CPCE'
                 else:
                     tipo_documento = 'RCE'
-                response_json = get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
+                response_json = get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal,
+                                          inv.journal_id.terminal)
                 inv.consecutive_number_receiver = response_json.get('resp').get('consecutivo')
 
-        payload['clave'] = inv.number_electronic + "-" + inv.consecutive_number_receiver
+        clave = inv.number_electronic + "-" + inv.consecutive_number_receiver
     else:
-        payload['clave'] = inv.number_electronic
-    
-    response = requests.request("POST", url, data=payload, headers=headers)
-    response_json = response.json()
-    estado_m_h = response_json.get('resp').get('ind-estado')
+        clave = inv.number_electronic
+
+    response_json = consulta_clave(clave, token_m_h, env)
+    estado_m_h = response_json.get('ind-estado')
     
     if (not xml_firmado) and (not date_cr):
         self.message_post(body='<p>Ha realizado la consulta a Haciendo de:'
