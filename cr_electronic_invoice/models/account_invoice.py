@@ -63,6 +63,7 @@ class AccountInvoiceRefund(models.TransientModel):
                                         form.reference_code_id.id)
 
                     created_inv.append(refund.id)
+
                     if mode in ('cancel', 'modify'):
                         movelines = inv.move_id.line_ids
                         to_reconcile_ids = {}
@@ -73,6 +74,8 @@ class AccountInvoiceRefund(models.TransientModel):
                                 to_reconcile_ids.setdefault(line.account_id.id, []).append(line.id)
                             if line.reconciled:
                                 line.remove_move_reconcile()
+
+                        refund.payment_term_id = inv.payment_term_id
                         refund.action_invoice_open()
                         for tmpline in refund.move_id.line_ids:
                             if tmpline.account_id.id == inv.account_id.id:
@@ -108,6 +111,7 @@ class AccountInvoiceRefund(models.TransientModel):
                             if inv_refund.payment_term_id.id:
                                 inv_refund._onchange_payment_term_date_invoice()
                             created_inv.append(inv_refund.id)
+
                     xml_id = (inv.type in ['out_refund', 'out_invoice']) and 'action_invoice_tree1' or \
                              (inv.type in ['in_refund', 'in_invoice']) and 'action_invoice_tree2'
                     # Put the reason in the chatter
