@@ -7,7 +7,9 @@ from odoo import api, fields, models
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    expense_account_id = fields.Many2one('account.account', company_dependent=True,
+    expense_account_id = fields.Many2one(
+        'account.account', 
+        company_dependent=True,
         string="Default Expense Account for FE invoice import",
         domain=[('deprecated', '=', False)],
         help="The expense account used when importing Costa Rican electronic invoice automatically")

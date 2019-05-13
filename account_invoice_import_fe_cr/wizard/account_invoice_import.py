@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 # Dictionary to store all the attachemnts until they are processed 
 invoices = {}
 
+
 class AccountInvoiceImport(models.TransientModel):
     _name = 'account.invoice.import'
     _inherit = ['account.invoice.import', 'base.fe_cr']
@@ -36,7 +37,7 @@ class AccountInvoiceImport(models.TransientModel):
             return super(AccountInvoiceImport, self).parse_xml_invoice(xml_root)
 
     def parse_fe_cr_invoice_line(self, iline, counters, namespaces):
-        ## sample amount_total_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)
+        # sample amount_total_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)
         qty_xpath = iline.xpath("inv:Cantidad", namespaces=namespaces)
         qty = float(qty_xpath[0].text)
         uom_xpath = iline.xpath("inv:UnidadMedida", namespaces=namespaces)
@@ -44,7 +45,7 @@ class AccountInvoiceImport(models.TransientModel):
         if uom_pre == 'Otros':
             uom_pre = 'Unid'
         uom = {'unece_code': uom_pre}
-        #product_dict = self.fe_cr_parse_product(iline, namespaces)
+        # product_dict = self.fe_cr_parse_product(iline, namespaces)
         name_xpath = iline.xpath("inv:Detalle", namespaces=namespaces)
         name = name_xpath and name_xpath[0].text or '-'
         price_unit_xpath = iline.xpath("inv:PrecioUnitario", namespaces=namespaces)
@@ -62,7 +63,7 @@ class AccountInvoiceImport(models.TransientModel):
             discount_details = ''
         price_subtotal_xpath = iline.xpath("inv:SubTotal", namespaces=namespaces)
         price_subtotal = float(price_subtotal_xpath[0].text)
-        #if not price_subtotal:
+        # if not price_subtotal:
         #    return False
         counters['lines'] += price_subtotal
         taxes_xpath = iline.xpath("inv:Impuesto", namespaces=namespaces)
@@ -70,16 +71,16 @@ class AccountInvoiceImport(models.TransientModel):
         for tax in taxes_xpath:
             tax_code_xpath = tax.xpath("inv:Codigo", namespaces=namespaces)
             tax_code = tax_code_xpath[0].text
-            #categ_code_xpath = tax.xpath(
+            # categ_code_xpath = tax.xpath(
             #    "cbc:ID", namespaces=namespaces)
-            #categ_code = 'S'
+            # categ_code = 'S'
             percent_xpath = tax.xpath("inv:Tarifa", namespaces=namespaces)
             percentage = percent_xpath[0].text and float(percent_xpath[0].text)
             tax_dict = {
                 'amount_type': 'percent',
                 'amount': percentage,
                 'tax_code': tax_code,
-                }
+            }
             taxes.append(tax_dict)
         product_code_xpath = iline.xpath("inv:Codigo/inv:Codigo", namespaces=namespaces)
         product_dict = {
@@ -101,7 +102,7 @@ class AccountInvoiceImport(models.TransientModel):
             'price_subtotal': price_subtotal,
             'name': name,
             'taxes': taxes,
-            }
+        }
         return vals
 
     @api.model
@@ -114,9 +115,9 @@ class AccountInvoiceImport(models.TransientModel):
         xml_string = etree.tostring(
             xml_root, pretty_print=True, encoding='UTF-8',
             xml_declaration=True)
-        #fe_cr_version_xpath = xml_root.xpath(
+        # fe_cr_version_xpath = xml_root.xpath(
         #    "//cbc:UBLVersionID", namespaces=namespaces)
-        #fe_cr_version = fe_cr_version_xpath and fe_cr_version_xpath[0].text or '2.1'
+        # fe_cr_version = fe_cr_version_xpath and fe_cr_version_xpath[0].text or '2.1'
         fe_cr_version = '4.2'
         # Check XML schema to avoid headaches trying to import invalid files
         # not working !
@@ -137,8 +138,8 @@ class AccountInvoiceImport(models.TransientModel):
         date_invoice = parse(date_issuance)
 
         origin = False
-        supplier_dict = self.fe_cr_parse_party(xml_root.xpath('inv:Emisor',namespaces=namespaces)[0], namespaces)
-        company_dict_full = self.fe_cr_parse_party(xml_root.xpath('inv:Receptor',namespaces=namespaces)[0], namespaces)
+        supplier_dict = self.fe_cr_parse_party(xml_root.xpath('inv:Emisor', namespaces=namespaces)[0], namespaces)
+        company_dict_full = self.fe_cr_parse_party(xml_root.xpath('inv:Receptor', namespaces=namespaces)[0], namespaces)
         company_dict = {}
         # We only take the "official references" for company_dict
         if company_dict_full.get('vat'):
@@ -151,7 +152,7 @@ class AccountInvoiceImport(models.TransientModel):
         amount_total_tax_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
         amount_total_tax = float(amount_total_tax_xpath[0].text)
         total_line = amount_untaxed
-        #payment_type_code = xml_root.xpath(
+        # payment_type_code = xml_root.xpath(
         #    "/inv:Invoice/cac:PaymentMeans/"
         #    "cbc:PaymentMeansCode[@listAgencyID='6']",
         #   namespaces=namespaces)
@@ -182,10 +183,10 @@ class AccountInvoiceImport(models.TransientModel):
             'invoice_number': reference,
             'reference': reference,
             'origin': origin,
-            #'date': fields.Date.to_string(date_issuance),
+            # 'date': fields.Date.to_string(date_issuance),
             'date': date_issuance,
             'date_issuance': date_issuance,
-            #'date_due': date_due_str,
+            # 'date_due': date_due_str,
             'currency': {'iso': currency},
             'amount_total': amount_total,
             'amount_total_tax': amount_total_tax,
@@ -193,22 +194,20 @@ class AccountInvoiceImport(models.TransientModel):
             'amount_total_electronic_invoice': amount_total,
             'lines': res_lines,
             'attachments': attachments,
-            }
+        }
         logger.info('Result of CR FE XML parsing: %s', res)
         return res
-
 
     @api.model
     def _prepare_create_invoice_vals(self, parsed_inv, import_config=False):
         (vals, import_config) = super(AccountInvoiceImport, self)._prepare_create_invoice_vals(parsed_inv, import_config)
-        vals['number_electronic']=parsed_inv['number_electronic']
-        vals['date_issuance']=parsed_inv['date_issuance']
-        vals['amount_total_electronic_invoice']=parsed_inv['amount_total_electronic_invoice']
-        vals['xml_supplier_approval']=parsed_inv['xml_supplier_approval']
-        vals['fname_xml_supplier_approval']=parsed_inv['fname_xml_supplier_approval']
-        vals['amount_tax_electronic_invoice']=parsed_inv['amount_total_tax'] 
-        return (vals,import_config)
-
+        vals['number_electronic'] = parsed_inv['number_electronic']
+        vals['date_issuance'] = parsed_inv['date_issuance']
+        vals['amount_total_electronic_invoice'] = parsed_inv['amount_total_electronic_invoice']
+        vals['xml_supplier_approval'] = parsed_inv['xml_supplier_approval']
+        vals['fname_xml_supplier_approval'] = parsed_inv['fname_xml_supplier_approval']
+        vals['amount_tax_electronic_invoice'] = parsed_inv['amount_total_tax'] 
+        return (vals, import_config)
 
     @api.model
     def parse_invoice(self, invoice_file_b64, invoice_filename):
@@ -226,9 +225,9 @@ class AccountInvoiceImport(models.TransientModel):
         # Is it for reimburse
         reimbursable = reimbursable_email in msg_dict['to']
 
-        #TODO: Agregar una expresión regular para obtener el correo de configuración
+        # TODO: Agregar una expresión regular para obtener el correo de configuración
         # del cual se van a importar las facturas electrónicas
-        #TODO: Mergear la lógica de esta importación con la lectura del
+        # TODO: Mergear la lógica de esta importación con la lectura del
         # módulo 'ak_invoice_reimbursable'
         logger.info(
             'New email received associated with account.invoice.import: '
@@ -348,7 +347,7 @@ class AccountInvoiceImport(models.TransientModel):
                             logger.warning(
                                 "Mail import: missing Invoice Import Configuration "
                                 "for partner '%s'.", partner.display_name)
-                            #continue
+                            # continue
                             import_config = self._default_config(partner, company_id)
                         elif len(import_configs) == 1:
                             import_config = import_configs.convert_to_import_config()
@@ -361,15 +360,15 @@ class AccountInvoiceImport(models.TransientModel):
                                 import_configs[0].convert_to_import_config()
                         attrs_inv['parsed_inv'] = parsed_inv
                         attrs_inv['import_config'] = import_config 
-                        #invoice = self.create_invoice(parsed_inv, import_config)
-                        #logger.info('Invoice ID %d created from email', invoice.id)
+                        # invoice = self.create_invoice(parsed_inv, import_config)
+                        # logger.info('Invoice ID %d created from email', invoice.id)
                         # invoice.message_post(_(
                         #     "Invoice successfully imported from email sent by "
                         #     "<b>%s</b> on %s with subject <i>%s</i>.") % (
                         #         msg_dict.get('email_from'), msg_dict.get('date'),
                         #         msg_dict.get('subject')))
                     else:
-                        #pdf
+                        # pdf
                         pass
                     if 'attachments' not in attrs_inv:
                         attrs_inv['attachments'] = {}

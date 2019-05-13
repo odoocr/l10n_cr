@@ -93,13 +93,13 @@ def make_msj_receptor(url, clave, cedula_emisor, fecha_emision, id_mensaje, deta
 def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
 
     # tipo de documento
-    tipos_de_documento = { 'FE'  : '01', # Factura Electrónica
-                           'ND'  : '02', # Nota de Débito
-                           'NC'  : '03', # Nota de Crédito
-                           'TE'  : '04', # Tiquete Electrónico
-                           'CCE' : '05', # Confirmación Comprobante Electrónico
-                           'CPCE': '06', # Confirmación Parcial Comprobante Electrónico
-                           'RCE' : '07'} # Rechazo Comprobante Electrónico
+    tipos_de_documento = {'FE': '01',  # Factura Electrónica
+                          'ND': '02',  # Nota de Débito
+                          'NC': '03',  # Nota de Crédito
+                          'TE': '04',  # Tiquete Electrónico
+                          'CCE': '05',  # Confirmación Comprobante Electrónico
+                          'CPCE': '06',  # Confirmación Parcial Comprobante Electrónico
+                          'RCE': '07'}  # Rechazo Comprobante Electrónico
 
     if tipo_documento not in tipos_de_documento:
         raise UserError('No se encuentra tipo de documento')
@@ -137,7 +137,7 @@ def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situaci
     identificacion = identificacion.zfill(12)
 
     # situación
-    situaciones = { 'normal': '1', 'contingencia': '2', 'sininternet': '3'}
+    situaciones = {'normal': '1', 'contingencia': '2', 'sininternet': '3'}
 
     if situacion not in situaciones:
         raise UserError('No se encuentra tipo de situación')
@@ -165,7 +165,6 @@ def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situaci
     clave = codigo_de_pais + dia + mes + anio + identificacion + consecutivo + situacion + codigo_de_seguridad
 
     return {'resp': {'length': len(clave), 'clave': clave, 'consecutivo': consecutivo}}
-
 
 
 def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
@@ -243,7 +242,7 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
         payload['infoRefeRazon'] = razon_referencia
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    #response_json = response.json()
+    # response_json = response.json()
     xresponse_json = response.json()
     _logger.error('MAB - create_xml_file PAYLOAD: %s' % payload)
     _logger.error('MAB - create_xml_file response: %s' % xresponse_json)
@@ -263,8 +262,8 @@ last_tokens_time = {}
 
 
 def token_hacienda(company):
-    token = last_tokens.get(company.id,False)
-    token_time = last_tokens_time.get(company.id,False)
+    token = last_tokens.get(company.id, False)
+    token_time = last_tokens_time.get(company.id, False)
 
     current_time = time.time()
 
@@ -312,7 +311,7 @@ def sign_xml(inv, tipo_documento, url, xml):
     payload['tipodoc'] = tipo_documento
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    #response_json = response.json()
+    # response_json = response.json()
 
     if 200 <= response.status_code <= 299:
         response_json = {'status': 200, 'xmlFirmado': response.json().get('resp').get('xmlFirmado')}
@@ -374,16 +373,17 @@ def consulta_clave(clave, token, env):
         _logger.error('MAB - Ambiente no definido')
         return
 
-    headers = {'Authorization': 'Bearer {}'.format(token),
-               'Cache-Control': 'no-cache',
-               'Content-Type': 'application/x-www-form-urlencoded',
-               'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
+    headers = {
+        'Authorization': 'Bearer {}'.format(token),
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
     }
 
     _logger.error('MAB - consulta_clave - url: %s' % url)
 
     try:
-        #response = requests.request("GET", url, headers=headers)
+        # response = requests.request("GET", url, headers=headers)
         response = requests.get(url, headers=headers)
         ############################
     except requests.exceptions.RequestException as e:
@@ -457,8 +457,8 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
-    if inv.state_send_invoice == 'aceptado' and (last_state == False or last_state == 'procesando'):
-        #if not inv.partner_id.opt_out:
+    if inv.state_send_invoice == 'aceptado' and (last_state is False or last_state == 'procesando'):
+        # if not inv.partner_id.opt_out:
         if inv.type == 'in_invoice' or inv.type == 'in_refund':
             email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
         else:
@@ -496,9 +496,9 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         if len(attachments) == 2:
             email_template.attachment_ids = [(6, 0, attachments)]
 
-                # email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
-                #                                                                            raise_exception=False,
-                #                                                                            force_send=True)  # default_type='binary'
+            # email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
+            #                                                                            raise_exception=False,
+            #                                                                            force_send=True)  # default_type='binary'
 
             email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
                                                                                         raise_exception=False,
