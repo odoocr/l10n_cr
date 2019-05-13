@@ -1110,7 +1110,7 @@ class AccountInvoiceElectronic(models.Model):
                                                             inv.journal_id.sucursal,
                                                             inv.journal_id.terminal)
 
-                        inv.number_electronic = response_json.get('clave')
+                        inv.number_electronic = response_json.get('resp').get('clave')
                         inv.number = response_json.get('consecutivo')
 
                     else:
