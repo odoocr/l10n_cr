@@ -90,7 +90,7 @@ def make_msj_receptor(url, clave, cedula_emisor, fecha_emision, id_mensaje, deta
     return xml
 
 
-def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situacion='normal'):
+def get_clave(self, url, tipo_comprobante, numeracion, sucursal, terminal, situacion='normal'):
 
     # tipo de documento
     tipos_de_documento = {'FE': '01',  # Factura Electrónica
@@ -101,10 +101,10 @@ def get_clave(self, url, tipo_documento, numeracion, sucursal, terminal, situaci
                           'CPCE': '06',  # Confirmación Parcial Comprobante Electrónico
                           'RCE': '07'}  # Rechazo Comprobante Electrónico
 
-    if tipo_documento not in tipos_de_documento:
+    if tipo_comprobante not in tipos_de_documento:
         raise UserError('No se encuentra tipo de documento')
 
-    tipo_documento = tipos_de_documento[tipo_documento]
+    tipo_documento = tipos_de_documento[tipo_comprobante]
 
     # numeracion
     numeracion = re.sub('[^0-9]', '', numeracion)
