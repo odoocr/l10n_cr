@@ -1112,6 +1112,7 @@ class AccountInvoiceElectronic(models.Model):
 
                         inv.number_electronic = response_json.get('resp').get('clave')
                         inv.number = response_json.get('resp').get('consecutivo')
+                        inv.tipo_comprobante = tipo_documento
 
                     else:
                         raise UserError('Debe configurar correctamente la secuencia del documento')
