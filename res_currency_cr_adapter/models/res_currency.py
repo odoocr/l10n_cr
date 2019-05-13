@@ -49,7 +49,7 @@ class ResCurrencyRate(models.Model):
 
         # Get current date to get exchange rate for today
         currentDate = datetime.datetime.now().date()
-        today = currentDate.strftime('%d/%m/%Y') #formato requerido por el BCCR dd/mm/yy
+        today = currentDate.strftime('%d/%m/%Y')  # formato requerido por el BCCR dd/mm/yy
 
         # Get XML Schema for BCCR webservice SOAP
         imp = Import('http://www.w3.org/2001/XMLSchema', location='http://www.w3.org/2001/XMLSchema.xsd')
@@ -68,7 +68,7 @@ class ResCurrencyRate(models.Model):
         sellingRate = 0
         if len(rateNodes) > 0:
             sellingOriginalRate = float(rateNodes[0].text)
-            sellingRate = 1/sellingOriginalRate # Odoo utiliza un valor inverso. Es decir a cuantos dólares equivale 1 colón. Por eso se divide 1 colon entre el tipo de cambio. 
+            sellingRate = 1 / sellingOriginalRate  # Odoo utiliza un valor inverso. Es decir a cuantos dólares equivale 1 colón. Por eso se divide 1 colon entre el tipo de cambio. 
 
         # Get Buying exchange Rate from BCCR
         response = client.service.ObtenerIndicadoresEconomicosXML(tcIndicador='317', tcFechaInicio=today, tcFechaFinal=today, tcNombre=company_name, tnSubNiveles='N')
@@ -77,21 +77,21 @@ class ResCurrencyRate(models.Model):
         buyingRate = 0
         if len(rateNodes) > 0:
             buyingOriginalRate = float(rateNodes[0].text)
-            buyingRate = 1/buyingOriginalRate # Odoo utiliza un valor inverso. Es decir a cuantos dólares equivale 1 colón. Por eso se divide 1 colon entre el tipo de cambio. 
+            buyingRate = 1 / buyingOriginalRate  # Odoo utiliza un valor inverso. Es decir a cuantos dólares equivale 1 colón. Por eso se divide 1 colon entre el tipo de cambio. 
 
         # Save the exchange rate in database
         today = currentDate.strftime('%Y-%m-%d')
 
-        #GET THE CURRENCY ID
+        # GET THE CURRENCY ID
         currency_id = self.env['res.currency'].search([('name', '=', 'CRC')], limit=1)
 
         ratesIds = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
 
         if len(ratesIds) > 0:
-            newRate = ratesIds.write({'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': currency_id.id})
-            _logger.info({'name': today, 'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': currency_id.id})
+            newRate = ratesIds.write({'rate': sellingRate, 'original_rate': sellingOriginalRate, 'rate_2': buyingRate, 'original_rate_2': buyingOriginalRate, 'currency_id': currency_id.id})
+            _logger.info({'name': today, 'rate': sellingRate, 'original_rate': sellingOriginalRate, 'rate_2': buyingRate, 'original_rate_2': buyingOriginalRate, 'currency_id': currency_id.id})
         else:
-            newRate = self.create({'name': today,'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': currency_id.id})
-            _logger.info({'name': today, 'rate': sellingRate, 'original_rate':sellingOriginalRate, 'rate_2':buyingRate, 'original_rate_2':buyingOriginalRate, 'currency_id': currency_id.id})
+            newRate = self.create({'name': today, 'rate': sellingRate, 'original_rate': sellingOriginalRate, 'rate_2': buyingRate, 'original_rate_2': buyingOriginalRate, 'currency_id': currency_id.id})
+            _logger.info({'name': today, 'rate': sellingRate, 'original_rate': sellingOriginalRate, 'rate_2': buyingRate, 'original_rate_2': buyingOriginalRate, 'currency_id': currency_id.id})
 
         _logger.info("=========================================================")

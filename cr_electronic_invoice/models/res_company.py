@@ -10,9 +10,8 @@ class CompanyElectronic(models.Model):
     _inherit = ['res.company', 'mail.thread', ]
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
-    #phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
-    phone_code = fields.Char(string="Código de teléfono", required=False, size=3,
-    default="506", help="Sin espacios ni guiones")
+    # phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
+    phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506", help="Sin espacios ni guiones")
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
                                         required=False, )
@@ -40,18 +39,18 @@ class CompanyElectronic(models.Model):
     frm_callback_url = fields.Char(string="Callback Url", required=False, default="https://url_callback/repuesta.php?",
                                    help='Es la URL en a la cual se reenviarán las respuestas de Hacienda.')
 
-    #activated = fields.Boolean('Activado')
-    #state = fields.Selection([
+    # activated = fields.Boolean('Activado')
+    # state = fields.Selection([
     #    ('draft', 'Draft'),
     #    ('started', 'Started'),
     #    ('progress', 'In progress'),
     #    ('finished', 'Done'),
-    #], default='draft')
+    # ], default='draft')
 
-    #frm_apicr_username = fields.Char(string="Usuario de Api", required=False, )
-    #frm_apicr_password = fields.Char(string="Password de Api", required=False, )
+    # frm_apicr_username = fields.Char(string="Usuario de Api", required=False, )
+    # frm_apicr_password = fields.Char(string="Password de Api", required=False, )
     frm_apicr_signaturecode = fields.Char(string="Codigo para Firmar API", required=False, )
 
-    #@api.onchange('email')
-    #def _onchange_email(self):
+    # @api.onchange('email')
+    # def _onchange_email(self):
     #    pass

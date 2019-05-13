@@ -138,7 +138,7 @@ class BaseCRFe(models.AbstractModel):
             'id': 'VAT',
             'name': False,
             'type_code': False,
-            }
+        }
         return tax_scheme_dict
 
     @api.model
@@ -411,7 +411,7 @@ class BaseCRFe(models.AbstractModel):
         tax_amount_node.text = '%0.*f' % (prec, tax_amount)
         if (
                 tax.amount_type == 'percent' and
-                not float_is_zero(tax.amount, precision_digits=prec+3)):
+                not float_is_zero(tax.amount, precision_digits=prec + 3)):
             percent = etree.SubElement(
                 tax_subtotal, ns['cbc'] + 'Percent')
             percent.text = unicode(
@@ -450,7 +450,7 @@ class BaseCRFe(models.AbstractModel):
             'id': tax.unece_type_code,
             'name': False,
             'type_code': False,
-            }
+        }
         return tax_scheme_dict
 
     @api.model
@@ -478,13 +478,13 @@ class BaseCRFe(models.AbstractModel):
                    'schema:xsd:CommonAggregateComponents-2',
             'cbc': 'urn:oasis:names:specification:fe_cr:schema:xsd:'
                    'CommonBasicComponents-2',
-            }
+        }
         ns = {
             'cac': '{urn:oasis:names:specification:fe_cr:schema:xsd:'
                    'CommonAggregateComponents-2}',
             'cbc': '{urn:oasis:names:specification:fe_cr:schema:xsd:'
                    'CommonBasicComponents-2}',
-            }
+        }
         return nsmap, ns
 
     @api.model
@@ -583,7 +583,7 @@ class BaseCRFe(models.AbstractModel):
         partner_vat = party_node.find('inv:Identificacion/inv:Numero', ns).text
         partner = self.env['res.partner'].search([('vat', '=', partner_vat)])
         if partner:
-            #self.partner_id = partner.id
+            # self.partner_id = partner.id
             partner_dict = {
                 'vat': partner_vat,
                 'name': partner.name,
@@ -600,7 +600,7 @@ class BaseCRFe(models.AbstractModel):
                 'email': email and email[0].text or '',
                 'phone': phone and phone[0].text or '',
             }
-            #raise UserError('El proveedor con identificación ' + root.findall('Emisor')[0].find('Identificacion')[
+            # raise UserError('El proveedor con identificación ' + root.findall('Emisor')[0].find('Identificacion')[
             #    1].text + ' no existe. Por favor creelo primero en el sistema.')
 
         address_xpath = party_node.find('inv:Ubicacion', namespaces=ns)
@@ -627,7 +627,7 @@ class BaseCRFe(models.AbstractModel):
             'state_code': state_code,
             'county_code': county_code,
             'district_code': district_code,
-            }
+        }
         return address_dict
 
     @api.model
@@ -650,7 +650,7 @@ class BaseCRFe(models.AbstractModel):
         delivery_dict = {
             'partner': partner_dict,
             'address': address_dict,
-            }
+        }
         return delivery_dict
 
     def fe_cr_parse_incoterm(self, delivery_term_node, ns):
@@ -669,7 +669,7 @@ class BaseCRFe(models.AbstractModel):
         product_dict = {
             'barcode': barcode_xpath and barcode_xpath[0].text or False,
             'code': code_xpath and code_xpath[0].text or False,
-            }
+        }
         return product_dict
 
     # ======================= METHODS only needed for testing
@@ -693,7 +693,7 @@ class BaseCRFe(models.AbstractModel):
             for embeddedfile in embeddedfiles[:-1]:
                 mime_res = mimetypes.guess_type(embeddedfile)
                 if mime_res and mime_res[0] in ['application/xml', 'text/xml']:
-                    xmlfiles[embeddedfile] = embeddedfiles[i+1]
+                    xmlfiles[embeddedfile] = embeddedfiles[i + 1]
                 i += 1
             logger.debug('xmlfiles=%s', xmlfiles)
             for filename, xml_file_dict_obj in xmlfiles.iteritems():

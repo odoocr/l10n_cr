@@ -21,13 +21,13 @@ except ImportError:
     from xml.etree import ElementTree
 
 try:
-    #import xmlsig
+    # import xmlsig
     from .. import signature
     from OpenSSL import crypto
 except(ImportError, IOError) as err:
     logging.info(err)
 
-#PARA VALIDAR JSON DE RESPUESTA
+# PARA VALIDAR JSON DE RESPUESTA
 from .. import extensions
 
 _logger = logging.getLogger(__name__)
@@ -37,37 +37,36 @@ def sign_file2(cert, password, xml):
     min = 1
     max = 99999
     signature_id = 'Signature-%05d' % random.randint(min, max)
-    #signed_properties_id = signature_id + '-SignedProperties%05d' \
+    # signed_properties_id = signature_id + '-SignedProperties%05d' \
     #                       % random.randint(min, max)
-
 
     signed_properties_id = 'SignedProperties-' + signature_id
 
-    #key_info_id = 'KeyInfo%05d' % random.randint(min, max)
+    # key_info_id = 'KeyInfo%05d' % random.randint(min, max)
     key_info_id = 'KeyInfoId-' + signature_id
     reference_id = 'Reference-%05d' % random.randint(min, max)
     object_id = 'XadesObjectId-%05d' % random.randint(min, max)
     etsi = 'http://uri.etsi.org/01903/v1.3.2#'
-    #sig_policy_identifier = 'http://www.facturae.es/' \
+    # sig_policy_identifier = 'http://www.facturae.es/' \
     #                        'politica_de_firma_formato_facturae/' \
     #                        'politica_de_firma_formato_facturae_v3_1' \
     #                        '.pdf'
 
-    #sig_policy_identifier = 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4/' \
+    # sig_policy_identifier = 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4/' \
     #                        'Resolucion%20Comprobantes%20Electronicos%20%20DGT-R-48-2016.pdf'
 
     sig_policy_identifier = 'https://tribunet.hacienda.go.cr/docs/esquemas/2016/v4/Resolucion%20Comprobantes%20Electronicos%20%20DGT-R-48-2016.pdf'
 
     sig_policy_hash_value = 'V8lVVNGDCPen6VELRD1Ja8HARFk='
-    #root = etree.fromstring(xml)
+    # root = etree.fromstring(xml)
 
     xml_decoder = base64decode(xml)
     xml_no_bytes = base64UTF8Decoder(xml_decoder)
 
-    #root = etree.fromstring(xml, etree.XMLParser(remove_blank_text=True))
+    # root = etree.fromstring(xml, etree.XMLParser(remove_blank_text=True))
     root = etree.fromstring(xml_no_bytes)
 
-    #sign = xmlsig.template.create(
+    # sign = xmlsig.template.create(
     sign = signature.template.create(
         c14n_method=signature.constants.TransformInclC14N,
         sign_method=signature.constants.TransformRsaSha256,
@@ -75,36 +74,36 @@ def sign_file2(cert, password, xml):
         ns="ds"
     )
 
-    #sign = create_sign_node(
+    # sign = create_sign_node(
     #    c14n_method=xmlsig.constants.TransformInclC14N,
     #    sign_method=xmlsig.constants.TransformRsaSha256,
     #    name=signature_id,
     #    ns="ds"
-    #)
+    # )
 
-    #key_info = xmlsig.template.ensure_key_info(
+    # key_info = xmlsig.template.ensure_key_info(
     key_info = signature.template.ensure_key_info(
         sign,
         name=key_info_id
     )
 
-    #key_info= ensure_key_info_fe(
+    # key_info= ensure_key_info_fe(
     #    sign,
     #    name=key_info_id
-    #)
+    # )
 
-    #x509_data = xmlsig.template.add_x509_data(key_info)
+    # x509_data = xmlsig.template.add_x509_data(key_info)
     x509_data = signature.template.add_x509_data(key_info)
-    #x509_data = add_x509_data_fe(key_info)
+    # x509_data = add_x509_data_fe(key_info)
 
-    #xmlsig.template.x509_data_add_certificate(x509_data)
+    # xmlsig.template.x509_data_add_certificate(x509_data)
     signature.template.x509_data_add_certificate(x509_data)
 
-    #x509_data_add_certificate_fe(x509_data)
+    # x509_data_add_certificate_fe(x509_data)
 
-    #xmlsig.template.add_key_value(key_info)
+    # xmlsig.template.add_key_value(key_info)
     signature.template.add_key_value(key_info)
-    #add_key_value_fe(key_info)
+    # add_key_value_fe(key_info)
 
     certificate = crypto.load_pkcs12(base64.b64decode(cert), password)
 
@@ -115,7 +114,7 @@ def sign_file2(cert, password, xml):
         uri=""
     )
 
-    #xmlsig.template.add_transform(
+    # xmlsig.template.add_transform(
     signature.template.add_transform(
         ref,
         signature.constants.TransformEnveloped
@@ -138,7 +137,7 @@ def sign_file2(cert, password, xml):
     object_node = etree.SubElement(
         sign,
         etree.QName(signature.constants.DSigNs, 'Object'),
-        #nsmap={'xades': etsi},
+        # nsmap={'xades': etsi},
         attrib={signature.constants.ID_ATTR: object_id}
     )
 
@@ -165,9 +164,9 @@ def sign_file2(cert, password, xml):
         etree.QName(etsi, 'SignedSignatureProperties')
     )
 
-    #now = datetime.now().replace(
+    # now = datetime.now().replace(
     #    microsecond=0, tzinfo=pytz.utc
-    #)
+    # )
 
     etree.SubElement(
         signed_signature_properties,
@@ -189,14 +188,14 @@ def sign_file2(cert, password, xml):
         etree.QName(etsi, 'CertDigest')
     )
 
-    #ESTE NODO TIENEN PROBLEMAS PUESTO QUE SOLO CARGA EN
+    # ESTE NODO TIENEN PROBLEMAS PUESTO QUE SOLO CARGA EN
     etree.SubElement(
         cert_digest,
         etree.QName(signature.constants.DSigNs, 'DigestMethod'),
-        #etree.QName('http://www.w3.org/2001/04/xmlenc#sha256', 'DigestMethod'),
-        #xmlsig.constants.TransformSha256,
+        # etree.QName('http://www.w3.org/2001/04/xmlenc#sha256', 'DigestMethod'),
+        # xmlsig.constants.TransformSha256,
         attrib={
-            #'Algorithm': 'http://www.w3.org/2000/09/xmldsig#sha1'
+            # 'Algorithm': 'http://www.w3.org/2000/09/xmldsig#sha1'
             'Algorithm': 'http://www.w3.org/2001/04/xmlenc#sha256'
         }
     )
@@ -208,12 +207,11 @@ def sign_file2(cert, password, xml):
         )
     )
 
-    #ESTE TAMBIEN TIENE PROBLEMAS NO GENERA EL DIGEST VALUE EN SHA 256
+    # ESTE TAMBIEN TIENE PROBLEMAS NO GENERA EL DIGEST VALUE EN SHA 256
     etree.SubElement(
         cert_digest,
         etree.QName(signature.constants.DSigNs, 'DigestValue')
     ).text = base64.b64encode(hash_cert.digest())
-
 
     issuer_serial = etree.SubElement(
         signing_certificate_cert,
@@ -249,11 +247,11 @@ def sign_file2(cert, password, xml):
         etree.QName(etsi, 'Identifier')
     ).text = sig_policy_identifier
 
-    #HACIENDA NO PIDE ESTE NODO
-    #etree.SubElement(
+    # HACIENDA NO PIDE ESTE NODO
+    # etree.SubElement(
     #    sig_policy_id,
     #    etree.QName(etsi, 'Description')
-    #).text = "Política de Firma FacturaE v3.1"
+    # ).text = "Política de Firma FacturaE v3.1"
 
     sig_policy_hash = etree.SubElement(
         signature_policy_id,
@@ -268,11 +266,11 @@ def sign_file2(cert, password, xml):
         }
     )
 
-    #try:
+    # try:
     #    remote = urllib.request.urlopen(sig_policy_identifier)
     #    hash_value = base64.b64encode(hashlib.sha1(remote.read()).digest())
-        #hacemos este cambio porque estamos encodeando el valor
-    #except urllib.request.HTTPError:
+    # hacemos este cambio porque estamos encodeando el valor
+    # except urllib.request.HTTPError:
     #    hash_value = sig_policy_hash_value
 
     etree.SubElement(
@@ -339,8 +337,8 @@ def get_time_hacienda():
     return date_cr
 
 
-#Utilizada para establecer un limite de caracteres en la cedula del cliente, no mas de 20
-#de lo contrario hacienda lo rechaza
+# Utilizada para establecer un limite de caracteres en la cedula del cliente, no mas de 20
+# de lo contrario hacienda lo rechaza
 def limit(str, limit):
     return (str[:limit - 3] + '...') if len(str) > limit else str
 
@@ -624,7 +622,7 @@ def gen_xml_mr(clave, cedula_emisor, fecha_emision, id_mensaje, detalle_mensaje,
     return base64UTF8Decoder(mr_to_base64)
 
 
-def gen_xml_fe(inv,consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
+def gen_xml_fe(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
                total_mercaderia_gravado, total_mercaderia_exento, base_total, total_impuestos, total_descuento,
                lines, currency_rate, invoice_comments):
 
@@ -759,11 +757,13 @@ def gen_xml_fe(inv,consecutivo, date, sale_conditions, medio_pago, total_servici
     return stringToBase64(felectronica_bytes)
 
 
-def gen_xml_nc(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
-                     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
-                     total_impuestos, total_descuento,lines,
-                     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-                     codigo_referencia, razon_referencia, currency_rate, invoice_comments):
+def gen_xml_nc(
+    inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
+    total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
+    total_impuestos, total_descuento, lines,
+    tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
+    codigo_referencia, razon_referencia, currency_rate, invoice_comments
+):
 
     numero_linea = 0
 
@@ -904,13 +904,13 @@ def gen_xml_nc(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
     return stringToBase64(ncelectronica_bytes)
 
 
-def gen_xml_nd(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
-                     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
-                     total_impuestos, total_descuento, lines,
-                     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-                     codigo_referencia, razon_referencia, currency_rate, invoice_comments):
-
-
+def gen_xml_nd(
+    inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
+    total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
+    total_impuestos, total_descuento, lines,
+    tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
+    codigo_referencia, razon_referencia, currency_rate, invoice_comments
+):
     numero_linea = 0
 
     sb = StringBuilder()
@@ -1051,7 +1051,7 @@ def gen_xml_nd(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
     return stringToBase64(ncelectronica_bytes)
 
 
-#Funcion para enviar el XML al Ministerio de Hacienda
+# Funcion para enviar el XML al Ministerio de Hacienda
 def send_xml_fe(inv, token, date, xml, tipo_ambiente):
     headers = {'Authorization': 'Bearer ' + token, 'Content-type': 'application/json'}
 
@@ -1118,7 +1118,7 @@ def schema_validator(xml_file, xsd_file) -> bool:
     return result
 
 
-#Obtener Attachments para las Facturas Electrónicas
+# Obtener Attachments para las Facturas Electrónicas
 def get_invoice_attachments(invoice, record_id):
 
     attachments = []
@@ -1148,30 +1148,30 @@ def parse_xml(name):
     return etree.parse(name).getroot()
 
 
-#CONVIERTE UN STRING A BASE 64
+# CONVIERTE UN STRING A BASE 64
 def stringToBase64(s):
     return base64.b64encode(s.encode('utf-8'))
 
 
-#TOMA UNA CADENA Y ELIMINA LOS CARACTERES AL INICIO Y AL FINAL
+# TOMA UNA CADENA Y ELIMINA LOS CARACTERES AL INICIO Y AL FINAL
 def stringStrip(s, start, end):
     return s[start:-end]
 
 
-#Tomamos el XML y le hacemos el decode de base 64, esto por ahora es solo para probar
-#la posible implementacion de la firma en python
+# Tomamos el XML y le hacemos el decode de base 64, esto por ahora es solo para probar
+# la posible implementacion de la firma en python
 def base64decode(string_decode):
     return base64.b64decode(string_decode)
 
 
-#TOMA UNA CADENA EN BASE64 Y LA DECODIFICA PARA ELIMINAR EL b' Y DEJAR EL STRING CODIFICADO
-#DE OTRA MANERA HACIENDA LO RECHAZA
+# TOMA UNA CADENA EN BASE64 Y LA DECODIFICA PARA ELIMINAR EL b' Y DEJAR EL STRING CODIFICADO
+# DE OTRA MANERA HACIENDA LO RECHAZA
 def base64UTF8Decoder(s):
     return s.decode("utf-8")
 
 
-#CLASE PERSONALIZADA (NO EXISTE EN PYTHON) QUE CONSTRUYE UNA CADENA MEDIANTE APPEND SEMEJANTE
-#AL STRINGBUILDER DEL C#
+# CLASE PERSONALIZADA (NO EXISTE EN PYTHON) QUE CONSTRUYE UNA CADENA MEDIANTE APPEND SEMEJANTE
+# AL STRINGBUILDER DEL C#
 class StringBuilder:
     _file_str = None
 

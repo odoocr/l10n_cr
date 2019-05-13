@@ -5,7 +5,7 @@
 	'version': '12.0.1.0.0',
 	'author': 'CRLibre.org',
 	'license': 'AGPL-3',
-	'website': 'https://www.techmicrocr.com/',
+	'website': 'https://crlibre.org/',
 	'category': 'Account',
 	'description':
 		'''
