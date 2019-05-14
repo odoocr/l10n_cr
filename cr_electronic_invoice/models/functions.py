@@ -411,8 +411,9 @@ def send_file(inv, token, xml, env):
         #raise Exception(e)
 
     if not (200 <= response.status_code <= 299):
-        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' % response.headers.get('X-Error-Cause','Unknown'))
-        return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause','Unknown')}
+        error_cause = response.headers.get('X-Error-Cause', response.text)
+        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' % error_cause)
+        return {'status': response.status_code, 'text': error_cause}
     else:
         return {'status': response.status_code, 'text': response.text}
 
@@ -477,9 +478,7 @@ def consulta_clave(clave, token, env):
     _logger.error('MAB - consulta_clave - url: %s' % url)
 
     try:
-        #response = requests.request("GET", url, headers=headers)
         response = requests.get(url, headers=headers)
-        ############################
     except requests.exceptions.RequestException as e:
         _logger.error('Exception %s' % e)
         return {'status': -1, 'text': 'Excepcion %s' % e}
@@ -493,15 +492,8 @@ def consulta_clave(clave, token, env):
             try:
                 respuesta = etree.fromstring(xml_decoded)
             except Exception, e:
-                # raise UserError(_(
-                #    "This XML file is not XML-compliant. Error: %s") % e)
                 _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
                 return {'status': 400, 'text': 'Excepción de conversión de XML'}
-            #pretty_xml_string = etree.tostring(
-            #    respuesta, pretty_print=True, encoding='UTF-8',
-            #    xml_declaration=True)
-
-            #_logger.error(u'MAB - send_file XML: %s' % pretty_xml_string)
 
             namespaces = respuesta.nsmap
             resp_xmlns = namespaces.pop(None)

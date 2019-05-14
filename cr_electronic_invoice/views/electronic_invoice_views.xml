@@ -414,7 +414,7 @@
 							<field name="xml_supplier_approval" filename="fname_xml_supplier_approval"/>
 							<button name="charge_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':[('state','!=','draft')]}"/>
 							<button name="send_acceptance_message" type="object" string="Enviar XML" colspan="2" />
-							<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
+							<field name="ignore_total_difference"/>
 						</group>
 						<group>
 							<field name="state_invoice_partner"/>

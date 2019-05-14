@@ -68,7 +68,9 @@ class PosOrder(models.Model):
                 session = self.env['pos.session'].browse(vals['session_id'])
                 vals['name'] = '/'
                 vals.setdefault('pricelist_id', session.config_id.pricelist_id.id)
-            order = super(PosOrder, self).create(vals)
+                values.setdefault('pricelist_id', session.config_id.pricelist_id.id)
+            else
+                order = super(PosOrder, self).create(vals)
         return order
 
     number_electronic = fields.Char(string="Número electrónico", required=False, copy=False, index=True)

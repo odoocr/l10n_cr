@@ -6,7 +6,6 @@ import datetime
 import pytz
 import base64
 import json
-import xml.etree.ElementTree as ET
 from lxml import etree
 from xml.sax.saxutils import escape
 from dateutil.parser import parse
@@ -75,7 +74,7 @@ class PartnerElectronic(models.Model):
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:
-            self.phone = re.sub(r"[^0-9]+", "", self.phone)
+            self.phone = re.sub(r"[^0-9]+", "", self.phone)[:19]
             if not self.phone.isdigit():
                 alert = {
                     'title': 'Atención',
@@ -86,7 +85,7 @@ class PartnerElectronic(models.Model):
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:
-            self.mobile = re.sub(r"[^0-9]+", "", self.mobile)
+            self.mobile = re.sub(r"[^0-9]+", "", self.mobile)[:19]
             if not self.mobile.isdigit():
                 alert = {
                     'title': 'Atención',
@@ -413,10 +412,14 @@ class AccountInvoiceElectronic(models.Model):
             try:
                 factura = etree.fromstring(xml_decoded)
             except Exception, e:
-                # raise UserError(_(
-                #    "This XML file is not XML-compliant. Error: %s") % e)
-                _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
-                return {'status': 400, 'text': 'Excepción de conversión de XML'}
+                #doble decode para los casos en que el proveedor envía el archivo en base64
+                self.xml_supplier_approval = xml_decoded
+                xml_decoded = base64.b64decode(self.xml_supplier_approval)
+                try:
+                    factura = etree.fromstring(xml_decoded)
+                except Exception, e:
+                    _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
+                    return {'status': 400, 'text': 'Excepción de conversión de XML'}
             pretty_xml_string = etree.tostring(
                 factura, pretty_print=True, encoding='UTF-8',
                 xml_declaration=True)
@@ -448,7 +451,6 @@ class AccountInvoiceElectronic(models.Model):
                 self.state_send_invoice = 'error'
                 self.message_post(subject='Error', body=u'El archivo XML no tiene receptor!')
                 return
-                #raise except_orm("Error : ",u'El archivo XML es inválido!')
 
             self.number_electronic = number_electronic_node[0].text
             self.date_issuance = date_issuance_node[0].text
@@ -483,7 +485,9 @@ class AccountInvoiceElectronic(models.Model):
     def send_acceptance_message(self):
         for inv in self:
             if inv.state_send_invoice and inv.state_send_invoice in ('aceptado', 'rechazado', 'na'):
-                raise UserError('Aviso!.\n La factura de proveedor ya fue confirmada')
+                inv.state_send_invoice = 'error'
+                inv.message_post(subject='Error', body='Aviso!.\n La factura de proveedor ya fue confirmada')
+                continue
             elif not self.ignore_total_difference and abs(self.amount_total_electronic_invoice-self.amount_total) > 1:
                 inv.state_send_invoice = 'error'
                 inv.message_post(subject='Error', body='Aviso!.\n Monto total no concuerda con monto del XML')
@@ -498,43 +502,34 @@ class AccountInvoiceElectronic(models.Model):
                 inv.state_send_invoice = 'error'
                 inv.message_post(subject='Error', body='Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
                 continue
-                #raise UserError('Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
-            #elif not inv.journal_id.sequence_electronic_invoice_provider:
-            #    raise UserError('Aviso!.\nPor favor configure la secuencia para la FE de proveedor')
+
             url = self.company_id.frm_callback_url
-            #root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(inv.xml_supplier_approval).decode("utf-8"), count=1))
             if not inv.state_invoice_partner:
                 inv.state_send_invoice = 'error'
                 inv.message_post(subject='Error', body='Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
                 continue
                 #raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
 
-            _logger.error('MAB - send_acceptance_message - 02')
             if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
-                _logger.error('MAB - send_acceptance_message - 03')
                 now_utc = datetime.datetime.now(pytz.timezone('UTC'))
                 now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
                 date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
                 if not inv.xml_comprobante or inv.state_send_invoice == 'rechazado':
-                    _logger.error('MAB - send_acceptance_message - 04')
                     if inv.state_invoice_partner == '1':
                         detalle_mensaje = 'Aceptado'
                         tipo = 1
                         tipo_documento = 'CCE'
                         sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.confirmation')
-                        _logger.error('MAB - send_acceptance_message - 05a')
                     elif inv.state_invoice_partner == '2':
                         detalle_mensaje = 'Aceptado parcial'
                         tipo = 2
                         tipo_documento = 'CPCE'
                         sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.partial.confirmation')
-                        _logger.error('MAB - send_acceptance_message - 05b')
                     else:
                         detalle_mensaje = 'Rechazado'
                         tipo = 3
                         tipo_documento = 'RCE'
                         sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.reject')
-                        _logger.error('MAB - send_acceptance_message - 05c')
 
                     '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
                     if inv.state_send_invoice == 'rechazado':
@@ -550,7 +545,6 @@ class AccountInvoiceElectronic(models.Model):
                     #response_json = functions.get_clave(self, url, tipo_documento, sequence, inv.journal_id.sucursal, inv.journal_id.terminal)
                     response_json = functions.get_clave(self, tipo_documento, sequence, 1, 1)
                     inv.consecutive_number_receiver = response_json.get('consecutivo')
-                    _logger.error('MAB - send_acceptance_message - 06')
 
                     response_json = functions.make_msj_receptor(url, inv.number_electronic, inv.partner_id.vat,
                                                       inv.date_issuance, tipo, detalle_mensaje,
@@ -571,10 +565,9 @@ class AccountInvoiceElectronic(models.Model):
                         _logger.error('MAB - API Error signing XML:%s', response_json['text'])
                         inv.state_send_invoice = 'error'
                         inv.message_post(subject='Error',
-                                         body='MAB - API Error signing XML:' + response_json['text'])
+                                         body='API Error signing XML:' + response_json['text'])
                         continue
 
-                    _logger.error('MAB - send_acceptance_message - 08')
                     xml_firmado = response_json.get('xmlFirmado')
 
                     inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
@@ -583,41 +576,37 @@ class AccountInvoiceElectronic(models.Model):
                     _logger.error('MAB - SIGNED XML:%s', inv.fname_xml_comprobante)
 
                 if inv.state_send_invoice != 'procesando':
-                    _logger.error('MAB - send_acceptance_message - 09')
                     env = inv.company_id.frm_ws_ambiente
                     response_json = functions.token_hacienda(inv.company_id)
                     if response_json['status'] != 200:
                         _logger.error('MAB - Send Acceptance Message - HALTED - Failed to get token')
                         return
-                    _logger.error('MAB - send_acceptance_message - 10')
 
                     response_json = functions.send_message(inv, date_cr, response_json['token'],  env)
 
-                    ##1response_json = response.json()
-                    status = response_json.get('status')
+                    response_status = response_json.get('status')
                     response_text = response_json.get('text')
                     if 200 <=  status <= 299:
                         inv.state_send_invoice = 'procesando'
                         #functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
                     else:
-                        inv.state_send_invoice = 'error'
-                        #inv.message_post(subject='Error',
-                        #                 body='MAB - Invoice: ' + inv.number_electronic + '  Error sending Acceptance Message: ' + response_json.get('resp').get('text'))
-                        _logger.error('MAB - Invoice: %s  Error sending Acceptance Message: %s', inv.number_electronic,
-                                      response_text)
+                        if response_text.find('ya fue recibido anteriormente') != -1:
+                            inv.state_send_invoice = 'procesando'
+                            inv.message_post(subject='Error', body='Ya recibido anteriormente, se pasa a consultar')
+                        else:
+                            inv.state_send_invoice = 'error'
+                            _logger.error('MAB - Invoice: %s  Error sending Acceptance Message: %s', inv.number_electronic,
+                                          response_text)
 
-                _logger.error('MAB - send_acceptance_message - 12')
                 if inv.state_send_invoice == 'procesando':
                     response_json = functions.token_hacienda(inv.company_id)
                     if response_json['status'] != 200:
                         _logger.error('MAB - Send Acceptance Message - HALTED - Failed to get token')
                         return
 
-                    _logger.error('MAB - send_acceptance_message - 013')
                     response_json = functions.consulta_clave(inv.number_electronic+'-'+inv.consecutive_number_receiver,
                                                              response_json['token'],
                                                              inv.company_id.frm_ws_ambiente)
-                    _logger.error('MAB - send_acceptance_message - 014')
                     status = response_json['status']
                     if status == 200:
                         inv.state_send_invoice = response_json.get('ind-estado')
@@ -737,6 +726,17 @@ class AccountInvoiceElectronic(models.Model):
                     i.state_email = 'fe_error'
                     i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
                     i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+                else:
+                    if i.error_count > 10:
+                        i.state_tributacion = 'error'
+                    elif i.error_count < 4:
+                        i.error_count += 1
+                        i.state_tributacion = 'procesando'
+                    else:
+                        i.error_count += 1
+                        i.state_tributacion = ''
+                    #doc.state_tributacion = 'no_encontrado'
+                    _logger.error('MAB - Consulta Hacienda - Invoice not found: %s  -  Estado Hacienda: %s', i.number_electronic, estado_m_h)
 
     @api.multi
     def action_consultar_hacienda(self):
@@ -813,9 +813,9 @@ class AccountInvoiceElectronic(models.Model):
 
             if not inv.xml_comprobante:
                 url = inv.company_id.frm_callback_url
-                now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+                #now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+                #now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+                #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
 
                 tipo_documento = ''
                 numero_documento_referencia = ''
@@ -882,15 +882,12 @@ class AccountInvoiceElectronic(models.Model):
                     if not quantity:
                         continue
 
-                    ##1 line_taxes = inv_line.invoice_line_tax_ids.compute_all(price, currency, 1, product=inv_line.product_id, partner=inv_line.invoice_id.partner_id)
                     line_taxes = inv_line.invoice_line_tax_ids.compute_all(inv_line.price_unit, currency, 1, product=inv_line.product_id, partner=inv_line.invoice_id.partner_id)
 
-                    #price_unit = round(line_taxes['total_excluded'] / (1 - inv_line.discount / 100.0), 5)  #ajustar para IVI
                     price_unit = round(line_taxes['total_excluded'], 5)  #ajustar para IVI
 
                     base_line = round(price_unit * quantity, 5)
                     descuento = inv_line.discount and round(price_unit * quantity * inv_line.discount / 100.0, 5) or 0.0
-                    ##1 subtotal_line = round(price_unit * quantity * (1 - inv_line.discount / 100.0), 5)
                     subtotal_line = round(base_line - descuento, 5)
 
                     line = {
@@ -905,7 +902,6 @@ class AccountInvoiceElectronic(models.Model):
                         line["codigo"] = inv_line.product_id.default_code or ''
 
                     if inv_line.discount:
-                        ##1 descuento = round(base_line - subtotal_line,5)
                         total_descuento += descuento
                         line["montoDescuento"] = descuento
                         line["naturalezaDescuento"] = 'Descuento Comercial'
@@ -922,7 +918,6 @@ class AccountInvoiceElectronic(models.Model):
                         for i in line_taxes['taxes']:
                             if taxes_lookup[i['id']]['tax_code'] <> '00':
                                 tax_index += 1
-                                ##1 tax_amount = round(i['amount'], 5)*quantity
                                 tax_amount = round(subtotal_line*taxes_lookup[i['id']]['tarifa']/100, 5)
                                 impuesto_linea += tax_amount
                                 tax = {
@@ -965,7 +960,7 @@ class AccountInvoiceElectronic(models.Model):
 
                     lines[line_number] = line
 
-                response_json = functions.make_xml_invoice(inv, tipo_documento, inv.number, date_cr,
+                response_json = functions.make_xml_invoice(inv, tipo_documento, inv.number, inv.date_issuance,
                                                            sale_conditions, medio_pago, total_servicio_gravado,
                                                            total_servicio_exento, total_mercaderia_gravado,
                                                            total_mercaderia_exento, base_subtotal,
@@ -1013,8 +1008,6 @@ class AccountInvoiceElectronic(models.Model):
                         inv.message_post(subject='Error', body=response_text)
                         _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', inv.number_electronic,
                                       response_status, response_text)
-
-
             else:
                 _logger.error('MAB - Error obteniendo token_hacienda')
         _logger.error('MAB - Valida Hacienda - Finalizado Exitosamente')
