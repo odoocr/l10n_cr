@@ -264,7 +264,7 @@ class AccountInvoiceElectronic(models.Model):
                 self.message_post(subject='Error', body=u'El archivo XML no tiene receptor!')
                 return
 
-            if self.env['account.invoice'].search([('number_electronic', '=', number_electronic_node[0].text)]):
+            if self.env['account.invoice'].search([('id', '!=', self.id),('number_electronic', '=', number_electronic_node[0].text)]):
                 _logger.error('MAB - Comprobante %s ya existe', number_electronic_node[0].text)
                 self.state_send_invoice = 'error'
                 self.message_post(subject='Error', body=u'El Comprobante ya existe!')
@@ -434,7 +434,26 @@ class AccountInvoiceElectronic(models.Model):
                                                              inv.company_id.frm_ws_ambiente)
                     status = response_json['status']
                     if status == 200:
-                        inv.state_send_invoice = response_json.get('ind-estado')
+                        state_send_invoice = response_json.get('ind-estado')
+                        if state_send_invoice == 'firma_invalida':
+                            if inv.error_count >= 2:
+                                inv.message_post(subject='Error',
+                                                 body=u'Firma inválida, se procede a generar nuevo mensaje aceptación',
+                                                 attachments=[(inv.fname_xml_comprobante, base64.b64decode(inv.xml_comprobante)),
+                                                             (inv.fname_xml_respuesta_tributacion, base64.b64decode(inv.xml_respuesta_tributacion))])
+                                _logger.error(
+                                    u'MAB - Send Acceptance Message - Documento %s recibió respuesta Firma inválida, se procede a generar nuevo mensaje aceptación',
+                                    inv.number)
+                                inv.state_send_invoice = False
+                                inv.xml_comprobante = False
+                                inv.fname_xml_comprobante = ''
+                                inv.xml_respuesta_tributacion = False
+                                inv.fname_xml_respuesta_tributacion = ''
+                                continue
+                            else:
+                                inv.error_count += 1
+
+                        inv.state_send_invoice = state_send_invoice
                         inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
                         inv.fname_xml_respuesta_tributacion = 'Aceptacion_' + inv.number_electronic+'-'+inv.consecutive_number_receiver + '.xml'
                         _logger.error('MAB - Estado Documento:%s', inv.state_send_invoice)

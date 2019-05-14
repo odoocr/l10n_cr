@@ -484,6 +484,7 @@ def consulta_clave(clave, token, env):
     if 200 <= response.status_code <= 299:
         respuesta_xml = response.json().get('respuesta-xml')
         ind_estado = response.json().get('ind-estado')
+        _logger.error('MAB - consulta_clave Estado Tributacion: %s', ind_estado)
 
         if ind_estado in ( 'rechazado', 'error'):
             xml_decoded = base64.b64decode(respuesta_xml)
