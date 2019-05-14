@@ -3,6 +3,7 @@
 # @author: Alexis de Lattre <alexis.delattre@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import base64
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
 from odoo.tools import float_compare, float_round, float_is_zero, config
@@ -76,7 +77,7 @@ class AccountInvoiceImport(models.TransientModel):
         modules'''
         bdio = self.env['business.document.import']
         xml_files_dict = bdio.get_xml_files_from_pdf(file_data)
-        for xml_filename, xml_root in xml_files_dict.iteritems():
+        for xml_filename, xml_root in xml_files_dict.items():
             logger.info('Trying to parse XML file %s', xml_filename)
             parsed_inv = self.parse_xml_invoice(xml_root)
             if parsed_inv:
@@ -367,15 +368,14 @@ class AccountInvoiceImport(models.TransientModel):
     def parse_invoice(self, invoice_file_b64, invoice_filename):
         assert invoice_file_b64, 'No invoice file'
         logger.info('Starting to import invoice %s', invoice_filename)
-        file_data = invoice_file_b64.decode('base64')
+        file_data = base64.b64decode(invoice_file_b64)
         parsed_inv = {}
         filetype = mimetypes.guess_type(invoice_filename)
         logger.debug('Invoice mimetype: %s', filetype)
         if filetype and filetype[0] in ['application/xml', 'text/xml']:
             try:
                 xml_root = etree.fromstring(file_data)
-
-            except Exception, e:
+            except Exception as e:
                 raise UserError(_(
                     "This XML file is not XML-compliant. Error: %s") % e)
             pretty_xml_string = etree.tostring(
@@ -763,7 +763,7 @@ class AccountInvoiceImport(models.TransientModel):
             existing_lines, parsed_inv['lines'], chatter, seller=seller)
         if not compare_res:
             return
-        for eline, cdict in compare_res['to_update'].iteritems():
+        for eline, cdict in list(compare_res['to_update'].items()):
             write_vals = {}
             if cdict.get('qty'):
                 chatter.append(_(
@@ -913,7 +913,7 @@ class AccountInvoiceImport(models.TransientModel):
         return action
 
     def xpath_to_dict_helper(self, xml_root, xpath_dict, namespaces):
-        for key, value in xpath_dict.iteritems():
+        for key, value in xpath_dict.items():
             if isinstance(value, list):
                 isdate = isfloat = False
                 if 'date' in key:
@@ -970,6 +970,7 @@ class AccountInvoiceImport(models.TransientModel):
             msg_dict.get('email_from'), msg_dict.get('subject'),
             msg_dict.get('date'), msg_dict.get('message_id'),
             self.env.user.name, self.env.user.id)
+            
         # It seems that the "Odoo-way" to handle multi-company in E-mail
         # gateways is by using mail.aliases associated with users that
         # don't switch company (I haven't found any other way), which
@@ -1019,7 +1020,7 @@ class AccountInvoiceImport(models.TransientModel):
                     'Attachment %d: %s. Trying to import it as an invoice',
                     i, attach.fname)
                 parsed_inv = self.parse_invoice(
-                    attach.content.encode('base64'), attach.fname)
+                    base64.b64encode(attach.content), attach.fname)
                 partner = bdio._match_partner(
                     parsed_inv['partner'], parsed_inv['chatter_msg'])
 

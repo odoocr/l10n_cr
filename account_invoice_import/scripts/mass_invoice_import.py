@@ -7,7 +7,7 @@
 Mass import of PDF/XML invoice.
 The module OCA/edi/account_invoice_import must be installed on Odoo.
 """
-
+import base64
 import odoorpc
 import sys
 from optparse import OptionParser
@@ -74,7 +74,7 @@ def send_file(odoo, file_path):
         f.seek(0)
         invoice = f.read()
         f.close()
-        inv_b64 = invoice.encode('base64')
+        inv_b64 = base64.b64encode(invoice)
         wiz_id = odoo.execute(
             'account.invoice.import', 'create',
             {'invoice_file': inv_b64, 'invoice_filename': filename})
@@ -93,7 +93,7 @@ def send_file(odoo, file_path):
                 logger.warning('Very strange: no res_id key in action')
                 fail_files.append(filename)
                 return 'failure'
-        except Exception, e:
+        except Exception as e:
             logger.warning(
                 'Odoo failed to import file %s. Reason: %s', filename, e)
             fail_files.append(filename)
@@ -177,7 +177,7 @@ def main(options, arguments):
         odoo = odoorpc.ODOO(options.server, proto, options.port)
         odoo.login(options.database, options.username, pwd)
         logger.info('Successfully connected to Odoo')
-    except Exception, e:
+    except Exception as e:
         logger.error("Failed to connect to Odoo. Error: %s", e)
         sys.exit(1)
 

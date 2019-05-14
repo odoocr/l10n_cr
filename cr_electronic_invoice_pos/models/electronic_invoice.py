@@ -340,6 +340,10 @@ class PosOrder(models.Model):
                         razon_referencia = 'nota debito'
                     else:
                         tipo_documento = 'NC'
+                        tipo_documento_referencia = 'FE'
+                        numero_documento_referencia = doc.pos_order_id.number_electronic
+                        fecha_emision_referencia = doc.pos_order_id.date_issuance
+                        codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
                     tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
                     numero_documento_referencia = doc.pos_order_id.number_electronic
@@ -507,5 +511,5 @@ class PosOrder(models.Model):
                 doc.message_post(body='Error obteniendo token_hacienda', subject='Error')
                 _logger.error('MAB - Error obteniendo token_hacienda')
 
-        _logger.error('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
+        _logger.info('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
 

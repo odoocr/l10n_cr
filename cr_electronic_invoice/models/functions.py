@@ -3,15 +3,14 @@ import json
 import requests
 import re
 import random
-import logging
-from xml.sax.saxutils import escape
-from odoo.exceptions import UserError
-
 import base64
 from lxml import etree
 import datetime
 import time
 import pytz
+import logging
+from odoo.exceptions import UserError
+from xml.sax.saxutils import escape
 
 _logger = logging.getLogger(__name__)
 
@@ -285,7 +284,6 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
 
     return response_json
 
-
 last_tokens = {}
 last_tokens_time = {}
 
@@ -300,7 +298,7 @@ def token_hacienda(company):
     else:
         if company.frm_ws_ambiente == 'api-prod':
             url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
-        else:    #if env == 'api-stag':
+        else:
             url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
 
         data = {
@@ -363,7 +361,7 @@ def send_file(inv, token, xml, env):
     xml_decoded = base64.b64decode(xml)
     try:
         factura = etree.fromstring(xml_decoded)
-    except Exception, e:
+    except Exception as e:
         #raise UserError(_(
         #    "This XML file is not XML-compliant. Error: %s") % e)
         _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
