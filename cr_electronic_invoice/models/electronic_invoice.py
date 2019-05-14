@@ -223,10 +223,11 @@ class AccountInvoiceElectronic(models.Model):
             try:
                 factura = etree.fromstring(xml_decoded)
             except Exception as e:
-                #doble decode para los casos en que el proveedor envía el archivo en base64
-                self.xml_supplier_approval = xml_decoded
-                xml_decoded = base64.b64decode(self.xml_supplier_approval)
                 try:
+                    _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
+                    #doble decode para los casos en que el proveedor envía el archivo en base64
+                    self.xml_supplier_approval = xml_decoded
+                    xml_decoded = base64.b64decode(self.xml_supplier_approval)
                     factura = etree.fromstring(xml_decoded)
                 except Exception as e:
                     _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
@@ -261,6 +262,12 @@ class AccountInvoiceElectronic(models.Model):
             elif not receptor_node:
                 self.state_send_invoice = 'error'
                 self.message_post(subject='Error', body=u'El archivo XML no tiene receptor!')
+                return
+
+            if self.env['account.invoice'].search([('number_electronic', '=', number_electronic_node[0].text)]):
+                _logger.error('MAB - Comprobante %s ya existe', number_electronic_node[0].text)
+                self.state_send_invoice = 'error'
+                self.message_post(subject='Error', body=u'El Comprobante ya existe!')
                 return
 
             self.number_electronic = number_electronic_node[0].text
@@ -399,7 +406,7 @@ class AccountInvoiceElectronic(models.Model):
 
                     response_status = response_json.get('status')
                     response_text = response_json.get('text')
-                    if 200 <=  status <= 299:
+                    if 200 <=  response_status <= 299:
                         inv.state_send_invoice = 'procesando'
                         #functions.consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado)
                     else:
@@ -416,6 +423,11 @@ class AccountInvoiceElectronic(models.Model):
                     if response_json['status'] != 200:
                         _logger.error('MAB - Send Acceptance Message - HALTED - Failed to get token')
                         return
+                    if not inv.number_electronic:
+                        inv.state_send_invoice = 'error'
+                        inv.message_post(subject='Error', body='Documento no tiene Número Electrónico')
+                        _logger.error(u'MAB - Send Acceptance Message - Documento %s no tiene Número Electrónico', inv.number)
+                        continue
 
                     response_json = functions.consulta_clave(inv.number_electronic+'-'+inv.consecutive_number_receiver,
                                                              response_json['token'],

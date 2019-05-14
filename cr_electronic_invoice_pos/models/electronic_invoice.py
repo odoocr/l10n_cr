@@ -59,7 +59,7 @@ class PosOrder(models.Model):
             self.sequence_number_sync(vals)
             order = super(PosOrder, self).create(vals)
             _logger.error('MAB - Previous name: %s    New name: %s', order.name, real_name)
-            if self.search([('name', 'like', real_name[21:41])]):
+            if self.env['pos.order'].search([('name', 'like', real_name[21:41])]):
                 real_name = self.env['ir.sequence'].next_by_code('pos.order.recovery')
             order.name = real_name
         else:
