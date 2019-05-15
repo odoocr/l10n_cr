@@ -404,6 +404,49 @@ def consulta_clave(clave, token, env):
     return response_json
 
 
+def send_message(inv, date_cr, token, env):
+
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
+    else:
+        _logger.error('MAB - Ambiente no definido')
+        return
+
+    comprobante = {}
+    comprobante['clave'] = inv.number_electronic
+    comprobante['consecutivoReceptor'] = inv.consecutive_number_receiver
+    comprobante["fecha"] = date_cr
+    vat = re.sub('[^0-9]', '', inv.partner_id.vat)
+    comprobante['emisor'] = {}
+    comprobante['emisor']['tipoIdentificacion'] = inv.partner_id.identification_id.code
+    comprobante['emisor']['numeroIdentificacion'] = vat
+    comprobante['receptor'] = {}
+    comprobante['receptor']['tipoIdentificacion'] = inv.company_id.identification_id.code
+    comprobante['receptor']['numeroIdentificacion'] = inv.company_id.vat
+
+    comprobante['comprobanteXml'] = inv.xml_comprobante
+    _logger.info('MAB - Comprobante : %s' % comprobante)
+    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
+    _logger.info('MAB - URL : %s' % url)
+    _logger.info('MAB - Headers : %s' % headers)
+
+    try:
+        response = requests.post(url, data=json.dumps(comprobante), headers=headers)
+
+    except requests.exceptions.RequestException as e:
+        _logger.info('Exception %s' % e)
+        return {'status': 400, 'text': u'Excepción de envio XML'}
+        # raise Exception(e)
+
+    if not (200 <= response.status_code <= 299):
+        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' % response.headers.get('X-Error-Cause', 'Unknown'))
+        return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause', 'Unknown')}
+    else:
+        return {'status': response.status_code, 'text': response.text}
+
+
 def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
 
     if inv.type == 'in_invoice' or inv.type == 'in_refund':
@@ -417,8 +460,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
                     tipo_documento = 'CPCE'
                 else:
                     tipo_documento = 'RCE'
-                response_json = get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal,
-                                          inv.journal_id.terminal)
+                response_json = get_clave(self, url, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
                 inv.consecutive_number_receiver = response_json.get('resp').get('consecutivo')
 
         clave = inv.number_electronic + "-" + inv.consecutive_number_receiver
@@ -450,7 +492,6 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         inv.state_send_invoice = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
-    
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
             inv.type == 'out_invoice' or inv.type == 'out_refund'):
         inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
@@ -477,8 +518,6 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
              ('res_field', '=', 'xml_comprobante')], limit=1)
 
         if attachment.id:
-            # attachment.name = inv.fname_xml_comprobante
-            # attachment.datas_fname = inv.fname_xml_comprobante
             attachment.name = inv.fname_xml_comprobante
             attachment.datas_fname = inv.fname_xml_comprobante
             attachments.append(attachment.id)
@@ -492,20 +531,14 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
             attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
             attachments.append(attachment_resp.id)
 
-        # email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
         if len(attachments) == 2:
             email_template.attachment_ids = [(6, 0, attachments)]
-
-            # email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
-            #                                                                            raise_exception=False,
-            #                                                                            force_send=True)  # default_type='binary'
 
             email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
                                                                                         raise_exception=False,
                                                                                         force_send=True)  # default_type='binary'
 
             # limpia el template de los attachments
-            # email_template.attachment_ids = [(6, 0, [])]
             email_template.attachment_ids = [(5)]
 
 
