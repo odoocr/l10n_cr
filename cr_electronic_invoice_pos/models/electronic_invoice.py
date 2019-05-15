@@ -59,7 +59,7 @@ class PosOrder(models.Model):
             self.sequence_number_sync(vals)
             order = super(PosOrder, self).create(vals)
             _logger.error('MAB - Previous name: %s    New name: %s', order.name, real_name)
-            if self.search([('name', 'like', real_name[21:41])]):
+            if self.env['pos.order'].search([('name', 'like', real_name[21:41])]):
                 real_name = self.env['ir.sequence'].next_by_code('pos.order.recovery')
             order.name = real_name
         else:
@@ -68,7 +68,9 @@ class PosOrder(models.Model):
                 session = self.env['pos.session'].browse(vals['session_id'])
                 vals['name'] = '/'
                 vals.setdefault('pricelist_id', session.config_id.pricelist_id.id)
-            order = super(PosOrder, self).create(vals)
+                values.setdefault('pricelist_id', session.config_id.pricelist_id.id)
+            else
+                order = super(PosOrder, self).create(vals)
         return order
 
     number_electronic = fields.Char(string="Número electrónico", required=False, copy=False, index=True)
@@ -338,6 +340,10 @@ class PosOrder(models.Model):
                         razon_referencia = 'nota debito'
                     else:
                         tipo_documento = 'NC'
+                        tipo_documento_referencia = 'FE'
+                        numero_documento_referencia = doc.pos_order_id.number_electronic
+                        fecha_emision_referencia = doc.pos_order_id.date_issuance
+                        codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
                     tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
                     numero_documento_referencia = doc.pos_order_id.number_electronic
@@ -505,5 +511,5 @@ class PosOrder(models.Model):
                 doc.message_post(body='Error obteniendo token_hacienda', subject='Error')
                 _logger.error('MAB - Error obteniendo token_hacienda')
 
-        _logger.error('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
+        _logger.info('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
 

@@ -164,7 +164,7 @@
 			</field>
 		</record>
 
-		<record id="view_exoneration_form" model="ir.ui.view">
+		<!--record id="view_exoneration_form" model="ir.ui.view">
 			<field name="name">exoneration.form</field>
 			<field name="model">exoneration</field>
 			<field name="arch" type="xml">
@@ -182,8 +182,8 @@
 					</sheet>
 				</form>
 			</field>
-		</record>
-		<record id="view_exoneration_tree" model="ir.ui.view">
+		</record-->
+		<!--record id="view_exoneration_tree" model="ir.ui.view">
 			<field name="name">exoneration.tree</field>
 			<field name="model">exoneration</field>
 			<field name="arch" type="xml">
@@ -197,7 +197,7 @@
 					<field name="percentage_exoneration"/>
 				</tree>
 			</field>
-		</record>
+		</record-->
 
 		<record id="view_company_form_inherit" model="ir.ui.view">
 			<field name="name">res.company.form.inherit</field>
@@ -414,7 +414,7 @@
 							<field name="xml_supplier_approval" filename="fname_xml_supplier_approval"/>
 							<button name="charge_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':[('state','!=','draft')]}"/>
 							<button name="send_acceptance_message" type="object" string="Enviar XML" colspan="2" />
-							<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
+							<field name="ignore_total_difference"/>
 						</group>
 						<group>
 							<field name="state_invoice_partner"/>

@@ -3,15 +3,14 @@ import json
 import requests
 import re
 import random
-import logging
-from xml.sax.saxutils import escape
-from odoo.exceptions import UserError
-
 import base64
 from lxml import etree
 import datetime
 import time
 import pytz
+import logging
+from odoo.exceptions import UserError
+from xml.sax.saxutils import escape
 
 _logger = logging.getLogger(__name__)
 
@@ -285,7 +284,6 @@ def make_xml_invoice(inv, tipo_documento, consecutivo, date, sale_conditions, me
 
     return response_json
 
-
 last_tokens = {}
 last_tokens_time = {}
 
@@ -300,7 +298,7 @@ def token_hacienda(company):
     else:
         if company.frm_ws_ambiente == 'api-prod':
             url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
-        else:    #if env == 'api-stag':
+        else:
             url = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
 
         data = {
@@ -363,7 +361,7 @@ def send_file(inv, token, xml, env):
     xml_decoded = base64.b64decode(xml)
     try:
         factura = etree.fromstring(xml_decoded)
-    except Exception, e:
+    except Exception as e:
         #raise UserError(_(
         #    "This XML file is not XML-compliant. Error: %s") % e)
         _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
@@ -411,8 +409,9 @@ def send_file(inv, token, xml, env):
         #raise Exception(e)
 
     if not (200 <= response.status_code <= 299):
-        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' % response.headers.get('X-Error-Cause','Unknown'))
-        return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause','Unknown')}
+        error_cause = response.headers.get('X-Error-Cause', response.text)
+        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' % error_cause)
+        return {'status': response.status_code, 'text': error_cause}
     else:
         return {'status': response.status_code, 'text': response.text}
 
@@ -477,9 +476,7 @@ def consulta_clave(clave, token, env):
     _logger.error('MAB - consulta_clave - url: %s' % url)
 
     try:
-        #response = requests.request("GET", url, headers=headers)
         response = requests.get(url, headers=headers)
-        ############################
     except requests.exceptions.RequestException as e:
         _logger.error('Exception %s' % e)
         return {'status': -1, 'text': 'Excepcion %s' % e}
@@ -487,21 +484,15 @@ def consulta_clave(clave, token, env):
     if 200 <= response.status_code <= 299:
         respuesta_xml = response.json().get('respuesta-xml')
         ind_estado = response.json().get('ind-estado')
+        _logger.error('MAB - consulta_clave Estado Tributacion: %s', ind_estado)
 
         if ind_estado in ( 'rechazado', 'error'):
             xml_decoded = base64.b64decode(respuesta_xml)
             try:
                 respuesta = etree.fromstring(xml_decoded)
             except Exception, e:
-                # raise UserError(_(
-                #    "This XML file is not XML-compliant. Error: %s") % e)
                 _logger.info('MAB - This XML file is not XML-compliant.  Exception %s' % e)
                 return {'status': 400, 'text': 'Excepción de conversión de XML'}
-            #pretty_xml_string = etree.tostring(
-            #    respuesta, pretty_print=True, encoding='UTF-8',
-            #    xml_declaration=True)
-
-            #_logger.error(u'MAB - send_file XML: %s' % pretty_xml_string)
 
             namespaces = respuesta.nsmap
             resp_xmlns = namespaces.pop(None)
