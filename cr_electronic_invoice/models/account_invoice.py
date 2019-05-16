@@ -13,7 +13,6 @@ from xml.sax.saxutils import escape
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
-from . import functions
 from . import api_facturae
 from lxml import etree
 from .. import extensions
@@ -406,12 +405,8 @@ class AccountInvoiceElectronic(models.Model):
 
                     token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
 
-                    # now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                    # now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                    # date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                    
-                    functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h,
-                                                  inv.company_id.frm_callback_url, api_facturae.get_time_hacienda(), False)
+                    api_facturae.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h,
+                                                     inv.company_id.frm_callback_url, api_facturae.get_time_hacienda(), False)
                 else:
 
                     if abs(self.amount_total_electronic_invoice - self.amount_total) > 1:
@@ -478,7 +473,7 @@ class AccountInvoiceElectronic(models.Model):
                                 inv.amount_total_electronic_invoice)
 
                             # TODO: Sign using any python library
-                            response_json = functions.sign_xml(inv, tipo_documento, url, xml)
+                            response_json = api_facturae.sign_xml(inv, tipo_documento, url, xml)
 
                             if response_json['status'] != 200:
                                 _logger.info('MAB - API Error signing XML:%s', response_json['text'])
@@ -495,20 +490,20 @@ class AccountInvoiceElectronic(models.Model):
 
                             env = inv.company_id.frm_ws_ambiente
                             token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
-                            response_json = functions.send_message(inv, api_facturae.get_time_hacienda(), token_m_h, env)
+                            response_json = api_facturae.send_message(inv, api_facturae.get_time_hacienda(), token_m_h, env)
 
-                            status = response_json.get('Status')
+                            status = response_json.get('status')
 
                             if status == 202:
                                 inv.state_send_invoice = 'procesando'
                             else:
                                 inv.state_send_invoice = 'error'
-                                _logger.error('MAB - Invoice: %s  Error sending Acceptance Message: %s', inv.number_electronic, response_json.get('resp').get('text'))
+                                _logger.error('MAB - Invoice: %s  Error sending Acceptance Message: %s', inv.number_electronic, response_json.get('text'))
 
                             if inv.state_send_invoice == 'procesando':
                                 token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
 
-                                response_json = functions.consulta_clave(inv.number_electronic + '-' + inv.consecutive_number_receiver, token_m_h, inv.company_id.frm_ws_ambiente)
+                                response_json = api_facturae.consulta_clave(inv.number_electronic + '-' + inv.consecutive_number_receiver, token_m_h, inv.company_id.frm_ws_ambiente)
                                 status = response_json['status']
 
                                 if status == 200:
@@ -586,7 +581,7 @@ class AccountInvoiceElectronic(models.Model):
             token_m_h = api_facturae.get_token_hacienda(i, i.company_id.frm_ws_ambiente)
 
             if i.number_electronic and len(i.number_electronic) == 50:
-                response_json = functions.consulta_clave(i.number_electronic, token_m_h,
+                response_json = api_facturae.consulta_clave(i.number_electronic, token_m_h,
                                                          i.company_id.frm_ws_ambiente)
                 status = response_json['status']
 
@@ -640,7 +635,7 @@ class AccountInvoiceElectronic(models.Model):
         if self.company_id.frm_ws_ambiente != 'disabled':
             for inv in self:
                 token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
-                functions.consulta_documentos(self, inv, self.company_id.frm_ws_ambiente, token_m_h, self.company_id.frm_callback_url, False, False)
+                api_facturae.consulta_documentos(self, inv, self.company_id.frm_ws_ambiente, token_m_h, self.company_id.frm_callback_url, False, False)
 
     @api.model
     def _confirmahacienda(self, max_invoices=10):  # cron
@@ -914,7 +909,7 @@ class AccountInvoiceElectronic(models.Model):
                         inv.state_tributacion = 'error'
                         continue
                 else:
-                    response_json = functions.sign_xml(inv, tipo_documento, url, xml)
+                    response_json = api_facturae.sign_xml(inv, tipo_documento, url, xml)
                     # obtenemos el xml firmado, como en ambos metodos tenemos que firmar con crlibre
                     # podemos dejar el get del response fuera de los IF
 
