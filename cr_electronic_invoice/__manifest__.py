@@ -22,6 +22,7 @@
              'data/product.uom.csv',
              'data/mail_template_data.xml',
              'data/aut.ex.csv',
+             'data/sequence.xml',
              'views/uom_views.xml',
              'views/account_invoice_views.xml',
              'views/account_journal_views.xml',

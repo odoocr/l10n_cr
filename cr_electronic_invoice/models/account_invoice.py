@@ -439,8 +439,7 @@ class AccountInvoiceElectronic(models.Model):
                                 detalle_mensaje = 'Aceptado parcial'
                                 tipo = 2
                                 tipo_documento = 'CPCE'
-                                sequence = inv.env['ir.sequence'].next_by_code(
-                                    'sequece.electronic.doc.partial.confirmation')
+                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.partial.confirmation')
                             else:
                                 detalle_mensaje = 'Rechazado'
                                 tipo = 3
@@ -581,8 +580,7 @@ class AccountInvoiceElectronic(models.Model):
             token_m_h = api_facturae.get_token_hacienda(i, i.company_id.frm_ws_ambiente)
 
             if i.number_electronic and len(i.number_electronic) == 50:
-                response_json = api_facturae.consulta_clave(i.number_electronic, token_m_h,
-                                                         i.company_id.frm_ws_ambiente)
+                response_json = api_facturae.consulta_clave(i.number_electronic, token_m_h, i.company_id.frm_ws_ambiente)
                 status = response_json['status']
 
                 if status == 200:

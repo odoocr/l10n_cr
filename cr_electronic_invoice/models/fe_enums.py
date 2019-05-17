@@ -34,13 +34,13 @@ class SituacionComprobante(Enum):
 
 
 class TipoDocumento(Enum):
-    FE = '01'   #Factura Electrónica
-    ND = '02'   #Nota de Débito
-    NC = '03'   #Nota de Crédito
-    TE = '04'   #Tiquete Electrónico
-    CCE = '05'  #confirmacion comprobante electronico
-    CPCE = '06' #confirmacion parcial comprobante electronico
-    RCE = '07'  #rechazo comprobante electronico
+    FE = '01'    # Factura Electrónica
+    ND = '02'    # Nota de Débito
+    NC = '03'    # Nota de Crédito
+    TE = '04'    # Tiquete Electrónico
+    CCE = '05'   # confirmacion comprobante electronico
+    CPCE = '06'  # confirmacion parcial comprobante electronico
+    RCE = '07'   # rechazo comprobante electronico
 
     @classmethod
     def has_value(cls, value):
