@@ -34,6 +34,6 @@ class TipoDocumento(Enum):
     ND = '02'
     NC = '03'
     TE = '04'
-    CCE = '05' #confirmacion comprobante electronico
-    CPCE = '06' #confirmacion parcial comprobante electronico
-    RCE = '07' #rechazo comprobante electronico
+    CCE = '05'  # confirmacion comprobante electronico
+    CPCE = '06'  # confirmacion parcial comprobante electronico
+    RCE = '07'  # rechazo comprobante electronico
