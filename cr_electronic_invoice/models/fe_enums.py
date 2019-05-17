@@ -24,16 +24,24 @@ class TipoCedula(Enum):
 
 
 class SituacionComprobante(Enum):
-    Normal = '1'
-    Contingencia = '2'
-    SinInternet = '3'
+    normal = '1'
+    contingencia = '2'
+    sininternet = '3'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
 
 
 class TipoDocumento(Enum):
-    FE = '01'
-    ND = '02'
-    NC = '03'
-    TE = '04'
-    CCE = '05'  # confirmacion comprobante electronico
-    CPCE = '06'  # confirmacion parcial comprobante electronico
-    RCE = '07'  # rechazo comprobante electronico
+    FE = '01'   #Factura Electrónica
+    ND = '02'   #Nota de Débito
+    NC = '03'   #Nota de Crédito
+    TE = '04'   #Tiquete Electrónico
+    CCE = '05'  #confirmacion comprobante electronico
+    CPCE = '06' #confirmacion parcial comprobante electronico
+    RCE = '07'  #rechazo comprobante electronico
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
