@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from . import account
 from . import account_journal
+from . import account_invoice
 from . import account_payment
 from . import api_facturae
 from . import code_type_product

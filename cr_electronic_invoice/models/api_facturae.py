@@ -1183,3 +1183,203 @@ class StringBuilder:
 
     def __str__(self):
         return self._file_str.getvalue()
+
+
+def consulta_clave(clave, token, env):
+
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/' + clave
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/' + clave
+    else:
+        _logger.error('MAB - Ambiente no definido')
+        return
+
+    headers = {
+        'Authorization': 'Bearer {}'.format(token),
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
+    }
+
+    _logger.error('MAB - consulta_clave - url: %s' % url)
+
+    try:
+        # response = requests.request("GET", url, headers=headers)
+        response = requests.get(url, headers=headers)
+        ############################
+    except requests.exceptions.RequestException as e:
+        _logger.error('Exception %s' % e)
+        return {'status': -1, 'text': 'Excepcion %s' % e}
+
+    if 200 <= response.status_code <= 299:
+        response_json = {
+            'status': 200,
+            'ind-estado': response.json().get('ind-estado'),
+            'respuesta-xml': response.json().get('respuesta-xml')
+        }
+    elif 400 <= response.status_code <= 499:
+        response_json = {'status': 400, 'ind-estado': 'error'}
+    else:
+        _logger.error('MAB - consulta_clave failed.  error: %s', response.status_code)
+        response_json = {'status': response.status_code, 'text': 'token_hacienda failed: %s' % response.reason}
+    return response_json
+
+
+def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
+    if inv.type == 'in_invoice' or inv.type == 'in_refund':
+        if not inv.consecutive_number_receiver:
+            if len(inv.number) == 20:
+                inv.consecutive_number_receiver = inv.number
+            else:
+                if inv.state_invoice_partner == '1':
+                    tipo_documento = 'CCE'
+                elif inv.state_invoice_partner == '2':
+                    tipo_documento = 'CPCE'
+                else:
+                    tipo_documento = 'RCE'
+                response_json = get_clave_hacienda(self, tipo_documento, inv.number, inv.journal_id.sucursal, inv.journal_id.terminal)
+                inv.consecutive_number_receiver = response_json.get('consecutivo')
+
+        clave = inv.number_electronic + "-" + inv.consecutive_number_receiver
+    else:
+        clave = inv.number_electronic
+
+    response_json = consulta_clave(clave, token_m_h, env)
+    estado_m_h = response_json.get('ind-estado')
+
+    if (not xml_firmado) and (not date_cr):
+        self.message_post(body='<p>Ha realizado la consulta a Haciendo de:'
+                               + '<br /><b>Documento: </b>' + payload['clave']
+                               + '<br /><b>Estado del documento: </b>' + estado_m_h + '</p>',
+                          subtype='mail.mt_note',
+                          content_subtype='html')
+
+    # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
+    # se carga el xml devuelto por Hacienda
+    last_state = inv.state_send_invoice
+    if inv.type == 'out_invoice' or inv.type == 'out_refund':
+        # Se actualiza el estado con el que devuelve Hacienda
+        inv.state_tributacion = estado_m_h
+        inv.date_issuance = date_cr
+        inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
+        inv.xml_comprobante = xml_firmado
+    elif inv.type == 'in_invoice' or inv.type == 'in_refund':
+        inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
+        inv.xml_comprobante = xml_firmado
+        inv.state_send_invoice = estado_m_h
+
+    # Si fue aceptado o rechazado por haciendo se carga la respuesta
+    if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
+            inv.type == 'out_invoice' or inv.type == 'out_refund'):
+        inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
+        inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+
+    # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
+    if inv.state_send_invoice == 'aceptado' and (last_state is False or last_state == 'procesando'):
+        # if not inv.partner_id.opt_out:
+        if inv.type == 'in_invoice' or inv.type == 'in_refund':
+            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
+        else:
+            email_template = self.env.ref('account.email_template_edi_invoice', False)
+
+            # attachment_resp = self.env['ir.attachment'].search(
+            #    [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+            #     ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+            # attachment_resp.name = inv.fname_xml_respuesta_tributacion
+            # attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+
+        attachments = []
+
+        attachment = self.env['ir.attachment'].search(
+            [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+             ('res_field', '=', 'xml_comprobante')], limit=1)
+
+        if attachment.id:
+            attachment.name = inv.fname_xml_comprobante
+            attachment.datas_fname = inv.fname_xml_comprobante
+            attachments.append(attachment.id)
+
+        attachment_resp = self.env['ir.attachment'].search(
+            [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+
+        if attachment_resp.id:
+            attachment_resp.name = inv.fname_xml_respuesta_tributacion
+            attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
+            attachments.append(attachment_resp.id)
+
+        if len(attachments) == 2:
+            email_template.attachment_ids = [(6, 0, attachments)]
+
+            email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
+                                                                                        raise_exception=False,
+                                                                                        force_send=True)  # default_type='binary'
+
+            # limpia el template de los attachments
+            email_template.attachment_ids = [(5)]
+
+
+def send_message(inv, date_cr, token, env):
+
+    if env == 'api-stag':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
+    elif env == 'api-prod':
+        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
+    else:
+        _logger.error('MAB - Ambiente no definido')
+        return
+
+    comprobante = {}
+    comprobante['clave'] = inv.number_electronic
+    comprobante['consecutivoReceptor'] = inv.consecutive_number_receiver
+    comprobante["fecha"] = date_cr
+    vat = re.sub('[^0-9]', '', inv.partner_id.vat)
+    comprobante['emisor'] = {}
+    comprobante['emisor']['tipoIdentificacion'] = inv.partner_id.identification_id.code
+    comprobante['emisor']['numeroIdentificacion'] = vat
+    comprobante['receptor'] = {}
+    comprobante['receptor']['tipoIdentificacion'] = inv.company_id.identification_id.code
+    comprobante['receptor']['numeroIdentificacion'] = inv.company_id.vat
+
+    comprobante['comprobanteXml'] = inv.xml_comprobante
+    _logger.info('MAB - Comprobante : %s' % comprobante)
+    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
+    _logger.info('MAB - URL : %s' % url)
+    _logger.info('MAB - Headers : %s' % headers)
+
+    try:
+        response = requests.post(url, data=json.dumps(comprobante), headers=headers)
+
+    except requests.exceptions.RequestException as e:
+        _logger.info('Exception %s' % e)
+        return {'status': 400, 'text': u'Excepción de envio XML'}
+        # raise Exception(e)
+
+    if not (200 <= response.status_code <= 299):
+        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' % response.headers.get('X-Error-Cause', 'Unknown'))
+        return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause', 'Unknown')}
+    else:
+        return {'status': response.status_code, 'text': response.text}
+
+
+# TODO: Cambiar esto por un firmador de Python
+def sign_xml(inv, tipo_documento, url, xml):
+    payload = {}
+    headers = {}
+    payload['w'] = 'signXML'
+    payload['r'] = 'signFE'
+    payload['p12Url'] = inv.company_id.frm_apicr_signaturecode
+    payload['inXml'] = xml
+    payload['pinP12'] = inv.company_id.frm_pin
+    payload['tipodoc'] = tipo_documento
+
+    response = requests.request("POST", url, data=payload, headers=headers)
+    # response_json = response.json()
+
+    if 200 <= response.status_code <= 299:
+        response_json = {'status': 200, 'xmlFirmado': response.json().get('resp').get('xmlFirmado')}
+    else:
+        response_json = {'status': response.status_code, 'text': 'sign_xml_invoice failed: %s' % response.reason}
+
+    return response_json
