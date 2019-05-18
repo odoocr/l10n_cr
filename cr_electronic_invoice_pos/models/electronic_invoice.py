@@ -5,13 +5,14 @@ import requests
 import logging
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-import odoo.addons.cr_electronic_invoice.models.functions as functions
+import odoo.addons.cr_electronic_invoice.models.api_facturae as functions
 import datetime
 import pytz
 from threading import Lock
 lock = Lock()
 
 _logger = logging.getLogger(__name__)
+
 
 class AccountJournal(models.Model):
     _inherit = 'account.journal'
@@ -24,8 +25,9 @@ class PosConfig(models.Model):
     sucursal = fields.Char(string='Point of Sale Sucursal', required=True, help="Sucursal for this point of sale")
     terminal = fields.Char(string='Point of Sale Terminal Number', required=True, help="Terminal number for this point of sale")
     return_sequence_id = fields.Many2one('ir.sequence', string='Order IDs Return Sequence', readonly=False,
-        help="This sequence is automatically created by Odoo but you can change it "
-        "to customize the reference numbers of your orders.", copy=False)
+                                         help="This sequence is automatically created by Odoo but you can change it "
+                                         "to customize the reference numbers of your orders.", copy=False)
+
 
 class PosOrder(models.Model):
     _inherit = "pos.order"
@@ -71,8 +73,8 @@ class PosOrder(models.Model):
 
     number_electronic = fields.Char(string="Número electrónico", required=False, copy=False, index=True)
     date_issuance = fields.Char(string="Fecha de emisión", required=False, copy=False)
-    state_tributacion = fields.Selection([('aceptado', 'Aceptado'), ('rechazado', 'Rechazado'), ('rejected', 'Rechazado2'),('no_encontrado', 'No encontrado'), ('recibido', 'Recibido'),
-         ('error', 'Error'), ('procesando', 'Procesando')], 'Estado FE', copy=False)
+    state_tributacion = fields.Selection([('aceptado', 'Aceptado'), ('rechazado', 'Rechazado'), ('rejected', 'Rechazado2'), ('no_encontrado', 'No encontrado'), ('recibido', 'Recibido'),
+                                         ('error', 'Error'), ('procesando', 'Procesando')], 'Estado FE', copy=False)
 
     reference_code_id = fields.Many2one(comodel_name="reference.code", string="Código de referencia", required=False)
     pos_order_id = fields.Many2one(comodel_name="pos.order", string="Documento de referencia", required=False, copy=False)
@@ -82,13 +84,12 @@ class PosOrder(models.Model):
     fname_xml_comprobante = fields.Char(string="Nombre de archivo Comprobante XML", required=False, copy=False)
     xml_supplier_approval = fields.Binary(string="XML Proveedor", required=False, copy=False, attachment=True)
     fname_xml_supplier_approval = fields.Char(string="Nombre de archivo Comprobante XML proveedor", required=False, copy=False)
-    state_email= fields.Selection([('no_email', 'Sin cuenta de correo'), ('sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
+    state_email = fields.Selection([('no_email', 'Sin cuenta de correo'), ('sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),
         ('consecutive_number_receiver_uniq', 'unique (company_id,consecutive_number_receiver)', "Numero de FE repetido, por favor modifique el diario de compras"),
     ]
-
 
     @api.multi
     def action_pos_order_paid(self):
@@ -137,24 +138,22 @@ class PosOrder(models.Model):
         }
 
     @api.model
-    def _consultahacienda_pos(self, max_orders=10):  #cron
-        pos_orders = self.env['pos.order'].search([('state', 'in', ('paid','done','invoiced')),
+    def _consultahacienda_pos(self, max_orders=10):  # cron
+        pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    ('date_order', '>=', '2018-09-01'),
                                                    ('number_electronic', '!=', False),
                                                    ('state_tributacion', 'in', ('recibido', 'procesando'))],
                                                   limit=max_orders)
-        total_orders=len(pos_orders)
-        current_order=0
+        total_orders = len(pos_orders)
+        current_order = 0
         _logger.error('MAB - Consulta Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
-            current_order+=1
+            current_order += 1
             _logger.error('MAB - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
             url = doc.company_id.frm_callback_url
 
+            token_m_h = functions.get_token_hacienda(doc, doc.company_id.frm_ws_ambiente)
 
-            response_json = functions.token_hacienda(doc, doc.company_id.frm_ws_ambiente, url)
-
-            token_m_h = response_json.get('resp').get('access_token')
             if doc.number_electronic and len(doc.number_electronic) == 50:
                 headers = {}
                 payload = {}
@@ -171,7 +170,7 @@ class PosOrder(models.Model):
                     doc.fname_xml_respuesta_tributacion = 'AHC_' + doc.number_electronic + '.xml'
                     doc.xml_respuesta_tributacion = responsejson.get('resp').get('respuesta-xml')
                     if doc.partner_id and doc.partner_id.email and not doc.partner_id.opt_out:
-                        #email_template = self.env.ref('account.email_template_edi_invoice', False)
+                        # email_template = self.env.ref('account.email_template_edi_invoice', False)
                         email_template = self.env.ref(
                             'cr_electronic_invoice_pos.email_template_pos_invoice', False)
                         attachment = self.env['ir.attachment'].search(
@@ -216,18 +215,17 @@ class PosOrder(models.Model):
 
     @api.model
     def _reenviacorreos_pos(self, max_orders=1):  # cron
-        pos_orders = self.env['pos.order'].search([('state', 'in', ('paid','done','invoiced')),
+        pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    ('date_order', '>=', '2018-09-01'),
                                                    ('number_electronic', '!=', False),
                                                    ('state_email', '=', False),
                                                    ('state_tributacion', '=', 'aceptado')],
-                                                  limit=max_orders
-                                                 )
-        total_orders=len(pos_orders)
-        current_order=0
+                                                  limit=max_orders)
+        total_orders = len(pos_orders)
+        current_order = 0
         _logger.error('MAB - Reenvia Correos- POS Orders to send: %s', total_orders)
         for doc in pos_orders:
-            current_order+=1
+            current_order += 1
             _logger.error('MAB - Reenvia Correos- POS Order %s - %s / %s', doc.name, current_order, total_orders)
             if doc.partner_id.email and not doc.partner_id.opt_out and doc.state_tributacion == 'aceptado':
                 comprobante = self.env['ir.attachment'].search(
@@ -240,7 +238,7 @@ class PosOrder(models.Model):
                 try:
                     comprobante.name = doc.fname_xml_comprobante
                 except:
-                    comprobante.name = 'FE_'+doc.number_electronic+'.xml'
+                    comprobante.name = 'FE_' + doc.number_electronic + '.xml'
 
                 comprobante.datas_fname = comprobante.name
 
@@ -266,15 +264,12 @@ class PosOrder(models.Model):
         _logger.error('MAB - Reenvia Correos - Finalizado')
 
     @api.model
-    def _validahacienda_pos(self, max_orders=10):  #cron
+    def _validahacienda_pos(self, max_orders=10):  # cron
         lock.acquire()
         try:
-            pos_orders = self.env['pos.order'].search([('state', 'in', ('paid','done','invoiced')),
-                                                       #('name', 'like', '506030918%'),
-                                                       #('name', 'not like', '**%'),
+            pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                        ('number_electronic', '=', False),
                                                        ('date_order', '>=', '2018-09-01'),
-                                                       #('id', '=', 22145),
                                                        ('state_tributacion', '=', False)],
                                                       order="date_order",
                                                       limit=max_orders)
@@ -303,34 +298,34 @@ class PosOrder(models.Model):
                         fecha_emision_referencia = doc.pos_order_id.date_issuance
                         codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
-                        #FacturaReferencia = ''   *****************
+                        # FacturaReferencia = ''   *****************
 
                     now_utc = datetime.datetime.now(pytz.timezone('UTC'))
                     now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                    dia = docName[3:5]#'%02d' % now_cr.day,
-                    mes = docName[5:7]#'%02d' % now_cr.month,
-                    anno = docName[7:9]#str(now_cr.year)[2:4],
-                    #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                    date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
-                    #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
+                    dia = docName[3:5]  # '%02d' % now_cr.day,
+                    mes = docName[5:7]  # '%02d' % now_cr.month,
+                    anno = docName[7:9]  # str(now_cr.year)[2:4],
+                    # date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+                    date_cr = now_cr.strftime("20" + anno + "-" + mes + "-" + dia + "T%H:%M:%S-06:00")
+                    # date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
                     codigo_seguridad = docName[-8:]  # ,doc.company_id.security_code,
                     if not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
                         _logger.error('MAB 001 - codigo seguridad : %s  -- Pedido: %s Metodo de pago de diario no definido, utilizando efectivo', codigo_seguridad, docName)
                     medio_pago = doc.statement_ids[0].statement_id.journal_id.payment_method_id and doc.statement_ids[0].statement_id.journal_id.payment_method_id.sequence or '01'
-                    sale_conditions = '01' #Contado !!   doc.sale_conditions_id.sequence,
+                    sale_conditions = '01'  # Contado !!   doc.sale_conditions_id.sequence,
 
-                    currency_rate = 1 # 1 / doc.currency_id.rate
+                    currency_rate = 1  # 1 / doc.currency_id.rate
                     lines = []
                     numero = 0
-                    vat=doc.partner_id.vat
+                    vat = doc.partner_id.vat
 
-                    if doc.partner_id and doc.partner_id.vat: #and doc.partner_id.email:
+                    if doc.partner_id and doc.partner_id.vat:  # and doc.partner_id.email:
                         if not doc.partner_id.identification_id:
-                            if len(doc.partner_id.vat)==9:  #cedula fisica
-                                id_code='01'
-                            elif len(doc.partner_id.vat)==10:  #cedula juridica
-                                id_code='02'
-                            elif len(doc.partner_id.vat)==11 or len(doc.partner_id.vat)==12:  #dimex
+                            if len(doc.partner_id.vat) == 9:  # cedula fisica
+                                id_code = '01'
+                            elif len(doc.partner_id.vat) == 10:  # cedula juridica
+                                id_code = '02'
+                            elif len(doc.partner_id.vat) == 11 or len(doc.partner_id.vat) == 12:  # dimex
                                 id_code = '03'
                             else:
                                 id_code = '05'
@@ -348,12 +343,11 @@ class PosOrder(models.Model):
                                 'tipo': id_code,
                                 'numero': doc.partner_id.vat,
                             }
-                            receptor_identificacion_extranjero =''
-                        receptor = {##
-                                'nombre': doc.partner_id.name[:80],
-                                'identificacion': receptor_identificacion,
-                                'IdentificacionExtranjero': receptor_identificacion_extranjero,
-                            }
+                            receptor_identificacion_extranjero = ''
+                        receptor = { 
+                            'nombre': doc.partner_id.name[:80],
+                            'identificacion': receptor_identificacion,
+                            'IdentificacionExtranjero': receptor_identificacion_extranjero, }
                     else:
                         receptor = ''
 
@@ -369,8 +363,8 @@ class PosOrder(models.Model):
                     base_subtotal = 0.0
 
                     for line in doc.lines:
-                        #impuestos_acumulados = 0.0
-                        numero +=1
+                        # impuestos_acumulados = 0.0
+                        numero += 1
                         price = line.price_unit * (1 - line.discount / 100.0)
                         qty = abs(line.qty)
                         if not qty:
@@ -379,7 +373,7 @@ class PosOrder(models.Model):
                         tax_ids = fpos.map_tax(line.tax_ids, line.product_id, line.order_id.partner_id) if fpos else line.tax_ids
                         line_taxes = tax_ids.compute_all(price, line.order_id.pricelist_id.currency_id, 1, product=line.product_id, partner=line.order_id.partner_id)
 
-                        price_unit = round(line_taxes['total_excluded'] / (1 - line.discount / 100.0), 5)  #ajustar para IVI
+                        price_unit = round(line_taxes['total_excluded'] / (1 - line.discount / 100.0), 5)  # ajustar para IVI
                         base_line = abs(round(price_unit * qty, 5))
                         subtotal_line = abs(round(price_unit * qty * (1 - line.discount / 100.0), 5))
 
@@ -455,36 +449,31 @@ class PosOrder(models.Model):
 
                     _logger.error('MAB - unsigned JSON DATA:%s', response_json)
                     xml = response_json.get('resp').get('xml')
+
                     response_json = functions.sign_xml(doc, tipo_documento, url, xml)
                     xml_firmado = response_json.get('resp').get('xmlFirmado')
                     _logger.error('MAB - SIGNED XML:%s', xml_firmado)
 
                     # get token
                     # url param added by @jbarboza
-                    response_json = functions.token_hacienda(doc, doc.company_id.frm_ws_ambiente, url)
-                    token_m_h = response_json.get('resp').get('access_token')
+                    token_m_h = functions.get_token_hacienda(doc, doc.company_id.frm_ws_ambiente)
 
                     _logger.error('MAB 002 - enviando documento')
-                    response_json = functions.send_file(doc, token_m_h, date_cr, xml_firmado,
-                                                        doc.company_id.frm_ws_ambiente, url)
+                    response_json = functions.send_xml_fe(doc, token_m_h, date_cr, xml_firmado, doc.company_id.frm_ws_ambiente)
 
                     _logger.error('MAB 003 - respuesta recibida')
                     if response_json.get('resp').get('Status') == 202:
-                        #functions.consulta_documentos(self, doc, 'TE', doc.company_id.frm_ws_ambiente, token_m_h, url,
-                        #                              date_cr, xml_firmado)
+                        # functions.consulta_documentos(self, doc, 'TE', doc.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
                         doc.state_tributacion = 'procesando'
                         doc.date_issuance = date_cr
                         doc.fname_xml_comprobante = 'comprobante_' + doc.number_electronic + '.xml'
                         doc.xml_comprobante = xml_firmado
                     else:
                         _logger.error(
-                            'No se pudo Crear la factura electrónica: \n' + str(
-                                response_json.get('resp').get('text')))
-                        number_electronic = '-1--' + docName + 'text :' + str(
-                                response_json.get('resp').get('text'))
+                            'No se pudo Crear la factura electrónica: \n' + str(response_json.get('resp').get('text')))
+                        number_electronic = '-1--' + docName + 'text :' + str(response_json.get('resp').get('text'))
                 else:
                     _logger.error('MAB 013 - Pos Order:%s skipped.  FE disabled', doc.name)
             _logger.error('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
         finally:
             lock.release()
-

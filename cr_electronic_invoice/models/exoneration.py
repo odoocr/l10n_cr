@@ -18,4 +18,3 @@ class Exoneration(models.Model):
     name_institution = fields.Char(string="Nombre de institución", required=False, )
     date = fields.Date(string="Fecha", required=False, )
     percentage_exoneration = fields.Float(string="Porcentaje de exoneración", required=False, )
-

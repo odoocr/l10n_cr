@@ -6,9 +6,9 @@ class CompanyElectronic(models.Model):
     _inherit = ['res.company', 'mail.thread', ]
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
-    #phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
+    # phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
     phone_code = fields.Char(string="Código de teléfono", required=False, size=3,
-    default="506", help="Sin espacios ni guiones")
+    default = "506", help="Sin espacios ni guiones")
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
                                         required=False, )
