@@ -1,3 +1,0 @@
-id,tax_code,name,amount,type_tax_use,description,sequence,price_include
-AccountTax_1,00,Impuesto Incluido,0,sale,IVI,10,true
-AccountTax_2,00,Impuesto Incluido,0,purchase,IVI,10,true
