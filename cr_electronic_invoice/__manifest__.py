@@ -45,6 +45,8 @@
 			 'views/exoneration_views.xml',
 	         'security/ir.model.access.csv',
 			 'views/menu_views.xml',
+			 'views/res_config_settings_views.xml',
+             'wizard/account_invoice_import_view.xml',
 	         ],
 	'installable': True,
 }

@@ -1246,6 +1246,7 @@ def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
         clave = inv.number_electronic
 
     response_json = consulta_clave(clave, token_m_h, env)
+    _logger.debug(response_json)
     estado_m_h = response_json.get('ind-estado')
 
     if (not xml_firmado) and (not date_cr):

@@ -663,7 +663,7 @@ class AccountInvoiceElectronic(models.Model):
                                                        ('state', 'in', ('open', 'paid')),
                                                        ('number_electronic', '!=', False),
                                                        ('date_invoice', '>=', '2018-10-01'),
-                                                       '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
+                                                       '|', ('state_tributacion', '=', False), ('state_tributacion', 'in', ('ne')),],
                                                       order='number',
                                                       limit=max_invoices)
         total_invoices = len(invoices)
