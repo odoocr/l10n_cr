@@ -20,10 +20,10 @@ logger = logging.getLogger(__name__)
 # Dictionary to store all the attachemnts until they are processed 
 invoices = {}
 
-
 class AccountInvoiceImport(models.TransientModel):
     _name = 'account.invoice.import'
     _inherit = ['account.invoice.import', 'base.fe_cr']
+    _description = 'Wizard to import supplier invoices/refunds'
 
     @api.model
     def parse_xml_invoice(self, xml_root):
@@ -44,7 +44,7 @@ class AccountInvoiceImport(models.TransientModel):
         uom_pre = uom_xpath[0].text
         if uom_pre == 'Otros':
             uom_pre = 'Unid'
-        uom = {'unece_code': uom_pre}
+        uom = {'cr_code': uom_pre}
         # product_dict = self.fe_cr_parse_product(iline, namespaces)
         name_xpath = iline.xpath("inv:Detalle", namespaces=namespaces)
         name = name_xpath and name_xpath[0].text or '-'
@@ -89,7 +89,7 @@ class AccountInvoiceImport(models.TransientModel):
             'taxes': taxes,
             'name': name,
             'price': price_subtotal / qty,
-            'uom': uom['unece_code']
+            'uom': uom['cr_code']
         }
 
         vals = {
