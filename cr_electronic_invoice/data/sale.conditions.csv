@@ -1,8 +1,0 @@
-id,sequence,name,notes
-SaleConditions_1,01,Contado,
-SaleConditions_2,02,Crédito,
-SaleConditions_3,03,Consignación,
-SaleConditions_4,04,Apartado,
-SaleConditions_5,05,Arrendamiento con opción de compra,
-SaleConditions_6,06,Arrendamiento en función financiera,
-SaleConditions_99,99,Otros (se debe indicar la condición de la venta),
