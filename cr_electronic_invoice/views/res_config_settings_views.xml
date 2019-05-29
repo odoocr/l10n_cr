@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<data>
-		<record id="res_config_settings_view_form" model="ir.ui.view">
-			<field name="name">res.config.settings.view.form</field>
-			<field name="model">res.config.settings</field>
-			<field name="inherit_id" ref="account.res_config_settings_view_form"/>
-			<field name="arch" type="xml">
+    <data>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
                 <xpath expr="//div[@data-key='account']" position="inside">
-					<h2>Product Catalog</h2>
-					<div class="row mt16 o_settings_container">
+                    <h2>Product Catalog</h2>
+                    <div class="row mt16 o_settings_container">
                         <div class="col-xs-12 col-md-6 o_setting_box">
                             <div class="o_setting_left_pane">
                                 <field name="group_product_variant"/>
@@ -64,7 +64,7 @@
                             </div>
                         </div>
                     </div>
-				</xpath>
+                </xpath>
 
                 <xpath expr="//div[@id='account_ocr_settings']" position="after">
                     <div class="row mt16 o_settings_container" id="fecr_xml_charge">
@@ -72,16 +72,12 @@
                             <div class="o_setting_right_pane">
                                 <div class="o_form_label">Account used for expenses when importing electronic invoice</div>
                                 <field name="expense_account_id" string="Default account for expenses when importing electronic invoice" />
-                                <div class="o_form_label">email address to receive reimbursable electronic invoices</div>
-                                <field name="reimbursable_email" string="email to receive reimbursable electronic invoices" />
-                                <div class="o_form_label">email address to notify any alert or problem CR electronic invoice related</div>
-                                <field name="notification_email" string="email to notify any issue with electronic invoices procesing" />                            
                             </div>
                         </div>
                     </div>
-			    </xpath>
+                </xpath>
 
-			</field>
-    	</record>
+            </field>
+        </record>
     </data>
 </odoo>

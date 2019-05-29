@@ -3,3 +3,4 @@
 from . import models
 from . import signature
 from . import extensions
+from . import wizard

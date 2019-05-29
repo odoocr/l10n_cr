@@ -18,7 +18,7 @@
             <field name="uom_type">reference</field>
         </record>
         <record id="product_uom_sp" model="uom.uom">
-            <field name="category_id" ref="uom.product_uom_categ_unit"/>
+            <field name="category_id" ref="uom.product_uom_categ_sp"/>
             <field name="name">Servicios Profesionales</field>
             <field name="factor" eval="1.0"/>
             <field name="rounding" eval="0.01"/>

@@ -200,19 +200,40 @@ class AccountInvoiceElectronic(models.Model):
         else:
             email_template = self.env.ref('account.email_template_edi_invoice', False)
 
-        attachments = api_facturae.get_invoice_attachments(self, invoice_id)
+        if self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
+            attachment = self.env['ir.attachment'].search(
+                [('res_model', '=', 'account.invoice'), ('res_id', '=', self.id),
+                    ('res_field', '=', 'xml_comprobante')], limit=1)
+            if attachment:
+                attachment.name = i.fname_xml_comprobante
+                attachment.datas_fname = i.fname_xml_comprobante
 
-        if len(attachments) == 2:
-            email_template.attachment_ids = [(6, 0, attachments)]
-            email_template.with_context(type='binary', default_type='binary').send_mail(invoice_id,
-                                                                                        raise_exception=False,
-                                                                                        force_send=True)
-            # limpia el template de los attachments
-            email_template.attachment_ids = [5]
-            self.write({
-                'invoice_mailed': True,
-                'sent': True,
-            })
+                attachment_resp = self.env['ir.attachment'].search(
+                    [('res_model', '=', 'account.invoice'), ('res_id', '=', self.id),
+                        ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+                if attachment_resp:
+                    attachment_resp.name = i.fname_xml_respuesta_tributacion
+                    attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
+
+                    email_template.attachment_ids = [(6, 0, [attachment.id, attachment_resp.id])]
+
+                    email_template.with_context(type='binary', default_type='binary').send_mail(self.id,
+                                                                                                raise_exception=False,
+                                                                                                force_send=True)  # default_type='binary'
+
+                    email_template.attachment_ids = [(5)]
+
+                    self.write({
+                        'invoice_mailed': True,
+                        'sent': True,
+                    })
+                else:
+                    raise UserError(_('Response XML from Hacienda has not been received'))
+            else:
+                raise UserError(_('Invoice XML has not been generated'))
+        else:
+            raise UserError(_('Partner is not assigne to this invoice'))
+
 
     @api.onchange('xml_supplier_approval')
     def _onchange_xml_supplier_approval(self):
@@ -663,7 +684,7 @@ class AccountInvoiceElectronic(models.Model):
                                                        ('state', 'in', ('open', 'paid')),
                                                        ('number_electronic', '!=', False),
                                                        ('date_invoice', '>=', '2018-10-01'),
-                                                       '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
+                                                       '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne'),],
                                                       order='number',
                                                       limit=max_invoices)
         total_invoices = len(invoices)

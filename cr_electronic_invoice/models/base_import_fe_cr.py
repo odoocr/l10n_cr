@@ -23,8 +23,6 @@ class BaseCRFe(models.AbstractModel):
     _name = 'base.fe_cr'
     _description = 'Common methods to generate and parse Costa Rican Electronic Document files'
 
-    # ==================== METHODS TO GENERATE UBL files
-
     @api.model
     def _fe_cr_add_country(self, country, parent_node, ns, version='2.1'):
         country_root = etree.SubElement(parent_node, ns['cac'] + 'Country')
@@ -604,7 +602,7 @@ class BaseCRFe(models.AbstractModel):
             #    1].text + ' no existe. Por favor creelo primero en el sistema.')
 
         address_xpath = party_node.find('inv:Ubicacion', namespaces=ns)
-        if address_xpath:
+        if address_xpath is not None:
             address_dict = self.fe_cr_parse_address(address_xpath, ns)
             partner_dict.update(address_dict)
         return partner_dict
@@ -712,3 +710,4 @@ class BaseCRFe(models.AbstractModel):
             pass
         logger.info('Valid XML files found in PDF: %s', res.keys())
         return res
+
