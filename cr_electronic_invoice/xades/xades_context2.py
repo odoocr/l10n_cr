@@ -15,13 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 def xmlsig_create(c14n_method=False, sign_method=False, name=False, ns='ds', value_name=None):
-    node = etree.Element(etree.QName(xmlsig.constants.DSigNs, 'Signature')
-                         , nsmap={ns: xmlsig.constants.DSigNs})
+    node = etree.Element(etree.QName(xmlsig.constants.DSigNs, 'Signature'), nsmap={ns: xmlsig.constants.DSigNs})
     if name:
         node.set(xmlsig.constants.ID_ATTR, name)
     signed_info = xmlsig.utils.create_node('SignedInfo', node, xmlsig.constants.DSigNs)
-    canonicalization = xmlsig.utils.create_node('CanonicalizationMethod'
-                                                , signed_info, xmlsig.constants.DSigNs)
+    canonicalization = xmlsig.utils.create_node('CanonicalizationMethod', signed_info, xmlsig.constants.DSigNs)
     canonicalization.set('Algorithm', c14n_method)
     signature_method = xmlsig.utils.create_node('SignatureMethod', signed_info, xmlsig.constants.DSigNs)
     signature_method.set('Algorithm', sign_method)
@@ -59,6 +57,7 @@ def get_reversed_rdns_name(rdns):
 
 
 def make_xmlsig_template_function(xml_key):
+
     def xmlfunc(node):
         return xmlsig.utils.create_node(xml_key, node, xmlsig.constants.DSigNs)
 
@@ -95,7 +94,6 @@ xmlsig.template.create_node = create_node
 xmlsig.signature_context.b64_print = b64_print
 xmlsig.algorithms.rsa.create_node = create_node
 xmlsig.algorithms.rsa.b64_print = b64_print
-
 
 from .xades_context import XAdESContext, PolicyId
 from .constants import NS_MAP, EtsiNS, MAP_HASHLIB
@@ -148,6 +146,7 @@ def validate_hacienda_url(url):
 
 class PolicyId2Exception(Exception):
     pass
+
 
 class PolicyId2(PolicyId):
     check_strict = False
