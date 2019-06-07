@@ -494,7 +494,7 @@ class AccountInvoiceElectronic(models.Model):
                                 inv.amount_total_electronic_invoice)
 
                             # TODO: Sign using any python library
-                            response_json = api_facturae.sign_xml(inv, tipo_documento, url, xml)
+                            response_json = api_facturae.sign_file2(inv.company_id.signature, inv.company_id.frm_pin, xml)
 
                             if response_json['status'] != 200:
                                 _logger.info('MAB - API Error signing XML:%s', response_json['text'])

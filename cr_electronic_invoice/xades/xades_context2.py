@@ -95,7 +95,8 @@ xmlsig.signature_context.b64_print = b64_print
 xmlsig.algorithms.rsa.create_node = create_node
 xmlsig.algorithms.rsa.b64_print = b64_print
 
-from .xades_context import XAdESContext, PolicyId
+from .xades_context import XAdESContext
+from .policy import PolicyId
 from .constants import NS_MAP, EtsiNS, MAP_HASHLIB
 import re
 

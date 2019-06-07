@@ -5,11 +5,11 @@
 from base64 import b64decode, b64encode
 import hashlib
 
-from xades.ns import EtsiNS
-from xades.constants import NS_MAP, MAP_HASHLIB
+from .ns import EtsiNS
+from .constants import NS_MAP, MAP_HASHLIB
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_der_x509_certificate
-from xades.utils import rdns_to_map, dict_compare
+from .utils import rdns_to_map, dict_compare
 from xmlsig.constants import TransformUsageDigestMethod
 from xmlsig.ns import DSigNs
 from xmlsig.utils import create_node, USING_PYTHON2, get_rdns_name
@@ -155,4 +155,3 @@ class PolicyId(Policy):
             digest_value.text = b64encode(digest_val)
         assert digest_value.text.encode() == b64encode(digest_val)
         return policy_id
-

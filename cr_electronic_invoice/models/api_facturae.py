@@ -12,8 +12,11 @@ import logging
 import pytz
 import time
 import logging
+import xmlsig
+
 from odoo.exceptions import UserError
 from xml.sax.saxutils import escape
+from ..xades import XAdESContext2, PolicyId2, template, constants
 
 try:
     from lxml import etree
@@ -21,9 +24,6 @@ except ImportError:
     from xml.etree import ElementTree
 
 try:
-    from ..xades import *
-    import xmlsig
-    
     from OpenSSL import crypto
 except(ImportError, IOError) as err:
     logging.info(err)
@@ -47,9 +47,9 @@ def sign_file2(cert, password, xml):
     object_id = 'XadesObjectId-%05d' % random.randint(min, max)
 
     xml_decoder = base64decode(xml)
-    xml_no_bytes = base64UTF8Decoder(xml_decoder)
+    #xml_no_bytes = base64UTF8Decoder(xml_decoder)
 
-    root = etree.fromstring(xml_no_bytes)
+    root = etree.fromstring(xml_decoder) # xml_no_bytes)
 
     signature = xmlsig.template.create(
         xmlsig.constants.TransformInclC14N,
@@ -69,11 +69,11 @@ def sign_file2(cert, password, xml):
     ki = xmlsig.template.ensure_key_info(signature, name=key_info_id)
     x509_data = xmlsig.template.add_x509_data(ki)
 
-    xmlsig.template.x509_data_add_certificate(data)
+    xmlsig.template.x509_data_add_certificate(x509_data)
     xmlsig.template.add_key_value(ki)
     qualifying = template.create_qualifying_properties(signature, 'XadesObjects', 'xades')
-    fac_date = datetime.datetime.now(pytz.timezone('UTC')
-    props = template.create_signed_properties(qualifying, name="SignedProperties", datetime=fac_date)
+    fac_date = datetime.datetime.now(pytz.timezone('UTC'))
+    props = template.create_signed_properties(qualifying, name=signed_properties_id, datetime=fac_date)
     # Manually add DataObjectFormat
     data_obj = xmlsig.utils.create_node('SignedDataObjectProperties', props, ns=constants.EtsiNS)
     obj_format = xmlsig.utils.create_node('DataObjectFormat', data_obj, ns=constants.EtsiNS)
