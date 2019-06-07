@@ -769,8 +769,8 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
                 'numeroIdentificacion': inv.company_id.vat
             },
             'receptor': {
-                'tipoIdentificacion': inv.company_id.identification_id.code,
-                'numeroIdentificacion': inv.company_id.vat
+                'tipoIdentificacion': inv.partner_id.identification_id.code,
+                'numeroIdentificacion': inv.partner_id.vat
             },
             'comprobanteXml': xml_listo
             }
