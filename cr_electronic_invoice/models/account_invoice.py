@@ -455,18 +455,17 @@ class AccountInvoiceElectronic(models.Model):
                                 detalle_mensaje = 'Aceptado'
                                 tipo = 1
                                 tipo_documento = 'CCE'
-                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.confirmation')
+                                sequence = inv.company_id.CCE_sequence_id.next_by_id()
                             elif inv.state_invoice_partner == '2':
                                 detalle_mensaje = 'Aceptado parcial'
                                 tipo = 2
                                 tipo_documento = 'CPCE'
-                                sequence = inv.env['ir.sequence'].next_by_code(
-                                    'sequece.electronic.doc.partial.confirmation')
+                                sequence = inv.company_id.CPCE_sequence_id.next_by_id()
                             else:
                                 detalle_mensaje = 'Rechazado'
                                 tipo = 3
                                 tipo_documento = 'RCE'
-                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.reject')
+                                sequence = inv.company_id.RCE_sequence_id.next_by_id()
 
                             '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
                             if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error':
@@ -911,7 +910,7 @@ class AccountInvoiceElectronic(models.Model):
                 if False:                     
                     # Firmamos con el api. Por ahora todo lo firmamos con el API CR LIBRE
                     # TODO: cambiar esto para utilizar algun firmador desde Python
-                    response_json = functions.sign_xml(inv, tipo_documento, url, xml)
+                    response_json = api_facturae.sign_xml(inv, tipo_documento, url, xml)
                     # response_json = api_facturae.sign_file2(inv.company_id.signature, inv.company_id.frm_pin, xml)
 
                     # another_test = api_facturae.sign_xml(xml, inv.company_id.signature, inv.company_id.frm_pin)
