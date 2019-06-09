@@ -66,8 +66,6 @@
 								<field name="frm_ws_password" password="True"/>
 								<field name="frm_pin" password="True"/>
 								<field name="frm_ws_api"  widget="radio"/>
-								<!--<field name="pciaid"/>-->
-								<!--<field name="cta_id_electronic_invoice"/>-->
 							</group>
 							<group cols="2" >
 								<field name="frm_callback_url"/>

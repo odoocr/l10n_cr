@@ -18,9 +18,9 @@ class CompanyElectronic(models.Model):
     district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
     county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
     neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
-    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False, )
+    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False, )     
     frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False, )
-
+    
     frm_ws_ambiente = fields.Selection(
         selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'), ('api-prod', 'Producción'), ], string="Ambiente",
         required=True, default='disabled',
@@ -38,6 +38,12 @@ class CompanyElectronic(models.Model):
     frm_pin = fields.Char(string="Pin", required=False, help='Es el pin correspondiente al certificado. Requerido')
     frm_callback_url = fields.Char(string="Callback Url", required=False, default="https://url_callback/repuesta.php?",
                                    help='Es la URL en a la cual se reenviarán las respuestas de Hacienda.')
+
+    xml_version = fields.Selection(
+        selection=[('4.2', 'Usar version 4.2 de Tributación'), ('4.3', 'Usar version 4.2 de Tributación')],
+        string="Versión de XML de Tributación",
+        required=True, default='4.2',
+        help='Indica si se utiliza la vrsión 4.2 o 4.3 de los XMLs y XSDs del Ministerio de Hacienda')
 
     # activated = fields.Boolean('Activado')
     # state = fields.Selection([

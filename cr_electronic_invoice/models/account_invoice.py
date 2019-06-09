@@ -200,7 +200,10 @@ class AccountInvoiceElectronic(models.Model):
         else:
             email_template = self.env.ref('account.email_template_edi_invoice', False)
 
-        if self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
+        email_template.attachment_ids = [(5)]
+
+        if self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:    
+
             attachment = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'), ('res_id', '=', self.id),
                     ('res_field', '=', 'xml_comprobante')], limit=1)
@@ -783,13 +786,18 @@ class AccountInvoiceElectronic(models.Model):
 
                     # Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
                     # Esto no debería suceder, pero, si sucede, lo corregimos
-                    if inv_line.name[:159].find('"'):
-                        detalle_linea = inv_line.name[:159].replace('"', '')
+                    if True: # inv.company_id.xml_version = '4.3':
+                        if inv_line.name[:200].find('"'):
+                            detalle_linea = inv_line.name[:200].replace('"', '')
+                    else:
+                        if inv_line.name[:160].find('"'):
+                            detalle_linea = inv_line.name[:160].replace('"', '')
 
                     line = {
                         "cantidad": quantity,
                         "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
                         "detalle": escape(detalle_linea),
+                        "codigoProducto": inv_line.product_id.code,
                         "precioUnitario": price_unit,
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
@@ -863,7 +871,7 @@ class AccountInvoiceElectronic(models.Model):
                 
                 if tipo_documento == 'FE':
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
-                    xml_ready = api_facturae.gen_xml_fe(inv, inv.number, api_facturae.get_time_hacienda(),
+                    xml_ready = api_facturae.gen_xml_fe_v42(inv,
                                                         sale_conditions, medio_pago,
                                                         round(total_servicio_gravado, 5),
                                                         round(total_servicio_exento, 5),
@@ -892,7 +900,7 @@ class AccountInvoiceElectronic(models.Model):
                     xml = api_facturae.base64UTF8Decoder(xml_ready)
 
                 else:
-                    xml_ready = api_facturae.gen_xml_nd(inv, inv.number, api_facturae.get_time_hacienda(),
+                    xml_ready = api_facturae.gen_xml_nd(inv, 
                                                         sale_conditions, medio_pago,
                                                         round(total_servicio_gravado, 5),
                                                         round(total_servicio_exento, 5),
@@ -959,7 +967,7 @@ class AccountInvoiceElectronic(models.Model):
                 _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', inv.number_electronic,
                               "", response_json.get('resp').get('text'))
 
-        _logger.error('MAB - Valida Hacienda - Finalizado Exitosamente')
+        _logger.info('MAB - Valida Hacienda - Finalizado Exitosamente')
 
     @api.multi
     def action_invoice_open(self):
