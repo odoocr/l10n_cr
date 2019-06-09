@@ -869,7 +869,7 @@ class AccountInvoiceElectronic(models.Model):
                 xml_string_builder = None
                 if tipo_documento == 'FE':
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
-                    if inv.company_id.version_hacienda = '4.2':
+                    if inv.company_id.version_hacienda == '4.2':
                         xml_string_builder = api_facturae.gen_xml_fe_v42(inv,
                                                             sale_conditions, medio_pago,
                                                             round(total_servicio_gravado, 5),
