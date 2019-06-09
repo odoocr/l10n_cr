@@ -70,8 +70,9 @@
 							</group>
 							<group cols="2" >
 								<!-- <field name="frm_callback_url"/> -->
-								<!--<field name="activated" readonly="True" />-->
+								<!-- <field name="activated" readonly="True" /> -->
 								<field name="frm_ws_ambiente"  widget="radio"/>
+								<field name="version_hacienda"  widget="radio"/>
             		<!--<field name="frm_tipo_id"/>-->
 							</group>
 						</group>

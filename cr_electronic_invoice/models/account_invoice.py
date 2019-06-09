@@ -866,21 +866,37 @@ class AccountInvoiceElectronic(models.Model):
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
 
-
                 xml_string_builder = None
                 if tipo_documento == 'FE':
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
-                    xml_string_builder = api_facturae.gen_xml_fe(inv, inv.number, api_facturae.get_time_hacienda(),
-                                                        sale_conditions, medio_pago,
-                                                        round(total_servicio_gravado, 5),
-                                                        round(total_servicio_exento, 5),
-                                                        round(total_mercaderia_gravado, 5),
-                                                        round(total_mercaderia_exento, 5), base_subtotal,
-                                                        total_impuestos, total_descuento,
-                                                        json.dumps(lines, ensure_ascii=False),
-                                                        currency_rate, invoice_comments)
-
-                    #xml = api_facturae.base64UTF8Decoder(xml_ready)
+                    if inv.company_id.version_hacienda = '4.2':
+                        xml_string_builder = api_facturae.gen_xml_fe_v42(inv,
+                                                            sale_conditions, medio_pago,
+                                                            round(total_servicio_gravado, 5),
+                                                            round(total_servicio_exento, 5),
+                                                            round(total_mercaderia_gravado, 5),
+                                                            round(total_mercaderia_exento, 5), base_subtotal,
+                                                            total_impuestos, total_descuento,
+                                                            json.dumps(lines, ensure_ascii=False),
+                                                            currency_rate, invoice_comments)
+                    else:
+                        xml_string_builder = api_facturae.gen_xml_fe_v43(inv = inv,
+                                                            sale_conditions = sale_conditions, 
+                                                            medio_pago = medio_pago,
+                                                            total_servicio_gravado = round(total_servicio_gravado, 5),
+                                                            total_servicio_exento = round(total_servicio_exento, 5),
+                                                            totalServExonerado = 0,
+                                                            total_mercaderia_gravado = round(total_mercaderia_gravado, 5),
+                                                            total_mercaderia_exento = round(total_mercaderia_exento, 5), 
+                                                            totalMercExonerada = 0,
+                                                            totalOtrosCargos = 0,
+                                                            base_total = base_subtotal,
+                                                            total_impuestos = total_impuestos, 
+                                                            total_descuento = total_descuento,
+                                                            lines = json.dumps(lines, ensure_ascii=False),
+                                                            otrosCargos = False,
+                                                            currency_rate = currency_rate, 
+                                                            invoice_comments = invoice_comments)
 
                 elif tipo_documento == 'NC':
                     xml_string_builder = api_facturae.gen_xml_nc(inv, inv.number, api_facturae.get_time_hacienda(),
@@ -896,8 +912,6 @@ class AccountInvoiceElectronic(models.Model):
                                                         fecha_emision_referencia, codigo_referencia,
                                                         razon_referencia, currency_rate, invoice_comments)
 
-                    #xml = api_facturae.base64UTF8Decoder(xml_ready)
-
                 else:
                     xml_string_builder = api_facturae.gen_xml_nd(inv, inv.number, api_facturae.get_time_hacienda(),
                                                         sale_conditions, medio_pago,
@@ -912,7 +926,6 @@ class AccountInvoiceElectronic(models.Model):
                                                         fecha_emision_referencia, codigo_referencia,
                                                         razon_referencia, currency_rate, invoice_comments)
 
-                #response_json.get('xmlFirmado')
                 inv.date_issuance = date_cr
                 inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
 

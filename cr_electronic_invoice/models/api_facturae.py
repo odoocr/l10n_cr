@@ -476,7 +476,7 @@ def gen_xml_fe_v42(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     #return stringToBase64(felectronica_bytes)
 
 
-def gen_xml_fe_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
+def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
                    totalServExonerado, total_mercaderia_gravado, total_mercaderia_exento, totalMercExonerada,
                    totalOtrosCargos, base_total, total_impuestos, total_descuento, lines, otrosCargos,
                    currency_rate, invoice_comments):
@@ -492,8 +492,8 @@ def gen_xml_fe_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_se
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<CodigoActividad>' + '721001' + '</CodigoActividad>')
-    sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<NumeroConsecutivo>' + inv.number + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -652,9 +652,7 @@ def gen_xml_fe_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_se
 
     sb.Append('</FacturaElectronica>')
 
-    felectronica_bytes = str(sb)
-
-    return stringToBase64(felectronica_bytes)
+    return sb
 
 
 def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento, totalServExonerado,
