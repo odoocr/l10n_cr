@@ -74,11 +74,6 @@
 								<field name="frm_ws_ambiente"  widget="radio"/>
             		<!--<field name="frm_tipo_id"/>-->
 							</group>
-							<group cols="2" >
-								<field name="CCE_sequence_id"/>
-								<field name="CPCE_sequence_id"/>
-								<field name="RCE_sequence_id"/>
-							</group>
 						</group>
 					</page>
 				</xpath>

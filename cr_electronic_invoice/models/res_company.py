@@ -38,15 +38,3 @@ class CompanyElectronic(models.Model):
     frm_pin = fields.Char(string="Pin", required=False, help='Es el pin correspondiente al certificado. Requerido')
     frm_callback_url = fields.Char(string="Callback Url", required=False, default="https://url_callback/repuesta.php?",
                                    help='Es la URL en a la cual se reenviarán las respuestas de Hacienda.')
-<<<<<<< HEAD
-=======
-
-    frm_apicr_signaturecode = fields.Char(string="Codigo para Firmar API", required=False, )
-
-    CCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Confirmación de Aceptación Comprobante Electrónico', 
-                                      readonly=False, copy=False)
-    CPCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Confirmación de Aceptación Parcial Comprobante Electrónico', 
-                                       readonly=False, copy=False)
-    RCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Rechazo Comprobante Electrónico', 
-                                      readonly=False, copy=False)
->>>>>>> 7ef015ecebed305866cd05144b496247292cb605
