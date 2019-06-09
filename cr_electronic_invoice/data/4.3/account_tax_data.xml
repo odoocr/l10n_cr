@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- account tax -->
+        <record id="cr_electronic_invoice.iva_tax_01" model="account.tax">
+            <field name="tax_code">01</field>
+            <field name="name">Tarifa 0% (Exento)</field>
+            <field name="amount">0</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA 0% (Excento)</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_02" model="account.tax">
+            <field name="tax_code">01</field>
+            <field name="name">Tarifa 0% (Exento)</field>
+            <field name="amount">0</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA 0% (Excento)</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_03" model="account.tax">
+            <field name="tax_code">02</field>
+            <field name="name">Tarifa Reducida 1%</field>
+            <field name="amount">1</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA Reducido 1%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_04" model="account.tax">
+            <field name="tax_code">02</field>
+            <field name="name">Tarifa Reducida 1%</field>
+            <field name="amount">1</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA Reducido 1%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_05" model="account.tax">
+            <field name="tax_code">03</field>
+            <field name="name">Tarifa Reducida 2%</field>
+            <field name="amount">2</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA Reducido 2%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_06" model="account.tax">
+            <field name="tax_code">03</field>
+            <field name="name">Tarifa Reducida 2%</field>
+            <field name="amount">2</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA Reducido 2%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_07" model="account.tax">
+            <field name="tax_code">04</field>
+            <field name="name">Tarifa Reducida 4%</field>
+            <field name="amount">4</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA Reducido 4%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_08" model="account.tax">
+            <field name="tax_code">04</field>
+            <field name="name">Tarifa Reducida 4%</field>
+            <field name="amount">4</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA Reducido 4%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_09" model="account.tax">
+            <field name="tax_code">05</field>
+            <field name="name">Transitorio 0%</field>
+            <field name="amount">0</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA Transitorio 0%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_10" model="account.tax">
+            <field name="tax_code">05</field>
+            <field name="name">Transitorio 0%</field>
+            <field name="amount">0</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA Transitorio 0%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_11" model="account.tax">
+            <field name="tax_code">06</field>
+            <field name="name">Transitorio 4%</field>
+            <field name="amount">4</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA Transitorio 4%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_12" model="account.tax">
+            <field name="tax_code">06</field>
+            <field name="name">Transitorio 4%</field>
+            <field name="amount">4</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA Transitorio 4%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_13" model="account.tax">
+            <field name="tax_code">06</field>
+            <field name="name">Transitorio 4%</field>
+            <field name="amount">4</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA Transitorio 4%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_14" model="account.tax">
+            <field name="tax_code">06</field>
+            <field name="name">Transitorio 4%</field>
+            <field name="amount">4</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA Transitorio 4%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+         <record id="cr_electronic_invoice.iva_tax_15" model="account.tax">
+            <field name="tax_code">07</field>
+            <field name="name">Transitorio 8%</field>
+            <field name="amount">8</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA Transitorio 8%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_16" model="account.tax">
+            <field name="tax_code">07</field>
+            <field name="name">Transitorio 8%</field>
+            <field name="amount">8</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA Transitorio 8%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+          <record id="cr_electronic_invoice.iva_tax_17" model="account.tax">
+            <field name="tax_code">08</field>
+            <field name="name">Tarifa General 13%</field>
+            <field name="amount">13</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">IVA Tarifa General 13%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+        <record id="cr_electronic_invoice.iva_tax_18" model="account.tax">
+            <field name="tax_code">08</field>
+            <field name="name">Tarifa General 13%</field>
+            <field name="amount">13</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">IVA Tarifa General 13%</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+        </record>
+
+    </data>
+</odoo>

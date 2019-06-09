@@ -43,8 +43,7 @@ class BusinessDocumentImport(models.AbstractModel):
                 match_dict['state_code'] = match_dict['state_code'].upper()
 
     @api.model
-    def _match_partner(
-            self, partner_dict, chatter_msg, partner_type='supplier'):
+    def _match_partner(self, partner_dict, chatter_msg, partner_type='supplier'):
         """Example:
         partner_dict = {
             'country_code': 'FR',

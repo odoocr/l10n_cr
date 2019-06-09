@@ -14,6 +14,8 @@
         'base_iban',
         'base_business_document_import',
         'onchange_helper',
+        # add bank_payment dependency to have commercial_partner_id on invoice
+        # PR in odoo will be create soon
         'account_payment_partner',
         ],
     'data': [

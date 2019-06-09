@@ -200,7 +200,10 @@ class AccountInvoiceElectronic(models.Model):
         else:
             email_template = self.env.ref('account.email_template_edi_invoice', False)
 
-        if self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
+        email_template.attachment_ids = [(5)]
+
+        if self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:    
+
             attachment = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'), ('res_id', '=', self.id),
                     ('res_field', '=', 'xml_comprobante')], limit=1)
@@ -287,11 +290,11 @@ class AccountInvoiceElectronic(models.Model):
 
             root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(self.xml_comprobante).decode("utf-8"),
                                         count=1))  # quita el namespace de los elementos
-            
+
             partner_id = root.findall('Receptor')[0].find('Identificacion')[1].text
             date_issuance = root.findall('FechaEmision')[0].text
             consecutive = root.findall('NumeroConsecutivo')[0].text
-            
+
             partner = self.env['res.partner'].search(
                 [('vat', '=', partner_id)])
             if partner and self.partner_id.id != partner.id:
@@ -426,8 +429,7 @@ class AccountInvoiceElectronic(models.Model):
 
                     token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
 
-                    api_facturae.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h,
-                                                     inv.company_id.frm_callback_url, api_facturae.get_time_hacienda(), False)
+                    api_facturae.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, api_facturae.get_time_hacienda(), False)
                 else:
 
                     if abs(self.amount_total_electronic_invoice - self.amount_total) > 1:
@@ -446,7 +448,6 @@ class AccountInvoiceElectronic(models.Model):
 
                     if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
 
-                        url = self.company_id.frm_callback_url
                         message_description = "<p><b>Enviando Mensaje Receptor</b></p>"
 
                         '''Si por el contrario es un documento nuevo, asignamos todos los valores'''
@@ -494,7 +495,7 @@ class AccountInvoiceElectronic(models.Model):
                                 inv.amount_total_electronic_invoice)
 
                             # TODO: Sign using any python library
-                            response_json = api_facturae.sign_xml(inv, tipo_documento, url, xml)
+                            response_json = api_facturae.sign_xml(inv.company_id.signature, inv.company_id.frm_pin, xml)
 
                             if response_json['status'] != 200:
                                 _logger.info('MAB - API Error signing XML:%s', response_json['text'])
@@ -552,7 +553,7 @@ class AccountInvoiceElectronic(models.Model):
                                 else:
                                     _logger.error('MAB - Error inesperado en Send Acceptance File - Abortando')
                                     return
-                            
+
     @api.multi
     @api.returns('self')
     def refund(self, date_invoice=None, date=None, description=None, journal_id=None, invoice_id=None,
@@ -656,7 +657,7 @@ class AccountInvoiceElectronic(models.Model):
         if self.company_id.frm_ws_ambiente != 'disabled':
             for inv in self:
                 token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
-                api_facturae.consulta_documentos(self, inv, self.company_id.frm_ws_ambiente, token_m_h, self.company_id.frm_callback_url, False, False)
+                api_facturae.consulta_documentos(self, inv, self.company_id.frm_ws_ambiente, token_m_h, False, False)
 
     @api.model
     def _confirmahacienda(self, max_invoices=10):  # cron
@@ -700,7 +701,6 @@ class AccountInvoiceElectronic(models.Model):
                 continue
 
             if not inv.xml_comprobante:
-                url = inv.company_id.frm_callback_url
                 now_utc = datetime.datetime.now(pytz.timezone('UTC'))
                 now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
                 date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
@@ -783,13 +783,18 @@ class AccountInvoiceElectronic(models.Model):
 
                     # Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
                     # Esto no debería suceder, pero, si sucede, lo corregimos
-                    if inv_line.name[:159].find('"'):
-                        detalle_linea = inv_line.name[:159].replace('"', '')
+                    if True: # inv.company_id.xml_version = '4.3':
+                        if inv_line.name[:200].find('"'):
+                            detalle_linea = inv_line.name[:200].replace('"', '')
+                    else:
+                        if inv_line.name[:160].find('"'):
+                            detalle_linea = inv_line.name[:160].replace('"', '')
 
                     line = {
                         "cantidad": quantity,
                         "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
                         "detalle": escape(detalle_linea),
+                        "codigoProducto": inv_line.product_id.code,
                         "precioUnitario": price_unit,
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
@@ -860,23 +865,41 @@ class AccountInvoiceElectronic(models.Model):
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
-                
+
+                xml_string_builder = None
                 if tipo_documento == 'FE':
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
-                    xml_ready = api_facturae.gen_xml_fe(inv, inv.number, api_facturae.get_time_hacienda(),
-                                                        sale_conditions, medio_pago,
-                                                        round(total_servicio_gravado, 5),
-                                                        round(total_servicio_exento, 5),
-                                                        round(total_mercaderia_gravado, 5),
-                                                        round(total_mercaderia_exento, 5), base_subtotal,
-                                                        total_impuestos, total_descuento,
-                                                        json.dumps(lines, ensure_ascii=False),
-                                                        currency_rate, invoice_comments)
-
-                    xml = api_facturae.base64UTF8Decoder(xml_ready)
+                    if inv.company_id.version_hacienda == '4.2':
+                        xml_string_builder = api_facturae.gen_xml_fe_v42(inv,
+                                                            sale_conditions, medio_pago,
+                                                            round(total_servicio_gravado, 5),
+                                                            round(total_servicio_exento, 5),
+                                                            round(total_mercaderia_gravado, 5),
+                                                            round(total_mercaderia_exento, 5), base_subtotal,
+                                                            total_impuestos, total_descuento,
+                                                            json.dumps(lines, ensure_ascii=False),
+                                                            currency_rate, invoice_comments)
+                    else:
+                        xml_string_builder = api_facturae.gen_xml_fe_v43(inv = inv,
+                                                            sale_conditions = sale_conditions, 
+                                                            medio_pago = medio_pago,
+                                                            total_servicio_gravado = round(total_servicio_gravado, 5),
+                                                            total_servicio_exento = round(total_servicio_exento, 5),
+                                                            totalServExonerado = 0,
+                                                            total_mercaderia_gravado = round(total_mercaderia_gravado, 5),
+                                                            total_mercaderia_exento = round(total_mercaderia_exento, 5), 
+                                                            totalMercExonerada = 0,
+                                                            totalOtrosCargos = 0,
+                                                            base_total = base_subtotal,
+                                                            total_impuestos = total_impuestos, 
+                                                            total_descuento = total_descuento,
+                                                            lines = json.dumps(lines, ensure_ascii=False),
+                                                            otrosCargos = False,
+                                                            currency_rate = currency_rate, 
+                                                            invoice_comments = invoice_comments)
 
                 elif tipo_documento == 'NC':
-                    xml_ready = api_facturae.gen_xml_nc(inv, inv.number, api_facturae.get_time_hacienda(),
+                    xml_string_builder = api_facturae.gen_xml_nc(inv, inv.number, api_facturae.get_time_hacienda(),
                                                         sale_conditions, medio_pago,
                                                         round(total_servicio_gravado, 5),
                                                         round(total_servicio_exento, 5),
@@ -889,10 +912,8 @@ class AccountInvoiceElectronic(models.Model):
                                                         fecha_emision_referencia, codigo_referencia,
                                                         razon_referencia, currency_rate, invoice_comments)
 
-                    xml = api_facturae.base64UTF8Decoder(xml_ready)
-
                 else:
-                    xml_ready = api_facturae.gen_xml_nd(inv, inv.number, api_facturae.get_time_hacienda(),
+                    xml_string_builder = api_facturae.gen_xml_nd(inv, inv.number, api_facturae.get_time_hacienda(),
                                                         sale_conditions, medio_pago,
                                                         round(total_servicio_gravado, 5),
                                                         round(total_servicio_exento, 5),
@@ -904,48 +925,21 @@ class AccountInvoiceElectronic(models.Model):
                                                         numero_documento_referencia,
                                                         fecha_emision_referencia, codigo_referencia,
                                                         razon_referencia, currency_rate, invoice_comments)
-
-                    xml = api_facturae.base64UTF8Decoder(xml_ready)
-
-                # Estas son las pruebas de firmado usando la librería de Python
-                if False:                     
-                    # Firmamos con el api. Por ahora todo lo firmamos con el API CR LIBRE
-                    # TODO: cambiar esto para utilizar algun firmador desde Python
-                    response_json = functions.sign_xml(inv, tipo_documento, url, xml)
-                    # response_json = api_facturae.sign_file2(inv.company_id.signature, inv.company_id.frm_pin, xml)
-
-                    # another_test = api_facturae.sign_xml(xml, inv.company_id.signature, inv.company_id.frm_pin)
-                    # response_json = bateo_firma.firmar_xml(inv.company_id.signature,inv.company_id.frm_pin, xml,
-                    #                                       "01")
-
-                    # remove_bite_base = api_facturae.base64UTF8Decoder(response_json)
-                    # xml_to_base64 = api_facturae.stringToBase64(remove_bite_base)
-                    # xml_firmado = xml_to_base64
-
-                    # if response_json.get('resp').get('xmlFirmado') == "":
-                    # if xml_firmado == "":
-
-                    if response_json['status'] != 200:
-                        _logger.error('MAB - API Error signing XML:%s', response_json.get('resp').get('text'))
-                        inv.state_tributacion = 'error'
-                        continue
-                else:
-                    response_json = api_facturae.sign_xml(inv, tipo_documento, url, xml)
-                    # obtenemos el xml firmado, como en ambos metodos tenemos que firmar con crlibre
-                    # podemos dejar el get del response fuera de los IF
-
-                xml_firmado = response_json.get('xmlFirmado')
 
                 inv.date_issuance = date_cr
                 inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
-                inv.xml_comprobante = xml_firmado
-                _logger.error('MAB - SIGNED XML:%s', inv.fname_xml_comprobante)
+
+                xml_to_sign = str(xml_string_builder)
+                xml_firmado = api_facturae.sign_xml(inv.company_id.signature, inv.company_id.frm_pin, xml_to_sign)
+
+                inv.xml_comprobante = base64.encodestring(xml_firmado)
+                _logger.info('MAB - SIGNED XML:%s', inv.fname_xml_comprobante)
 
             # Obtenemos el token con el api interna
             token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
 
             response_json = api_facturae.send_xml_fe(inv, token_m_h, api_facturae.get_time_hacienda(),
-                                                     inv.xml_comprobante, inv.company_id.frm_ws_ambiente)
+                                                     xml_firmado, inv.company_id.frm_ws_ambiente)
 
             if response_json.get('resp').get('Status') == 202:
                 inv.state_tributacion = 'procesando'
@@ -959,7 +953,7 @@ class AccountInvoiceElectronic(models.Model):
                 _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', inv.number_electronic,
                               "", response_json.get('resp').get('text'))
 
-        _logger.error('MAB - Valida Hacienda - Finalizado Exitosamente')
+        _logger.info('MAB - Valida Hacienda - Finalizado Exitosamente')
 
     @api.multi
     def action_invoice_open(self):
@@ -967,8 +961,6 @@ class AccountInvoiceElectronic(models.Model):
 
         # Revisamos si el ambiente para Hacienda está habilitado
         if self.company_id.frm_ws_ambiente != 'disabled':
-
-            url = self.company_id.frm_callback_url
 
             for inv in self:
                 if(inv.journal_id.type == 'sale'):

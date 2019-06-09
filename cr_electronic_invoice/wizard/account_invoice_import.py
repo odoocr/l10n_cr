@@ -141,21 +141,33 @@ class AccountInvoiceImport(models.TransientModel):
         supplier_dict = self.fe_cr_parse_party(xml_root.xpath('inv:Emisor', namespaces=namespaces)[0], namespaces)
         company_dict_full = self.fe_cr_parse_party(xml_root.xpath('inv:Receptor', namespaces=namespaces)[0], namespaces)
         company_dict = {}
+
         # We only take the "official references" for company_dict
         if company_dict_full.get('vat'):
             company_dict = {'vat': company_dict_full['vat']}
 
         total_untaxed_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalVentaNeta", namespaces=namespaces)
-        amount_untaxed = float(total_untaxed_xpath[0].text)
+        if total_untaxed_xpath:
+            amount_untaxed = float(total_untaxed_xpath[0].text)
+        else:
+            amount_untaxed = 0
+
         amount_total_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)
         amount_total = float(amount_total_xpath[0].text)
+        
         amount_total_tax_xpath = xml_root.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
-        amount_total_tax = float(amount_total_tax_xpath[0].text)
+        if amount_total_tax_xpath:
+            amount_total_tax = float(amount_total_tax_xpath[0].text)
+        else:
+            amount_total_tax = 0
+
         total_line = amount_untaxed
+
         # payment_type_code = xml_root.xpath(
         #    "/inv:Invoice/cac:PaymentMeans/"
         #    "cbc:PaymentMeansCode[@listAgencyID='6']",
         #   namespaces=namespaces)
+
         res_lines = []
         counters = {'lines': 0.0}
         inv_line_xpath = xml_root.xpath('inv:DetalleServicio/inv:LineaDetalle', namespaces=namespaces)

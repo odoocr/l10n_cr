@@ -587,8 +587,7 @@ class AccountInvoiceImport(models.TransientModel):
             assert self.import_config_id
             import_config = self.import_config_id.convert_to_import_config()
         invoice = self.create_invoice(parsed_inv, import_config)
-        invoice.message_post(_(
-            "This invoice has been created automatically via file import"))
+        invoice.message_post(body=_("This invoice has been created automatically via file import"))
         action = iaao.for_xml_id('account', 'action_invoice_tree2')
         action.update({
             'view_mode': 'form,tree,calendar,graph',
@@ -724,7 +723,10 @@ class AccountInvoiceImport(models.TransientModel):
                 parsed_inv['amount_untaxed']
             invoice.tax_line_ids[0].amount = tax_amount
             cur_symbol = invoice.currency_id.symbol
-            invoice.message_post(_("The total tax amount has been forced to '%s' '%s' (amount computed by Odoo was: '%s' '%s')." % ('tax_amount', 'cur_symbol', 'initial_tax_amount', 'cur_symbol')))
+            invoice.message_post(_(
+                'The total tax amount has been forced to %s %s '
+                '(amount computed by Odoo was: %s %s).')
+                % (tax_amount, cur_symbol, initial_tax_amount, cur_symbol))
 
     @api.multi
     def update_invoice_lines(self, parsed_inv, invoice, seller):
