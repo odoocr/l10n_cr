@@ -10,7 +10,7 @@ import logging
 import datetime
 import pytz
 import random
-from . import create_node, get_reversed_rdns_name
+from . import get_reversed_rdns_name
 
 __all__ = ['XAdESContext2', 'PolicyId2', 'PolicyId2Exception', 'create_xades_epes_signature']
 
@@ -138,14 +138,14 @@ class PolicyId2(PolicyId):
         if sign:
             remote = self.id
             hash_method = self.hash_method
-            policy_id = create_node('SignaturePolicyId', node, EtsiNS)
-            identifier = create_node('SigPolicyId', policy_id, EtsiNS)
-            create_node('Identifier', identifier, EtsiNS).text = self.id
-            create_node('Description', identifier, EtsiNS).text = self.name
-            digest = create_node('SigPolicyHash', policy_id, EtsiNS)
-            digest_method = create_node('DigestMethod', digest, xmlsig.ns.DSigNs)
+            policy_id = xmlsig.utils.create_node('SignaturePolicyId', node, EtsiNS)
+            identifier = xmlsig.utils.create_node('SigPolicyId', policy_id, EtsiNS)
+            xmlsig.utils.create_node('Identifier', identifier, EtsiNS).text = self.id
+            xmlsig.utils.create_node('Description', identifier, EtsiNS).text = self.name
+            digest = xmlsig.utils.create_node('SigPolicyHash', policy_id, EtsiNS)
+            digest_method = xmlsig.utils.create_node('DigestMethod', digest, xmlsig.ns.DSigNs)
             digest_method.set('Algorithm', self.hash_method)
-            digest_value = create_node('DigestValue', digest, xmlsig.ns.DSigNs)
+            digest_value = xmlsig.utils.create_node('DigestValue', digest, xmlsig.ns.DSigNs)
         else:
             policy_id = node.find('etsi:SignaturePolicyId', namespaces=NS_MAP)
             identifier = policy_id.find('etsi:SigPolicyId', namespaces=NS_MAP)
@@ -179,14 +179,14 @@ class PolicyId2(PolicyId):
         return policy_id
 
     def calculate_certificate(self, node, key_x509):
-        cert = create_node('Cert', node, EtsiNS)
-        cert_digest = create_node('CertDigest', cert, EtsiNS)
-        digest_algorithm = create_node('DigestMethod', cert_digest, xmlsig.constants.DSigNs)
+        cert = xmlsig.utils.create_node('Cert', node, EtsiNS)
+        cert_digest = xmlsig.utils.create_node('CertDigest', cert, EtsiNS)
+        digest_algorithm = xmlsig.utils.create_node('DigestMethod', cert_digest, xmlsig.constants.DSigNs)
         digest_algorithm.set('Algorithm', self.hash_method)
-        digest_value = create_node('DigestValue', cert_digest, xmlsig.constants.DSigNs)
+        digest_value = xmlsig.utils.create_node('DigestValue', cert_digest, xmlsig.constants.DSigNs)
         digest_value.text = b64encode(key_x509.fingerprint(MAP_HASHLIB[self.hash_method]()))
-        issuer_serial = create_node('IssuerSerial', cert, EtsiNS)
-        create_node('X509IssuerName', issuer_serial,
+        issuer_serial = xmlsig.utils.create_node('IssuerSerial', cert, EtsiNS)
+        xmlsig.utils.create_node('X509IssuerName', issuer_serial,
                     xmlsig.constants.DSigNs).text = get_reversed_rdns_name(key_x509.issuer.rdns)
-        create_node('X509SerialNumber', issuer_serial, xmlsig.constants.DSigNs).text = str(key_x509.serial_number)
+        xmlsig.utils.create_node('X509SerialNumber', issuer_serial, xmlsig.constants.DSigNs).text = str(key_x509.serial_number)
         return
