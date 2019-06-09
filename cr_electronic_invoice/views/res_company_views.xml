@@ -69,7 +69,7 @@
 								<!--<field name="cta_id_electronic_invoice"/>-->
 							</group>
 							<group cols="2" >
-								<field name="frm_callback_url"/>
+								<!-- <field name="frm_callback_url"/> -->
 								<!--<field name="activated" readonly="True" />-->
 								<field name="frm_ws_ambiente"  widget="radio"/>
             		<!--<field name="frm_tipo_id"/>-->

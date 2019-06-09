@@ -429,8 +429,7 @@ class AccountInvoiceElectronic(models.Model):
 
                     token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
 
-                    api_facturae.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h,
-                                                     inv.company_id.frm_callback_url, api_facturae.get_time_hacienda(), False)
+                    api_facturae.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, api_facturae.get_time_hacienda(), False)
                 else:
 
                     if abs(self.amount_total_electronic_invoice - self.amount_total) > 1:
@@ -449,7 +448,6 @@ class AccountInvoiceElectronic(models.Model):
 
                     if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
 
-                        url = self.company_id.frm_callback_url
                         message_description = "<p><b>Enviando Mensaje Receptor</b></p>"
 
                         '''Si por el contrario es un documento nuevo, asignamos todos los valores'''
@@ -659,7 +657,7 @@ class AccountInvoiceElectronic(models.Model):
         if self.company_id.frm_ws_ambiente != 'disabled':
             for inv in self:
                 token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
-                api_facturae.consulta_documentos(self, inv, self.company_id.frm_ws_ambiente, token_m_h, self.company_id.frm_callback_url, False, False)
+                api_facturae.consulta_documentos(self, inv, self.company_id.frm_ws_ambiente, token_m_h, False, False)
 
     @api.model
     def _confirmahacienda(self, max_invoices=10):  # cron
@@ -703,7 +701,6 @@ class AccountInvoiceElectronic(models.Model):
                 continue
 
             if not inv.xml_comprobante:
-                url = inv.company_id.frm_callback_url
                 now_utc = datetime.datetime.now(pytz.timezone('UTC'))
                 now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
                 date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
@@ -951,8 +948,6 @@ class AccountInvoiceElectronic(models.Model):
 
         # Revisamos si el ambiente para Hacienda está habilitado
         if self.company_id.frm_ws_ambiente != 'disabled':
-
-            url = self.company_id.frm_callback_url
 
             for inv in self:
                 if(inv.journal_id.type == 'sale'):

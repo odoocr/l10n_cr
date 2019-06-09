@@ -36,5 +36,3 @@ class CompanyElectronic(models.Model):
              'significa que todas las peticiones se procesarán con el API de CRLIBRE')
 
     frm_pin = fields.Char(string="Pin", required=False, help='Es el pin correspondiente al certificado. Requerido')
-    frm_callback_url = fields.Char(string="Callback Url", required=False, default="https://url_callback/repuesta.php?",
-                                   help='Es la URL en a la cual se reenviarán las respuestas de Hacienda.')

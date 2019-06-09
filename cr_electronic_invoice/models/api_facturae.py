@@ -1298,7 +1298,7 @@ def consulta_clave(clave, token, env):
     return response_json
 
 
-def consulta_documentos(self, inv, env, token_m_h, url, date_cr, xml_firmado):
+def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     if inv.type == 'in_invoice' or inv.type == 'in_refund':
         if not inv.consecutive_number_receiver:
             if len(inv.number) == 20:
