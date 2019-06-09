@@ -8,7 +8,7 @@
     'website': 'https://www.delfixcr.com',
     'category': 'Account',
     'description':'''Codigos Pais para Facturación electronica Costa Rica.''',
-    'depends': ['base', 'account', 'product', 'l10n_cr'],
+    'depends': ['base', 'account', 'product'],
     'data': ['views/country_codes_views.xml',
              'data/res.country.county.csv',
              'data/res.country.state.csv',

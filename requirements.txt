@@ -1,0 +1,4 @@
+xmlsig==0.1.3
+jsonschema==3.0.*
+pyopenssl==19.*
+

@@ -38,19 +38,3 @@ class CompanyElectronic(models.Model):
     frm_pin = fields.Char(string="Pin", required=False, help='Es el pin correspondiente al certificado. Requerido')
     frm_callback_url = fields.Char(string="Callback Url", required=False, default="https://url_callback/repuesta.php?",
                                    help='Es la URL en a la cual se reenviarán las respuestas de Hacienda.')
-
-    # activated = fields.Boolean('Activado')
-    # state = fields.Selection([
-    #    ('draft', 'Draft'),
-    #    ('started', 'Started'),
-    #    ('progress', 'In progress'),
-    #    ('finished', 'Done'),
-    # ], default='draft')
-
-    # frm_apicr_username = fields.Char(string="Usuario de Api", required=False, )
-    # frm_apicr_password = fields.Char(string="Password de Api", required=False, )
-    frm_apicr_signaturecode = fields.Char(string="Codigo para Firmar API", required=False, )
-
-    # @api.onchange('email')
-    # def _onchange_email(self):
-    #    pass
