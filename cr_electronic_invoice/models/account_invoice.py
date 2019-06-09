@@ -914,7 +914,7 @@ class AccountInvoiceElectronic(models.Model):
                 xml_to_sign = str(xml_string_builder)
                 xml_firmado = api_facturae.sign_xml(inv.company_id.signature, inv.company_id.frm_pin, xml_to_sign)
 
-                inv.xml_comprobante = str(xml_firmado)
+                inv.xml_comprobante = base64.encodestring(xml_firmado)
                 _logger.info('MAB - SIGNED XML:%s', inv.fname_xml_comprobante)
 
             # Obtenemos el token con el api interna
