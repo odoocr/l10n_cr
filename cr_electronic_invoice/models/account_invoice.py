@@ -455,18 +455,17 @@ class AccountInvoiceElectronic(models.Model):
                                 detalle_mensaje = 'Aceptado'
                                 tipo = 1
                                 tipo_documento = 'CCE'
-                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.confirmation')
+                                sequence = inv.company_id.CCE_sequence_id.next_by_id()
                             elif inv.state_invoice_partner == '2':
                                 detalle_mensaje = 'Aceptado parcial'
                                 tipo = 2
                                 tipo_documento = 'CPCE'
-                                sequence = inv.env['ir.sequence'].next_by_code(
-                                    'sequece.electronic.doc.partial.confirmation')
+                                sequence = inv.company_id.CPCE_sequence_id.next_by_id()
                             else:
                                 detalle_mensaje = 'Rechazado'
                                 tipo = 3
                                 tipo_documento = 'RCE'
-                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.reject')
+                                sequence = inv.company_id.RCE_sequence_id.next_by_id()
 
                             '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
                             if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error':
@@ -783,13 +782,18 @@ class AccountInvoiceElectronic(models.Model):
 
                     # Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
                     # Esto no debería suceder, pero, si sucede, lo corregimos
-                    if inv_line.name[:159].find('"'):
-                        detalle_linea = inv_line.name[:159].replace('"', '')
+                    if True: # inv.company_id.xml_version = '4.3':
+                        if inv_line.name[:200].find('"'):
+                            detalle_linea = inv_line.name[:200].replace('"', '')
+                    else:
+                        if inv_line.name[:160].find('"'):
+                            detalle_linea = inv_line.name[:160].replace('"', '')
 
                     line = {
                         "cantidad": quantity,
                         "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
                         "detalle": escape(detalle_linea),
+                        "codigoProducto": inv_line.product_id.code,
                         "precioUnitario": price_unit,
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
@@ -860,12 +864,10 @@ class AccountInvoiceElectronic(models.Model):
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
-
-
-                xml_string_builder = None
+                
                 if tipo_documento == 'FE':
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
-                    xml_string_builder = api_facturae.gen_xml_fe(inv, inv.number, api_facturae.get_time_hacienda(),
+                    xml_ready = api_facturae.gen_xml_fe_v42(inv,
                                                         sale_conditions, medio_pago,
                                                         round(total_servicio_gravado, 5),
                                                         round(total_servicio_exento, 5),
@@ -875,10 +877,10 @@ class AccountInvoiceElectronic(models.Model):
                                                         json.dumps(lines, ensure_ascii=False),
                                                         currency_rate, invoice_comments)
 
-                    #xml = api_facturae.base64UTF8Decoder(xml_ready)
+                    xml = api_facturae.base64UTF8Decoder(xml_ready)
 
                 elif tipo_documento == 'NC':
-                    xml_string_builder = api_facturae.gen_xml_nc(inv, inv.number, api_facturae.get_time_hacienda(),
+                    xml_ready = api_facturae.gen_xml_nc(inv, inv.number, api_facturae.get_time_hacienda(),
                                                         sale_conditions, medio_pago,
                                                         round(total_servicio_gravado, 5),
                                                         round(total_servicio_exento, 5),
@@ -891,10 +893,10 @@ class AccountInvoiceElectronic(models.Model):
                                                         fecha_emision_referencia, codigo_referencia,
                                                         razon_referencia, currency_rate, invoice_comments)
 
-                    #xml = api_facturae.base64UTF8Decoder(xml_ready)
+                    xml = api_facturae.base64UTF8Decoder(xml_ready)
 
                 else:
-                    xml_string_builder = api_facturae.gen_xml_nd(inv, inv.number, api_facturae.get_time_hacienda(),
+                    xml_ready = api_facturae.gen_xml_nd(inv, 
                                                         sale_conditions, medio_pago,
                                                         round(total_servicio_gravado, 5),
                                                         round(total_servicio_exento, 5),
@@ -907,21 +909,22 @@ class AccountInvoiceElectronic(models.Model):
                                                         fecha_emision_referencia, codigo_referencia,
                                                         razon_referencia, currency_rate, invoice_comments)
 
-                #response_json.get('xmlFirmado')
+                    xml = api_facturae.base64UTF8Decoder(xml_ready)
+
+                # obtenemos el xml firmado, como en ambos metodos tenemos que firmar con crlibre
+                response_json = api_facturae.sign_xml(inv, tipo_documento, url, xml)
+                xml_firmado = response_json.get('xmlFirmado')
+
                 inv.date_issuance = date_cr
                 inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
-
-                xml_to_sign = str(xml_string_builder)
-                xml_firmado = api_facturae.sign_xml(inv.company_id.signature, inv.company_id.frm_pin, xml_to_sign)
-
-                inv.xml_comprobante = base64.encodestring(xml_firmado)
+                inv.xml_comprobante = xml_firmado
                 _logger.info('MAB - SIGNED XML:%s', inv.fname_xml_comprobante)
 
             # Obtenemos el token con el api interna
             token_m_h = api_facturae.get_token_hacienda(inv, inv.company_id.frm_ws_ambiente)
 
             response_json = api_facturae.send_xml_fe(inv, token_m_h, api_facturae.get_time_hacienda(),
-                                                     xml_firmado, inv.company_id.frm_ws_ambiente)
+                                                     inv.xml_comprobante, inv.company_id.frm_ws_ambiente)
 
             if response_json.get('resp').get('Status') == 202:
                 inv.state_tributacion = 'procesando'
@@ -998,7 +1001,7 @@ class AccountInvoiceElectronic(models.Model):
                             elif id_code == '04' and len(identificacion) != 10:
                                 raise UserError('La identificación NITE del emisor debe de tener 10 dígitos')
 
-                            if not inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
+                            if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
                                 raise UserError(
                                     'No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para' +
                                     inv.payment_term_id.name)
@@ -1015,6 +1018,7 @@ class AccountInvoiceElectronic(models.Model):
                                                                         inv.journal_id.sucursal,
                                                                         inv.journal_id.terminal)
 
+                        inv.date_issuance = date_cr
                         inv.number_electronic = response_json.get('clave')
                         inv.number = response_json.get('consecutivo')
                         inv.tipo_comprobante = tipo_documento
