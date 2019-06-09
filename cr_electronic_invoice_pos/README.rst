@@ -3,7 +3,7 @@
    :alt: License: AGPL-3
 
 ==================================
-Facturación electrónica Costa Rica
+POS para Facturación electrónica Costa Rica
 ==================================
 
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
@@ -64,21 +64,11 @@ Authors
 Delfix S.A.
     * Mario Arias <the.clone.master@gmail.com>
 
-* Charlie Monge <charlit02390@gmail.com>
-
 * `TechMicro Inc S.A. <https://www.techmicrocr.com>`_
     * Jason Ulloa <jason.ulloa@techmicrocr.com>
 
-* `AKUREY S.A. <https://www.akurey.com>`_
-    * Carlos Wong <cwong@akurey.com>
-    * Sergio Hidalgo <shidalgo@akurey.com>
-    * Joaquin Mena <jmena@akurey.com>
-    * Julio Barboza <jbarboza@akurey.com>
-
-
 Contributors
 ~~~~~~~~~~~~
-* Nehemias Herrera
 * Esteban Monge <estebanmonge@riseup.net>
 
 
