@@ -1,5 +1,4 @@
 import requests
-import random
 import datetime
 import json
 from . import fe_enums
@@ -13,10 +12,11 @@ import pytz
 import time
 import logging
 import xmlsig
+import random
 
 from odoo.exceptions import UserError
 from xml.sax.saxutils import escape
-from ..xades import XAdESContext2, PolicyId2, template, constants
+from ..xades.context2 import XAdESContext2, PolicyId2, create_xades_epes_signature
 
 try:
     from lxml import etree
@@ -34,57 +34,13 @@ from .. import extensions
 _logger = logging.getLogger(__name__)
 
 
-def sign_file2(cert, password, xml):
-    min = 1
-    max = 99999
-    signature_id = 'Signature-%05d' % random.randint(min, max)
-    # signed_properties_id = signature_id + '-SignedProperties%05d' \
-    #                       % random.randint(min, max)
-
-    signed_properties_id = 'SignedProperties-' + signature_id
-    key_info_id = 'KeyInfoId-' + signature_id
-    reference_id = 'Reference-%05d' % random.randint(min, max)
-    object_id = 'XadesObjectId-%05d' % random.randint(min, max)
-
-    xml_decoder = base64decode(xml)
-    #xml_no_bytes = base64UTF8Decoder(xml_decoder)
-
-    root = etree.fromstring(xml_decoder) # xml_no_bytes)
-
-    signature = xmlsig.template.create(
-        xmlsig.constants.TransformInclC14N,
-        xmlsig.constants.TransformRsaSha256,
-        signature_id
-    )
-
-    # Reference to Document Digest
-    ref = xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256, reference_id, uri="")
-    xmlsig.template.add_transform(ref, xmlsig.constants.TransformEnveloped)
-    # Reference to KeyInfo Digest
-    xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256, 'ReferenceKeyInfo' ,
-        uri='#' + key_info_id)
-    # Reference to the SignedProperties Digest
-    xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256,
-        uri='#' + signed_properties_id, uri_type='http://uri.etsi.org/01903#SignedProperties')
-    ki = xmlsig.template.ensure_key_info(signature, name=key_info_id)
-    x509_data = xmlsig.template.add_x509_data(ki)
-
-    xmlsig.template.x509_data_add_certificate(x509_data)
-    xmlsig.template.add_key_value(ki)
-    qualifying = template.create_qualifying_properties(signature, 'XadesObjects', 'xades')
-    fac_date = datetime.datetime.now(pytz.timezone('UTC'))
-    props = template.create_signed_properties(qualifying, name=signed_properties_id, datetime=fac_date)
-    # Manually add DataObjectFormat
-    data_obj = xmlsig.utils.create_node('SignedDataObjectProperties', props, ns=constants.EtsiNS)
-    obj_format = xmlsig.utils.create_node('DataObjectFormat', data_obj, ns=constants.EtsiNS)
-    obj_format.set('ObjectReference', '#' + reference_id)
-    xmlsig.utils.create_node('MimeType', obj_format, ns=constants.EtsiNS).text = 'text/xml'
-    xmlsig.utils.create_node('Encoding', obj_format, ns=constants.EtsiNS).text = 'UTF-8'
+def sign_xml(cert, password, xml, policy_id='https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/' \
+    '2016/v4.2/ResolucionComprobantesElectronicosDGT-R-48-2016_4.2.pdf'):
+    root = etree.fromstring(xml)
+    signature = create_xades_epes_signature()
 
     policy = PolicyId2()
-    policy.id = 'https://tribunet.hacienda.go.cr/docs/esquemas/2016/v4/' \
-                + 'Resolucion%20Comprobantes%20Electronicos%20%20DGT-R-48-2016.pdf'
-    policy.hash_method = xmlsig.constants.TransformSha256
+    policy.id = policy_id
 
     root.append(signature)
     ctx = XAdESContext2(policy)
@@ -356,12 +312,10 @@ def gen_xml_mr(clave, cedula_emisor, fecha_emision, id_mensaje, detalle_mensaje,
 
     '''Iniciamos con la creación del mensaje Receptor'''
     sb = StringBuilder()
-    sb.Append('<?xml version="1.0" encoding="utf-8"?>')
-    sb.Append('<MensajeReceptor xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/mensajeReceptor" ')
-    sb.Append('xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ')
-    sb.Append('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
-    sb.Append(
-        'xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/mensajeReceptor MensajeReceptor_4.2.xsd">')
+    sb.Append('<MensajeReceptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
+    sb.Append('xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/mensajeReceptor" ')
+    sb.Append('xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/mensajeReceptor ')
+    sb.Append('https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/MensajeReceptor_4.2.xsd">')
     sb.Append('<Clave>' + mr_clave + '</Clave>')
     sb.Append('<NumeroCedulaEmisor>' + mr_cedula_emisor + '</NumeroCedulaEmisor>')
     sb.Append('<FechaEmisionDoc>' + mr_fecha_emision + '</FechaEmisionDoc>')
@@ -395,12 +349,10 @@ def gen_xml_fe(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
     numero_linea = 0
 
     sb = StringBuilder()
-    sb.Append('<?xml version="1.0" encoding="utf-8"?>')
-    sb.Append('<FacturaElectronica xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/facturaElectronica" ')
-    sb.Append('xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ')
-    sb.Append('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
-    sb.Append('xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/facturaElectronicaFacturaElectronica_V.4.2.xsd">')
-
+    sb.Append('<FacturaElectronica xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
+    sb.Append('xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/facturaElectronica" ')
+    sb.Append('xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/facturaElectronica ')
+    sb.Append('https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/FacturaElectronica_V.4.2.xsd">')
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + date + '</FechaEmision>')
@@ -512,15 +464,16 @@ def gen_xml_fe(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
     sb.Append('<NumeroResolucion>DGT-R-48-2016</NumeroResolucion>')
     sb.Append('<FechaResolucion>07-10-2016 08:00:00</FechaResolucion>')
     sb.Append('</Normativa>')
-    sb.Append('<Otros>')
-    sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
-    sb.Append('</Otros>')
+    if invoice_comments:
+        sb.Append('<Otros>')
+        sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        sb.Append('</Otros>')
 
     sb.Append('</FacturaElectronica>')
 
-    felectronica_bytes = str(sb)
-
-    return stringToBase64(felectronica_bytes)
+    #felectronica_bytes = str(sb)
+    return sb
+    #return stringToBase64(felectronica_bytes)
 
 
 def gen_xml_nc(
@@ -534,12 +487,11 @@ def gen_xml_nc(
     numero_linea = 0
 
     sb = StringBuilder()
-    sb.Append('<?xml version="1.0" encoding="utf-8"?>')
-    sb.Append('<NotaCreditoElectronica xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/notaCreditoElectronica" ')
-    sb.Append('xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ')
-    sb.Append('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
-    sb.Append('xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/notaCreditoElectronicaNotaCreditoElectronica_V4.2.xsd">')
 
+    sb.Append('<NotaCreditoElectronica xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
+    sb.Append('xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/notaCreditoElectronica" ')
+    sb.Append('xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/notaCreditoElectronica ')
+    sb.Append('https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/NotaCreditoElectronica_V4.2.xsd">')
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + date + '</FechaEmision>')
@@ -660,14 +612,16 @@ def gen_xml_nc(
     sb.Append('<NumeroResolucion>DGT-R-48-2016</NumeroResolucion>')
     sb.Append('<FechaResolucion>07-10-2016 08:00:00</FechaResolucion>')
     sb.Append('</Normativa>')
-    sb.Append('<Otros>')
-    sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
-    sb.Append('</Otros>')
+    if invoice_comments:
+        sb.Append('<Otros>')
+        sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        sb.Append('</Otros>')
     sb.Append('</NotaCreditoElectronica>')
 
-    ncelectronica_bytes = str(sb)
+    return sb
+    #ncelectronica_bytes = str(sb)
 
-    return stringToBase64(ncelectronica_bytes)
+    #return stringToBase64(ncelectronica_bytes)
 
 
 def gen_xml_nd(
@@ -680,13 +634,10 @@ def gen_xml_nd(
     numero_linea = 0
 
     sb = StringBuilder()
-    sb.Append('<?xml version="1.0" encoding="utf-8"?>')
-    sb.Append('<NotaDebitoElectronica xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/notaDebitoElectronica" ')
-    sb.Append('xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ')
-    sb.Append('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
-    sb.Append(
-        'xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/notaCreditoElectronicaNotaCreditoElectronica_V4.2.xsd">')
-
+    sb.Append('<NotaDebitoElectronica xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
+    sb.Append('xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/notaDebitoElectronica" ')
+    sb.Append('xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/notaCreditoElectronica ')
+    sb.Append('https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/NotaCreditoElectronica_V4.2.xsd">')
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + date + '</FechaEmision>')
@@ -807,14 +758,16 @@ def gen_xml_nd(
     sb.Append('<NumeroResolucion>DGT-R-48-2016</NumeroResolucion>')
     sb.Append('<FechaResolucion>07-10-2016 08:00:00</FechaResolucion>')
     sb.Append('</Normativa>')
-    sb.Append('<Otros>')
-    sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
-    sb.Append('</Otros>')
+    if invoice_comments:
+        sb.Append('<Otros>')
+        sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        sb.Append('</Otros>')
     sb.Append('</NotaDebitoElectronica>')
 
-    ncelectronica_bytes = str(sb)
+    return sb
+    #ncelectronica_bytes = str(sb)
 
-    return stringToBase64(ncelectronica_bytes)
+    #return stringToBase64(ncelectronica_bytes)
 
 
 # Funcion para enviar el XML al Ministerio de Hacienda
@@ -827,11 +780,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
     else:
         endpoint = fe_enums.UrlHaciendaRecepcion.apiprod.value
 
-    try:
-        xml_listo = base64UTF8Decoder(xml)
-    except AttributeError:
-        xml_listo = xml
-        pass
+    xml_base64 = stringToBase64(xml)
 
     data = {'clave': inv.number_electronic,
             'fecha': date,
@@ -843,7 +792,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
                 'tipoIdentificacion': inv.company_id.identification_id.code,
                 'numeroIdentificacion': inv.company_id.vat
             },
-            'comprobanteXml': xml_listo
+            'comprobanteXml': xml_base64
             }
 
     json_hacienda = json.dumps(data)
@@ -854,7 +803,10 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
 
         # Verificamos el codigo devuelto, si es distinto de 202 es porque hacienda nos está devolviendo algun error
         if response.status_code != 202:
-            error_caused_by = response.headers['x-error-cause']
+            error_caused_by = response.headers.get('X-Error-Cause') if 'X-Error-Cause' in response.headers else ''
+            error_caused_by += response.headers.get('validation-exception', '')
+            _logger.info('Status: {}, Text {}'.format(response.status_code, error_caused_by))
+
             return {'resp': {'Status': response.status_code, 'text': error_caused_by}}
         else:
             # respuesta_hacienda = response.status_code
@@ -916,7 +868,7 @@ def parse_xml(name):
 
 # CONVIERTE UN STRING A BASE 64
 def stringToBase64(s):
-    return base64.b64encode(s.encode('utf-8'))
+    return base64.b64encode(s).decode()
 
 
 # TOMA UNA CADENA Y ELIMINA LOS CARACTERES AL INICIO Y AL FINAL
@@ -1128,25 +1080,3 @@ def send_message(inv, date_cr, token, env):
         return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause', 'Unknown')}
     else:
         return {'status': response.status_code, 'text': response.text}
-
-
-# TODO: Cambiar esto por un firmador de Python
-def sign_xml(inv, tipo_documento, url, xml):
-    payload = {}
-    headers = {}
-    payload['w'] = 'signXML'
-    payload['r'] = 'signFE'
-    payload['p12Url'] = inv.company_id.frm_apicr_signaturecode
-    payload['inXml'] = xml
-    payload['pinP12'] = inv.company_id.frm_pin
-    payload['tipodoc'] = tipo_documento
-
-    response = requests.request("POST", url, data=payload, headers=headers)
-    # response_json = response.json()
-
-    if 200 <= response.status_code <= 299:
-        response_json = {'status': 200, 'xmlFirmado': response.json().get('resp').get('xmlFirmado')}
-    else:
-        response_json = {'status': response.status_code, 'text': 'sign_xml_invoice failed: %s' % response.reason}
-
-    return response_json

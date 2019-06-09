@@ -1,107 +1,73 @@
 # Lib to sign Xades-EPES xml docx
-# 2019 Ricardo Vong <rvong@indelsacr.com>
-# This file should be imported after xmlsig or byitself if only XadesContext is used.
+# 2019 por Ricardo Vong <rvong@indelsacr.com>
+# Based on Tobella's original Xades implementation
 
 import hashlib
 import xmlsig
-from lxml import etree
 from base64 import b64decode, b64encode
 from urllib import parse, request
 import logging
+import datetime
+import pytz
+import random
+from . import create_node, get_reversed_rdns_name
 
-__all__ = ['XAdESContext2', 'PolicyId2', 'PolicyId2Exception']
+__all__ = ['XAdESContext2', 'PolicyId2', 'PolicyId2Exception', 'create_xades_epes_signature']
 
 logger = logging.getLogger(__name__)
 
-
-def xmlsig_create(c14n_method=False, sign_method=False, name=False, ns='ds', value_name=None):
-    node = etree.Element(etree.QName(xmlsig.constants.DSigNs, 'Signature'), nsmap={ns: xmlsig.constants.DSigNs})
-    if name:
-        node.set(xmlsig.constants.ID_ATTR, name)
-    signed_info = xmlsig.utils.create_node('SignedInfo', node, xmlsig.constants.DSigNs)
-    canonicalization = xmlsig.utils.create_node('CanonicalizationMethod', signed_info, xmlsig.constants.DSigNs)
-    canonicalization.set('Algorithm', c14n_method)
-    signature_method = xmlsig.utils.create_node('SignatureMethod', signed_info, xmlsig.constants.DSigNs)
-    signature_method.set('Algorithm', sign_method)
-    signature_value = xmlsig.utils.create_node('SignatureValue', node, xmlsig.constants.DSigNs)
-    if value_name:
-        signature_value.set(xmlsig.constants.ID_ATTR, value_name)
-    return node
-
-
-def xmlsig_add_key_name(node, name=False):
-    key_name = xmlsig.utils.create_node('KeyName', node, xmlsig.constants.DSigNs)
-    if name:
-        key_name.text = name
-    return key_name
-
-
-def get_reversed_rdns_name(rdns):
-    """
-    Gets the rdns String name, but in the right order. xmlsig original function produces a reversed order
-    :param rdns: RDNS object
-    :type rdns: cryptography.x509.RelativeDistinguishedName
-    :return: RDNS name
-    """
-    name = ''
-    for rdn in reversed(rdns):
-        for attr in rdn._attributes:
-            if len(name) > 0:
-                name = name + ','
-            if attr.oid in xmlsig.utils.OID_NAMES:
-                name = name + xmlsig.utils.OID_NAMES[attr.oid]
-            else:
-                name = name + attr.oid._name
-            name = name + '=' + attr.value
-    return name
-
-
-def make_xmlsig_template_function(xml_key):
-
-    def xmlfunc(node):
-        return xmlsig.utils.create_node(xml_key, node, xmlsig.constants.DSigNs)
-
-    return xmlfunc
-
-
-def b64_print(s):
-    return s
-
-
-def create_node(name, parent=None, ns='', tail=False, text=False):
-    node = etree.Element(etree.QName(ns, name))
-    if parent is not None:
-        parent.append(node)
-    if tail and tail != '\n':
-        node.tail = tail
-    if text and text != '\n':
-        node.text = text
-    return node
-
-
-# Monkey patching xmlsig functions to remove unecesary tail and body newlines
-xmlsig.template.create = xmlsig_create
-xmlsig.template.add_key_name = xmlsig_add_key_name
-xmlsig.template.add_x509_data = make_xmlsig_template_function('X509Data')
-xmlsig.template.x509_data_add_certificate = make_xmlsig_template_function('X509Certificate')
-xmlsig.template.x509_data_add_crl = make_xmlsig_template_function('X509CRL')
-xmlsig.template.x509_data_add_issuer_serial = make_xmlsig_template_function('X509IssuerSerial')
-xmlsig.template.x509_data_add_ski = make_xmlsig_template_function('X509SKI')
-xmlsig.template.x509_data_add_subject_name = make_xmlsig_template_function('X509SubjectName')
-xmlsig.template.x509_issuer_serial_add_issuer_name = make_xmlsig_template_function('X509IssuerName')
-xmlsig.template.x509_issuer_serial_add_serial_number = make_xmlsig_template_function('X509SerialNumber')
-xmlsig.template.create_node = create_node
-xmlsig.signature_context.b64_print = b64_print
-xmlsig.algorithms.rsa.create_node = create_node
-xmlsig.algorithms.rsa.b64_print = b64_print
-
-from .xades_context import XAdESContext
-from .policy import PolicyId
-from .constants import NS_MAP, EtsiNS, MAP_HASHLIB
+from .tobella_xades import XAdESContext, PolicyId, template, constants
+from .tobella_xades.constants import NS_MAP, EtsiNS, MAP_HASHLIB
+import xmlsig
 import re
 
 URL_ESCAPE_PATTERN = re.compile('[\r\n]')
 URL_HACIENDA_PATTERN = re.compile('.+\.hacienda\.go\.cr$')
+
+
+def create_xades_epes_signature(sign_date=datetime.datetime.now(pytz.timezone('UTC'))):
+    min = 1
+    max = 9999
+
+    signature_id = 'Signature-{:04d}'.format(random.randint(min, max))
+    signed_properties_id = 'SignedProperties-' + signature_id
+    key_info_id = 'KeyInfoId-' + signature_id
+    reference_id = 'Reference-{:04d}'.format(random.randint(min, max))
+    object_id = 'XadesObjectId-{:04d}'.format(random.randint(min, max))
+
+    signature = xmlsig.template.create(
+        xmlsig.constants.TransformInclC14N,
+        xmlsig.constants.TransformRsaSha256,
+        signature_id
+    )
+
+    # Reference to Document Digest
+    ref = xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256, reference_id, uri="")
+    xmlsig.template.add_transform(ref, xmlsig.constants.TransformEnveloped)
+    xmlsig.template.add_transform(ref, xmlsig.constants.TransformInclC14N)
+    # Reference to KeyInfo Digest
+    ref = xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256, 'ReferenceKeyInfo' ,
+        uri='#' + key_info_id)
+    xmlsig.template.add_transform(ref, xmlsig.constants.TransformInclC14N)
+    # Reference to the SignedProperties Digest
+    ref = xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256,
+        uri='#' + signed_properties_id, uri_type='http://uri.etsi.org/01903#SignedProperties')
+    xmlsig.template.add_transform(ref, xmlsig.constants.TransformInclC14N)
+
+    ki = xmlsig.template.ensure_key_info(signature, name=key_info_id)
+    x509_data = xmlsig.template.add_x509_data(ki)
+
+    xmlsig.template.x509_data_add_certificate(x509_data)
+    xmlsig.template.add_key_value(ki)
+    qualifying = template.create_qualifying_properties(signature, 'XadesObjects', 'xades')
+    props = template.create_signed_properties(qualifying, name=signed_properties_id, datetime=sign_date)
+    # Manually add DataObjectFormat
+    data_obj = xmlsig.utils.create_node('SignedDataObjectProperties', props, ns=constants.EtsiNS)
+    obj_format = xmlsig.utils.create_node('DataObjectFormat', data_obj, ns=constants.EtsiNS)
+    obj_format.set('ObjectReference', '#' + reference_id)
+    xmlsig.utils.create_node('MimeType', obj_format, ns=constants.EtsiNS).text = 'text/xml'
+    xmlsig.utils.create_node('Encoding', obj_format, ns=constants.EtsiNS).text = 'UTF-8'
+    return signature
 
 
 class XAdESContext2(XAdESContext):
@@ -151,6 +117,7 @@ class PolicyId2Exception(Exception):
 
 class PolicyId2(PolicyId):
     check_strict = False
+    hash_method = xmlsig.constants.TransformSha1
     # Theres is something wrong with Hacienda's hash for their policy document, so we need to use their
     # previously generated value
     cache = {
