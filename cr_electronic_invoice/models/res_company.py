@@ -18,23 +18,19 @@ class CompanyElectronic(models.Model):
     district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
     county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
     neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
-    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False, )
+    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False, )     
     frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False, )
-
+    
     frm_ws_ambiente = fields.Selection(
         selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'), ('api-prod', 'Producción'), ], string="Ambiente",
         required=True, default='disabled',
         help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente de calidad (stag), '
              'para el ambiente de producción (prod). Requerido.')
 
-    frm_ws_api = fields.Selection(
-        selection=[('api-interna', 'API Interna'), ('api-hacienda', 'API Hacienda')],
-        string="Procesar Utilizando",
-        required=True, default='api-interna',
-        help='Es la forma en la cual se procesarán las peticiones hacia el Ministerio de Hacienda. API Interna: signifca'
-             ' que las peticiones se realizarán utilizando el API definida en PYTHON, excepto el firmado. API Hacienda:'
-             'significa que todas las peticiones se procesarán con el API de CRLIBRE')
+    version_hacienda = fields.Selection(
+        selection=[('4.2', 'Utilizar XMLs version 4.2'), ('4.3', 'Utilizar XMLs version 4.3')],
+        string="Versión de Hacienda a utilizar",
+        required=True, default='4.2',
+        help='Indica si se quiere utilizar la versión 4.2 o 4.3 de Hacienda')
 
     frm_pin = fields.Char(string="Pin", required=False, help='Es el pin correspondiente al certificado. Requerido')
-    frm_callback_url = fields.Char(string="Callback Url", required=False, default="https://url_callback/repuesta.php?",
-                                   help='Es la URL en a la cual se reenviarán las respuestas de Hacienda.')
