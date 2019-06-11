@@ -75,6 +75,15 @@
 								<field name="version_hacienda"  widget="radio"/>
             		<!--<field name="frm_tipo_id"/>-->
 							</group>
+							<group cols="2" >
+								<field name="CCE_sequence_id"/>
+								<field name="CPCE_sequence_id"/>
+								<field name="RCE_sequence_id"/>
+							</group>
+							<group cols="2" >
+								<field name="sucursal_MR"/>
+								<field name="terminal_MR"/>
+							</group>
 						</group>
 					</page>
 				</xpath>
