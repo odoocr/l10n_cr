@@ -9,12 +9,13 @@
     'category': 'Account',
     'description':'''Codigos Pais para Facturación electronica Costa Rica.''',
     'depends': ['base', 'account', 'product'],
-    'data': ['views/country_codes_views.xml',
+    'data': [
+             'data/res.country.state.csv',
              'data/res.country.county.csv',
-             'data/res.country.state.xml',
              'data/res.country.district.csv',
              'data/res.country.neighborhood.csv',
              'security/ir.model.access.csv',
+             'views/country_codes_views.xml',
              ],
     'installable': True,
 }
