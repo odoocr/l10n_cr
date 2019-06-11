@@ -147,14 +147,23 @@ class AccountInvoiceElectronic(models.Model):
     state_send_invoice = fields.Selection([('aceptado', 'Aceptado'),
                                            ('rechazado', 'Rechazado'),
                                            ('error', 'Error'),
+                                           ('na', 'No Aplica'),
                                            ('ne', 'No Encontrado'),
+                                           ('firma_invalida', 'Firma Inválida'),
                                            ('procesando', 'Procesando')],
                                           'Estado FE Proveedor')
 
     state_tributacion = fields.Selection(
-        [('aceptado', 'Aceptado'), ('rechazado', 'Rechazado'), ('recibido', 'Recibido'),
-         ('error', 'Error'), ('procesando', 'Procesando'), ('na', 'No Aplica'), ('ne', 'No Encontrado')], 'Estado FE',
-        copy=False)
+        [('aceptado', 'Aceptado'), 
+         ('rechazado', 'Rechazado'), 
+         ('recibido', 'Recibido'), 
+         ('firma_invalida', 'Firma Inválida'),
+         ('error', 'Error'), 
+         ('procesando', 'Procesando'), 
+         ('na', 'No Aplica'), 
+         ('ne', 'No Encontrado')], 
+         'Estado FE', copy=False)
+         
     state_invoice_partner = fields.Selection([('1', 'Aceptado'), ('3', 'Rechazado'), ('2', 'Aceptacion parcial')],
                                              'Respuesta del Cliente')
     reference_code_id = fields.Many2one(comodel_name="reference.code", string="Código de referencia", required=False, )
@@ -486,13 +495,22 @@ class AccountInvoiceElectronic(models.Model):
                             inv.consecutive_number_receiver = response_json.get('consecutivo')
                             '''Generamos el Mensaje Receptor'''
 
-                            xml = api_facturae.gen_xml_mr(
-                                inv.number_electronic, inv.partner_id.vat,
-                                inv.date_issuance,
-                                tipo, detalle_mensaje, inv.company_id.vat,
-                                inv.consecutive_number_receiver,
-                                inv.amount_tax_electronic_invoice,
-                                inv.amount_total_electronic_invoice)
+                            if inv.company_id.version_hacienda == '4.2':
+                                xml = api_facturae.gen_xml_mr_42(
+                                    inv.number_electronic, inv.partner_id.vat,
+                                    inv.date_issuance,
+                                    tipo, detalle_mensaje, inv.company_id.vat,
+                                    inv.consecutive_number_receiver,
+                                    inv.amount_tax_electronic_invoice,
+                                    inv.amount_total_electronic_invoice)
+                            else:
+                                xml = api_facturae.gen_xml_mr_43(
+                                    inv.number_electronic, inv.partner_id.vat,
+                                    inv.date_issuance,
+                                    tipo, detalle_mensaje, inv.company_id.vat,
+                                    inv.consecutive_number_receiver,
+                                    inv.amount_tax_electronic_invoice,
+                                    inv.amount_total_electronic_invoice, 721001)
 
                             # TODO: Sign using any python library
                             response_json = api_facturae.sign_xml(inv.company_id.signature, inv.company_id.frm_pin, xml)
@@ -760,6 +778,8 @@ class AccountInvoiceElectronic(models.Model):
 
                 # Generamos las líneas de la factura
                 lines = dict()
+                otros_cargos = dict() 
+                otros_cargos_id = 0
                 line_number = 0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
@@ -769,95 +789,107 @@ class AccountInvoiceElectronic(models.Model):
                 total_impuestos = 0.0
                 base_subtotal = 0.0
                 for inv_line in inv.invoice_line_ids:
-                    line_number += 1
-                    price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
-                    quantity = inv_line.quantity
-                    if not quantity:
-                        continue
-
-                    line_taxes = inv_line.invoice_line_tax_ids.compute_all(price, currency, 1, product=inv_line.product_id, partner=inv_line.invoice_id.partner_id)
-                    price_unit = round(line_taxes['total_excluded'] / (1 - inv_line.discount / 100.0), 5)  # ajustar para IVI
-
-                    base_line = round(price_unit * quantity, 5)
-                    subtotal_line = round(price_unit * quantity * (1 - inv_line.discount / 100.0), 5)
-
-                    # Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
-                    # Esto no debería suceder, pero, si sucede, lo corregimos
-                    if True: # inv.company_id.xml_version = '4.3':
-                        if inv_line.name[:200].find('"'):
-                            detalle_linea = inv_line.name[:200].replace('"', '')
+                    # Revisamos si está línea es de Otros Cargos
+                    if inv_line.product_id.categ_id.name == 'Otros Cargos':
+                        otros_cargos_id += 1
+                        otros_cargos[otros_cargos_id]
+                        otros_cargos[otros_cargos_id]['TipoDocumento'] = inv.line.product_id.default_code
+                        
+                        # TODO: Cómo meter esto en la línea
+                        # otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.partner_id.vat
+                        # otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.partner_id.name
+                        otros_cargos[otros_cargos_id]['Detalle'] = escape(inv_line.name[:160])
+                        otros_cargos[otros_cargos_id]['MontoCargo'] = inv_line.total_amount
                     else:
-                        if inv_line.name[:160].find('"'):
-                            detalle_linea = inv_line.name[:160].replace('"', '')
+                        line_number += 1
+                        price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
+                        quantity = inv_line.quantity
+                        if not quantity:
+                            continue
 
-                    line = {
-                        "cantidad": quantity,
-                        "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
-                        "detalle": escape(detalle_linea),
-                        "codigoProducto": inv_line.product_id.code,
-                        "precioUnitario": price_unit,
-                        "montoTotal": base_line,
-                        "subtotal": subtotal_line,
-                    }
-                    if inv_line.discount:
-                        descuento = round(base_line - subtotal_line, 5)
-                        total_descuento += descuento
-                        line["montoDescuento"] = descuento
-                        line["naturalezaDescuento"] = inv_line.discount_note or 'Descuento Comercial'
+                        line_taxes = inv_line.invoice_line_tax_ids.compute_all(price, currency, 1, product=inv_line.product_id, partner=inv_line.invoice_id.partner_id)
+                        price_unit = round(line_taxes['total_excluded'] / (1 - inv_line.discount / 100.0), 5)  # ajustar para IVI
 
-                    # Se generan los impuestos
-                    taxes = dict()
-                    impuesto_linea = 0.0
-                    if inv_line.invoice_line_tax_ids:
-                        tax_index = 0
+                        base_line = round(price_unit * quantity, 5)
+                        subtotal_line = round(price_unit * quantity * (1 - inv_line.discount / 100.0), 5)
 
-                        taxes_lookup = {}
-                        for i in inv_line.invoice_line_tax_ids:
-                            taxes_lookup[i.id] = {'tax_code': i.tax_code, 'tarifa': i.amount}
-                        for i in line_taxes['taxes']:
-                            if taxes_lookup[i['id']]['tax_code'] != '00':
-                                tax_index += 1
-                                tax_amount = round(i['amount'], 5) * quantity
-                                impuesto_linea += tax_amount
-                                tax = {
-                                    'codigo': taxes_lookup[i['id']]['tax_code'],
-                                    'tarifa': taxes_lookup[i['id']]['tarifa'],
-                                    'monto': tax_amount,
-                                }
-                                # Se genera la exoneración si existe para este impuesto
-                                if inv_line.exoneration_id:
-                                    tax["exoneracion"] = {
-                                        "tipoDocumento": inv_line.exoneration_id.type,
-                                        "numeroDocumento": inv_line.exoneration_id.exoneration_number,
-                                        "nombreInstitucion": inv_line.exoneration_id.name_institution,
-                                        "fechaEmision": str(inv_line.exoneration_id.date) + 'T00:00:00-06:00',
-                                        "montoImpuesto": round(tax_amount * inv_line.exoneration_id.percentage_exoneration / 100, 2),
-                                        "porcentajeCompra": int(inv_line.exoneration_id.percentage_exoneration)
+                        # Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
+                        # Esto no debería suceder, pero, si sucede, lo corregimos
+                        if inv.company_id.version_hacienda == '4.3':
+                            if inv_line.name[:200].find('"'):
+                                detalle_linea = inv_line.name[:200].replace('"', '')
+                        else:
+                            if inv_line.name[:160].find('"'):
+                                detalle_linea = inv_line.name[:160].replace('"', '')
+
+                        line = {
+                            "cantidad": quantity,
+                            "unidadMedida": inv_line.product_id and inv_line.product_id.uom_id.code or 'Sp',
+                            "detalle": escape(detalle_linea),
+                            "codigoProducto": inv_line.product_id.code,
+                            "precioUnitario": price_unit,
+                            "montoTotal": base_line,
+                            "subtotal": subtotal_line,
+                        }
+                        if inv_line.discount:
+                            descuento = round(base_line - subtotal_line, 5)
+                            total_descuento += descuento
+                            line["montoDescuento"] = descuento
+                            line["naturalezaDescuento"] = inv_line.discount_note or 'Descuento Comercial'
+
+                        # Se generan los impuestos
+                        taxes = dict()
+                        impuesto_linea = 0.0
+                        if inv_line.invoice_line_tax_ids:
+                            tax_index = 0
+
+                            taxes_lookup = {}
+                            for i in inv_line.invoice_line_tax_ids:
+                                taxes_lookup[i.id] = {'tax_code': i.tax_code, 'tarifa': i.amount}
+                            for i in line_taxes['taxes']:
+                                if taxes_lookup[i['id']]['tax_code'] != '00':
+                                    tax_index += 1
+                                    tax_amount = round(i['amount'], 5) * quantity
+                                    impuesto_linea += tax_amount
+                                    tax = {
+                                        'codigo': taxes_lookup[i['id']]['tax_code'],
+                                        'tarifa': taxes_lookup[i['id']]['tarifa'],
+                                        'monto': tax_amount,
                                     }
+                                    # Se genera la exoneración si existe para este impuesto
+                                    if inv_line.exoneration_id:
+                                        tax["exoneracion"] = {
+                                            "tipoDocumento": inv_line.exoneration_id.type,
+                                            "numeroDocumento": inv_line.exoneration_id.exoneration_number,
+                                            "nombreInstitucion": inv_line.exoneration_id.name_institution,
+                                            "fechaEmision": str(inv_line.exoneration_id.date) + 'T00:00:00-06:00',
+                                            "montoImpuesto": round(tax_amount * inv_line.exoneration_id.percentage_exoneration / 100, 2),
+                                            "porcentajeCompra": int(inv_line.exoneration_id.percentage_exoneration)
+                                        }
 
-                                taxes[tax_index] = tax
+                                    taxes[tax_index] = tax
 
-                    line["impuesto"] = taxes
+                        line["impuesto"] = taxes
 
-                    # Si no hay product_id se asume como mercaderia
-                    if inv_line.product_id and inv_line.product_id.type == 'service':
-                        if taxes:
-                            total_servicio_gravado += base_line
-                            total_impuestos += impuesto_linea
+                        # Si no hay product_id se asume como mercaderia
+                        if inv_line.product_id and inv_line.product_id.type == 'service':
+                            if taxes:
+                                total_servicio_gravado += base_line
+                                total_impuestos += impuesto_linea
+                            else:
+                                total_servicio_exento += base_line
                         else:
-                            total_servicio_exento += base_line
-                    else:
-                        if taxes:
-                            total_mercaderia_gravado += base_line
-                            total_impuestos += impuesto_linea
-                        else:
-                            total_mercaderia_exento += base_line
+                            if taxes:
+                                total_mercaderia_gravado += base_line
+                                total_impuestos += impuesto_linea
+                            else:
+                                total_mercaderia_exento += base_line
 
-                    base_subtotal += subtotal_line
+                        base_subtotal += subtotal_line
 
-                    line["montoTotalLinea"] = subtotal_line + impuesto_linea
+                        line["montoTotalLinea"] = subtotal_line + impuesto_linea
 
-                    lines[line_number] = line
+                        lines[line_number] = line
 
                 # convertir el monto de la factura a texto
                 inv.invoice_amount_text = extensions.text_converter.number_to_text_es(base_subtotal + total_impuestos)
@@ -869,7 +901,7 @@ class AccountInvoiceElectronic(models.Model):
                 xml_string_builder = None
                 if tipo_documento == 'FE':
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
-                    if inv.company_id.version_hacienda = '4.2':
+                    if inv.company_id.version_hacienda == '4.2':
                         xml_string_builder = api_facturae.gen_xml_fe_v42(inv,
                                                             sale_conditions, medio_pago,
                                                             round(total_servicio_gravado, 5),
