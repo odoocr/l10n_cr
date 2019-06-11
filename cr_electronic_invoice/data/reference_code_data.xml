@@ -22,7 +22,7 @@
         </record>
 
         <record id="cr_electronic_invoice.ReferenceCode_4" model="reference.code">
-            <field name="code">94</field>
+            <field name="code">04</field>
             <field name="name">Referencia a otro documento</field>
             <field name="active">true</field>
         </record>
