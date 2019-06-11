@@ -761,7 +761,7 @@ class AccountInvoiceElectronic(models.Model):
                         fecha_emision_referencia = date_invoice.strftime("%Y-%m-%d") + "T12:00:00-06:00"
 
                 if inv.payment_term_id:
-                    sale_conditions = inv.payment_term_id.sale_conditions_id.sequence or '01'
+                    sale_conditions = inv.payment_term_id.sale_conditions_id and inv.payment_term_id.sale_conditions_id.sequence or '01'
                 else:
                     sale_conditions = '01'
 
@@ -1045,7 +1045,7 @@ class AccountInvoiceElectronic(models.Model):
                             elif id_code == '04' and len(identificacion) != 10:
                                 raise UserError('La identificación NITE del emisor debe de tener 10 dígitos')
 
-                            if not inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
+                            if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
                                 raise UserError(
                                     'No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para' +
                                     inv.payment_term_id.name)
