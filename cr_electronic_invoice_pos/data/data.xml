@@ -5,7 +5,7 @@
 			<field name="name">Consulta Hacienda POS</field>
 			<field name="model_id" ref="model_pos_order" />
 			<field name="state">code</field>
-			<field name="code">model._consultahacienda_pos()</field>
+			<field name="code">model._consultahacienda_pos(20)</field>
 			<field name="interval_number">5</field>
 			<field name="interval_type">minutes</field>
 			<field name="numbercall">-1</field>
@@ -15,7 +15,7 @@
 			<field name="name">Valida Hacienda POS</field>
 			<field name="model_id" ref="model_pos_order" />
 			<field name="state">code</field>
-			<field name="code">model._validahacienda_pos()</field>
+			<field name="code">model._validahacienda_pos(20)</field>
 			<field name="interval_number">5</field>
 			<field name="interval_type">minutes</field>
 			<field name="numbercall">-1</field>
