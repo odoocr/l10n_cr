@@ -52,7 +52,7 @@
 					<attribute name="attrs">{'invisible': [('state_tributacion','!=', False)]}</attribute>
 				</xpath>
 				<xpath expr="//button[@name='action_invoice_sent']" position="attributes">
-					<attribute name="invisible">True</attribute>
+					<attribute name="invisible">False</attribute>
 				</xpath>
 
 			</field>
