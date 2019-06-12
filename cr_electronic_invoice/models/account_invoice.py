@@ -465,18 +465,17 @@ class AccountInvoiceElectronic(models.Model):
                                 detalle_mensaje = 'Aceptado'
                                 tipo = 1
                                 tipo_documento = 'CCE'
-                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.confirmation')
+                                sequence = inv.company_id.CCE_sequence_id.next_by_id()
                             elif inv.state_invoice_partner == '2':
                                 detalle_mensaje = 'Aceptado parcial'
                                 tipo = 2
                                 tipo_documento = 'CPCE'
-                                sequence = inv.env['ir.sequence'].next_by_code(
-                                    'sequece.electronic.doc.partial.confirmation')
+                                sequence = inv.company_id.CPCE_sequence_id.next_by_id()
                             else:
                                 detalle_mensaje = 'Rechazado'
                                 tipo = 3
                                 tipo_documento = 'RCE'
-                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.reject')
+                                sequence = inv.company_id.RCE_sequence_id.next_by_id()
 
                             '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
                             if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error':
@@ -487,8 +486,8 @@ class AccountInvoiceElectronic(models.Model):
 
                             '''Solicitamos la clave para el Mensaje Receptor'''
                             response_json = api_facturae.get_clave_hacienda(self, tipo_documento, sequence,
-                                                                            inv.journal_id.sucursal,
-                                                                            inv.journal_id.terminal)
+                                                                            inv.company_id.sucursal_MR,
+                                                                            inv.company_id.terminal_MR)
 
                             _logger.info('MAB - JSON Clave Mensaje Receptor:%s', response_json)
 
@@ -762,7 +761,7 @@ class AccountInvoiceElectronic(models.Model):
                         fecha_emision_referencia = date_invoice.strftime("%Y-%m-%d") + "T12:00:00-06:00"
 
                 if inv.payment_term_id:
-                    sale_conditions = inv.payment_term_id.sale_conditions_id.sequence or '01'
+                    sale_conditions = inv.payment_term_id.sale_conditions_id and inv.payment_term_id.sale_conditions_id.sequence or '01'
                 else:
                     sale_conditions = '01'
 
@@ -1046,7 +1045,7 @@ class AccountInvoiceElectronic(models.Model):
                             elif id_code == '04' and len(identificacion) != 10:
                                 raise UserError('La identificación NITE del emisor debe de tener 10 dígitos')
 
-                            if not inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
+                            if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
                                 raise UserError(
                                     'No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para' +
                                     inv.payment_term_id.name)

@@ -627,7 +627,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     sb.Append('<CorreoElectronico>' + str(inv.partner_id.email) + '</CorreoElectronico>')
     sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
-    sb.Append('<PlazoCredito>' + str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
+    sb.Append('<PlazoCredito>' + str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
     sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
