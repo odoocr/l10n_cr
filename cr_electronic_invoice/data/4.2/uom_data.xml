@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="1">
+		<record id="product_uom_mcuadrado" model="uom.uom">
+            <field name="category_id" ref="uom.uom_categ_length"/>
+            <field name="name">Metro Cuadrado</field>
+            <field name="factor" eval="1.0"/>
+            <field name="rounding" eval="0.01"/>
+            <field name="code">m2</field>
+            <field name="uom_type">reference</field>
+        </record>
+        <record id="product_uom_mcubico" model="uom.uom">
+            <field name="category_id" ref="uom.uom_categ_length"/>
+            <field name="name">Metro Cubico</field>
+            <field name="factor" eval="1.0"/>
+            <field name="rounding" eval="0.01"/>
+            <field name="code">m3</field>
+            <field name="uom_type">reference</field>
+        </record>
+        <record id="product_uom_sp" model="uom.uom">
+            <field name="category_id" ref="uom.product_uom_categ_sp"/>
+            <field name="name">Servicios Profesionales</field>
+            <field name="factor" eval="1.0"/>
+            <field name="rounding" eval="0.01"/>
+            <field name="code">Sp</field>
+            <field name="uom_type">reference</field>
+        </record>
+    </data>
+</odoo>
