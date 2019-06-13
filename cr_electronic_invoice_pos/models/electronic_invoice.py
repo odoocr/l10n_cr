@@ -59,7 +59,7 @@ class PosOrder(models.Model):
             self.sequence_number_sync(vals)
             order = super(PosOrder, self).create(vals)
             _logger.error('MAB - Previous name: %s    New name: %s', order.name, real_name)
-            if self.search([('name', 'like', real_name[21:41])]):
+            if self.env['pos.order'].search([('name', 'like', real_name[21:41])]):
                 real_name = self.env['ir.sequence'].next_by_code('pos.order.recovery')
             order.name = real_name
         else:
@@ -68,7 +68,9 @@ class PosOrder(models.Model):
                 session = self.env['pos.session'].browse(vals['session_id'])
                 vals['name'] = '/'
                 vals.setdefault('pricelist_id', session.config_id.pricelist_id.id)
-            order = super(PosOrder, self).create(vals)
+                # TODO check if call to super is not needed for create
+            else
+                order = super(PosOrder, self).create(vals)
         return order
 
     number_electronic = fields.Char(string="Número electrónico", required=False, copy=False, index=True)
@@ -93,7 +95,7 @@ class PosOrder(models.Model):
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),
-        ('consecutive_number_receiver_uniq', 'unique (company_id, consecutive_number_receiver)', "Numero de FE repetido, por favor modifique el diario de compras"),
+        ('consecutive_number_receiver_uniq', 'unique (company_id, consecutive_number_receiver)', "Numero de MR repetido, por favor modifique las secuencias de MR de la compañía"),
     ]
 
 
@@ -339,6 +341,10 @@ class PosOrder(models.Model):
                         razon_referencia = 'nota debito'
                     else:
                         tipo_documento = 'NC'
+                        tipo_documento_referencia = 'FE'
+                        numero_documento_referencia = doc.pos_order_id.number_electronic
+                        fecha_emision_referencia = doc.pos_order_id.date_issuance
+                        codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
                     tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
                     numero_documento_referencia = doc.pos_order_id.number_electronic
