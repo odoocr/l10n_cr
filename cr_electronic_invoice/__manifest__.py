@@ -3,10 +3,11 @@
 {
 	'name': 'Facturación electrónica Costa Rica',
 	'version': '12.0.2.0.0',
-	'author': 'CRLibre.org',
+	'author': 'Odoo CR',
 	'license': 'AGPL-3',
-	'website': 'https://crlibre.org/',
-	'category': 'Account',
+	'website': 'https://github.com/odoocr',
+	'category': 'Accounting & Finance',
+    'summary': 'This module extends invoincing to comply Costa Rican Electronic Invoice regulation',
 	'description':
 		'''
 		Facturación electronica Costa Rica.
@@ -25,8 +26,9 @@
 	         'data/reference_document_data.xml',
 	         'data/sale_conditions_data.xml',
 			 'data/sequence.xml',
-		    # 'data/uom_data.xml',
-
+			 'data/product_category_data.xml',
+			 'data/product_data.xml',
+		     # 'data/uom_data.xml',
 			 'views/uom_views.xml',
 			 'views/account_invoice_views.xml',
 			 'views/account_journal_views.xml',
