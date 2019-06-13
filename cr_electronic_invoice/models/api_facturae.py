@@ -646,7 +646,6 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
         #sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' + str(v['unidadMedida']) + '</UnidadMedida>')
-        sb.Append('<UnidadMedidaComercial>' + str(v['unidadMedidaComercial']) + '</UnidadMedidaComercial>')
         sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
         sb.Append('<PrecioUnitario>' + str(v['precioUnitario']) + '</PrecioUnitario>')
         sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
