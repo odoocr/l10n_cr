@@ -932,7 +932,6 @@ class AccountInvoiceElectronic(models.Model):
                     # Revisamos si está línea es de Otros Cargos
                     if inv_line.product_id.categ_id.name == 'Otros Cargos':
                         otros_cargos_id += 1
-                        otros_cargos[otros_cargos_id]
                         otros_cargos[otros_cargos_id]['TipoDocumento'] = inv.line.product_id.default_code
 
                         # TODO: Cómo meter esto en la línea
@@ -942,7 +941,8 @@ class AccountInvoiceElectronic(models.Model):
                         otros_cargos[otros_cargos_id]['MontoCargo'] = inv_line.total_amount
                     else:
                         line_number += 1
-                        price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
+                        #price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
+                        price = inv_line.price_unit
                         quantity = inv_line.quantity
                         if not quantity:
                             continue
@@ -957,17 +957,15 @@ class AccountInvoiceElectronic(models.Model):
                         base_line = round(price_unit * quantity, 5)
                         descuento = inv_line.discount and round(price_unit * quantity * inv_line.discount / 100.0, 5) or 0.0
 
+                        #descuento2 = round(price_unit * quantity * inv_line.discount / 100.0, 5) or 0.0
+
                         #subtotal_line = round(price_unit * quantity * (1 - inv_line.discount / 100.0), 5)
                         subtotal_line = round(base_line - descuento, 5)
 
                         # Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
                         # Esto no debería suceder, pero, si sucede, lo corregimos
-                        if True: # inv.company_id.xml_version = '4.3':
-                            if inv_line.name[:200].find('"'):
-                                detalle_linea = inv_line.name[:200].replace('"', '')
-                        else:
-                            if inv_line.name[:160].find('"'):
-                                detalle_linea = inv_line.name[:160].replace('"', '')
+                        if inv_line.name[:156].find('"'):
+                            detalle_linea = inv_line.name[:160].replace('"', '')
 
                         line = {
                             "cantidad": quantity,
@@ -977,6 +975,7 @@ class AccountInvoiceElectronic(models.Model):
                             "precioUnitario": price_unit,
                             "montoTotal": base_line,
                             "subtotal": subtotal_line,
+                            "BaseImponible": subtotal_line,
                         }
 
                         if inv_line.product_id:

@@ -646,13 +646,17 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
         #sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' + str(v['unidadMedida']) + '</UnidadMedida>')
+        sb.Append('<UnidadMedidaComercial>' + str(v['unidadMedidaComercial']) + '</UnidadMedidaComercial>')
         sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
         sb.Append('<PrecioUnitario>' + str(v['precioUnitario']) + '</PrecioUnitario>')
         sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
         if v.get('montoDescuento'):
+            sb.Append('<Descuento>')
             sb.Append('<MontoDescuento>' + str(v['montoDescuento']) + '</MontoDescuento>')
-        if v.get('naturalezaDescuento'):
-            sb.Append('<NaturalezaDescuento>' + str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
+            if v.get('naturalezaDescuento'):
+                sb.Append('<NaturalezaDescuento>' + str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
+            sb.Append('</Descuento>')
+
         sb.Append('<SubTotal>' + str(v['subtotal']) + '</SubTotal>')
 
         # TODO: ¿qué es base imponible? ¿porqué podría ser diferente del subtotal?
@@ -704,6 +708,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     sb.Append('<ResumenFactura>')
     sb.Append('<CodigoTipoMoneda><CodigoMoneda>' + str(inv.currency_id.name) + '</CodigoMoneda><TipoCambio>' + str(
         currency_rate) + '</TipoCambio></CodigoTipoMoneda>')
+
     sb.Append('<TotalServGravados>' + str(total_servicio_gravado) + '</TotalServGravados>')
     sb.Append('<TotalServExentos>' + str(total_servicio_exento) + '</TotalServExentos>')
 
