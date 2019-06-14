@@ -1,5 +1,11 @@
-edi
+account-invoicing
+account-financial-tools
 bank-payment
-server-tools
-partner-contact
 community-data-files
+currency
+edi
+partner-contact
+queue
+sale-workflow
+server-tools
+server-ux
