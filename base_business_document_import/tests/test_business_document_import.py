@@ -127,7 +127,7 @@ class TestBaseBusinessDocumentImport(TransactionCase):
         self.assertEqual(res, product1)
         product_dict = {'code': 'TEST1242'}
         res = bdio._match_product(
-            product_dict, [], seller=self.env.ref('base.res_partner_2'))
+            product_dict, [], seller=self.env.ref('base.res_partner_12'))
         self.assertEqual(res, product1)
         raise_test = True
         try:
