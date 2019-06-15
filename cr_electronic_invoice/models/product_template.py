@@ -14,5 +14,5 @@ class ProductElectronic(models.Model):
         return code_type_id or False
 
     commercial_measurement = fields.Char(string="Unidad de Medida Comercial", required=False, )
-    code_type_id = fields.Many2one(comodel_name="code.type.product", string="Tipo de código", required=False,
+    code_type_id = fields.Many2one(comodel_name="code.type.product", string="Tipo Código Comercial", required=False,
                                    default=_default_code_type_id)

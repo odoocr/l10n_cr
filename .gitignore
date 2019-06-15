@@ -53,3 +53,9 @@ docs/_build/
 # Backup files
 *~
 *.swp
+
+# macOS filestore
+.DS_Store
+
+# VS Code
+.vscode
