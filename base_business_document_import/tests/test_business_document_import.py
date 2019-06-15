@@ -17,7 +17,7 @@ class TestBaseBusinessDocumentImport(TransactionCase):
         })
         bdio = self.env['business.document.import']
         # match on domain extracted from email with warning
-        partner_dict = {'email': 'alexis.delattre@total.com'}
+        partner_dict = {'email': 'azure.Interior24@example.com'}
         warn = []
         res = bdio._match_partner(partner_dict, warn, partner_type=False)
         self.assertEqual(res, partner1)
@@ -25,7 +25,7 @@ class TestBaseBusinessDocumentImport(TransactionCase):
         partner_dict = {'name': 'ready mat '}
         res = bdio._match_partner(
             partner_dict, [], partner_type='supplier')
-        self.assertEqual(res, self.env.ref('base.res_partner_4'))
+        self.assertEqual(res, self.env.ref('base.res_partner_14'))
         partner_dict = {'ref': 'TOTAL'}
         res = bdio._match_partner(partner_dict, [], partner_type=False)
         self.assertEqual(res, partner1)
@@ -62,21 +62,21 @@ class TestBaseBusinessDocumentImport(TransactionCase):
             'country_id': self.env.ref('base.fr').id,
             'type': 'invoice',
         })
-        agrolait = self.env.ref('base.res_partner_2')
+        azure = self.env.ref('base.res_partner_14')
         shipping_dict = {
             'partner': {'email': 'contact@akretion.com'},
             'address': {},
         }
-        res = bdio._match_shipping_partner(shipping_dict, agrolait, [])
+        res = bdio._match_shipping_partner(shipping_dict, azure, [])
         self.assertEqual(res, cpartner1)
         shipping_dict['address'] = {
             'zip': '92400',
             'country_code': 'fr',
         }
-        res = bdio._match_shipping_partner(shipping_dict, agrolait, [])
+        res = bdio._match_shipping_partner(shipping_dict, azure, [])
         self.assertEqual(res, cpartner3)
         shipping_dict['address']['zip'] = '92500'
-        res = bdio._match_shipping_partner(shipping_dict, agrolait, [])
+        res = bdio._match_shipping_partner(shipping_dict, azure, [])
         self.assertEqual(res, partner1)
         shipping_dict = {
             'partner': {},
@@ -114,8 +114,8 @@ class TestBaseBusinessDocumentImport(TransactionCase):
             'barcode': '9782203121102',
             'seller_ids': [
                 (0, 0, {
-                    'name': self.env.ref('base.res_partner_2').id,
-                    'product_code': 'TEST1242',
+                    'name': self.env.ref('base.res_partner_14').id,
+                    'product_code': 'FURN_6666',
                 }),
             ]
         })
@@ -125,9 +125,9 @@ class TestBaseBusinessDocumentImport(TransactionCase):
         product_dict = {'barcode': '9782203121102'}
         res = bdio._match_product(product_dict, [])
         self.assertEqual(res, product1)
-        product_dict = {'code': 'TEST1242'}
+        product_dict = {'code': 'FURN_6666'}
         res = bdio._match_product(
-            product_dict, [], seller=self.env.ref('base.res_partner_12'))
+            product_dict, [], seller=self.env.ref('base.res_partner_14'))
         self.assertEqual(res, product1)
         raise_test = True
         try:
