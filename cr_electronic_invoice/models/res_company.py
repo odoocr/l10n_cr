@@ -36,10 +36,17 @@ class CompanyElectronic(models.Model):
     frm_pin = fields.Char(string="Pin", required=False, help='Es el pin correspondiente al certificado. Requerido')
 
     sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False, default="1")
+
     terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False, default="1")
-    CCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Confirmación de Aceptación Comprobante Electrónico', 
+
+    CCE_sequence_id = fields.Many2one('ir.sequence',
+                                      string='Secuencia de Confirmación de Aceptación Comprobante Electrónico',
                                       readonly=False, copy=False)
-    CPCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Confirmación de Aceptación Parcial Comprobante Electrónico', 
+
+    CPCE_sequence_id = fields.Many2one('ir.sequence',
+                                       string='Secuencia de Confirmación de Aceptación Parcial Comprobante Electrónico',
                                        readonly=False, copy=False)
-    RCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Rechazo Comprobante Electrónico', 
+
+    RCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Rechazo Comprobante Electrónico',
                                       readonly=False, copy=False)
+

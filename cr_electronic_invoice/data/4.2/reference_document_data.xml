@@ -51,36 +51,6 @@
             <field name="active">true</field>
         </record>
 
-        <record id="cr_electronic_invoice.ReferenceDocument_9" model="reference.document">
-            <field name="code">09</field>
-            <field name="name">Devolución mercadería</field>
-            <field name="active">true</field>
-        </record>
-
-        <record id="cr_electronic_invoice.ReferenceDocument_10" model="reference.document">
-            <field name="code">10</field>
-            <field name="name">Sustituye factura rechazada por el Ministerio de Hacienda</field>
-            <field name="active">true</field>
-        </record>
-
-        <record id="cr_electronic_invoice.ReferenceDocument_11" model="reference.document">
-            <field name="code">11</field>
-            <field name="name">Sustituye factura rechazada por el Receptor del comprobante</field>
-            <field name="active">true</field>
-        </record>
-
-        <record id="cr_electronic_invoice.ReferenceDocument_12" model="reference.document">
-            <field name="code">12</field>
-            <field name="name">Sustituye Factura de exportación</field>
-            <field name="active">true</field>
-        </record>
-
-        <record id="cr_electronic_invoice.ReferenceDocument_13" model="reference.document">
-            <field name="code">13</field>
-            <field name="name">*Facturación mes vencido</field>
-            <field name="active">true</field>
-        </record>
-
         <record id="cr_electronic_invoice.ReferenceDocument_99" model="reference.document">
             <field name="code">99</field>
             <field name="name">Otros</field>
