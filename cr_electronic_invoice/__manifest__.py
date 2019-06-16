@@ -8,9 +8,9 @@
     'author': 'Odoo CR',
     'license': 'AGPL-3',
     'description': """
-    Factura Electrónica Costa Rica
-    ==============================
-    Allows to apply invoices accord to Ministerio de Hacienda regulation.
+Factura Electrónica Costa Rica
+==============================
+Allows to apply invoices accord to Ministerio de Hacienda regulation.
     """,
 
     'depends': [
