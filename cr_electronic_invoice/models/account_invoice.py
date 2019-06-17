@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-import requests
+
 import logging
 import re
 import datetime
 import pytz
 import base64
 import json
-from dateutil.parser import parse
-from num2words import num2words
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
 from odoo import models, fields, api, _
@@ -18,6 +16,12 @@ from lxml import etree
 from .. import extensions
 
 _logger = logging.getLogger(__name__)
+
+
+class InvoiceTaxElectronic(models.Model):
+    _inherit = "account.tax"
+
+    tax_code = fields.Char(string="Código de impuesto", required=False, )
 
 
 class AccountInvoiceRefund(models.TransientModel):
