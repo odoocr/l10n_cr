@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
         <function model="res.country.state" name="try_migrate_old_l10n_cr">
           <value model="res.country.state" eval="obj()"/>
         </function>
