@@ -11,8 +11,18 @@
 		'''
 		Facturación electronica Costa Rica.
 		''',
-	'depends': ['base', 'product','uom', 'sale_management', 'sales_team', 'account', 'l10n_cr_country_codes',
-				'account_cancel', 'res_currency_cr_adapter', 'base_business_document_import', 'account_invoice_import'],
+	'depends': [
+            'base', 
+            'product',
+            'uom', 
+            'sale_management', 
+            'sales_team', 
+            'account', 
+            'l10n_cr_country_codes',
+			'account_cancel', 
+            'res_currency_cr_adapter', 
+            'base_business_document_import', 
+            'account_invoice_import'],
 	'data': [
 			 'data/account_tax_data.xml',
 		  	 'data/aut_ex_data.xml',
@@ -49,5 +59,10 @@
 			 'views/menu_views.xml',
              'wizard/account_invoice_import_view.xml',
 	         ],
+    'external_dependencies': {
+        "python": [
+            'xmlsig',
+        ],
+    },
 	'installable': True,
 }

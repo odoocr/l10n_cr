@@ -161,7 +161,6 @@
             <field name="code">m3</field>
             <field name="uom_type">bigger</field>
         </record>
-
         <record id="product_uom_sp" model="uom.uom">
             <field name="category_id" ref="product_uom_categ_service"/>
             <field name="name">Servicios Profesionales</field>
@@ -302,6 +301,5 @@
             <field name="code">m2</field>
             <field name="uom_type">reference</field>
         </record> 
-
     </data>
 </odoo>
