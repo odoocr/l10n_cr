@@ -4411,9 +4411,9 @@
             <field name="name">Playa</field>
             <field name="district_id" ref="district_palmichal_acosta_sj"/>
         </record>
-        <record id="neighborhood_san_pablo_palmichal_acosta_sj" model="res.country.neighborhood">
+        <record id="neighborhood_san_pablo2_palmichal_acosta_sj" model="res.country.neighborhood">
             <field name="code">18</field>
-            <field name="name">San Pablo</field>
+            <field name="name">San Pablo 2</field>
             <field name="district_id" ref="district_palmichal_acosta_sj"/>
         </record>
         <record id="neighborhood_sevilla_palmichal_acosta_sj" model="res.country.neighborhood">
@@ -7766,9 +7766,9 @@
             <field name="name">Coyol</field>
             <field name="district_id" ref="district_san_jose_alajuela_a"/>
         </record>
-        <record id="neighborhood_flores_san_jose_alajuela_a" model="res.country.neighborhood">
+        <record id="neighborhood_flores2_san_jose_alajuela_a" model="res.country.neighborhood">
             <field name="code">20</field>
-            <field name="name">Flores</field>
+            <field name="name">Flores 2</field>
             <field name="district_id" ref="district_san_jose_alajuela_a"/>
         </record>
         <record id="neighborhood_alto_pavas_carrizal_alajuela_a" model="res.country.neighborhood">
@@ -18006,9 +18006,9 @@
             <field name="name">Chilamate</field>
             <field name="district_id" ref="district_puerto_viejo_sarapiqui_h"/>
         </record>
-        <record id="neighborhood_esperanza_puerto_viejo_sarapiqui_h" model="res.country.neighborhood">
+        <record id="neighborhood_esperanza2_puerto_viejo_sarapiqui_h" model="res.country.neighborhood">
             <field name="code">22</field>
-            <field name="name">Esperanza</field>
+            <field name="name">Esperanza 2</field>
             <field name="district_id" ref="district_puerto_viejo_sarapiqui_h"/>
         </record>
         <record id="neighborhood_estrellales_puerto_viejo_sarapiqui_h" model="res.country.neighborhood">
@@ -18021,9 +18021,9 @@
             <field name="name">Guaria</field>
             <field name="district_id" ref="district_puerto_viejo_sarapiqui_h"/>
         </record>
-        <record id="neighborhood_jardin_puerto_viejo_sarapiqui_h" model="res.country.neighborhood">
+        <record id="neighborhood_jardin2_puerto_viejo_sarapiqui_h" model="res.country.neighborhood">
             <field name="code">25</field>
-            <field name="name">Jardín</field>
+            <field name="name">Jardín 2</field>
             <field name="district_id" ref="district_puerto_viejo_sarapiqui_h"/>
         </record>
         <record id="neighborhood_jormo_puerto_viejo_sarapiqui_h" model="res.country.neighborhood">
@@ -19166,9 +19166,9 @@
             <field name="name">Varillas (Zapotillo)</field>
             <field name="district_id" ref="district_nicoya_nicoya_g"/>
         </record>
-        <record id="neighborhood_virginia_nicoya_nicoya_g" model="res.country.neighborhood">
+        <record id="neighborhood_virginia2_nicoya_nicoya_g" model="res.country.neighborhood">
             <field name="code">54</field>
-            <field name="name">Virginia</field>
+            <field name="name">Virginia 2</field>
             <field name="district_id" ref="district_nicoya_nicoya_g"/>
         </record>
         <record id="neighborhood_zompopa_nicoya_nicoya_g" model="res.country.neighborhood">
@@ -22741,9 +22741,9 @@
             <field name="name">Santa Rogelia</field>
             <field name="district_id" ref="district_la_cruz_la_cruz_g"/>
         </record>
-        <record id="neighborhood_santa_rosa_la_cruz_la_cruz_g" model="res.country.neighborhood">
+        <record id="neighborhood_santa_rosa2_la_cruz_la_cruz_g" model="res.country.neighborhood">
             <field name="code">31</field>
-            <field name="name">Santa Rosa</field>
+            <field name="name">Santa Rosa 2</field>
             <field name="district_id" ref="district_la_cruz_la_cruz_g"/>
         </record>
         <record id="neighborhood_soley_la_cruz_la_cruz_g" model="res.country.neighborhood">
@@ -29166,9 +29166,9 @@
             <field name="name">Veracruz</field>
             <field name="district_id" ref="district_limon_limon_l"/>
         </record>
-        <record id="neighborhood_buenos_aires_limon_limon_l" model="res.country.neighborhood">
+        <record id="neighborhood_buenos_aires2_limon_limon_l" model="res.country.neighborhood">
             <field name="code">29</field>
-            <field name="name">Buenos Aires</field>
+            <field name="name">Buenos Aires 2</field>
             <field name="district_id" ref="district_limon_limon_l"/>
         </record>
         <record id="neighborhood_cocal_limon_limon_l" model="res.country.neighborhood">
@@ -29476,9 +29476,9 @@
             <field name="name">Vegas de Cerere</field>
             <field name="district_id" ref="district_valle_la_estrella_limon_l"/>
         </record>
-        <record id="neighborhood_brisas_valle_la_estrella_limon_l" model="res.country.neighborhood">
+        <record id="neighborhood_brisas2_valle_la_estrella_limon_l" model="res.country.neighborhood">
             <field name="code">55</field>
-            <field name="name">Brisas</field>
+            <field name="name">Brisas 2</field>
             <field name="district_id" ref="district_valle_la_estrella_limon_l"/>
         </record>
         <record id="neighborhood_brisas_de_veragua_valle_la_estrella_limon_l" model="res.country.neighborhood">
