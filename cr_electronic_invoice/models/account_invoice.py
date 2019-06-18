@@ -905,7 +905,7 @@ class AccountInvoiceElectronic(models.Model):
                 if tipo_documento == 'FE':
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
                     if inv.company_id.version_hacienda == '4.2':
-                        xml_string_builder = api_facturae.gen_xml_fe_v42(inv,
+                        xml_string_builder = api_facturae.gen_xml_fe_v42(inv, date_cr,
                                                             sale_conditions, medio_pago,
                                                             round(total_servicio_gravado, 5),
                                                             round(total_servicio_exento, 5),
@@ -976,17 +976,17 @@ class AccountInvoiceElectronic(models.Model):
             response_json = api_facturae.send_xml_fe(inv, token_m_h, api_facturae.get_time_hacienda(),
                                                      xml_firmado, inv.company_id.frm_ws_ambiente)
 
-            if response_json.get('resp').get('Status') == 202:
+            if response_json.get('status') == 202:
                 inv.state_tributacion = 'procesando'
                 # inv.date_issuance = api_facturae.get_time_hacienda()
                 # inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
                 # inv.xml_comprobante = xml_firmado
-                inv.electronic_invoice_return_message = response_json.get('resp').get('text')
+                inv.electronic_invoice_return_message = response_json.get('text')
             else:
-                inv.electronic_invoice_return_message = response_json.get('resp').get('text')
+                inv.electronic_invoice_return_message = response_json.get('text')
                 inv.state_tributacion = 'error'
                 _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', inv.number_electronic,
-                              "", response_json.get('resp').get('text'))
+                              "", response_json.get('text'))
 
         _logger.info('MAB - Valida Hacienda - Finalizado Exitosamente')
 
