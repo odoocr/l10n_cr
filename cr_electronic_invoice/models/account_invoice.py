@@ -1027,25 +1027,25 @@ class AccountInvoiceElectronic(models.Model):
 
                             line["impuesto"] = taxes
 
-                            # Si no hay product_id se asume como mercaderia
-                            if inv_line.product_id and inv_line.product_id.type == 'service':
-                                if taxes:
-                                    total_servicio_gravado += base_line
-                                    total_impuestos += impuesto_linea
-                                else:
-                                    total_servicio_exento += base_line
+                        # Si no hay product_id se asume como mercaderia
+                        if inv_line.product_id and inv_line.product_id.type == 'service':
+                            if taxes:
+                                total_servicio_gravado += base_line
+                                total_impuestos += impuesto_linea
                             else:
-                                if taxes:
-                                    total_mercaderia_gravado += base_line
-                                    total_impuestos += impuesto_linea
-                                else:
-                                    total_mercaderia_exento += base_line
+                                total_servicio_exento += base_line
+                        else:
+                            if taxes:
+                                total_mercaderia_gravado += base_line
+                                total_impuestos += impuesto_linea
+                            else:
+                                total_mercaderia_exento += base_line
 
-                            base_subtotal += subtotal_line
+                        base_subtotal += subtotal_line
 
-                            line["montoTotalLinea"] = subtotal_line + impuesto_linea
+                        line["montoTotalLinea"] = subtotal_line + impuesto_linea
 
-                            lines[line_number] = line
+                        lines[line_number] = line
 
                 # convertir el monto de la factura a texto
                 inv.invoice_amount_text = extensions.text_converter.number_to_text_es(base_subtotal + total_impuestos)
