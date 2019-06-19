@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import base64
 import json
 import requests
 import logging
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-import odoo.addons.cr_electronic_invoice.models.functions as functions
+import odoo.addons.cr_electronic_invoice.models.api_facturae as api_facturae
 from xml.sax.saxutils import escape
 import datetime
 import pytz
@@ -22,8 +23,8 @@ class AccountJournal(models.Model):
 
 class PosConfig(models.Model):
     _inherit = 'pos.config'
-    sucursal = fields.Char(string='Point of Sale Sucursal', required=True, help="Sucursal for this point of sale")
-    terminal = fields.Char(string='Point of Sale Terminal Number', required=True, help="Terminal number for this point of sale")
+    #sucursal = fields.Char(string='Point of Sale Sucursal', required=True, help="Sucursal for this point of sale")
+    #terminal = fields.Char(string='Point of Sale Terminal Number', required=True, help="Terminal number for this point of sale")
     return_sequence_id = fields.Many2one('ir.sequence', string='Order IDs Return Sequence', readonly=False,
         help="This sequence is automatically created by Odoo but you can change it "
         "to customize the reference numbers of your orders.", copy=False)
@@ -69,7 +70,7 @@ class PosOrder(models.Model):
                 vals['name'] = '/'
                 vals.setdefault('pricelist_id', session.config_id.pricelist_id.id)
                 # TODO check if call to super is not needed for create
-            else
+            else:
                 order = super(PosOrder, self).create(vals)
         return order
 
@@ -95,7 +96,6 @@ class PosOrder(models.Model):
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)', "La clave de comprobante debe ser única"),
-        ('consecutive_number_receiver_uniq', 'unique (company_id, consecutive_number_receiver)', "Numero de MR repetido, por favor modifique las secuencias de MR de la compañía"),
     ]
 
 
@@ -159,13 +159,16 @@ class PosOrder(models.Model):
             current_order+=1
             _logger.error('MAB - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
 
-            response_json = functions.token_hacienda(doc.company_id)
-            if response_json['status'] != 200:
-                _logger.error('MAB - Consulta Hacienda - HALTED - Failed to get token')
-                return
+            #response_json = fxunctions.token_hacienda(doc.company_id)
+            token_m_h = api_facturae.get_token_hacienda(doc, doc.company_id.frm_ws_ambiente)
+            #if response_json['status'] != 200:
+            #    _logger.error('MAB - Consulta Hacienda - HALTED - Failed to get token')
+            #    return
 
             if doc.number_electronic and len(doc.number_electronic) == 50:
-                response_json = functions.consulta_clave(doc.number_electronic, response_json['token'], doc.company_id.frm_ws_ambiente)
+                #response_json = fxunctions.consulta_clave(doc.number_electronic, response_json['token'], doc.company_id.frm_ws_ambiente)
+                response_json = api_facturae.consulta_clave(doc.number_electronic, token_m_h, doc.company_id.frm_ws_ambiente)
+
                 status = response_json['status']
                 if status == 200:
                     estado_m_h = response_json.get('ind-estado')
@@ -180,7 +183,7 @@ class PosOrder(models.Model):
                     doc.state_tributacion = estado_m_h
                     doc.fname_xml_respuesta_tributacion = 'AHC_' + doc.number_electronic + '.xml'
                     doc.xml_respuesta_tributacion = response_json.get('respuesta-xml')
-                    if doc.partner_id and doc.partner_id.email and not doc.partner_id.opt_out:
+                    if doc.partner_id and doc.partner_id.email: # and not doc.partner_id.opt_out:
                         #email_template = self.env.ref('account.email_template_edi_invoice', False)
                         email_template = self.env.ref(
                             'cr_electronic_invoice_pos.email_template_pos_invoice', False)
@@ -322,7 +325,7 @@ class PosOrder(models.Model):
                 continue
 
             if not doc.xml_comprobante:
-                url = doc.company_id.frm_callback_url
+                #url = doc.company_id.frm_callback_url
                 if not doc.pos_order_id.number_electronic:
                     if doc.amount_total >= 0:
                         tipo_documento = 'TE'
@@ -352,14 +355,15 @@ class PosOrder(models.Model):
                     codigo_referencia = doc.reference_code_id.code
                     #FacturaReferencia = ''   *****************
 
-                now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                dia = docName[3:5]#'%02d' % now_cr.day,
-                mes = docName[5:7]#'%02d' % now_cr.month,
-                anno = docName[7:9]#str(now_cr.year)[2:4],
+                #now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+                #now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+                #dia = docName[3:5]#'%02d' % now_cr.day,
+                #mes = docName[5:7]#'%02d' % now_cr.month,
+                #anno = docName[7:9]#str(now_cr.year)[2:4],
                 #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
+                #date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
                 #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
+                date_cr = api_facturae.get_time_hacienda()
                 codigo_seguridad = docName[-8:]  # ,doc.company_id.security_code,
                 if not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
                     _logger.error('MAB 001 - codigo seguridad : %s  -- Pedido: %s Metodo de pago de diario no definido, utilizando efectivo', codigo_seguridad, docName)
@@ -449,68 +453,91 @@ class PosOrder(models.Model):
 
                     lines[line_number] = dline
                 doc.number_electronic = docName
-                consecutivo = docName[21:41]
-                response_json = functions.make_xml_invoice(doc, tipo_documento, consecutivo, date_cr,
-                                                           sale_conditions, medio_pago,
-                                                           total_servicio_gravado,
-                                                           total_servicio_exento, total_mercaderia_gravado,
-                                                           total_mercaderia_exento, base_subtotal,
-                                                           total_impuestos, total_descuento,
-                                                           json.dumps(lines, ensure_ascii=False),
-                                                           tipo_documento_referencia,
-                                                           numero_documento_referencia,
-                                                           fecha_emision_referencia,
-                                                           codigo_referencia, razon_referencia, url,
-                                                           currency_rate)
+                invoice_comments = ''
 
-                if response_json['status'] != 200:
-                    _logger.error('MAB - API Error creating XML:%s', response_json['text'])
-                    doc.state_tributacion = 'error'
-                    continue
+                xml_string_builder = api_facturae.gen_xml_fe_v42(doc, date_cr,
+                                                    sale_conditions, medio_pago,
+                                                    round(total_servicio_gravado, 5),
+                                                    round(total_servicio_exento, 5),
+                                                    round(total_mercaderia_gravado, 5),
+                                                    round(total_mercaderia_exento, 5), base_subtotal,
+                                                    total_impuestos, total_descuento,
+                                                    json.dumps(lines, ensure_ascii=False),
+                                                    currency_rate, invoice_comments)
 
-                xml = response_json.get('xml')
-                if tipo_documento == 'TE':
-                    tipo_documento = 'FE'
-                response_json = functions.sign_xml(doc, tipo_documento, url, xml)
-                if response_json['status'] != 200:
-                    _logger.error('MAB - API Error signing XML:%s', response_json['text'])
-                    doc.state_tributacion = 'error'
-                    continue
+                #response_json = fxunctions.make_xml_invoice(doc, tipo_documento, 
+                #                                           sale_conditions, medio_pago,
+                #                                           total_servicio_gravado,
+                #                                           total_servicio_exento, total_mercaderia_gravado,
+                #                                           total_mercaderia_exento, base_subtotal,
+                #                                           total_impuestos, total_descuento,
+                #                                           json.dumps(lines, ensure_ascii=False),
+                #                                           tipo_documento_referencia,
+                #                                           numero_documento_referencia,
+                #                                           fecha_emision_referencia,
+                #                                           codigo_referencia, razon_referencia, url,
+                #                                           currency_rate)
+
+
+                xml_to_sign = str(xml_string_builder)
+                xml_firmado = api_facturae.sign_xml(doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
+
+
+                #if response_json['status'] != 200:
+                #    _logger.error('MAB - API Error creating XML:%s', response_json['text'])
+                #    doc.state_tributacion = 'error'
+                #    continue
+
+                #xml = response_json.get('xml')
+                #if tipo_documento == 'TE':
+                #    tipo_documento = 'FE'
+                #response_json = fxunctions.sign_xml(doc, tipo_documento, url, xml)
+                #if response_json['status'] != 200:
+                #    _logger.error('MAB - API Error signing XML:%s', response_json['text'])
+                #    doc.state_tributacion = 'error'
+                #    continue
 
                 doc.date_issuance = date_cr
                 doc.fname_xml_comprobante = tipo_documento + '_' + docName + '.xml'
-                doc.xml_comprobante = response_json.get('xmlFirmado')
+                #doc.xml_comprobante = response_json.get('xmlFirmado')
+                doc.xml_comprobante = base64.encodestring(xml_firmado)
+
                 _logger.error('MAB - SIGNED XML:%s', doc.fname_xml_comprobante)
 
             # get token
-            response_json = functions.token_hacienda(doc.company_id)
-            if response_json['status'] == 200:
-                response_json = functions.send_file(doc, response_json['token'], doc.xml_comprobante,
-                                                    doc.company_id.frm_ws_ambiente)
-                response_status = response_json.get('status')
-                response_text = response_json.get('text')
-                if 200 <= response_status <= 299:
-                    doc.state_tributacion = 'procesando'
-                    # functions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
-                else:
-                    if response_text.find('ya fue recibido anteriormente') != -1:
-                        doc.state_tributacion = 'procesando'
-                        doc.message_post(subject='Error', body='Ya recibido anteriormente, se pasa a consultar')
-                    elif doc.error_count > 10:
-                        doc.message_post(subject='Error', body=response_text)
-                        doc.state_tributacion = 'error'
-                        _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
-                                      response_status, response_text)
-                    else:
-                        doc.error_count += 1
-                        doc.state_tributacion = 'procesando'
-                        doc.message_post(subject='Error', body=response_text)
-                        _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
-                                      response_status, response_text)
-            else:
-                doc.state_tributacion = 'error'
-                doc.message_post(body='Error obteniendo token_hacienda', subject='Error')
-                _logger.error('MAB - Error obteniendo token_hacienda')
+            #response_json = fxunctions.token_hacienda(doc.company_id)
+            token_m_h = api_facturae.get_token_hacienda(doc, doc.company_id.frm_ws_ambiente)
 
-        _logger.error('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
+            #if response_json['status'] == 200:
+            ##response_json = fxunctions.send_file(doc, token_m_h, doc.xml_comprobante,
+            ##                                    doc.company_id.frm_ws_ambiente)
+            response_json = api_facturae.send_xml_fe(doc, token_m_h, date_cr,
+                                                     xml_firmado, doc.company_id.frm_ws_ambiente)
+
+            response_status = response_json.get('status')
+            response_text = response_json.get('text')
+            if 200 <= response_status <= 299:
+                doc.state_tributacion = 'procesando'
+                # fxunctions.consulta_documentos(self, inv, inv.company_id.frm_ws_ambiente, token_m_h, url, date_cr, xml_firmado)
+            else:
+                if response_text.find('ya fue recibido anteriormente') != -1:
+                    doc.state_tributacion = 'procesando'
+                    doc.message_post(subject='Error', body='Ya recibido anteriormente, se pasa a consultar')
+                elif doc.error_count > 10:
+                    doc.message_post(subject='Error', body=response_text)
+                    doc.state_tributacion = 'error'
+                    _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
+                                    response_status, response_text)
+                else:
+                    doc.error_count += 1
+                    doc.state_tributacion = 'procesando'
+                    doc.message_post(subject='Error', body=response_text)
+                    _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
+                                    response_status, response_text)
+            #else:
+            #    doc.state_tributacion = 'error'
+            #    doc.message_post(body='Error obteniendo token_hacienda', subject='Error')
+            #    _logger.error('MAB - Error obteniendo token_hacienda')
+
+        _logger.info('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
 
