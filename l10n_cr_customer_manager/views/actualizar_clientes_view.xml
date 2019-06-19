@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--Herencia de Compañia-->
+        <record id="view_company_form_inherit" model="ir.ui.view">
+            <field name="name">res.company.form.inherit</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[1]" position="after">
+                    <page string="Nombre de Cliente Automático">
+                        <separator string="URL Base"/>
+                        <group col="4" colspan="2">
+                            <group col="2">
+                                <field name="url_base" nolabel="1"/>
+                            </group>
+                            <group col="2"/>
+                        </group>
+                        <group col="4">
+                            <field attrs="{'invisible' : [('ultima_respuesta', 'in', (False,''))], 'readonly' : [('ultima_respuesta', '!=', False)]}" colspan="4" name="ultima_respuesta"/>
+                        </group>
+                        <separator string="Token de Acceso"/>
+                        <group col="4" colspan="2">
+                            <field colspan="2" name="token" nolabel="1"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+        <!--Herencia de Partner-->
+        <record id="view_partner_form_inherit" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='vat']" position="replace"/>
+                 <xpath expr="//field[@name='company_type']" position="before">
+                    <h1>
+                        <field attrs="{'required' : [('type', '=', 'contact')]}" default_focus="1" name="cedula" placeholder="Cédula" readonly="0" />
+                    </h1>
+                </xpath>
+                <xpath expr="//field[@name='company_type']" position="replace"/>
+                <xpath expr="//field[@name='name']" position="after">
+                    <field class="oe_edit_only" name="company_type" options="{'horizontal': true}" widget="radio"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

@@ -13,7 +13,11 @@ class ResCountryCounty(models.Model):
     _order = 'name'
 
     code = fields.Char(string="Código", required=True, )
+<<<<<<< refs/remotes/upstream/13.0
     state_id = fields.Many2one("res.country.state", string="Provincia", required=True)
+=======
+    state_id = fields.Many2one(comodel_name="res.country.state", string="Provincia", required=True)
+>>>>>>> Many Fixes
     name = fields.Char(string="Nombre", required=True, )
 
 
@@ -23,7 +27,11 @@ class ResCountryDistrict(models.Model):
     _order = 'name'
 
     code = fields.Char(string="Código", required=True, )
+<<<<<<< refs/remotes/upstream/13.0
     county_id = fields.Many2one("res.country.county", string="Cantón", required=True)
+=======
+    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=True)
+>>>>>>> Many Fixes
     name = fields.Char(string="Nombre", required=True, )
 
 
@@ -33,7 +41,11 @@ class ResCountryNeighborhood(models.Model):
     _order = 'name'
 
     code = fields.Char(string="Código", required=True, )
+<<<<<<< refs/remotes/upstream/13.0
     district_id = fields.Many2one("res.country.district", string="Distrito", required=True)
+=======
+    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=True)
+>>>>>>> Many Fixes
     name = fields.Char(string="Nombre", required=True, )
 
 
@@ -41,7 +53,10 @@ class ResCountryState(models.Model):
     _inherit = 'res.country.state'
 
     def try_migrate_old_l10n_cr(self):
+<<<<<<< refs/remotes/upstream/13.0
         return
+=======
+>>>>>>> Many Fixes
         _logger.info('Check if needed to migrate old l10n_cr states')
         self.env.cr.execute(
             "SELECT module FROM ir_model_data WHERE model=%s AND name='state_SJ'", (self._name,)

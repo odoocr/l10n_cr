@@ -1,0 +1,241 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* tm_sale_discount_total
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-04-10 03:10+0000\n"
+"PO-Revision-Date: 2019-04-10 03:10+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: tm_sale_discount_total
+#: model_terms:ir.ui.view,arch_db:tm_sale_discount_total.discount_sale_view_form
+msgid "(update)"
+msgstr "(actualizar)"
+
+#. module: tm_sale_discount_total
+#: model_terms:ir.ui.view,arch_db:tm_sale_discount_total.res_config_settings_view_form_sale_discount
+msgid "<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" groups=\"base.group_multi_company\"/>"
+msgstr "<span class=\"fa fa-lg fa-building-o\" title=\"Los valores establecidos aquí son específicos de la empresa.\" groups=\"base.group_multi_company\"/>"
+
+#. module: tm_sale_discount_total
+#: selection:account.invoice,discount_type:0
+#: selection:sale.order,discount_type:0
+msgid "Amount"
+msgstr "Monto"
+
+#. module: tm_sale_discount_total
+#: model_terms:ir.ui.view,arch_db:tm_sale_discount_total.discount_sale_view_form
+msgid "Approve"
+msgstr "Aprobar"
+
+#. module: tm_sale_discount_total
+#: selection:sale.order,state:0
+msgid "Cancelled"
+msgstr "Cancelada"
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_res_company
+msgid "Companies"
+msgstr "Compañías"
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_res_config_settings
+msgid "Config Settings"
+msgstr "Opciones de Configuración"
+
+#. module: tm_sale_discount_total
+#: selection:res.company,so_double_validation:0
+msgid "Confirm sale orders in one step"
+msgstr "Confirmar ordenes de venta en un paso"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_account_invoice__amount_discount
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_account_invoice_report__discount
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_order__amount_discount
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_report__discount
+#: model_terms:ir.ui.view,arch_db:tm_sale_discount_total.report_invoice_customized
+msgid "Discount"
+msgstr "Descuento"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_account_invoice_line__discount
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_order_line__discount
+msgid "Discount (%)"
+msgstr "Descuento (%)"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_account_invoice__discount_rate
+msgid "Discount Amount"
+msgstr "Monto del descuento"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_order__discount_rate
+msgid "Discount Rate"
+msgstr "Tasa de Descuento"
+
+#. module: tm_sale_discount_total
+#: model_terms:ir.ui.view,arch_db:tm_sale_discount_total.discount_account_invoice_view_form
+msgid "Discount Rate :"
+msgstr "Tasa de Descuento :"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_account_invoice__discount_type
+msgid "Discount Type"
+msgstr "Tipo de Descuento"
+
+#. module: tm_sale_discount_total
+#: model_terms:ir.ui.view,arch_db:tm_sale_discount_total.discount_account_invoice_view_form
+msgid "Discount Type :"
+msgstr "Tipo de Descuento :"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_res_config_settings__so_double_validation_limit
+msgid "Discount limit requires approval in %"
+msgstr "El límite de descuento requiere aprobación cuando sea superior a %"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_order__discount_type
+msgid "Discount type"
+msgstr "Tipo de Descuento"
+
+#. module: tm_sale_discount_total
+#: selection:res.company,so_double_validation:0
+msgid "Get 2 levels of approvals to confirm a sale order"
+msgstr "Obtener 2 niveles de aprobaciones para confirmar una orden de venta."
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_account_invoice
+msgid "Invoice"
+msgstr "Factura"
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_account_invoice_line
+msgid "Invoice Line"
+msgstr "Línea factura"
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_account_invoice_report
+msgid "Invoices Statistics"
+msgstr "Estadísticas de facturas"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_res_company__so_double_validation
+msgid "Levels of Approvals"
+msgstr "Niveles de Aprobación"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_res_config_settings__so_double_validation
+msgid "Levels of Approvals *"
+msgstr "Niveles de Aprobación *"
+
+#. module: tm_sale_discount_total
+#: selection:sale.order,state:0
+msgid "Locked"
+msgstr "Bloqueado"
+
+#. module: tm_sale_discount_total
+#: model_terms:ir.ui.view,arch_db:tm_sale_discount_total.res_config_settings_view_form_sale_discount
+msgid "Managers must approve discount"
+msgstr "Administradores deben aprobar el descuento"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,help:tm_sale_discount_total.field_res_company__so_double_validation_limit
+#: model:ir.model.fields,help:tm_sale_discount_total.field_res_config_settings__so_double_validation_limit
+msgid "Minimum discount percentage for which a double validation is required"
+msgstr "Porcentaje de descuento mínimo para el que se requiere una doble validación."
+
+#. module: tm_sale_discount_total
+#: selection:account.invoice,discount_type:0
+#: selection:sale.order,discount_type:0
+msgid "Percentage"
+msgstr "Porcentaje"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_res_company__so_double_validation_limit
+msgid "Percentage of Discount that requires double validation'"
+msgstr "Porcentaje de descuento que requiere doble validación'"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,help:tm_sale_discount_total.field_res_company__so_double_validation
+#: model:ir.model.fields,help:tm_sale_discount_total.field_res_config_settings__so_double_validation
+msgid "Provide a double validation mechanism for sales discount"
+msgstr "Proporcionar un doble mecanismo de validación para el descuento de ventas."
+
+#. module: tm_sale_discount_total
+#: selection:sale.order,state:0
+msgid "Quotation"
+msgstr "Presupuesto"
+
+#. module: tm_sale_discount_total
+#: selection:sale.order,state:0
+msgid "Quotation Sent"
+msgstr "Presupuesto enviado"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_res_config_settings__so_order_approval
+msgid "Sale Discount Approval"
+msgstr "Aprobación de descuento de venta"
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_sale_order
+msgid "Sale Order"
+msgstr "Pedido de venta"
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_sale_report
+msgid "Sales Analysis Report"
+msgstr "Informe de análisis de ventas"
+
+#. module: tm_sale_discount_total
+#: selection:sale.order,state:0
+msgid "Sales Order"
+msgstr "Pedido de venta"
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Línea pedido de venta"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_order__state
+msgid "Status"
+msgstr "Estado"
+
+#. module: tm_sale_discount_total
+#: model:ir.model,name:tm_sale_discount_total.model_account_tax
+msgid "Tax"
+msgstr "Impuesto"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_order__amount_tax
+msgid "Taxes"
+msgstr "Impuestos"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_order__amount_total
+msgid "Total"
+msgstr "Total"
+
+#. module: tm_sale_discount_total
+#: model_terms:ir.ui.view,arch_db:tm_sale_discount_total.report_saleorder_customized
+msgid "Total Discount"
+msgstr "Descuento Total"
+
+#. module: tm_sale_discount_total
+#: model:ir.model.fields,field_description:tm_sale_discount_total.field_sale_order__amount_untaxed
+msgid "Untaxed Amount"
+msgstr "Base imponible"
+
+#. module: tm_sale_discount_total
+#: selection:sale.order,state:0
+msgid "Waiting Approval"
+msgstr "Esperando Aprobación"
+

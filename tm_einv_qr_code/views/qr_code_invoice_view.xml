@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <record id="account_invoice_form_view" model="ir.ui.view">
+        <field name="name">account.invoice.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <field name="number" position="before">
+                <div class="oe_button_box">
+                    <field name="qr_image" widget="image" width="100" height="100"/>
+                </div>
+            </field>
+            <field name="partner_id" position="after">
+                    <field name="qr_in_report"/>
+            </field>
+        </field>
+    </record>
+</odoo>

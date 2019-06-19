@@ -1,0 +1,12 @@
+account-invoicing
+account-financial-tools
+bank-payment
+community-data-files
+connector-telephony
+currency
+edi
+partner-contact
+queue
+sale-workflow
+server-tools
+server-ux

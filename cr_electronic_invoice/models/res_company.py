@@ -24,6 +24,15 @@ _TIPOS_CONFIRMACION = (
 )
 
 
+_TIPOS_CONFIRMACION = (
+    # Provides listing of types of comprobante confirmations
+    ('CCE_sequence_id', 'account.invoice.supplier.accept.', 'Supplier invoice acceptance sequence'),
+    ('CPCE_sequence_id', 'account.invoice.supplier.partial.',
+     'Supplier invoice partial acceptance sequence'),
+    ('RCE_sequence_id', 'account.invoice.supplier.reject.', 'Supplier invoice rejection sequence'),
+)
+
+
 class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
@@ -31,6 +40,7 @@ class CompanyElectronic(models.Model):
     commercial_name = fields.Char(string="Commercial Name", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
+<<<<<<< refs/remotes/upstream/13.0
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
     frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
@@ -55,27 +65,77 @@ class CompanyElectronic(models.Model):
     terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", 
                                  required=False,
                                  default="1")
+=======
+    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
+                                        required=False, )
+    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
+    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
+    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
+    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False, )     
+    frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False, )
+    
+    frm_ws_ambiente = fields.Selection(
+        selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'), ('api-prod', 'Producción'), ], string="Ambiente",
+        required=True, default='disabled',
+        help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente de calidad (stag), '
+             'para el ambiente de producción (prod). Requerido.')
+
+    version_hacienda = fields.Selection(
+        selection=[('4.2', 'Utilizar XMLs version 4.2'), ('4.3', 'Utilizar XMLs version 4.3')],
+        string="Versión de Hacienda a utilizar",
+        required=True, default='4.2',
+        help='Indica si se quiere utilizar la versión 4.2 o 4.3 de Hacienda')
+
+    frm_pin = fields.Char(string="Pin", required=False, help='Es el pin correspondiente al certificado. Requerido')
+
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False, default="1")
+
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False, default="1")
+
+    #CCE_sequence_id = fields.Many2one('ir.sequence',
+    #                                  string='Secuencia de Confirmación de Aceptación Comprobante Electrónico',
+    #                                  readonly=False, copy=False)
+
+    #CPCE_sequence_id = fields.Many2one('ir.sequence',
+    #                                   string='Secuencia de Confirmación de Aceptación Parcial Comprobante Electrónico',
+    #                                   readonly=False, copy=False)
+
+    #RCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Rechazo Comprobante Electrónico',
+    #                                  readonly=False, copy=False)
+>>>>>>> Many Fixes
 
     CCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Aceptación',
         help='Secuencia de confirmacion de aceptación de comprobante electrónico. Dejar en blanco '
         'y el sistema automaticamente se lo creará.',
+<<<<<<< refs/remotes/upstream/13.0
         readonly=False, copy=False,
     )
+=======
+        readonly=False,
+        copy=False,
+        )
+>>>>>>> Many Fixes
 
     CPCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Parcial',
         help='Secuencia de confirmación de aceptación parcial de comprobante electrónico. Dejar '
         'en blanco y el sistema automáticamente se lo creará.',
+<<<<<<< refs/remotes/upstream/13.0
         readonly=False, copy=False,
     )
+=======
+        readonly=False, copy=False)
+
+>>>>>>> Many Fixes
     RCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Rechazo',
         help='Secuencia de confirmación de rechazo de comprobante electrónico. Dejar '
         'en blanco y el sistema automáticamente se lo creará.',
+<<<<<<< refs/remotes/upstream/13.0
         readonly=False, copy=False,
     )
     FEC_sequence_id = fields.Many2one(
@@ -107,6 +167,9 @@ class CompanyElectronic(models.Model):
                     'message': _('Número de teléfono inválido')
                 }
                 return {'value': {'phone': ''}, 'warning': alert}
+=======
+        readonly=False, copy=False)
+>>>>>>> Many Fixes
 
     @api.model
     def create(self, vals):
@@ -117,6 +180,7 @@ class CompanyElectronic(models.Model):
             where tipo is: accept, partial or reject, and company_name is either the first word
             of the name or commercial name.
         """
+<<<<<<< refs/remotes/upstream/13.0
         new_comp_id = super(CompanyElectronic, self).create(vals)
         #new_comp = self.browse(new_comp_id)
         new_comp_id.try_create_configuration_sequences()
@@ -133,18 +197,31 @@ class CompanyElectronic(models.Model):
         company_subname = self.commercial_name
         if not company_subname:
             company_subname = getattr(self, 'name')
+=======
+        new_comp = super(CompanyElectronic, self).create(vals)
+        company_subname = vals.get('commercial_name')
+        if not company_subname:
+            company_subname = vals.get('name')
+>>>>>>> Many Fixes
         company_subname = company_subname.split(' ')[0].lower()
         ir_sequence = self.env['ir.sequence']
         to_write = {}
         for field, seq_code, seq_name in _TIPOS_CONFIRMACION:
+<<<<<<< refs/remotes/upstream/13.0
             if not getattr(self, field, None):
                 seq_code += company_subname
                 seq = self.env.ref(seq_code, raise_if_not_found=False) or ir_sequence.create({
+=======
+            if field not in vals or not vals.get(field):
+                seq_code += company_subname
+                seq = ir_sequence.create({
+>>>>>>> Many Fixes
                     'name': seq_name,
                     'code': seq_code,
                     'implementation': 'standard',
                     'padding': 10,
                     'use_date_range': False,
+<<<<<<< refs/remotes/upstream/13.0
                     'company_id': getattr(self, 'id'),
                 })
                 to_write[field] = seq.id
@@ -193,3 +270,12 @@ class CompanyElectronic(models.Model):
                 'message': _('Company VAT is invalid')
             }
             return {'value': {'vat': ''}, 'warning': alert}
+=======
+                    'company_id': new_comp.id,
+                })
+                to_write[field] = seq.id
+
+        if to_write:
+            new_comp.write(to_write)
+        return new_comp
+>>>>>>> Many Fixes

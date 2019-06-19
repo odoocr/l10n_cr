@@ -43,4 +43,3 @@ Update Invoice QWEB template to meet DGT requirements for Costa Rica
     'installable': True,
 }
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

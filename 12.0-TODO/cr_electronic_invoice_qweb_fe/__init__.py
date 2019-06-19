@@ -19,7 +19,11 @@
 #
 ##############################################################################
 
+<<<<<<< refs/remotes/upstream/13.0:12.0-TODO/cr_electronic_invoice_qweb_fe/__init__.py
 from . import models
 from . import report
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+=======
+from . import res_company
+>>>>>>> Many Fixes:cr_electronic_invoice_qweb_fe/models/__init__.py
