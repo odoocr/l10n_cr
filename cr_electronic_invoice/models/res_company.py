@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
 import logging
+from odoo import models, fields, api
 _logger = logging.getLogger(__name__)
 
 _TIPOS_CONFIRMACION = (
@@ -11,6 +11,7 @@ _TIPOS_CONFIRMACION = (
      'Supplier invoice partial acceptance sequence'),
     ('RCE_sequence_id', 'account.invoice.supplier.reject.', 'Supplier invoice rejection sequence'),
 )
+
 
 class CompanyElectronic(models.Model):
     _name = 'res.company'
