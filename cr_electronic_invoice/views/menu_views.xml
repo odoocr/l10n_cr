@@ -24,5 +24,11 @@
 
 		<menuitem id="menu_exoneration_views" name="Exoneración" parent="menu_electronic_invoice"
 				  sequence="9" action="action_exoneration"/>
+
+		 <menuitem id="menu_action_invoice_tree_fec" name="Facturas de Compras" parent="account.menu_finance_receivables"
+				   sequence="2" action="action_invoice_tree_fec"/>
+
+		<menuitem id="menu_action_invoice_tree_fee" name="Facturas de Exportación" parent="account.menu_finance_receivables"
+				   sequence="3" action="action_invoice_tree_fee"/>
 	</data>
 </odoo>

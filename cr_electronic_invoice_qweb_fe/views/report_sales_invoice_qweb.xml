@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
 <data>
-<template id="sale.report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
+<!--<template id="sale.report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
 </template>
 
 <template id="sale_stock.report_invoice_document_inherit_sale_stock" inherit_id="account.report_invoice_document">
-</template>
+</template>-->
 
 <template id="account.report_invoice_document">
     <div class="header">
@@ -435,7 +435,7 @@
     </t>
 </template>
 </data>
-</openerp>
+</odoo>
 
 
 

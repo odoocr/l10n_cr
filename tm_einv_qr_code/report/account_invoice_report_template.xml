@@ -1,0 +1,132 @@
+<odoo>
+    <template id="web.external_layout_standard">
+           <div class="header">
+                    <style type="text/css">
+                        <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css' />
+                        <![CDATA[
+                        body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+                        }
+                        ]]>
+
+                        .rounded2{
+                        border: 1px solid;
+                        padding:5px 5px;
+                        }
+
+                        .dtheader{
+                        background-color:#222;
+                        color:#ffffff;
+                        border:none;
+                        padding:5px 5px;
+                        }
+
+                        .dtcls{
+                        color:#222;
+                        width:25%;
+                        padding:5px 5px;
+                        border: 1px solid;
+                        }
+
+                        .dtbg{
+                        margin:5px 5px;
+                        background-color:#fff;
+                        }
+                    </style>
+
+                    <table style="width:100%" class="mt32 mb35">
+                        <tr>
+                            <td width="15%">
+                                <img  t-if="o.company_id.logo"
+                                      t-att-src="'data:image/png;base64,%s' % to_text(company.logo)"
+                                      style="margin:100px 0 0 0; max-height:150px;"/>
+                            </td>
+
+                            <td width="60%">
+                                <strong>
+                                    <t t-esc="o.company_id.commercial_name"/>
+                                </strong><br/>
+
+                                Cédula Jurídica <t t-esc="o.company_id.vat"/><br/>
+                                <t t-if="o.company_id.street" t-esc="o.company_id.street"/><br/>
+                                <t t-if="o.company_id.street2" t-esc="o.company_id.street2"/>
+                                <span>
+                                    <t t-if="o.company_id.district_id" t-esc="o.company_id.district_id.name"/>,
+                                    <t t-if="o.company_id.county_id" t-esc="o.company_id.county_id.name"/>,
+                                    <t t-if="o.company_id.country_id" t-esc="o.company_id.country_id.name"/>
+                                </span><br/>
+                                <span>Tel.</span> <t t-esc="o.company_id.phone"/><br/>
+                                <span>Email:</span> <t t-esc="o.company_id.email"/><br/>
+                                <t t-esc="o.company_id.website"/><br/><br/>
+                            </td>
+
+                            <td width="35%">
+                                <div class="text-center">
+                                    <span style="font-weight:bolder"
+                                          t-if="(o.type == 'out_invoice' or o.type == 'in_invoice')
+                                          and o.tipo_comprobante == 'FE'">FACTURA ELECTRONICA</span>
+
+                                    <span style="font-weight:bolder"
+                                          t-if="(o.type == 'out_invoice' or o.type == 'in_invoice')
+                                          and o.tipo_comprobante == 'ND'">NOTA DÉBITO ELECTRÓNICA</span>
+
+                                    <span style="font-weight:bolder"
+                                          t-if="o.type == 'out_refund' or o.type == 'in_refund'">
+                                          NOTA CRÉDITO ELECTRONICA</span><br/>
+
+                                    <span t-if="(o.type == 'in_invoice' or o.type == 'in_refund')" t-esc="o.reference"/>
+                                    Clave: <span t-if="(o.type == 'out_invoice' or o.type == 'out_refund')"
+                                                 t-esc="o.number_electronic[21:41]"/><br/>
+
+                                    Consecutivo: <span t-if="(o.type == 'out_invoice' or o.type == 'out_refund')"
+                                                       t-esc="o.number_electronic"/>
+                                </div>
+
+                                <div class="text-center">
+                                    <table style="width:100%;" class="dtheader rounded2">
+                                        <tr>
+                                            <td class="text-center">DÍA</td>
+                                            <td class="text-center">MES</td>
+                                            <td class="text-center">AÑO</td>
+                                            <td class="text-center">HORA</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="dtcls text-center dtbg">
+                                                <span t-esc="o.date_issuance and (o.date_issuance[8:10]) or ''"/>
+                                            </td>
+                                            <td class="dtcls text-center dtbg">
+                                                <span t-esc="o.date_issuance and (o.date_issuance[5:7]) or ''"/>
+                                            </td>
+                                            <td class="dtcls text-center dtbg">
+                                                <span t-esc="o.date_issuance and (o.date_issuance[0:4]) or ''"/>
+                                            </td>
+                                            <td class="dtcls text-center dtbg">
+                                                <span t-esc="o.date_issuance and (o.date_issuance[11:16]) or ''"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                 </div>
+
+                 <div class="article o_report_layout_standard">
+                     <t t-raw="0"/>
+                 </div>
+
+                <div class="footer">
+                     <div style="width:100px;height:100px;float:right;margin-bottom: 300px;">
+                        <span t-field="o.qr_image" t-field-options='{"widget": "image"}' />
+                    </div>
+                    <p class="text-center" style="padding:2px 2px 2px 2px">Usuario:
+                        <span t-field="o.create_uid.name"/></p>
+
+                    <p class="text-center" style="padding:2px 2px 2px 2px">
+                        Autorizada mediante resolución No DGT-R-48-2016 del 7 de octubre de 2016</p>
+                </div>
+
+    </template>
+</odoo>

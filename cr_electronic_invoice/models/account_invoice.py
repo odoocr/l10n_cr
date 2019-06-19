@@ -405,8 +405,7 @@ class AccountInvoiceElectronic(models.Model):
 
             partner = self.env['res.partner'].search([('vat', '=', emisor),
                                                       ('supplier', '=', True), '|',
-                                                      ('company_id', '=', self.company_id.id),
-                                                      ('company_id', '=', False)], limit=1)
+                                                      ('company_id', '=', self.company_id.id)], limit=1)
 
             default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
 
@@ -500,18 +499,19 @@ class AccountInvoiceElectronic(models.Model):
 
                     if abs(self.amount_total_electronic_invoice - self.amount_total) > 1:
                         inv.message_post(subject='Error', body='Aviso!.\n Monto total no concuerda con monto del XML')
-                        continue
                         raise UserError('Aviso!.\n Monto total no concuerda con monto del XML')
+                        #continue
 
                     elif not inv.xml_supplier_approval:
                         inv.message_post(subject='Error', body='Aviso!.\n No se ha cargado archivo XML')
-                        continue
                         raise UserError('Aviso!.\n No se ha cargado archivo XML')
+                        #continue
 
                     elif not inv.journal_id.sucursal or not inv.journal_id.terminal:
                         inv.state_send_invoice = 'error'
                         inv.message_post(subject='Error',
                                          body='Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
+                        raise UserError('Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
                         continue
                         #raise UserError('Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
 
@@ -519,7 +519,9 @@ class AccountInvoiceElectronic(models.Model):
                         inv.state_send_invoice = 'error'
                         inv.message_post(subject='Error',
                                          body='Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
-                        continue
+                        raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para .'
+                                        'el archivo cargado.')
+                        #continue
                         #raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para .'
                         #                'el archivo cargado.')
 
@@ -873,7 +875,11 @@ class AccountInvoiceElectronic(models.Model):
 
                 # Es Factura de cliente o nota de débito
                 if inv.type == 'out_invoice':
-                    if inv.invoice_id and inv.journal_id and (inv.journal_id.code == 'NDV'):
+                    if inv.journal_id.code == 'FEC':
+                        tipo_documento = 'FEC'
+                        tipo_documento_referencia = ''
+
+                    elif inv.invoice_id and inv.journal_id and (inv.journal_id.code == 'NDV'):
                         tipo_documento = 'ND'
                         numero_documento_referencia = inv.invoice_id.number_electronic
                         tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]
@@ -1115,6 +1121,29 @@ class AccountInvoiceElectronic(models.Model):
                                                                          fecha_emision_referencia, codigo_referencia,
                                                                          razon_referencia, currency_rate, invoice_comments)
 
+                elif tipo_documento == "FEC":
+                    xml_string_builder = api_facturae.gen_xml_fec_v43(inv=inv,
+                                                                     sale_conditions=sale_conditions,
+                                                                     medio_pago=medio_pago,
+                                                                     total_servicio_gravado=round(
+                                                                         total_servicio_gravado, 5),
+                                                                     total_servicio_exento=round(total_servicio_exento,
+                                                                                                 5),
+                                                                     totalServExonerado=0,
+                                                                     total_mercaderia_gravado=round(
+                                                                         total_mercaderia_gravado, 5),
+                                                                     total_mercaderia_exento=round(
+                                                                         total_mercaderia_exento, 5),
+                                                                     totalMercExonerada=0,
+                                                                     totalOtrosCargos=0,
+                                                                     base_total=base_subtotal,
+                                                                     total_impuestos=total_impuestos,
+                                                                     total_descuento=total_descuento,
+                                                                     lines=json.dumps(lines, ensure_ascii=False),
+                                                                     otrosCargos=False,
+                                                                     currency_rate=currency_rate,
+                                                                     invoice_comments=invoice_comments)
+
                 else:
                     if inv.company_id.version_hacienda == '4.2':
                         xml_string_builder = api_facturae.gen_xml_nd(inv, inv.number, api_facturae.get_time_hacienda(),
@@ -1211,8 +1240,13 @@ class AccountInvoiceElectronic(models.Model):
                         # Es Factura de cliente
                         if inv.type == 'out_invoice':
 
+                            # Verificar si es FEC
+                            if inv.journal_id and (inv.journal_id.code == 'FEC'):
+                                tipo_documento = 'FEC'
+                                inv.refund_type = 'invoice'
+
                             # Verificar si es nota DEBITO
-                            if inv.invoice_id and inv.journal_id and (inv.journal_id.code == 'NDV'):
+                            elif inv.invoice_id and inv.journal_id and (inv.journal_id.code == 'NDV'):
                                 tipo_documento = 'ND'
                                 inv.refund_type = 'debit'
 
