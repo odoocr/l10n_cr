@@ -293,11 +293,11 @@
             model="account.tax">
             <field name="tax_code">05</field>
             <field name="name">Impuesto Específico sobre las bebidas envasadas sin
-                contenido alcohólico y jabones de tocador</field>
+    contenido alcohólico y jabones de tocador</field>
             <field name="amount">0</field>
             <field name="type_tax_use">sale</field>
             <field name="description">Impuesto Específico sobre las bebidas envasadas sin
-                contenido alcohólico y jabones de tocador</field>
+    contenido alcohólico y jabones de tocador</field>
             <field name="sequence">10</field>
             <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
@@ -308,11 +308,11 @@
             model="account.tax">
             <field name="tax_code">05</field>
             <field name="name">Impuesto Específico sobre las bebidas envasadas sin
-                contenido alcohólico y jabones de tocador</field>
+    contenido alcohólico y jabones de tocador</field>
             <field name="amount">0</field>
             <field name="type_tax_use">purchase</field>
             <field name="description">Impuesto Específico sobre las bebidas envasadas sin
-                contenido alcohólico y jabones de tocador</field>
+    contenido alcohólico y jabones de tocador</field>
             <field name="sequence">10</field>
             <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
