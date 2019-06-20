@@ -19,6 +19,10 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
     # phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
+
+    activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica",
+                                      required=False, )
+
     phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506",
                              help="Sin espacios ni guiones")
     signature = fields.Binary(string="Llave Criptográfica", )

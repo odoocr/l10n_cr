@@ -590,7 +590,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     sb.Append('xsi:schemaLocation="https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/FacturaElectronica_V4.3.xsd">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<CodigoActividad>' + '721001' + '</CodigoActividad>')
+    sb.Append('<CodigoActividad>' + inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
     sb.Append('<Emisor>')
@@ -772,7 +772,7 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_s
     sb.Append('xsi:schemaLocation="https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/FacturaElectronicaExportacion_V4.3.xsd">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<CodigoActividad>' + '721001' + '</CodigoActividad>')
+    sb.Append('<CodigoActividad>' + inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + date + '</FechaEmision>')
     sb.Append('<Emisor>')
@@ -1061,7 +1061,7 @@ def gen_xml_nc_v43(
     #sb.Append('https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<CodigoActividad>' + '721001' + '</CodigoActividad>')
+    sb.Append('<CodigoActividad>' + inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + date + '</FechaEmision>')
     sb.Append('<Emisor>')
@@ -1528,7 +1528,7 @@ def gen_xml_nd_v43(
         'xsi:schemaLocation="https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/NotaDebitoElectronica_V4.3.xsd">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<CodigoActividad>' + '721001' + '</CodigoActividad>')
+    sb.Append('<CodigoActividad>' + inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + date + '</FechaEmision>')
     sb.Append('<Emisor>')

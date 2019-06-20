@@ -6,8 +6,6 @@ import datetime
 import pytz
 import base64
 import json
-from dateutil.parser import parse
-from num2words import num2words
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
 from odoo import models, fields, api, _
@@ -297,34 +295,7 @@ class AccountInvoiceElectronic(models.Model):
                         'warning': {'title': 'Atención',
                                     'message': 'No se puede localizar el nodo TotalComprobante. Por favor cargue '
                                                'un archivo con el formato correcto.'}}
-
-            #if not root.findall('Clave'):
-            #    return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-            #                                                                   'message': 'El archivo xml no contiene el nodo Clave. Por favor cargue un archivo con el formato correcto.'}}
-            #if not root.findall('FechaEmision'):
-            #    return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-            #                                                                   'message': 'El archivo xml no contiene el nodo FechaEmision. Por favor cargue un archivo con el formato correcto.'}}
-            #if not root.findall('Emisor'):
-            #    return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-            #                                                                   'message': 'El archivo xml no contiene el nodo Emisor. Por favor cargue un archivo con el formato correcto.'}}
-            #if not root.findall('Emisor')[0].findall('Identificacion'):
-            #    return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-            #                                                                   'message': 'El archivo xml no contiene el nodo Identificacion. Por favor cargue un archivo con el formato correcto.'}}
-            #if not root.findall('Emisor')[0].findall('Identificacion')[0].findall('Tipo'):
-            #    return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-            #                                                                   'message': 'El archivo xml no contiene el nodo Tipo. Por favor cargue un archivo con el formato correcto.'}}
-            #if not root.findall('Emisor')[0].findall('Identificacion')[0].findall('Numero'):
-            #    return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-            #                                                                   'message': 'El archivo xml no contiene el nodo Numero. Por favor cargue un archivo con el formato correcto.'}}
-
-            #ESTA NO
-            # if not (root.findall('ResumenFactura') and root.findall('ResumenFactura')[0].findall('TotalImpuesto')):
-            #     return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-            #                                                                    'message': 'No se puede localizar el nodo TotalImpuesto. Por favor cargue un archivo con el formato correcto.'}}
-
-            #if not (root.findall('ResumenFactura') and root.findall('ResumenFactura')[0].findall('TotalComprobante')):
-                #    return {'value': {'xml_supplier_approval': False}, 'warning': {'title': 'Atención',
-            #                                                               'message': 'No se puede localizar el nodo TotalComprobante. Por favor cargue un archivo con el formato correcto.'}}
+                                               
         else:
             self.state_tributacion = False
             self.state_send_invoice = False
@@ -607,7 +578,7 @@ class AccountInvoiceElectronic(models.Model):
                                 tipo, detalle_mensaje, inv.company_id.vat,
                                 inv.consecutive_number_receiver,
                                 inv.amount_tax_electronic_invoice,
-                                inv.amount_total_electronic_invoice, 721001)
+                                inv.amount_total_electronic_invoice, inv.company_id.activity_id.code)
 
                             # TODO: Sign using any python library
                             response_json = api_facturae.sign_xml(inv.company_id.signature, inv.company_id.frm_pin, xml)

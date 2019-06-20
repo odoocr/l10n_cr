@@ -23,6 +23,7 @@
 
 				<field name="partner_id" position="after">
 					<field name="commercial_name"/>
+					<field name="activity_id"/>
 				</field>
 				<field name="vat" position="replace"/>
 
