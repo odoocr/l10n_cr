@@ -207,7 +207,7 @@
         </record>
 
         <record id="product_uom_com" model="uom.uom">
-            <field name="category_id" ref="product_uom_categ_unit"/>
+            <field name="category_id" ref="uom.product_uom_categ_unit"/>
             <field name="name">Comisiones</field>
             <field name="factor" eval="1.0"/>
             <field name="rounding" eval="0.01"/>
