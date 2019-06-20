@@ -41,16 +41,11 @@
 					<field name="discount_note"/>
 					<field name="exoneration_id" />
 				</xpath>
-				<xpath expr="//button[@name='action_invoice_cancel']" position="after">
+				<xpath expr="//button[@name='action_invoice_draft']" position="after">
 					<button name="charge_xml_data" type="object" string="Cargar datos desde XMLs" colspan="2" attrs="{'invisible':['|', ('state_tributacion','!=', False), '|', ('xml_comprobante', '=', False), ('xml_respuesta_tributacion', '=', False)]}" />
 					<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" attrs="{'invisible':[('state_tributacion','=', False)]}"/>
 				</xpath>
 
-				<!-- Verificar -->
-				<xpath expr="//button[@name='action_invoice_cancel']" position="attributes">
-					<attribute name="invisible">True</attribute>
-					<attribute name="attrs">{'invisible': [('state_tributacion','!=', False)]}</attribute>
-				</xpath>
 				<xpath expr="//button[@name='action_invoice_sent']" position="attributes">
 					<attribute name="invisible">False</attribute>
 				</xpath>
@@ -63,7 +58,7 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_supplier_form"/>
 			<field name="arch" type="xml">
-				<xpath expr="//button[@name='action_invoice_cancel']" position="after">
+				<xpath expr="//button[@name='action_invoice_draft']" position="after">
 					<button name="send_acceptance_message" type="object" string="Enviar Mensaje Receptor" colspan="2" attrs="{'invisible':[('state_send_invoice','!=', False), ('state_send_invoice','!=','rechazado'),('state_send_invoice','!=','error')]}"/>
 					<button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
 				</xpath>
