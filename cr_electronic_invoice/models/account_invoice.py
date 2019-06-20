@@ -396,6 +396,11 @@ class AccountInvoiceElectronic(models.Model):
             inv_xmlns = namespaces.pop(None)
             namespaces['inv'] = inv_xmlns
 
+            self.consecutive_number_receiver = factura.xpath(
+                "inv:NumeroConsecutivo", namespaces=namespaces)[0].text
+
+            self.reference = self.consecutive_number_receiver
+            
             self.number_electronic = factura.xpath(
                 "inv:Clave", namespaces=namespaces)[0].text
             self.date_issuance = factura.xpath(
@@ -404,6 +409,7 @@ class AccountInvoiceElectronic(models.Model):
                 "inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
             receptor = factura.xpath(
                 "inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+            
 
             if receptor != self.company_id.vat:
                 raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
@@ -432,8 +438,6 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError('El proveedor con identificación ' + emisor +
                                 ' no existe. Por favor creelo primero en el sistema.')
 
-            self.reference = self.number_electronic[21:41]
-
             lines = root.find('DetalleServicio').findall('LineaDetalle')
 
             new_lines = self.env['account.invoice.line']
@@ -461,6 +465,7 @@ class AccountInvoiceElectronic(models.Model):
                             if tax_amount > 0:
                                 tax = self.env['account.tax'].search(
                                     [('tax_code', '=', re.sub(r"[^0-9]+", "", tax_node.find('Codigo').text)),
+                                     ('amount', '=', tax_node.find('Tarifa').text),
                                      ('type_tax_use', '=', 'purchase')], limit=1)
                                 tax_amount = float(tax_node.find('Monto').text)
                                 if tax and tax.amount == float(re.sub(r"[^0-9.]+", "", tax_node.find('Tarifa').text)):

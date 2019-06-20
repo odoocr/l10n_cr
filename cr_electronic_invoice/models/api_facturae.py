@@ -366,10 +366,14 @@ def gen_xml_mr_42(clave, cedula_emisor, fecha_emision, id_mensaje, detalle_mensa
     return base64UTF8Decoder(mr_to_base64)
 
 
-def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje, detalle_mensaje, cedula_receptor,
+def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
+                  detalle_mensaje, cedula_receptor,
                   consecutivo_receptor,
-                  monto_impuesto=0, total_factura=0, codigo_actividad=False, monto_total_impuesto_acreditar=False,
-                  monto_total_gasto_aplicable=False):
+                  monto_impuesto=0, total_factura=0,
+                  codigo_actividad=False,
+                  monto_total_impuesto_acreditar=False,
+                  monto_total_gasto_aplicable=False,
+                  condicion_impuesto=False):
     '''Verificamos si la clave indicada corresponde a un numeros'''
     mr_clave = re.sub('[^0-9]', '', clave)
     if len(mr_clave) != 50:
@@ -447,18 +451,22 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje, detalle_mensa
     # TODO: Estar atento a la publicación de Hacienda de cómo utilizar esto
     if monto_total_impuesto_acreditar:
         sb.Append(
-            '<MontoTotalImpuestoAcreditar>' + str(monto_total_impuesto_acreditar) + '</MontoTotalImpuestoAcreditar>')
+            '<MontoTotalImpuestoAcreditar>' +
+            str(monto_total_impuesto_acreditar) +
+            '</MontoTotalImpuestoAcreditar>')
 
     # TODO: Estar atento a la publicación de Hacienda de cómo utilizar esto
     if monto_total_gasto_aplicable:
         sb.Append('<MontoTotalDeGastoAplicable>' +
-                  str(monto_total_gasto_aplicable) + '</MontoTotalDeGastoAplicable>')
+                  str(monto_total_gasto_aplicable) +
+                  '</MontoTotalDeGastoAplicable>')
 
     if mr_total_factura is not None and mr_total_factura > 0:
         sb.Append('<TotalFactura>' + str(mr_total_factura) + '</TotalFactura>')
     else:
         raise UserError(
-            'El monto Total de la Factura para el Mensaje Receptro es inválido')
+            'El monto Total de la Factura para el Mensaje Receptro es inválido'
+            )
 
     sb.Append('<NumeroCedulaReceptor>' +
               mr_cedula_receptor + '</NumeroCedulaReceptor>')
@@ -472,8 +480,10 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje, detalle_mensa
     return base64UTF8Decoder(mr_to_base64)
 
 
-def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
-                   total_mercaderia_gravado, total_mercaderia_exento, base_total, total_impuestos, total_descuento,
+def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago,
+                   total_servicio_gravado, total_servicio_exento,
+                   total_mercaderia_gravado, total_mercaderia_exento,
+                   base_total, total_impuestos, total_descuento,
                    lines, currency_rate, invoice_comments):
 
     numero_linea = 0

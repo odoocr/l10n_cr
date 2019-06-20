@@ -5,7 +5,7 @@
         <!-- account tax -->
         <record id="iva_tax_0" 
             model="account.tax">
-            <field name="tax_code">01</field>
+            <field name="tax_code">00</field>
             <field name="name">Excento</field>
             <field name="amount">0</field>
             <field name="type_tax_use">sale</field>
@@ -18,7 +18,7 @@
 
         <record id="iva_tax_00" 
             model="account.tax">
-            <field name="tax_code">01</field>
+            <field name="tax_code">00</field>
             <field name="name">Excento</field>
             <field name="amount">0</field>
             <field name="type_tax_use">purchase</field>

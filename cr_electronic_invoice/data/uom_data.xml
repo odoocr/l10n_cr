@@ -200,8 +200,6 @@
         <record id="product_uom_i" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_unit"/>
             <field name="name">Intereses</field>
-            <field name="factor" eval="1.0"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">I</field>
             <field name="uom_type">bigger</field>
         </record>
