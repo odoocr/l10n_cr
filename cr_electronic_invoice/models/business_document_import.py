@@ -3,6 +3,7 @@ from odoo import models, api, tools, _
 from odoo.exceptions import UserError
 from odoo.tools import float_compare, float_round, float_is_zero, config
 
+
 class BusinessDocumentImportCR(models.AbstractModel):
     _inherit = ['business.document.import']
 
@@ -21,7 +22,7 @@ class BusinessDocumentImportCR(models.AbstractModel):
                 "check the configuration of the units of measures in "
                 "Odoo.") % uom_dict['cr_code'])
             return self.env.ref('uom.product_uom_unit')
-    
+
     @api.model
     def _match_tax(self, tax_dict, chatter_msg, type_tax_use='purchase', price_include=False):
         ato = self.env['account.tax']

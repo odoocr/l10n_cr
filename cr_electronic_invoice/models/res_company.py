@@ -6,10 +6,12 @@ _logger = logging.getLogger(__name__)
 
 _TIPOS_CONFIRMACION = (
     # Provides listing of types of comprobante confirmations
-    ('CCE_sequence_id', 'account.invoice.supplier.accept.', 'Supplier invoice acceptance sequence'),
+    ('CCE_sequence_id', 'account.invoice.supplier.accept.',
+     'Supplier invoice acceptance sequence'),
     ('CPCE_sequence_id', 'account.invoice.supplier.partial.',
      'Supplier invoice partial acceptance sequence'),
-    ('RCE_sequence_id', 'account.invoice.supplier.reject.', 'Supplier invoice rejection sequence'),
+    ('RCE_sequence_id', 'account.invoice.supplier.reject.',
+     'Supplier invoice rejection sequence'),
 )
 
 
@@ -21,7 +23,7 @@ class CompanyElectronic(models.Model):
     # phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
 
     activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica",
-                                      required=False, )
+                                  required=False, )
 
     phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506",
                              help="Sin espacios ni guiones")
@@ -34,8 +36,10 @@ class CompanyElectronic(models.Model):
                                 required=False)
     neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios",
                                       required=False, )
-    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False)
-    frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False)
+    frm_ws_identificador = fields.Char(
+        string="Usuario de Factura Electrónica", required=False)
+    frm_ws_password = fields.Char(
+        string="Password de Factura Electrónica", required=False)
 
     frm_ws_ambiente = fields.Selection(
         selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'),
@@ -46,7 +50,8 @@ class CompanyElectronic(models.Model):
              'de calidad (stag), para el ambiente de producción (prod). Requerido.')
 
     version_hacienda = fields.Selection(
-        selection=[('4.2', 'Utilizar XMLs version 4.2'), ('4.3', 'Utilizar XMLs version 4.3')],
+        selection=[('4.2', 'Utilizar XMLs version 4.2'),
+                   ('4.3', 'Utilizar XMLs version 4.3')],
         string="Versión de Hacienda a utilizar",
         required=True, default='4.2',
         help='Indica si se quiere utilizar la versión 4.2 o 4.3 de Hacienda')
@@ -66,7 +71,7 @@ class CompanyElectronic(models.Model):
         'y el sistema automaticamente se lo creará.',
         readonly=False,
         copy=False,
-        )
+    )
     CPCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Parcial',
@@ -109,7 +114,6 @@ class CompanyElectronic(models.Model):
                 })
                 to_write[field] = seq.id
 
-    
         if to_write:
             new_comp.write(to_write)
         return new_comp

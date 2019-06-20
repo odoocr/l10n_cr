@@ -591,7 +591,8 @@ class BaseCRFe(models.AbstractModel):
         else:  # we create the new supplier
             name = party_node.xpath('inv:Nombre', namespaces=ns)
             email = party_node.xpath('inv:CorreoElectronico', namespaces=ns)
-            phone = party_node.xpath('inv:Telefono/inv:NumTelefono', namespaces=ns)
+            phone = party_node.xpath(
+                'inv:Telefono/inv:NumTelefono', namespaces=ns)
             partner_dict = {
                 'vat': partner_vat,
                 'name': name[0].text,
@@ -710,4 +711,3 @@ class BaseCRFe(models.AbstractModel):
             pass
         logger.info('Valid XML files found in PDF: %s', res.keys())
         return res
-

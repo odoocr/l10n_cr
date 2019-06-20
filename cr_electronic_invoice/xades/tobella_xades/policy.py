@@ -145,7 +145,7 @@ class PolicyId(Policy):
             hash_method = policy_id.find(
                 'etsi:SigPolicyHash/ds:DigestMethod', namespaces=NS_MAP
             ).get('Algorithm')
-            digest_value  = policy_id.find(
+            digest_value = policy_id.find(
                 'etsi:SigPolicyHash/ds:DigestValue', namespaces=NS_MAP
             )
         hash_calc = hashlib.new(TransformUsageDigestMethod[hash_method])

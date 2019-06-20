@@ -8,15 +8,17 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     expense_account_id = fields.Many2one(
-        'account.account', 
+        'account.account',
         company_dependent=True,
         string="Default Expense Account for FE invoice import",
         domain=[('deprecated', '=', False)],
         help="The expense account used when importing Costa Rican electronic invoice automatically")
 
-    reimbursable_email = fields.Char(string='Este email se busca en el "to" del correo para marcar la factura como reembolsable', required=False, copy=False, index=True)
+    reimbursable_email = fields.Char(
+        string='Este email se busca en el "to" del correo para marcar la factura como reembolsable', required=False, copy=False, index=True)
 
-    notification_email = fields.Char(string='Dirección a la que se envía cualquier notificación relacionada con FE', required=False, copy=False, index=True)
+    notification_email = fields.Char(
+        string='Dirección a la que se envía cualquier notificación relacionada con FE', required=False, copy=False, index=True)
 
     @api.model
     def get_values(self):
@@ -36,4 +38,3 @@ class ResConfigSettings(models.TransientModel):
         set_param('expense_account_id', self.expense_account_id.id)
         set_param('reimbursable_email', self.reimbursable_email)
         set_param('notification_email', self.notification_email)
-
