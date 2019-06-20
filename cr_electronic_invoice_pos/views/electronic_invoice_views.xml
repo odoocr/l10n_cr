@@ -12,7 +12,7 @@
 			</field>
 		</record>
 
-		<record id="view_pos_config_electronic_invoice_form" model="ir.ui.view">
+		<!--record id="view_pos_config_electronic_invoice_form" model="ir.ui.view">
 			<field name="name">pos.config.electronic.invoice.form</field>
 			<field name="model">pos.config</field>
 			<field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
@@ -25,7 +25,7 @@
 					<field name="return_sequence_id"/>
 				</field>
 			</field>
-		</record>
+		</record-->
 
 		<record id="view_pos_order_electronic_invoice_form" model="ir.ui.view">
 			<field name="name">pos.order.electronic.invoice.form</field>
@@ -235,7 +235,7 @@
             <field name="partner_to">${object.partner_id.id}</field>
             <field name="model_id" ref="point_of_sale.model_pos_order"/>
             <field name="auto_delete" eval="True"/>
-            <field name="report_template" ref="cr_electronic_invoice_pos.pos_orders"/>
+            <!--field name="report_template" ref="cr_electronic_invoice_pos.pos_orders"/-->
             <field name="report_name">FE_${(object.number_electronic or '').replace('/','_')}_${object.state == 'draft' and 'draft' or ''}</field>
             <field name="lang">${object.partner_id.lang}</field>
             <field name="body_html"><![CDATA[

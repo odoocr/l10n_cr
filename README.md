@@ -7,10 +7,6 @@
 #### Debe hacer clone del branch con la versión de Odoo que desea utilizar. 
 
 ##### Odoo V12
-git clone --branch 12.0 --detph 1 --single-branch https://github.com/odoocr/l10n_cr
+BRANCH='12.0'
 
-##### Odoo V11
-git clone --branch 11.0 --detph 1 --single-branch https://github.com/odoocr/l10n_cr
-
-##### Odoo V10
-git clone --branch 10.0 --detph 1 --single-branch https://github.com/odoocr/l10n_cr
+git clone --branch ${BRANCH} --depth 1 --single-branch https://github.com/odoocr/l10n_cr

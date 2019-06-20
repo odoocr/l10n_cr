@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-import requests
+
 import logging
 import re
 import datetime
 import pytz
 import base64
 import json
-from dateutil.parser import parse
-from num2words import num2words
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
 from odoo import models, fields, api, _
@@ -18,6 +16,12 @@ from lxml import etree
 from .. import extensions
 
 _logger = logging.getLogger(__name__)
+
+
+class InvoiceTaxElectronic(models.Model):
+    _inherit = "account.tax"
+
+    tax_code = fields.Char(string="Código de impuesto", required=False, )
 
 
 class AccountInvoiceRefund(models.TransientModel):
@@ -465,18 +469,17 @@ class AccountInvoiceElectronic(models.Model):
                                 detalle_mensaje = 'Aceptado'
                                 tipo = 1
                                 tipo_documento = 'CCE'
-                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.confirmation')
+                                sequence = inv.company_id.CCE_sequence_id.next_by_id()
                             elif inv.state_invoice_partner == '2':
                                 detalle_mensaje = 'Aceptado parcial'
                                 tipo = 2
                                 tipo_documento = 'CPCE'
-                                sequence = inv.env['ir.sequence'].next_by_code(
-                                    'sequece.electronic.doc.partial.confirmation')
+                                sequence = inv.company_id.CPCE_sequence_id.next_by_id()
                             else:
                                 detalle_mensaje = 'Rechazado'
                                 tipo = 3
                                 tipo_documento = 'RCE'
-                                sequence = inv.env['ir.sequence'].next_by_code('sequece.electronic.doc.reject')
+                                sequence = inv.company_id.RCE_sequence_id.next_by_id()
 
                             '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
                             if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error':
@@ -487,8 +490,8 @@ class AccountInvoiceElectronic(models.Model):
 
                             '''Solicitamos la clave para el Mensaje Receptor'''
                             response_json = api_facturae.get_clave_hacienda(self, tipo_documento, sequence,
-                                                                            inv.journal_id.sucursal,
-                                                                            inv.journal_id.terminal)
+                                                                            inv.company_id.sucursal_MR,
+                                                                            inv.company_id.terminal_MR)
 
                             _logger.info('MAB - JSON Clave Mensaje Receptor:%s', response_json)
 
@@ -762,7 +765,7 @@ class AccountInvoiceElectronic(models.Model):
                         fecha_emision_referencia = date_invoice.strftime("%Y-%m-%d") + "T12:00:00-06:00"
 
                 if inv.payment_term_id:
-                    sale_conditions = inv.payment_term_id.sale_conditions_id.sequence or '01'
+                    sale_conditions = inv.payment_term_id.sale_conditions_id and inv.payment_term_id.sale_conditions_id.sequence or '01'
                 else:
                     sale_conditions = '01'
 
@@ -902,7 +905,7 @@ class AccountInvoiceElectronic(models.Model):
                 if tipo_documento == 'FE':
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
                     if inv.company_id.version_hacienda == '4.2':
-                        xml_string_builder = api_facturae.gen_xml_fe_v42(inv,
+                        xml_string_builder = api_facturae.gen_xml_fe_v42(inv, date_cr,
                                                             sale_conditions, medio_pago,
                                                             round(total_servicio_gravado, 5),
                                                             round(total_servicio_exento, 5),
@@ -973,17 +976,17 @@ class AccountInvoiceElectronic(models.Model):
             response_json = api_facturae.send_xml_fe(inv, token_m_h, api_facturae.get_time_hacienda(),
                                                      xml_firmado, inv.company_id.frm_ws_ambiente)
 
-            if response_json.get('resp').get('Status') == 202:
+            if response_json.get('status') == 202:
                 inv.state_tributacion = 'procesando'
                 # inv.date_issuance = api_facturae.get_time_hacienda()
                 # inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
                 # inv.xml_comprobante = xml_firmado
-                inv.electronic_invoice_return_message = response_json.get('resp').get('text')
+                inv.electronic_invoice_return_message = response_json.get('text')
             else:
-                inv.electronic_invoice_return_message = response_json.get('resp').get('text')
+                inv.electronic_invoice_return_message = response_json.get('text')
                 inv.state_tributacion = 'error'
                 _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', inv.number_electronic,
-                              "", response_json.get('resp').get('text'))
+                              "", response_json.get('text'))
 
         _logger.info('MAB - Valida Hacienda - Finalizado Exitosamente')
 
@@ -1046,7 +1049,7 @@ class AccountInvoiceElectronic(models.Model):
                             elif id_code == '04' and len(identificacion) != 10:
                                 raise UserError('La identificación NITE del emisor debe de tener 10 dígitos')
 
-                            if not inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
+                            if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
                                 raise UserError(
                                     'No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para' +
                                     inv.payment_term_id.name)

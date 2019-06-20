@@ -430,11 +430,18 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje, detalle_mensa
     return base64UTF8Decoder(mr_to_base64)
 
 
-def gen_xml_fe_v42(inv, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
+def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
                total_mercaderia_gravado, total_mercaderia_exento, base_total, total_impuestos, total_descuento,
                lines, currency_rate, invoice_comments):
 
     numero_linea = 0
+
+    if inv._name == 'pos.order':
+        plazo_credito = '0'
+        cod_moneda = inv.company_id.currency_id.name
+    else:
+        plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
+        cod_moneda = inv.currency_id.name
 
     sb = StringBuilder()
     sb.Append('<FacturaElectronica xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
@@ -442,8 +449,8 @@ def gen_xml_fe_v42(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     sb.Append('xsi:schemaLocation="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/facturaElectronica ')
     sb.Append('https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/FacturaElectronica_V.4.2.xsd">')
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<NumeroConsecutivo>' + inv.number + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -489,7 +496,7 @@ def gen_xml_fe_v42(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     sb.Append('<CorreoElectronico>' + str(inv.partner_id.email) + '</CorreoElectronico>')
     sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
-    sb.Append('<PlazoCredito>' + str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
+    sb.Append('<PlazoCredito>' + str(plazo_credito) + '</PlazoCredito>')
     sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
@@ -534,7 +541,7 @@ def gen_xml_fe_v42(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
         sb.Append('</LineaDetalle>')
     sb.Append('</DetalleServicio>')
     sb.Append('<ResumenFactura>')
-    sb.Append('<CodigoMoneda>' + str(inv.currency_id.name) + '</CodigoMoneda>')
+    sb.Append('<CodigoMoneda>' + str(cod_moneda) + '</CodigoMoneda>')
     sb.Append('<TipoCambio>' + str(currency_rate) + '</TipoCambio>')
     sb.Append('<TotalServGravados>' + str(total_servicio_gravado) + '</TotalServGravados>')
     sb.Append('<TotalServExentos>' + str(total_servicio_exento) + '</TotalServExentos>')
@@ -627,7 +634,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     sb.Append('<CorreoElectronico>' + str(inv.partner_id.email) + '</CorreoElectronico>')
     sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
-    sb.Append('<PlazoCredito>' + str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
+    sb.Append('<PlazoCredito>' + str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
     sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
@@ -1247,10 +1254,10 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             error_caused_by += response.headers.get('validation-exception', '')
             _logger.info('Status: {}, Text {}'.format(response.status_code, error_caused_by))
 
-            return {'resp': {'Status': response.status_code, 'text': error_caused_by}}
+            return {'status': response.status_code, 'text': error_caused_by}
         else:
             # respuesta_hacienda = response.status_code
-            return {'resp': {'Status': response.status_code, 'text': response.reason}}
+            return {'status': response.status_code, 'text': response.reason}
             # return respuesta_hacienda
 
     except ImportError:
