@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- TODO-->
+        <!-- Secuencias de MR para asignar a la primera compañía.  Si hay más compañías, debemos generar las secuencias-->
         <record id="seq_electronic_doc_confirmation" model="ir.sequence">
             <field name="name">Secuencia de Confirmación de Aceptación Comprobante Electrónico</field>
             <field name="code">sequece.electronic.doc.confirmation</field>
@@ -18,6 +20,13 @@
             <field name="code">sequece.electronic.doc.reject</field>
             <field name="prefix"></field>
             <field name="padding">10</field>
+        </record>
+
+        <!-- Actualizar Compañía con estas secuencias -->
+        <record id="base.main_company" model="res.company">
+            <field name="CCE_sequence_id" ref="seq_electronic_doc_confirmation" />
+            <field name="CPCE_sequence_id" ref="seq_electronic_doc_partial_confirmation" />
+            <field name="RCE_sequence_id" ref="seq_electronic_doc_reject" />
         </record>
     </data>
 </odoo>
