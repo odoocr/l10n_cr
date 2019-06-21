@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<data noupdate="0">
+    <data noupdate="0">
 
         <!--
         Resource: uom.category
@@ -26,8 +26,6 @@
         <record id="uom.product_uom_cm" model="uom.uom">
             <field name="category_id" ref="uom.uom_categ_length"/>
             <field name="name">Centímetro</field>
-            <field name="factor" eval="100"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">cm</field>
             <field name="uom_type">smaller</field>
             <field name="active">True</field>
@@ -36,8 +34,6 @@
         <record id="uom.product_uom_day" model="uom.uom">
             <field name="category_id" ref="uom.uom_categ_wtime"/>
             <field name="name">Día(s)</field>
-            <field name="factor" eval="1"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">d</field>
             <field name="active">True</field>
             <field name="uom_type">reference</field>
@@ -46,8 +42,6 @@
         <record id="uom.product_uom_gram" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_kgm"/>
             <field name="name">Gramo</field>
-            <field name="factor" eval="1000"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">g</field>
             <field name="uom_type">smaller</field>
             <field name="active">True</field>
@@ -56,8 +50,6 @@
         <record id="uom.product_uom_gal" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_vol"/>
             <field name="name">Galón</field>
-            <field name="factor" eval="0.2641721769"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">Gal</field>
             <field name="uom_type">bigger</field>
             <field name="active">True</field>
@@ -66,8 +58,6 @@
         <record id="uom.product_uom_hour" model="uom.uom">
             <field name="category_id" ref="uom.uom_categ_wtime"/>
             <field name="name">Hora(s)</field>
-            <field name="factor" eval="8"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">h</field>
             <field name="uom_type">smaller</field>
             <field name="active">True</field>
@@ -76,8 +66,6 @@
         <record id="uom.product_uom_kgm" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_kgm"/>
             <field name="name">Kilogramo</field>
-            <field name="factor" eval="1"/>
-            <field name="rounding" eval="1"/>
             <field name="code">kg</field>
             <field name="uom_type">reference</field>
             <field name="active">True</field>
@@ -86,8 +74,6 @@
         <record id="uom.product_uom_km" model="uom.uom">
             <field name="category_id" ref="uom.uom_categ_length"/>
             <field name="name">Kilómetro</field>
-            <field name="factor" eval="1"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">km</field>
             <field name="uom_type">bigger</field>
             <field name="active">True</field>
@@ -96,8 +82,6 @@
         <record id="uom.product_uom_litre" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_vol"/>
             <field name="name">Litro</field>
-            <field name="factor" eval="1"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">L</field>
             <field name="uom_type">reference</field>
             <field name="active">True</field>
@@ -106,8 +90,6 @@
         <record id="uom.product_uom_inch" model="uom.uom">
             <field name="category_id" ref="uom.uom_categ_length"/>
             <field name="name">Pulgada</field>
-            <field name="factor" eval="39.3701"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">ln</field>
             <field name="uom_type">smaller</field>
             <field name="active">True</field>
@@ -116,8 +98,6 @@
         <record id="uom.product_uom_meter" model="uom.uom">
             <field name="category_id" ref="uom.uom_categ_length"/>
             <field name="name">Metro</field>
-            <field name="factor" eval="1"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">m</field>
             <field name="uom_type">reference</field>
             <field name="active">True</field>
@@ -126,8 +106,6 @@
         <record id="uom.product_uom_oz" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_kgm"/>
             <field name="name">Onzas</field>
-            <field name="factor" eval="35274"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">Oz</field>
             <field name="uom_type">smaller</field>
             <field name="active">True</field>
@@ -136,8 +114,6 @@
         <record id="uom.product_uom_ton" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_kgm"/>
             <field name="name">Tonelada</field>
-            <field name="factor" eval="1"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">t</field>
             <field name="uom_type">bigger</field>
             <field name="active">True</field>
@@ -146,8 +122,6 @@
         <record id="uom.product_uom_unit" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_unit"/>
             <field name="name">Unidad</field>
-            <field name="factor" eval="1"/>
-            <field name="rounding" eval="1"/>
             <field name="code">Unid</field>
             <field name="uom_type">reference</field>
             <field name="active">True</field>
@@ -200,8 +174,6 @@
         <record id="product_uom_i" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_unit"/>
             <field name="name">Intereses</field>
-            <field name="factor" eval="1.0"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">I</field>
             <field name="uom_type">bigger</field>
         </record>
@@ -236,8 +208,6 @@
         <record id="uom.product_uom_qt" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_vol"/>
             <field name="name">Cuarto(s) de Galón</field>
-            <field name="factor" eval="1.05669"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">cuarto(s) de galón</field>
             <field name="uom_type">smaller</field>
             <field name="active">False</field>
@@ -246,8 +216,6 @@
         <record id="uom.product_uom_dozen" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_unit"/>
             <field name="name">Docena(s)</field>
-            <field name="factor" eval="0.0833333333"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">Docena(s)</field>
             <field name="uom_type">bigger</field>
             <field name="active">False</field>
@@ -256,8 +224,6 @@
        <record id="uom.product_uom_floz" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_vol"/>
             <field name="name">fl oz</field>
-            <field name="factor" eval="33814"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">fl oz</field>
             <field name="uom_type">smaller</field>
             <field name="active">False</field>
@@ -266,8 +232,6 @@
         <record id="uom.product_uom_lb" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_kgm"/>
             <field name="name">Libra(s)</field>
-            <field name="factor" eval="2.20462"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">libra(s)</field>
             <field name="uom_type">smaller</field>
             <field name="active">False</field>
@@ -276,8 +240,6 @@
         <record id="uom.product_uom_mile" model="uom.uom">
             <field name="category_id" ref="uom.uom_categ_length"/>
             <field name="name">Milla(s)</field>
-            <field name="factor" eval="0.0006213727"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">milla(s)</field>
             <field name="uom_type">bigger</field>
             <field name="active">False</field>
@@ -286,14 +248,12 @@
         <record id="uom.product_uom_foot" model="uom.uom">
             <field name="category_id" ref="uom.uom_categ_length"/>
             <field name="name">Pie(s)</field>
-            <field name="factor" eval="3.28084"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">pie(s)</field>
             <field name="uom_type">smaller</field>
             <field name="active">False</field>
         </record>
 
-		<record id="product_uom_mcuadrado" model="uom.uom">
+        <record id="product_uom_mcuadrado" model="uom.uom">
             <field name="category_id" ref="product_uom_categ_area"/>
             <field name="name">Metro Cuadrado</field>
             <field name="factor" eval="1.0"/>
