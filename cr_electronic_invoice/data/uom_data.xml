@@ -50,8 +50,6 @@
         <record id="uom.product_uom_gal" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_vol"/>
             <field name="name">Galón</field>
-            <field name="factor" eval="0.2641721769"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">Gal</field>
             <field name="uom_type">bigger</field>
             <field name="active">True</field>
@@ -210,8 +208,6 @@
         <record id="uom.product_uom_qt" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_vol"/>
             <field name="name">Cuarto(s) de Galón</field>
-            <field name="factor" eval="1.05669"/>
-            <field name="rounding" eval="0.01"/>
             <field name="code">cuarto(s) de galón</field>
             <field name="uom_type">smaller</field>
             <field name="active">False</field>
