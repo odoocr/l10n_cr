@@ -449,5 +449,17 @@
             <field name="iva_tax_code">N/A</field>
         </record>
 
+        <record id="service_tax_sale" 
+            model="account.tax">
+            <field name="tax_code">service</field>
+            <field name="name">Impuesto de Servicio</field>
+            <field name="amount">10</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">Impuesto de servicio utilizado por los restraurantes</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+            <field name="iva_tax_desc">N/A</field>
+            <field name="iva_tax_code">06</field>
+        </record>
     </data>
 </odoo>
