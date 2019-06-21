@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<data noupdate="0">
+    <data noupdate="0">
 
         <!--
         Resource: uom.category
@@ -253,7 +253,7 @@
             <field name="active">False</field>
         </record>
 
-		<record id="product_uom_mcuadrado" model="uom.uom">
+        <record id="product_uom_mcuadrado" model="uom.uom">
             <field name="category_id" ref="product_uom_categ_area"/>
             <field name="name">Metro Cuadrado</field>
             <field name="factor" eval="1.0"/>
