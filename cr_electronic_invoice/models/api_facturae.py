@@ -670,7 +670,6 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     numero_linea = 0
 
     sb = StringBuilder()
-    #sb.Append('<?xml version="1.0" encoding="utf-8"?>')
     sb.Append('<FacturaElectronica xmlns="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/facturaElectronica" ')
     sb.Append(
         'xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ')

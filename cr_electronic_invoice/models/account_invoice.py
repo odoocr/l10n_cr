@@ -1023,12 +1023,16 @@ class AccountInvoiceElectronic(models.Model):
                         otros_cargos[otros_cargos_id]['TipoDocumento'] = inv.line.product_id.default_code
 
                         # TODO: Cómo meter esto en la línea
-                        # otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.partner_id.vat
-                        # otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.partner_id.name
+
+                        #otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.partner_id.vat
+                        #otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.partner_id.name
+
                         otros_cargos[otros_cargos_id]['Detalle'] = escape(
                             inv_line.name[:160])
                         otros_cargos[otros_cargos_id]['MontoCargo'] = inv_line.total_amount
+
                     else:
+
                         line_number += 1
                         #price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
                         price = inv_line.price_unit
