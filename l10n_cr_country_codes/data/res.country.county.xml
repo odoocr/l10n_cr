@@ -1,410 +1,572 @@
 <?xml version="1.0"?>
 <odoo>
     <data noupdate="1">
-        <record id="county_san_jose_sj" model="res.country.county">
+        <record id="county_san_jose_sj"
+                model="res.country.county">
             <field name="code">01</field>
             <field name="name">San José</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_alajuelita_sj" model="res.country.county">
+        <record id="county_alajuelita_sj"
+                model="res.country.county">
             <field name="code">10</field>
             <field name="name">Alajuelita</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_vasquez_de_coronado_sj" model="res.country.county">
+        <record id="county_vasquez_de_coronado_sj"
+                model="res.country.county">
             <field name="code">11</field>
             <field name="name">Vásquez de Coronado</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_acosta_sj" model="res.country.county">
+        <record id="county_acosta_sj"
+                model="res.country.county">
             <field name="code">12</field>
             <field name="name">Acosta</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_tibas_sj" model="res.country.county">
+        <record id="county_tibas_sj"
+                model="res.country.county">
             <field name="code">13</field>
             <field name="name">Tibás</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_moravia_sj" model="res.country.county">
+        <record id="county_moravia_sj"
+                model="res.country.county">
             <field name="code">14</field>
             <field name="name">Moravia</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_montes_de_oca_sj" model="res.country.county">
+        <record id="county_montes_de_oca_sj"
+                model="res.country.county">
             <field name="code">15</field>
             <field name="name">Montes de Oca</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_turrubares_sj" model="res.country.county">
+        <record id="county_turrubares_sj"
+                model="res.country.county">
             <field name="code">16</field>
             <field name="name">Turrubares</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_dota_sj" model="res.country.county">
+        <record id="county_dota_sj"
+                model="res.country.county">
             <field name="code">17</field>
             <field name="name">Dota</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_curridabat_sj" model="res.country.county">
+        <record id="county_curridabat_sj"
+                model="res.country.county">
             <field name="code">18</field>
             <field name="name">Curridabat</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_perez_zeledon_sj" model="res.country.county">
+        <record id="county_perez_zeledon_sj"
+                model="res.country.county">
             <field name="code">19</field>
             <field name="name">Pérez Zeledón</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_escazu_sj" model="res.country.county">
+        <record id="county_escazu_sj"
+                model="res.country.county">
             <field name="code">02</field>
             <field name="name">Escazú</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_leon_cortez_castro_sj" model="res.country.county">
+        <record id="county_leon_cortez_castro_sj"
+                model="res.country.county">
             <field name="code">20</field>
             <field name="name">León Cortéz Castro</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_desamparados_sj" model="res.country.county">
+        <record id="county_desamparados_sj"
+                model="res.country.county">
             <field name="code">03</field>
             <field name="name">Desamparados</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_puriscal_sj" model="res.country.county">
+        <record id="county_puriscal_sj"
+                model="res.country.county">
             <field name="code">04</field>
             <field name="name">Puriscal</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_tarrazu_sj" model="res.country.county">
+        <record id="county_tarrazu_sj"
+                model="res.country.county">
             <field name="code">05</field>
             <field name="name">Tarrazú</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_aserri_sj" model="res.country.county">
+        <record id="county_aserri_sj"
+                model="res.country.county">
             <field name="code">06</field>
             <field name="name">Aserrí</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_mora_sj" model="res.country.county">
+        <record id="county_mora_sj"
+                model="res.country.county">
             <field name="code">07</field>
             <field name="name">Mora</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_goicoechea_sj" model="res.country.county">
+        <record id="county_goicoechea_sj"
+                model="res.country.county">
             <field name="code">08</field>
             <field name="name">Goicoechea</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_santa_ana_sj" model="res.country.county">
+        <record id="county_santa_ana_sj"
+                model="res.country.county">
             <field name="code">09</field>
             <field name="name">Santa Ana</field>
-            <field name="state_id" ref="state_sj"/>
+            <field name="state_id"
+                   ref="state_sj"/>
         </record>
-        <record id="county_alajuela_a" model="res.country.county">
+        <record id="county_alajuela_a"
+                model="res.country.county">
             <field name="code">01</field>
             <field name="name">Alajuela</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_san_carlos_a" model="res.country.county">
+        <record id="county_san_carlos_a"
+                model="res.country.county">
             <field name="code">10</field>
             <field name="name">San Carlos</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_zarcero_a" model="res.country.county">
+        <record id="county_zarcero_a"
+                model="res.country.county">
             <field name="code">11</field>
             <field name="name">Zarcero</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_valverde_vega_a" model="res.country.county">
+        <record id="county_valverde_vega_a"
+                model="res.country.county">
             <field name="code">12</field>
             <field name="name">Valverde Vega</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_upala_a" model="res.country.county">
+        <record id="county_upala_a"
+                model="res.country.county">
             <field name="code">13</field>
             <field name="name">Upala</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_los_chiles_a" model="res.country.county">
+        <record id="county_los_chiles_a"
+                model="res.country.county">
             <field name="code">14</field>
             <field name="name">Los Chiles</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_guatuso_a" model="res.country.county">
+        <record id="county_guatuso_a"
+                model="res.country.county">
             <field name="code">15</field>
             <field name="name">Guatuso</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_san_ramon_a" model="res.country.county">
+        <record id="county_san_ramon_a"
+                model="res.country.county">
             <field name="code">02</field>
             <field name="name">San Ramón</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_grecia_a" model="res.country.county">
+        <record id="county_grecia_a"
+                model="res.country.county">
             <field name="code">03</field>
             <field name="name">Grecia</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_san_mateo_a" model="res.country.county">
+        <record id="county_san_mateo_a"
+                model="res.country.county">
             <field name="code">04</field>
             <field name="name">San Mateo</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_atenas_a" model="res.country.county">
+        <record id="county_atenas_a"
+                model="res.country.county">
             <field name="code">05</field>
             <field name="name">Atenas</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_naranjo_a" model="res.country.county">
+        <record id="county_naranjo_a"
+                model="res.country.county">
             <field name="code">06</field>
             <field name="name">Naranjo</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_palmares_a" model="res.country.county">
+        <record id="county_palmares_a"
+                model="res.country.county">
             <field name="code">07</field>
             <field name="name">Palmares</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_poas_a" model="res.country.county">
+        <record id="county_poas_a"
+                model="res.country.county">
             <field name="code">08</field>
             <field name="name">Poás</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_orotina_a" model="res.country.county">
+        <record id="county_orotina_a"
+                model="res.country.county">
             <field name="code">09</field>
             <field name="name">Orotina</field>
-            <field name="state_id" ref="state_a"/>
+            <field name="state_id"
+                   ref="state_a"/>
         </record>
-        <record id="county_cartago_c" model="res.country.county">
+        <record id="county_cartago_c"
+                model="res.country.county">
             <field name="code">01</field>
             <field name="name">Cartago</field>
-            <field name="state_id" ref="state_c"/>
+            <field name="state_id"
+                   ref="state_c"/>
         </record>
-        <record id="county_paraiso_c" model="res.country.county">
+        <record id="county_paraiso_c"
+                model="res.country.county">
             <field name="code">02</field>
             <field name="name">Paraíso</field>
-            <field name="state_id" ref="state_c"/>
+            <field name="state_id"
+                   ref="state_c"/>
         </record>
-        <record id="county_la_union_c" model="res.country.county">
+        <record id="county_la_union_c"
+                model="res.country.county">
             <field name="code">03</field>
             <field name="name">La Unión</field>
-            <field name="state_id" ref="state_c"/>
+            <field name="state_id"
+                   ref="state_c"/>
         </record>
-        <record id="county_jimenez_c" model="res.country.county">
+        <record id="county_jimenez_c"
+                model="res.country.county">
             <field name="code">04</field>
             <field name="name">Jiménez</field>
-            <field name="state_id" ref="state_c"/>
+            <field name="state_id"
+                   ref="state_c"/>
         </record>
-        <record id="county_turrialba_c" model="res.country.county">
+        <record id="county_turrialba_c"
+                model="res.country.county">
             <field name="code">05</field>
             <field name="name">Turrialba</field>
-            <field name="state_id" ref="state_c"/>
+            <field name="state_id"
+                   ref="state_c"/>
         </record>
-        <record id="county_alvarado_c" model="res.country.county">
+        <record id="county_alvarado_c"
+                model="res.country.county">
             <field name="code">06</field>
             <field name="name">Alvarado</field>
-            <field name="state_id" ref="state_c"/>
+            <field name="state_id"
+                   ref="state_c"/>
         </record>
-        <record id="county_oreamuno_c" model="res.country.county">
+        <record id="county_oreamuno_c"
+                model="res.country.county">
             <field name="code">07</field>
             <field name="name">Oreamuno</field>
-            <field name="state_id" ref="state_c"/>
+            <field name="state_id"
+                   ref="state_c"/>
         </record>
-        <record id="county_el_guarco_c" model="res.country.county">
+        <record id="county_el_guarco_c"
+                model="res.country.county">
             <field name="code">08</field>
             <field name="name">El Guarco</field>
-            <field name="state_id" ref="state_c"/>
+            <field name="state_id"
+                   ref="state_c"/>
         </record>
-        <record id="county_heredia_h" model="res.country.county">
+        <record id="county_heredia_h"
+                model="res.country.county">
             <field name="code">01</field>
             <field name="name">Heredia</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_sarapiqui_h" model="res.country.county">
+        <record id="county_sarapiqui_h"
+                model="res.country.county">
             <field name="code">10</field>
             <field name="name">Sarapiquí</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_barva_h" model="res.country.county">
+        <record id="county_barva_h"
+                model="res.country.county">
             <field name="code">02</field>
             <field name="name">Barva</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_santo_domingo_h" model="res.country.county">
+        <record id="county_santo_domingo_h"
+                model="res.country.county">
             <field name="code">03</field>
             <field name="name">Santo Domingo</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_santa_barbara_h" model="res.country.county">
+        <record id="county_santa_barbara_h"
+                model="res.country.county">
             <field name="code">04</field>
             <field name="name">Santa Bárbara</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_san_rafael_h" model="res.country.county">
+        <record id="county_san_rafael_h"
+                model="res.country.county">
             <field name="code">05</field>
             <field name="name">San Rafaél</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_san_isidro_h" model="res.country.county">
+        <record id="county_san_isidro_h"
+                model="res.country.county">
             <field name="code">06</field>
             <field name="name">San Isidro</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_belen_h" model="res.country.county">
+        <record id="county_belen_h"
+                model="res.country.county">
             <field name="code">07</field>
             <field name="name">Belén</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_flores_h" model="res.country.county">
+        <record id="county_flores_h"
+                model="res.country.county">
             <field name="code">08</field>
             <field name="name">Flores</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_san_pablo_h" model="res.country.county">
+        <record id="county_san_pablo_h"
+                model="res.country.county">
             <field name="code">09</field>
             <field name="name">San Pablo</field>
-            <field name="state_id" ref="state_h"/>
+            <field name="state_id"
+                   ref="state_h"/>
         </record>
-        <record id="county_liberia_g" model="res.country.county">
+        <record id="county_liberia_g"
+                model="res.country.county">
             <field name="code">01</field>
             <field name="name">Liberia</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_la_cruz_g" model="res.country.county">
+        <record id="county_la_cruz_g"
+                model="res.country.county">
             <field name="code">10</field>
             <field name="name">La Cruz</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_hojancha_g" model="res.country.county">
+        <record id="county_hojancha_g"
+                model="res.country.county">
             <field name="code">11</field>
             <field name="name">Hojancha</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_nicoya_g" model="res.country.county">
+        <record id="county_nicoya_g"
+                model="res.country.county">
             <field name="code">02</field>
             <field name="name">Nicoya</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_santa_cruz_g" model="res.country.county">
+        <record id="county_santa_cruz_g"
+                model="res.country.county">
             <field name="code">03</field>
             <field name="name">Santa Cruz</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_bagaces_g" model="res.country.county">
+        <record id="county_bagaces_g"
+                model="res.country.county">
             <field name="code">04</field>
             <field name="name">Bagaces</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_carrillo_g" model="res.country.county">
+        <record id="county_carrillo_g"
+                model="res.country.county">
             <field name="code">05</field>
             <field name="name">Carrillo</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_canas_g" model="res.country.county">
+        <record id="county_canas_g"
+                model="res.country.county">
             <field name="code">06</field>
             <field name="name">Cañas</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_abangares_g" model="res.country.county">
+        <record id="county_abangares_g"
+                model="res.country.county">
             <field name="code">07</field>
             <field name="name">Abangáres</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_tilaran_g" model="res.country.county">
+        <record id="county_tilaran_g"
+                model="res.country.county">
             <field name="code">08</field>
             <field name="name">Tilarán</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_nandayure_g" model="res.country.county">
+        <record id="county_nandayure_g"
+                model="res.country.county">
             <field name="code">09</field>
             <field name="name">Nandayure</field>
-            <field name="state_id" ref="state_g"/>
+            <field name="state_id"
+                   ref="state_g"/>
         </record>
-        <record id="county_puntarenas_p" model="res.country.county">
+        <record id="county_puntarenas_p"
+                model="res.country.county">
             <field name="code">01</field>
             <field name="name">Puntarenas</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_corredores_p" model="res.country.county">
+        <record id="county_corredores_p"
+                model="res.country.county">
             <field name="code">10</field>
             <field name="name">Corredores</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_garabito_p" model="res.country.county">
+        <record id="county_garabito_p"
+                model="res.country.county">
             <field name="code">11</field>
             <field name="name">Garabito</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_esparza_p" model="res.country.county">
+        <record id="county_esparza_p"
+                model="res.country.county">
             <field name="code">02</field>
             <field name="name">Esparza</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_buenos_aires_p" model="res.country.county">
+        <record id="county_buenos_aires_p"
+                model="res.country.county">
             <field name="code">03</field>
             <field name="name">Buenos Aires</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_montes_de_oro_p" model="res.country.county">
+        <record id="county_montes_de_oro_p"
+                model="res.country.county">
             <field name="code">04</field>
             <field name="name">Montes de Oro</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_osa_p" model="res.country.county">
+        <record id="county_osa_p"
+                model="res.country.county">
             <field name="code">05</field>
             <field name="name">Osa</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_aguirre_p" model="res.country.county">
+        <record id="county_aguirre_p"
+                model="res.country.county">
             <field name="code">06</field>
             <field name="name">Aguirre</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_golfito_p" model="res.country.county">
+        <record id="county_golfito_p"
+                model="res.country.county">
             <field name="code">07</field>
             <field name="name">Golfito</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_coto_brus_p" model="res.country.county">
+        <record id="county_coto_brus_p"
+                model="res.country.county">
             <field name="code">08</field>
             <field name="name">Coto Brus</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_parrita_p" model="res.country.county">
+        <record id="county_parrita_p"
+                model="res.country.county">
             <field name="code">09</field>
             <field name="name">Parrita</field>
-            <field name="state_id" ref="state_p"/>
+            <field name="state_id"
+                   ref="state_p"/>
         </record>
-        <record id="county_limon_l" model="res.country.county">
+        <record id="county_limon_l"
+                model="res.country.county">
             <field name="code">01</field>
             <field name="name">Limón</field>
-            <field name="state_id" ref="state_l"/>
+            <field name="state_id"
+                   ref="state_l"/>
         </record>
-        <record id="county_pococi_l" model="res.country.county">
+        <record id="county_pococi_l"
+                model="res.country.county">
             <field name="code">02</field>
             <field name="name">Pococí</field>
-            <field name="state_id" ref="state_l"/>
+            <field name="state_id"
+                   ref="state_l"/>
         </record>
-        <record id="county_siquirres_l" model="res.country.county">
+        <record id="county_siquirres_l"
+                model="res.country.county">
             <field name="code">03</field>
             <field name="name">Siquirres</field>
-            <field name="state_id" ref="state_l"/>
+            <field name="state_id"
+                   ref="state_l"/>
         </record>
-        <record id="county_talamanca_l" model="res.country.county">
+        <record id="county_talamanca_l"
+                model="res.country.county">
             <field name="code">04</field>
             <field name="name">Talamanca</field>
-            <field name="state_id" ref="state_l"/>
+            <field name="state_id"
+                   ref="state_l"/>
         </record>
-        <record id="county_matina_l" model="res.country.county">
+        <record id="county_matina_l"
+                model="res.country.county">
             <field name="code">05</field>
             <field name="name">Matina</field>
-            <field name="state_id" ref="state_l"/>
+            <field name="state_id"
+                   ref="state_l"/>
         </record>
-        <record id="county_guacimo_l" model="res.country.county">
+        <record id="county_guacimo_l"
+                model="res.country.county">
             <field name="code">06</field>
             <field name="name">Guácimo</field>
-            <field name="state_id" ref="state_l"/>
+            <field name="state_id"
+                   ref="state_l"/>
         </record>
     </data>
 </odoo>

@@ -58,4 +58,4 @@ docs/_build/
 .DS_Store
 
 # VS Code
-.vscode
+.vscode/

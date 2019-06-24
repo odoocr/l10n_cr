@@ -10,4 +10,3 @@ class CodeTypeProduct(models.Model):
 
     code = fields.Char(string="Código", required=False, )
     name = fields.Char(string="Nombre", required=False, )
-

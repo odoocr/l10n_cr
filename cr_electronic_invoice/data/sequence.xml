@@ -21,5 +21,12 @@
             <field name="prefix"></field>
             <field name="padding">10</field>
         </record>
+
+        <!-- Actualizar Compañía con estas secuencias -->
+        <record id="base.main_company" model="res.company">
+            <field name="CCE_sequence_id" ref="seq_electronic_doc_confirmation" />
+            <field name="CPCE_sequence_id" ref="seq_electronic_doc_partial_confirmation" />
+            <field name="RCE_sequence_id" ref="seq_electronic_doc_reject" />
+        </record>
     </data>
 </odoo>
