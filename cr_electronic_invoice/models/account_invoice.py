@@ -155,6 +155,9 @@ class InvoiceLineElectronic(models.Model):
     exoneration_id = fields.Many2one(
         comodel_name="exoneration", string="Exoneración", required=False, )
 
+    third_party_id = fields.Many2one(comodel_name="res_partner",
+                                     string="Tercero otros cargos",)
+
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
