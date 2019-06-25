@@ -777,7 +777,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
 
         sb.Append('<LineaDetalle>')
         sb.Append('<NumeroLinea>' + str(numero_linea) + '</NumeroLinea>')
-        #sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
+        # sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
                   str(v['unidadMedida']) + '</UnidadMedida>')
@@ -833,30 +833,41 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     # TODO: ¿Cómo implementar otros cargos a nivel de UI y model en Odoo?
     if otrosCargos:
         sb.Append('<OtrosCargos>')
-        response_json = json.loads(otrosCargos)
-        for (k, v) in response_json.items():
+        for otro_cargo in otrosCargos:
             sb.Append('<TipoDocumento>' +
-                      str(v['TipoDocumento']) + '<TipoDocumento>')
+                      str(otrosCargos[otro_cargo]['TipoDocumento']) +
+                      '</TipoDocumento>')
 
-            if v.get('NumeroIdentidadTercero'):
+            if otrosCargos[otro_cargo].get('NumeroIdentidadTercero'):
                 sb.Append('<NumeroIdentidadTercero>' +
-                          str(v['NumeroIdentidadTercero']) + '<NumeroIdentidadTercero>')
+                          str(otrosCargos[otro_cargo]['NumeroIdentidadTercero']) +
+                          '</NumeroIdentidadTercero>')
 
-            if v.get('NombreTercero'):
+            if otrosCargos[otro_cargo].get('NombreTercero'):
                 sb.Append('<NombreTercero>' +
-                          str(v['NombreTercero']) + '<NombreTercero>')
+                          str(otrosCargos[otro_cargo]['NombreTercero']) +
+                          '</NombreTercero>')
 
-            sb.Append('<Detalle>' + str(v['Detalle']) + '<Detalle>')
-            if v.get('Porcentaje'):
+            sb.Append('<Detalle>' +
+                      str(otrosCargos[otro_cargo]['Detalle']) +
+                      '</Detalle>')
+
+            if otrosCargos[otro_cargo].get('Porcentaje'):
                 sb.Append('<Porcentaje>' +
-                          str(v['Porcentaje']) + '<Porcentaje>')
+                          str(otrosCargos[otro_cargo]['Porcentaje']) +
+                          '</Porcentaje>')
 
-            sb.Append('<MontoCargo>' + str(v['MontoCargo']) + '<MontoCargo>')
+            sb.Append('<MontoCargo>' +
+                      str(otrosCargos[otro_cargo]['MontoCargo']) +
+                      '</MontoCargo>')
         sb.Append('</OtrosCargos>')
 
     sb.Append('<ResumenFactura>')
-    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' + str(inv.currency_id.name) + '</CodigoMoneda><TipoCambio>' + str(
-        currency_rate) + '</TipoCambio></CodigoTipoMoneda>')
+    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
+              str(inv.currency_id.name) +
+              '</CodigoMoneda><TipoCambio>' +
+              str(currency_rate) +
+              '</TipoCambio></CodigoTipoMoneda>')
 
     sb.Append('<TotalServGravados>' +
               str(total_servicio_gravado) + '</TotalServGravados>')

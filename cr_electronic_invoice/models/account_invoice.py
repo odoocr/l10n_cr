@@ -155,6 +155,9 @@ class InvoiceLineElectronic(models.Model):
     exoneration_id = fields.Many2one(
         comodel_name="exoneration", string="Exoneración", required=False, )
 
+    third_party_id = fields.Many2one(comodel_name="res_partner",
+                                     string="Tercero otros cargos",)
+
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -1112,8 +1115,11 @@ class AccountInvoiceElectronic(models.Model):
                     # Revisamos si está línea es de Otros Cargos
                     if inv_line.product_id.categ_id.name == 'Otros Cargos':
                         otros_cargos_id += 1
+                        if otros_cargos_id not in otros_cargos:
+                            otros_cargos[otros_cargos_id] = dict()
+
                         otros_cargos[otros_cargos_id][
-                            'TipoDocumento'] = inv.line.product_id.default_code
+                            'TipoDocumento'] = inv_line.product_id.default_code
 
                         # TODO: Cómo meter esto en la línea
 
@@ -1311,7 +1317,7 @@ class AccountInvoiceElectronic(models.Model):
                             total_descuento=total_descuento,
                             lines=json.dumps(
                                 lines, ensure_ascii=False),
-                            otrosCargos=False,
+                            otrosCargos=otros_cargos,
                             currency_rate=currency_rate,
                             invoice_comments=invoice_comments)
 

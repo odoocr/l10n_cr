@@ -30,18 +30,21 @@
                             placeholder="Canton" 
                             options='{"no_open": True, "no_create": True}' 
                             attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)], 'invisible': [('country_id','!=',%(base.cr)d)]}" 
+                            domain="[('state_id', '=', state_id)]"
                             context="{'country_id': country_id, 'state_id': state_id, 'zip': zip}"/>
                         <field name="district_id" 
                             class="o_address_state" 
                             placeholder="District" 
                             options='{"no_open": True, "no_create": True}' 
-                            attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)], 'invisible': [('country_id','!=',%(base.cr)d)]}" 
+                            attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)], 'invisible': [('country_id','!=',%(base.cr)d)]}"
+                            domain="[('county_id', '=', county_id)]" 
                             context="{'country_id': country_id, 'state_id': state_id, 'county_id': county_id, 'zip': zip}"/>
                         <field name="neighborhood_id" 
                             class="o_address_state" 
                             placeholder="Neighborhood" 
                             options='{"no_open": True, "no_create": True}' 
                             attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)], 'invisible': [('country_id','!=',%(base.cr)d)]}" 
+                            domain="[('district_id', '=', district_id)]" 
                             context="{'country_id': country_id, 'state_id': state_id, 'county_id': county_id, 'district_id': district_id, 'zip': zip}"/>
                     </xpath>
 
