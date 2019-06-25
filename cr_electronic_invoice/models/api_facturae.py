@@ -68,7 +68,7 @@ def limit(str, limit):
 def get_mr_sequencevalue(inv):
     '''Verificamos si el ID del mensaje receptor es válido'''
     mr_mensaje_id = int(inv.state_invoice_partner)
-    if mr_mensaje_id < 1 and mr_mensaje_id > 3:
+    if mr_mensaje_id < 1 or mr_mensaje_id > 3:
         raise UserError('El ID del mensaje receptor es inválido.')
     elif mr_mensaje_id is None:
         raise UserError('No se ha proporcionado un ID válido para el MR.')
@@ -76,20 +76,20 @@ def get_mr_sequencevalue(inv):
     if inv.state_invoice_partner == '1':
         detalle_mensaje = 'Aceptado'
         tipo = 1
-        tipo_documento = fe_enums.TipoDocumento.CCE.name
+        tipo_documento = fe_enums.TipoDocumento['CCE']
         sequence = inv.env['ir.sequence'].next_by_code(
             'sequece.electronic.doc.confirmation')
 
     elif inv.state_invoice_partner == '2':
         detalle_mensaje = 'Aceptado parcial'
         tipo = 2
-        tipo_documento = fe_enums.TipoDocumento.CPCE.name
+        tipo_documento = fe_enums.TipoDocumento['CPCE']
         sequence = inv.env['ir.sequence'].next_by_code(
             'sequece.electronic.doc.partial.confirmation')
     else:
         detalle_mensaje = 'Rechazado'
         tipo = 3
-        tipo_documento = fe_enums.TipoDocumento.RCE.name
+        tipo_documento = fe_enums.TipoDocumento['RCE']
         sequence = inv.env['ir.sequence'].next_by_code(
             'sequece.electronic.doc.reject')
 
@@ -98,20 +98,7 @@ def get_mr_sequencevalue(inv):
 
 def get_consecutivo_hacienda(tipo_documento, consecutivo, sucursal_id, terminal_id):
 
-    if tipo_documento == 'FE':
-        tipo_doc = fe_enums.TipoDocumento.FE.value
-    elif tipo_documento == 'NC':
-        tipo_doc = fe_enums.TipoDocumento.NC.value
-    elif tipo_documento == 'ND':
-        tipo_doc = fe_enums.TipoDocumento.ND.value
-    elif tipo_documento == 'TE':
-        tipo_doc = fe_enums.TipoDocumento.TE.value
-    elif tipo_documento == 'CCE':
-        tipo_doc = fe_enums.TipoDocumento.CCE.value
-    elif tipo_documento == 'CPCE':
-        tipo_doc = fe_enums.TipoDocumento.CPCE.value
-    else:
-        tipo_doc = fe_enums.TipoDocumento.RCE.value
+    tipo_doc = fe_enums.TipoDocumento[tipo_documento]
 
     inv_consecutivo = str(consecutivo).zfill(10)
     inv_sucursal = str(sucursal_id).zfill(3)
@@ -124,20 +111,7 @@ def get_consecutivo_hacienda(tipo_documento, consecutivo, sucursal_id, terminal_
 
 def get_clave_hacienda(self, tipo_documento, consecutivo, sucursal_id, terminal_id, situacion='normal'):
 
-    if tipo_documento == 'FE':
-        tipo_doc = fe_enums.TipoDocumento.FE.value
-    elif tipo_documento == 'NC':
-        tipo_doc = fe_enums.TipoDocumento.NC.value
-    elif tipo_documento == 'ND':
-        tipo_doc = fe_enums.TipoDocumento.ND.value
-    elif tipo_documento == 'TE':
-        tipo_doc = fe_enums.TipoDocumento.TE.value
-    elif tipo_documento == 'CCE':
-        tipo_doc = fe_enums.TipoDocumento.CCE.value
-    elif tipo_documento == 'CPCE':
-        tipo_doc = fe_enums.TipoDocumento.CPCE.value
-    else:
-        tipo_doc = fe_enums.TipoDocumento.RCE.value
+    tipo_doc = fe_enums.TipoDocumento[tipo_documento]
 
     '''Verificamos si el consecutivo indicado corresponde a un numero'''
     inv_consecutivo = re.sub('[^0-9]', '', consecutivo)
@@ -177,13 +151,8 @@ def get_clave_hacienda(self, tipo_documento, consecutivo, sucursal_id, terminal_
     cedula_emisor = limit(inv_cedula, 20)
 
     '''Validamos la situación del comprobante electrónico'''
-    if situacion == 'normal':
-        situacion_comprobante = fe_enums.SituacionComprobante.normal.value
-    elif situacion == 'contingencia':
-        situacion_comprobante = fe_enums.SituacionComprobante.contingencia.value
-    elif situacion == 'sininternet':
-        situacion_comprobante = fe_enums.SituacionComprobante.sininternet.value
-    else:
+    situacion_comprobante = fe_enums.SituacionComprobante.get(situacion)
+    if not situacion_comprobante:
         raise UserError(
             'La situación indicada para el comprobante electŕonico es inválida: ' + situacion)
 
@@ -228,16 +197,13 @@ def get_token_hacienda(inv, tipo_ambiente):
         headers = {}
         data = {'client_id': tipo_ambiente,
                 'client_secret': '',
-                'grant_type': fe_enums.GrandTypes.TypePassword.value,
+                'grant_type': 'password',
                 'username': inv.company_id.frm_ws_identificador,
                 'password': inv.company_id.frm_ws_password
                 }
 
         # establecer el ambiente al cual me voy a conectar
-        if tipo_ambiente == 'api-stag':
-            endpoint = fe_enums.UrlHaciendaToken.apistag.value
-        else:
-            endpoint = fe_enums.UrlHaciendaToken.apiprod.value
+        endpoint = fe_enums.UrlHaciendaToken[tipo_ambiente]
 
         try:
             # enviando solicitud post y guardando la respuesta como un objeto json
@@ -270,15 +236,12 @@ def refresh_token_hacienda(tipo_ambiente, token):
     headers = {}
     data = {'client_id': tipo_ambiente,
             'client_secret': '',
-            'grant_type': fe_enums.GrandTypes.TypeRefresh.value,
+            'grant_type': 'refresh_token',
             'refresh_token': token
             }
 
     # establecer el ambiente al cual me voy a conectar
-    if tipo_ambiente == 'api-stag':
-        endpoint = fe_enums.UrlHaciendaToken.apistag.value
-    else:
-        endpoint = fe_enums.UrlHaciendaToken.apiprod.value
+    endpoint = fe_enums.UrlHaciendaToken[tipo_ambiente]
 
     try:
         # enviando solicitud post y guardando la respuesta como un objeto json
@@ -544,7 +507,7 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago,
               str(inv.company_id.email) + '</CorreoElectronico>')
     sb.Append('</Emisor>')
 
-    vat = inv.partner_id and re.sub('[^0-9]', '', inv.partner_id.vat)
+    vat = inv.partner_id and inv.partner_id.vat and re.sub('[^0-9]', '', inv.partner_id.vat)
     if inv.partner_id and vat:
         if not inv.partner_id.identification_id:
             if len(vat) == 9:  # cedula fisica
@@ -664,13 +627,13 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago,
     sb.Append('<TotalVenta>' + str(total_servicio_gravado + total_mercaderia_gravado +
                                    total_servicio_exento + total_mercaderia_exento) + '</TotalVenta>')
     sb.Append('<TotalDescuentos>' +
-              str(round(total_descuento, 2)) + '</TotalDescuentos>')
+              str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' +
-              str(round(base_total, 2)) + '</TotalVentaNeta>')
+              str(round(base_total, 5)) + '</TotalVentaNeta>')
     sb.Append('<TotalImpuesto>' +
-              str(round(total_impuestos, 2)) + '</TotalImpuesto>')
+              str(round(total_impuestos, 5)) + '</TotalImpuesto>')
     sb.Append('<TotalComprobante>' + str(round(base_total +
-                                               total_impuestos, 2)) + '</TotalComprobante>')
+                                               total_impuestos, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
     sb.Append('<Normativa>')
     sb.Append('<NumeroResolucion>DGT-R-48-2016</NumeroResolucion>')
@@ -1123,12 +1086,13 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_s
 
     sb.Append('</FacturaElectronica>')
 
-    felectronica_bytes = str(sb)
+    #felectronica_bytes = str(sb)
 
-    return stringToBase64(felectronica_bytes)
+    #return stringToBase64(felectronica_bytes)
+    return sb
 
 
-def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
+def gen_xml_te(inv, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
                total_mercaderia_gravado, total_mercaderia_exento, base_total, total_impuestos, total_descuento,
                lines, currency_rate, invoice_comments):
 
@@ -1143,7 +1107,7 @@ def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
     sb.Append('xsi:schemaLocation="https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.2/TiqueteElectronico_V4.2.xsd">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + date + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
@@ -1265,9 +1229,10 @@ def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
 
     sb.Append('</TiqueteElectronico>')
 
-    telectronico_bytes = str(sb)
+    #telectronico_bytes = str(sb)
+    #return stringToBase64(telectronico_bytes)
+    return sb
 
-    return stringToBase64(telectronico_bytes)
 
 
 def gen_xml_nc_v43(
@@ -2061,10 +2026,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
                token, 'Content-type': 'application/json'}
 
     # establecer el ambiente al cual me voy a conectar
-    if tipo_ambiente == 'api-stag':
-        endpoint = fe_enums.UrlHaciendaRecepcion.apistag.value
-    else:
-        endpoint = fe_enums.UrlHaciendaRecepcion.apiprod.value
+    endpoint = fe_enums.UrlHaciendaRecepcion[tipo_ambiente]
 
     xml_base64 = stringToBase64(xml)
 
@@ -2192,15 +2154,9 @@ class StringBuilder:
         return self._file_str.getvalue()
 
 
-def consulta_clave(clave, token, env):
+def consulta_clave(clave, token, tipo_ambiente):
 
-    if env == 'api-stag':
-        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/' + clave
-    elif env == 'api-prod':
-        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/' + clave
-    else:
-        _logger.error('MAB - Ambiente no definido')
-        return
+    endpoint = fe_enums.UrlHaciendaRecepcion[tipo_ambiente] + clave
 
     headers = {
         'Authorization': 'Bearer {}'.format(token),
@@ -2209,11 +2165,11 @@ def consulta_clave(clave, token, env):
         'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
     }
 
-    _logger.error('MAB - consulta_clave - url: %s' % url)
+    _logger.error('MAB - consulta_clave - url: %s' % endpoint)
 
     try:
         # response = requests.request("GET", url, headers=headers)
-        response = requests.get(url, headers=headers)
+        response = requests.get(endpoint, headers=headers)
         ############################
     except requests.exceptions.RequestException as e:
         _logger.error('Exception %s' % e)
@@ -2336,13 +2292,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
 
 def send_message(inv, date_cr, token, env):
 
-    if env == 'api-stag':
-        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
-    elif env == 'api-prod':
-        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
-    else:
-        _logger.error('MAB - Ambiente no definido')
-        return
+    endpoint = fe_enums.UrlHaciendaRecepcion[tipo_ambiente]
 
     comprobante = {}
     comprobante['clave'] = inv.number_electronic
@@ -2360,12 +2310,12 @@ def send_message(inv, date_cr, token, env):
     _logger.info('MAB - Comprobante : %s' % comprobante)
     headers = {'Content-Type': 'application/json',
                'Authorization': 'Bearer {}'.format(token)}
-    _logger.info('MAB - URL : %s' % url)
+    _logger.info('MAB - URL : %s' % endpoint)
     _logger.info('MAB - Headers : %s' % headers)
 
     try:
         response = requests.post(
-            url, data=json.dumps(comprobante), headers=headers)
+            endpoint, data=json.dumps(comprobante), headers=headers)
 
     except requests.exceptions.RequestException as e:
         _logger.info('Exception %s' % e)

@@ -12,6 +12,8 @@ _TIPOS_CONFIRMACION = (
      'Supplier invoice partial acceptance sequence'),
     ('RCE_sequence_id', 'account.invoice.supplier.reject.',
      'Supplier invoice rejection sequence'),
+    ('FEC_sequence_id', 'account.invoice.supplier.reject.',
+     'Supplier electronic purchase invoice sequence'),
 )
 
 
@@ -69,21 +71,27 @@ class CompanyElectronic(models.Model):
         string='Secuencia Aceptación',
         help='Secuencia de confirmacion de aceptación de comprobante electrónico. Dejar en blanco '
         'y el sistema automaticamente se lo creará.',
-        readonly=False,
-        copy=False,
+        readonly=False, copy=False,
     )
     CPCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Parcial',
         help='Secuencia de confirmación de aceptación parcial de comprobante electrónico. Dejar '
         'en blanco y el sistema automáticamente se lo creará.',
-        readonly=False, copy=False)
+        readonly=False, copy=False,
+    )
     RCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Rechazo',
         help='Secuencia de confirmación de rechazo de comprobante electrónico. Dejar '
         'en blanco y el sistema automáticamente se lo creará.',
-        readonly=False, copy=False)
+        readonly=False, copy=False,
+    )
+    FEC_sequence_id = fields.Many2one(
+        'ir.sequence',
+        string='Secuencia de Facturas Electrónicas de Compra',
+        readonly=False, copy=False,
+    )
 
     @api.model
     def create(self, vals):

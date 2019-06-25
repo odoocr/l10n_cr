@@ -39,13 +39,6 @@
                     <span style="font-weight:bolder" t-if="o.type == '(out_refund' or o.type == 'in_refund) and not o.number_electronic'">NOTA DE CRÉDITO</span><br/>
                     <span t-if="(o.type == 'in_invoice' or o.type == 'in_refund')" t-esc="o.reference"/>
                     <span t-if="(o.type == 'out_invoice' or o.type == 'out_refund')" t-esc="o.number_electronic and o.number_electronic[21:41] or o.number"/>
-
-                    <!--span style="font-weight:bolder" t-if="(o.type == 'out_invoice' or o.type == 'in_invoice') and o.number_electronic">FACTURA ELECTRONICA</span>
-                    <span style="font-weight:bolder" t-if="(o.type == 'out_invoice' or o.type == 'in_invoice') and not o.number_electronic">FACTURA</span>
-                    <span style="font-weight:bolder" t-if="(o.type == 'out_refund' or o.type == 'in_refund') and o.number_electronic">NOTA DE CRÉDITO ELECTRONICA</span><br/>
-                    <span style="font-weight:bolder" t-if="(o.type == 'out_refund' or o.type == 'in_refund') and not o.number_electronic">NOTA DE CRÉDITO</span><br/>
-                    <span t-if="(o.type == 'in_invoice' or o.type == 'in_refund')" t-esc="o.reference"/>
-                    <span t-if="(o.type == 'out_invoice' or o.type == 'out_refund')" t-esc="o.number_electronic and o.number_electronic[21:41] or o.number"/-->
               </div>
               <div class="text-center">
                 <table style="width:100%;" class="dtheader rounded2">
@@ -187,7 +180,7 @@
                     </td>
                     <td>
                         <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
-                            <span t-field="o.number"/>-<span t-field="o.origin"/><br/>
+                            <span t-field="o.sequence"/>-<span t-field="o.origin"/><br/>
                         </span>
                         <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
                             <span t-field="o.name"/>-<span t-field="o.origin"/><br/>
