@@ -371,11 +371,11 @@ class PosOrder(models.Model):
                 if not doc.pos_order_id.number_electronic:
                     if doc.amount_total >= 0:
                         tipo_documento = 'TE'
-                        tipo_documento_referencia = ''
-                        numero_documento_referencia = ''
-                        fecha_emision_referencia = ''
-                        codigo_referencia = ''
-                        razon_referencia = ''
+                        #tipo_documento_referencia = ''
+                        #numero_documento_referencia = ''
+                        #fecha_emision_referencia = ''
+                        #codigo_referencia = ''
+                        #razon_referencia = ''
                     else:
                         doc.state_tributacion = 'error'
                         _logger.error(
@@ -398,23 +398,24 @@ class PosOrder(models.Model):
                     codigo_referencia = doc.reference_code_id.code
                     # FacturaReferencia = ''   *****************
 
-                #now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                #now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                # dia = docName[3:5]#'%02d' % now_cr.day,
-                # mes = docName[5:7]#'%02d' % now_cr.month,
-                # anno = docName[7:9]#str(now_cr.year)[2:4],
+                now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+                now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+                dia = docName[3:5]#'%02d' % now_cr.day,
+                mes = docName[5:7]#'%02d' % now_cr.month,
+                anno = docName[7:9]#str(now_cr.year)[2:4],
                 #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                #date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
+                date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
                 #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
-                date_cr = api_facturae.get_time_hacienda()
-                # ,doc.company_id.security_code,
-                codigo_seguridad = docName[-8:]
-                if not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
+                #date_cr = api_facturae.get_time_hacienda()
+                codigo_seguridad = docName[-8:]  # ,doc.company_id.security_code,
+                #if not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
+                if not doc.statement_ids or not doc.statement_ids[0].statement_id or not doc.statement_ids[0].statement_id.journal_id or not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
                     _logger.error(
                         'MAB 001 - codigo seguridad : %s  -- Pedido: %s Metodo de pago de diario no definido, utilizando efectivo', codigo_seguridad, docName)
-                medio_pago = doc.statement_ids[0].statement_id.journal_id.payment_method_id and doc.statement_ids[
-                    0].statement_id.journal_id.payment_method_id.sequence or '01'
-                sale_conditions = '01'  # Contado !!   doc.sale_conditions_id.sequence,
+                    medio_pago = '01'
+                else:
+                    medio_pago = doc.statement_ids[0].statement_id.journal_id.payment_method_id and doc.statement_ids[0].statement_id.journal_id.payment_method_id.sequence 
+                sale_conditions = '01' #Contado !!   doc.sale_conditions_id.sequence,
 
                 currency_rate = 1  # 1 / doc.currency_id.rate
 
@@ -506,21 +507,39 @@ class PosOrder(models.Model):
                     lines[line_number] = dline
                 doc.number_electronic = docName
                 invoice_comments = ''
-
-                xml_string_builder = api_facturae.gen_xml_fe_v42(doc, date_cr,
-                                                                 sale_conditions, medio_pago,
-                                                                 round(
-                                                                     total_servicio_gravado, 5),
-                                                                 round(
-                                                                     total_servicio_exento, 5),
-                                                                 round(
-                                                                     total_mercaderia_gravado, 5),
-                                                                 round(
-                                                                     total_mercaderia_exento, 5), base_subtotal,
-                                                                 total_impuestos, total_descuento,
-                                                                 json.dumps(
-                                                                     lines, ensure_ascii=False),
-                                                                 currency_rate, invoice_comments)
+                if tipo_documento == 'TE':
+                    xml_string_builder = api_facturae.gen_xml_fe_v42(doc, date_cr,
+                                                                    sale_conditions, medio_pago,
+                                                                    round(
+                                                                        total_servicio_gravado, 5),
+                                                                    round(
+                                                                        total_servicio_exento, 5),
+                                                                    round(
+                                                                        total_mercaderia_gravado, 5),
+                                                                    round(
+                                                                        total_mercaderia_exento, 5), base_subtotal,
+                                                                    total_impuestos, total_descuento,
+                                                                    json.dumps(
+                                                                        lines, ensure_ascii=False),
+                                                                    currency_rate, invoice_comments)
+                else:
+                    xml_string_builder = api_facturae.gen_xml_nc(doc, date_cr,
+                                                                    sale_conditions, medio_pago,
+                                                                    round(
+                                                                        total_servicio_gravado, 5),
+                                                                    round(
+                                                                        total_servicio_exento, 5),
+                                                                    round(
+                                                                        total_mercaderia_gravado, 5),
+                                                                    round(
+                                                                        total_mercaderia_exento, 5), base_subtotal,
+                                                                    total_impuestos, total_descuento,
+                                                                    json.dumps(
+                                                                        lines, ensure_ascii=False),
+                                                                    tipo_documento_referencia, numero_documento_referencia, 
+                                                                    fecha_emision_referencia, codigo_referencia, 
+                                                                    razon_referencia,
+                                                                    currency_rate, invoice_comments)
 
                 # response_json = fxunctions.make_xml_invoice(doc, tipo_documento,
                 #                                           sale_conditions, medio_pago,
