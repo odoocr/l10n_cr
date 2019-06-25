@@ -273,7 +273,7 @@ class AccountInvoiceElectronic(models.Model):
                  ('res_id', '=', self.id),
                  ('res_field', '=', 'xml_comprobante')], limit=1)
             if attachment:
-                attachment.name = i.fname_xml_comprobante
+                attachment.name = self.fname_xml_comprobante
                 attachment.datas_fname = i.fname_xml_comprobante
 
                 attachment_resp = self.env['ir.attachment'].search(
@@ -282,8 +282,8 @@ class AccountInvoiceElectronic(models.Model):
                      ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
 
                 if attachment_resp:
-                    attachment_resp.name = i.fname_xml_respuesta_tributacion
-                    attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
+                    attachment_resp.name = self.fname_xml_respuesta_tributacion
+                    attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
 
                     email_template.attachment_ids = [
                         (6, 0, [attachment.id, attachment_resp.id])]
@@ -1322,7 +1322,6 @@ class AccountInvoiceElectronic(models.Model):
 
                     if inv.company_id.version_hacienda == '4.2':
                         xml_string_builder = api_facturae.gen_xml_nc(inv,
-                                                                     inv.number,
                                                                      api_facturae.get_time_hacienda(),
                                                                      sale_conditions,
                                                                      medio_pago,
@@ -1353,7 +1352,6 @@ class AccountInvoiceElectronic(models.Model):
                                                                      invoice_comments)
                     else:
                         xml_string_builder = api_facturae.gen_xml_nc_v43(inv,
-                                                                         inv.number,
                                                                          api_facturae.get_time_hacienda(),
                                                                          sale_conditions,
                                                                          medio_pago,
