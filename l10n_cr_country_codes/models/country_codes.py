@@ -41,6 +41,7 @@ class ResCountryState(models.Model):
     _inherit = 'res.country.state'
 
     def try_migrate_old_l10n_cr(self):
+        return
         _logger.info('Check if needed to migrate old l10n_cr states')
         self.env.cr.execute(
             "SELECT module FROM ir_model_data WHERE model=%s AND name='state_SJ'", (self._name,)
