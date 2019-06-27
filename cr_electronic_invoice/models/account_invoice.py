@@ -155,6 +155,9 @@ class InvoiceLineElectronic(models.Model):
     exoneration_id = fields.Many2one(
         comodel_name="exoneration", string="Exoneración", required=False, )
 
+    third_party_id = fields.Many2one(comodel_name="res_partner",
+                                     string="Tercero otros cargos",)
+
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -270,7 +273,7 @@ class AccountInvoiceElectronic(models.Model):
                  ('res_id', '=', self.id),
                  ('res_field', '=', 'xml_comprobante')], limit=1)
             if attachment:
-                attachment.name = i.fname_xml_comprobante
+                attachment.name = self.fname_xml_comprobante
                 attachment.datas_fname = i.fname_xml_comprobante
 
                 attachment_resp = self.env['ir.attachment'].search(
@@ -279,8 +282,8 @@ class AccountInvoiceElectronic(models.Model):
                      ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
 
                 if attachment_resp:
-                    attachment_resp.name = i.fname_xml_respuesta_tributacion
-                    attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
+                    attachment_resp.name = self.fname_xml_respuesta_tributacion
+                    attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
 
                     email_template.attachment_ids = [
                         (6, 0, [attachment.id, attachment_resp.id])]
@@ -1112,8 +1115,11 @@ class AccountInvoiceElectronic(models.Model):
                     # Revisamos si está línea es de Otros Cargos
                     if inv_line.product_id.categ_id.name == 'Otros Cargos':
                         otros_cargos_id += 1
+                        if otros_cargos_id not in otros_cargos:
+                            otros_cargos[otros_cargos_id] = dict()
+
                         otros_cargos[otros_cargos_id][
-                            'TipoDocumento'] = inv.line.product_id.default_code
+                            'TipoDocumento'] = inv_line.product_id.default_code
 
                         # TODO: Cómo meter esto en la línea
 
@@ -1311,7 +1317,7 @@ class AccountInvoiceElectronic(models.Model):
                             total_descuento=total_descuento,
                             lines=json.dumps(
                                 lines, ensure_ascii=False),
-                            otrosCargos=False,
+                            otrosCargos=otros_cargos,
                             currency_rate=currency_rate,
                             invoice_comments=invoice_comments)
 
@@ -1319,7 +1325,6 @@ class AccountInvoiceElectronic(models.Model):
 
                     if inv.company_id.version_hacienda == '4.2':
                         xml_string_builder = api_facturae.gen_xml_nc(inv,
-                                                                     inv.number,
                                                                      api_facturae.get_time_hacienda(),
                                                                      sale_conditions,
                                                                      medio_pago,
@@ -1350,7 +1355,6 @@ class AccountInvoiceElectronic(models.Model):
                                                                      invoice_comments)
                     else:
                         xml_string_builder = api_facturae.gen_xml_nc_v43(inv,
-                                                                         inv.number,
                                                                          api_facturae.get_time_hacienda(),
                                                                          sale_conditions,
                                                                          medio_pago,

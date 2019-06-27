@@ -37,6 +37,9 @@
                     
                     <!--<field name="electronic_invoice_return_message" readonly="1"/>-->
                 </field>
+                <!-- <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+                    <field name="third_party_id"/>
+                </xpath> -->
                 <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
                     <field name="discount_note"/>
                     <field name="exoneration_id" />
@@ -132,8 +135,8 @@
                     <field name="discount_note" invisible="1"/>
                     <field name="total_tax" invisible="1"/>
                     <!--<field name="exoneration_total"/>
-                    <field name="total_line_exoneration"/>-->
-                    <field name="exoneration_id" />
+                    <field name="total_line_exoneration"/>
+                    <field name="exoneration_id" /> -->
                 </field>
             </field>
         </record>
