@@ -1570,10 +1570,6 @@ class AccountInvoiceElectronic(models.Model):
                                 raise UserError(
                                     'La identificación NITE del emisor debe de tener 10 dígitos')
 
-                            if not inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
-                                raise UserError(
-                                    'No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para' +
-                                    inv.payment_term_id.name)
 
                             # Validate if invoice currency is the same as the company currency
                             if currency.name != self.company_id.currency_id.name and (
