@@ -64,12 +64,26 @@
                             groups="account.group_account_invoice"/>
                     </field>
 
-                    <field name="vat" 
+                    <field name="vat"
                         position="after">
                         <field name="identification_id"/>
                     </field>
 
+                    <field name="category_id" position="after">
+                        <field name="has_exoneration"/>
+                    </field>
                 </data>
+                <xpath expr="//page[3]" position="after">
+                    <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">
+                        <group col="3">
+                            <field name="exoneration_number"/>
+                            <field name="type_exoneration"/>
+                            <field name="institution_name"/>
+                            <field name="date_issue"/>
+                            <field name="date_expiration"/>
+                        </group>
+                    </page>
+                </xpath>
             </field>
         </record>
     </data>
