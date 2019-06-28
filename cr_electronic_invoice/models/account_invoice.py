@@ -1093,8 +1093,10 @@ class AccountInvoiceElectronic(models.Model):
                 line_number = 0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
+                total_servicio_exonerado = 0.0
                 total_mercaderia_gravado = 0.0
                 total_mercaderia_exento = 0.0
+                total_mercaderia_exonerado = 0.0
                 total_descuento = 0.0
                 total_impuestos = 0.0
                 base_subtotal = 0.0
@@ -1169,15 +1171,25 @@ class AccountInvoiceElectronic(models.Model):
                         # Se generan los impuestos
                         taxes = dict()
                         impuesto_linea = 0.0
+                        _has_exoneration = False
                         if inv_line.invoice_line_tax_ids:
                             tax_index = 0
 
                             taxes_lookup = {}
                             for i in inv_line.invoice_line_tax_ids:
-                                taxes_lookup[i.id] = {'tax_code': i.tax_code,
-                                                      'tarifa': i.amount,
-                                                      'iva_tax_desc': i.iva_tax_desc,
-                                                      'iva_tax_code': i.iva_tax_code}
+                                if i.has_exoneration:
+                                    _has_exoneration = True
+                                    taxes_lookup[i.id] = {'tax_code': i.tax_root.tax_code,
+                                                          'tarifa': i.tax_root.amount,
+                                                          'iva_tax_desc': i.tax_root.iva_tax_desc,
+                                                          'iva_tax_code': i.tax_root.iva_tax_code,
+                                                          'exoneration_percentage': i.percentage_exoneration,
+                                                          'amount_exoneration': i.amount}
+                                else:
+                                    taxes_lookup[i.id] = {'tax_code': i.tax_code,
+                                                          'tarifa': i.amount,
+                                                          'iva_tax_desc': i.iva_tax_desc,
+                                                          'iva_tax_code': i.iva_tax_code}
 
                             for i in line_taxes['taxes']:
                                 if taxes_lookup[i['id']]['tax_code'] != '00':
@@ -1199,34 +1211,38 @@ class AccountInvoiceElectronic(models.Model):
                                             'iva_tax_code'],
                                     }
                                     # Se genera la exoneración si existe para este impuesto
-                                    if inv_line.exoneration_id:
+                                    if taxes_lookup[i['id']]['exoneration_percentage']:
+                                        tax_amount_exoneration = round(
+                                            subtotal_line * taxes_lookup[i['id']][
+                                                'amount_exoneration'] / 100, 5)
+                                        impuesto_linea -= tax_amount_exoneration
                                         tax["exoneracion"] = {
-                                            "tipoDocumento": inv_line.exoneration_id.type,
-                                            "numeroDocumento": inv_line.exoneration_id.exoneration_number,
-                                            "nombreInstitucion": inv_line.exoneration_id.name_institution,
-                                            "fechaEmision": str(
-                                                inv_line.exoneration_id.date) + 'T00:00:00-06:00',
-                                            "montoImpuesto": round(
-                                                tax_amount * inv_line.exoneration_id.percentage_exoneration / 100,
-                                                2),
+                                            "montoImpuesto": tax_amount_exoneration,
                                             "porcentajeCompra": int(
-                                                inv_line.exoneration_id.percentage_exoneration)
+                                                taxes_lookup[i['id']]['exoneration_percentage'])
                                         }
 
                                     taxes[tax_index] = tax
 
                             line["impuesto"] = taxes
+                            line["impuestoNeto"] = impuesto_linea
 
                         # Si no hay product_id se asume como mercaderia
                         if inv_line.product_id and inv_line.product_id.type == 'service':
                             if taxes:
-                                total_servicio_gravado += base_line
+                                if _has_exoneration:
+                                    total_servicio_exonerado += base_line
+                                else:
+                                    total_servicio_gravado += base_line
                                 total_impuestos += impuesto_linea
                             else:
                                 total_servicio_exento += base_line
                         else:
                             if taxes:
-                                total_mercaderia_gravado += base_line
+                                if _has_exoneration:
+                                    total_mercaderia_exonerado += base_line
+                                else:
+                                    total_mercaderia_gravado += base_line
                                 total_impuestos += impuesto_linea
                             else:
                                 total_mercaderia_exento += base_line
@@ -1282,12 +1298,12 @@ class AccountInvoiceElectronic(models.Model):
                                 total_servicio_gravado, 5),
                             total_servicio_exento=round(
                                 total_servicio_exento, 5),
-                            totalServExonerado=0,
+                            totalServExonerado=total_servicio_exonerado,
                             total_mercaderia_gravado=round(
                                 total_mercaderia_gravado, 5),
                             total_mercaderia_exento=round(
                                 total_mercaderia_exento, 5),
-                            totalMercExonerada=0,
+                            totalMercExonerada=total_mercaderia_exonerado,
                             totalOtrosCargos=0,
                             base_total=base_subtotal,
                             total_impuestos=total_impuestos,
