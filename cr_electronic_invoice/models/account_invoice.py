@@ -1210,7 +1210,7 @@ class AccountInvoiceElectronic(models.Model):
                                                           'iva_tax_code': i.iva_tax_code}
 
                             for i in line_taxes['taxes']:
-                                if taxes_lookup[i['id']]['tax_code'] != '99':
+                                if taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     # tax_amount = round(i['amount'], 5) * quantity
                                     tax_amount = round(
