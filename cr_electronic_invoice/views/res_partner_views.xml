@@ -78,6 +78,7 @@
                         <group col="3">
                             <field name="exoneration_number"/>
                             <field name="type_exoneration"/>
+                            <field name="institution_name"/>
                             <field name="date_issue"/>
                             <field name="date_expiration"/>
                         </group>

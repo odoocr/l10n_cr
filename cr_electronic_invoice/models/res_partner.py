@@ -31,6 +31,7 @@ class PartnerElectronic(models.Model):
         comodel_name="aut.ex", string="Tipo Autorizacion", required=False, )
     exoneration_number = fields.Char(
         string="Número de exoneración", required=False, )
+    institution_name = fields.Char(string="Institucion Emisora", required=False, )
     date_issue = fields.Date( string="Fecha de Emisión", required=False, )
     date_expiration = fields.Date( string="Fecha de Vencimiento", required=False, )
 

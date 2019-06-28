@@ -780,13 +780,13 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
                     sb.Append('<NumeroDocumento>' +
                               inv.partner_id.exoneration_number + '</NumeroDocumento>')
                     sb.Append('<NombreInstitucion>' +
-                              inv.partner_id.name + '</NombreInstitucion>')
+                              inv.partner_id.institution_name + '</NombreInstitucion>')
                     sb.Append('<FechaEmision>' +
-                              str(inv.partner_id.date_issue) + 'T00:00:00-06:00'+ '</FechaEmision>')
-                    sb.Append('<MontoImpuesto>' +
-                              str(b['exoneracion']['montoImpuesto']) + '</MontoImpuesto>')
-                    sb.Append('<PorcentajeCompra>' +
-                              str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeCompra>')
+                              str(inv.partner_id.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                    sb.Append('<PorcentajeExoneracion>' +
+                              str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                    sb.Append( '<MontoExoneracion>' +
+                               str( b['exoneracion']['montoImpuesto'] ) + '</MontoExoneracion>' )
                     sb.Append( '</Exoneracion>' )
 
                 sb.Append('</Impuesto>')
@@ -862,7 +862,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
 
     # TODO: agregar los exonerados en la suma
     sb.Append('<TotalVenta>' + str(
-        total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) + '</TotalVenta>')
+        total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento + totalServExonerado + totalMercExonerada) + '</TotalVenta>')
 
     sb.Append('<TotalDescuentos>' +
               str(round(total_descuento, 2)) + '</TotalDescuentos>')
