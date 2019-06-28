@@ -1458,7 +1458,7 @@ def gen_xml_nc_v43(
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-    codigo_referencia, razon_referencia, currency_rate, invoice_comments
+    codigo_referencia, razon_referencia, currency_rate, invoice_comments, otrosCargos
 ):
 
     numero_linea = 0
@@ -1474,7 +1474,7 @@ def gen_xml_nc_v43(
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1503,37 +1503,39 @@ def gen_xml_nc_v43(
     sb.Append('<Receptor>')
     sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
 
-    if inv.partner_id.identification_id.code == '05':
-        sb.Append('<IdentificacionExtranjero>' +
-                  inv.partner_id.vat + '</IdentificacionExtranjero>')
-    else:
-        sb.Append('<Identificacion>')
-        sb.Append('<Tipo>' + inv.partner_id.identification_id.code + '</Tipo>')
-        sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
-        sb.Append('</Identificacion>')
+    if inv.partner_id.identification_id:
+        if inv.partner_id.identification_id.code == '05':
+            sb.Append('<IdentificacionExtranjero>' +
+                    inv.partner_id.vat + '</IdentificacionExtranjero>')
+        else:
+            sb.Append('<Identificacion>')
+            sb.Append('<Tipo>' + inv.partner_id.identification_id.code + '</Tipo>')
+            sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
+            sb.Append('</Identificacion>')
 
-    sb.Append('<Ubicacion>')
-    sb.Append('<Provincia>' +
-              str(inv.partner_id.state_id.code or '') + '</Provincia>')
-    sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
-    sb.Append('<Distrito>' +
-              str(inv.partner_id.district_id.code or '') + '</Distrito>')
-    sb.Append(
-        '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
-    sb.Append('<OtrasSenas>' +
-              str(inv.partner_id.street or 'NA') + '</OtrasSenas>')
-    sb.Append('</Ubicacion>')
-    sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
-    sb.Append('<NumTelefono>' +
-              re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
-    sb.Append('</Telefono>')
-    sb.Append('<CorreoElectronico>' +
-              str(inv.partner_id.email) + '</CorreoElectronico>')
+        sb.Append('<Ubicacion>')
+        sb.Append('<Provincia>' +
+                str(inv.partner_id.state_id.code or '') + '</Provincia>')
+        sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
+        sb.Append('<Distrito>' +
+                str(inv.partner_id.district_id.code or '') + '</Distrito>')
+        sb.Append(
+            '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
+        sb.Append('<OtrasSenas>' +
+                str(inv.partner_id.street or 'NA') + '</OtrasSenas>')
+        sb.Append('</Ubicacion>')
+        sb.Append('<Telefono>')
+        sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
+        sb.Append('<NumTelefono>' +
+                re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
+        sb.Append('</Telefono>')
+        sb.Append('<CorreoElectronico>' +
+                str(inv.partner_id.email) + '</CorreoElectronico>')
+
     sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
-              str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
+              str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
     sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 

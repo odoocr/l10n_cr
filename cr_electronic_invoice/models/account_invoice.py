@@ -1396,7 +1396,6 @@ class AccountInvoiceElectronic(models.Model):
                                                                      invoice_comments)
                     else:
                         xml_string_builder = api_facturae.gen_xml_nc_v43(inv,
-                                                                         api_facturae.get_time_hacienda(),
                                                                          sale_conditions,
                                                                          round(
                                                                              total_servicio_gravado,
@@ -1458,8 +1457,6 @@ class AccountInvoiceElectronic(models.Model):
                                                                      invoice_comments)
                     else:
                         xml_string_builder = api_facturae.gen_xml_nd_v43(inv,
-                                                                         inv.sequence,
-                                                                         api_facturae.get_time_hacienda(),
                                                                          sale_conditions,
                                                                          round(
                                                                              total_servicio_gravado,
