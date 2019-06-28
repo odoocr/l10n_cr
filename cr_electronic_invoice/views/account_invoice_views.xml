@@ -45,7 +45,6 @@
                 </xpath> -->
                 <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
                     <field name="discount_note"/>
-                    <field name="exoneration_id" />
                 </xpath>
                 <xpath expr="//button[@name='action_invoice_draft']" position="after">
                     <button name="charge_xml_data" type="object" string="Cargar datos desde XMLs" colspan="2" attrs="{'invisible':['|', ('state_tributacion','!=', False), '|', ('xml_comprobante', '=', False), ('xml_respuesta_tributacion', '=', False)]}" />
@@ -138,9 +137,6 @@
                     <field name="total_discount" invisible="1"/>
                     <field name="discount_note" invisible="1"/>
                     <field name="total_tax" invisible="1"/>
-                    <!--<field name="exoneration_total"/>
-                    <field name="total_line_exoneration"/>
-                    <field name="exoneration_id" /> -->
                 </field>
             </field>
         </record>
