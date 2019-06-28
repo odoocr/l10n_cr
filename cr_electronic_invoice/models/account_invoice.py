@@ -158,9 +158,11 @@ class InvoiceLineElectronic(models.Model):
     third_party_id = fields.Many2one(comodel_name="res_partner",
                                      string="Tercero otros cargos",)
 
-    partida_arancelaria = fields.Char(string="Partida arancelaria para factura"
-                                             " de exportación",
-                                      required=False, )
+    tariff_head = fields.Char(
+        string=u'Partida Arancelaria', size=15,
+        help="Partida arancelaria para facturas de exportación"
+    )
+
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -1124,13 +1126,11 @@ class AccountInvoiceElectronic(models.Model):
                             'Detalle' : escape(inv_line.name[:150]),
                             'MontoCargo' : inv_line.total_amount
                         }
-                        # TODO: Cómo meter esto en la línea
-                        # otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.partner_id.vat
-                        # otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.partner_id.name
 
-
+                        if inv_line.third_party_id:
+                            otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.third_party_id.vat
+                            otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.third_party_id.name
                     else:
-
                         line_number += 1
                         # price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
                         price = inv_line.price_unit
