@@ -163,6 +163,11 @@ class InvoiceLineElectronic(models.Model):
         help="Partida arancelaria para facturas de exportación"
     )
 
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        if self.product_id.tariff_head:
+            self.tariff_head = self.product_id.tariff_head
+
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -1116,6 +1121,8 @@ class AccountInvoiceElectronic(models.Model):
                 total_mercaderia_gravado = 0.0
                 total_mercaderia_exento = 0.0
                 total_mercaderia_exonerado = 0.0
+                total_servicio_gravado = 0.0
+                total_otros_cargos = 0.0
                 total_descuento = 0.0
                 total_impuestos = 0.0
                 base_subtotal = 0.0
@@ -1132,6 +1139,8 @@ class AccountInvoiceElectronic(models.Model):
                         if inv_line.third_party_id:
                             otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.third_party_id.vat
                             otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.third_party_id.name
+
+                        total_otros_cargos += inv_line.total_amount
                     else:
                         line_number += 1
                         # price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
@@ -1334,7 +1343,7 @@ class AccountInvoiceElectronic(models.Model):
                             total_mercaderia_exento=round(
                                 total_mercaderia_exento, 5),
                             totalMercExonerada=total_mercaderia_exonerado,
-                            totalOtrosCargos=0,
+                            totalOtrosCargos=total_otros_cargos,
                             base_total=base_subtotal,
                             total_impuestos=total_impuestos,
                             total_descuento=total_descuento,

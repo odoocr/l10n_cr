@@ -60,6 +60,7 @@
     'external_dependencies': {
         "python": [
             'xmlsig',
+            'OpenSSL',
         ],
     },
     'installable': True,
