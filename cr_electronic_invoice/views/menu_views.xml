@@ -19,10 +19,5 @@
         <menuitem id="menu_identification_type" name="Tipo de identificación" parent="menu_electronic_invoice"
                   sequence="7" action="action_identification_type"/>
 
-        <menuitem id="menu_aut_exoneration" name="Exoneraciones y Autorizaciones" parent="menu_electronic_invoice"
-                  sequence="8" action="action_aut_ex"/>
-
-        <menuitem id="menu_exoneration_views" name="Exoneración" parent="menu_electronic_invoice"
-                  sequence="9" action="action_exoneration"/>
     </data>
 </odoo>

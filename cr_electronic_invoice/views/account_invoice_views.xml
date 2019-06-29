@@ -13,6 +13,9 @@
                 <field name="partner_id" position="before">
                     <field name="number_electronic" readonly="1"/>
                 </field>
+                <field name="payment_term_id" position="before">
+                    <field name="tipo_documento" required="1" />
+                </field>
                 <field name="payment_term_id" position="after">
                     <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <!--field name="sale_conditions_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/-->
@@ -37,9 +40,11 @@
                     
                     <!--<field name="electronic_invoice_return_message" readonly="1"/>-->
                 </field>
+                <!-- <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+                    <field name="third_party_id"/>
+                </xpath> -->
                 <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
                     <field name="discount_note"/>
-                    <field name="exoneration_id" />
                 </xpath>
                 <xpath expr="//button[@name='action_invoice_draft']" position="after">
                     <button name="charge_xml_data" type="object" string="Cargar datos desde XMLs" colspan="2" attrs="{'invisible':['|', ('state_tributacion','!=', False), '|', ('xml_comprobante', '=', False), ('xml_respuesta_tributacion', '=', False)]}" />
@@ -99,7 +104,8 @@
                     </attribute>
                 </tree>
                 <field name="state" position="before">
-                    <field name="tipo_comprobante" string="Doc Elect."/>
+                    <field name="tipo_documento" string="Doc Elect."/>
+                    <field name="sequence" string="Consecutivo"/>
                     <field name="state_tributacion"/>
                 </field>
             </field>
@@ -131,9 +137,6 @@
                     <field name="total_discount" invisible="1"/>
                     <field name="discount_note" invisible="1"/>
                     <field name="total_tax" invisible="1"/>
-                    <!--<field name="exoneration_total"/>
-                    <field name="total_line_exoneration"/>-->
-                    <field name="exoneration_id" />
                 </field>
             </field>
         </record>

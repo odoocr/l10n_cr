@@ -68,7 +68,7 @@ def limit(str, limit):
 def get_mr_sequencevalue(inv):
     '''Verificamos si el ID del mensaje receptor es válido'''
     mr_mensaje_id = int(inv.state_invoice_partner)
-    if mr_mensaje_id < 1 and mr_mensaje_id > 3:
+    if mr_mensaje_id < 1 or mr_mensaje_id > 3:
         raise UserError('El ID del mensaje receptor es inválido.')
     elif mr_mensaje_id is None:
         raise UserError('No se ha proporcionado un ID válido para el MR.')
@@ -76,20 +76,20 @@ def get_mr_sequencevalue(inv):
     if inv.state_invoice_partner == '1':
         detalle_mensaje = 'Aceptado'
         tipo = 1
-        tipo_documento = fe_enums.TipoDocumento.CCE.name
+        tipo_documento = fe_enums.TipoDocumento['CCE']
         sequence = inv.env['ir.sequence'].next_by_code(
             'sequece.electronic.doc.confirmation')
 
     elif inv.state_invoice_partner == '2':
         detalle_mensaje = 'Aceptado parcial'
         tipo = 2
-        tipo_documento = fe_enums.TipoDocumento.CPCE.name
+        tipo_documento = fe_enums.TipoDocumento['CPCE']
         sequence = inv.env['ir.sequence'].next_by_code(
             'sequece.electronic.doc.partial.confirmation')
     else:
         detalle_mensaje = 'Rechazado'
         tipo = 3
-        tipo_documento = fe_enums.TipoDocumento.RCE.name
+        tipo_documento = fe_enums.TipoDocumento['RCE']
         sequence = inv.env['ir.sequence'].next_by_code(
             'sequece.electronic.doc.reject')
 
@@ -98,20 +98,7 @@ def get_mr_sequencevalue(inv):
 
 def get_consecutivo_hacienda(tipo_documento, consecutivo, sucursal_id, terminal_id):
 
-    if tipo_documento == 'FE':
-        tipo_doc = fe_enums.TipoDocumento.FE.value
-    elif tipo_documento == 'NC':
-        tipo_doc = fe_enums.TipoDocumento.NC.value
-    elif tipo_documento == 'ND':
-        tipo_doc = fe_enums.TipoDocumento.ND.value
-    elif tipo_documento == 'TE':
-        tipo_doc = fe_enums.TipoDocumento.TE.value
-    elif tipo_documento == 'CCE':
-        tipo_doc = fe_enums.TipoDocumento.CCE.value
-    elif tipo_documento == 'CPCE':
-        tipo_doc = fe_enums.TipoDocumento.CPCE.value
-    else:
-        tipo_doc = fe_enums.TipoDocumento.RCE.value
+    tipo_doc = fe_enums.TipoDocumento[tipo_documento]
 
     inv_consecutivo = str(consecutivo).zfill(10)
     inv_sucursal = str(sucursal_id).zfill(3)
@@ -124,20 +111,7 @@ def get_consecutivo_hacienda(tipo_documento, consecutivo, sucursal_id, terminal_
 
 def get_clave_hacienda(self, tipo_documento, consecutivo, sucursal_id, terminal_id, situacion='normal'):
 
-    if tipo_documento == 'FE':
-        tipo_doc = fe_enums.TipoDocumento.FE.value
-    elif tipo_documento == 'NC':
-        tipo_doc = fe_enums.TipoDocumento.NC.value
-    elif tipo_documento == 'ND':
-        tipo_doc = fe_enums.TipoDocumento.ND.value
-    elif tipo_documento == 'TE':
-        tipo_doc = fe_enums.TipoDocumento.TE.value
-    elif tipo_documento == 'CCE':
-        tipo_doc = fe_enums.TipoDocumento.CCE.value
-    elif tipo_documento == 'CPCE':
-        tipo_doc = fe_enums.TipoDocumento.CPCE.value
-    else:
-        tipo_doc = fe_enums.TipoDocumento.RCE.value
+    tipo_doc = fe_enums.TipoDocumento[tipo_documento]
 
     '''Verificamos si el consecutivo indicado corresponde a un numero'''
     inv_consecutivo = re.sub('[^0-9]', '', consecutivo)
@@ -177,13 +151,8 @@ def get_clave_hacienda(self, tipo_documento, consecutivo, sucursal_id, terminal_
     cedula_emisor = limit(inv_cedula, 20)
 
     '''Validamos la situación del comprobante electrónico'''
-    if situacion == 'normal':
-        situacion_comprobante = fe_enums.SituacionComprobante.normal.value
-    elif situacion == 'contingencia':
-        situacion_comprobante = fe_enums.SituacionComprobante.contingencia.value
-    elif situacion == 'sininternet':
-        situacion_comprobante = fe_enums.SituacionComprobante.sininternet.value
-    else:
+    situacion_comprobante = fe_enums.SituacionComprobante.get(situacion)
+    if not situacion_comprobante:
         raise UserError(
             'La situación indicada para el comprobante electŕonico es inválida: ' + situacion)
 
@@ -207,29 +176,34 @@ def get_clave_hacienda(self, tipo_documento, consecutivo, sucursal_id, terminal_
 '''Variables para poder manejar el Refrescar del Token'''
 last_tokens = {}
 last_tokens_time = {}
+last_tokens_expire = {}
+last_tokens_refresh = {}
 
 
 def get_token_hacienda(inv, tipo_ambiente):
+    global last_tokens
+    global last_tokens_time
+    global last_tokens_expire
+    global last_tokens_refresh
+    
     token = last_tokens.get(inv.company_id.id, False)
     token_time = last_tokens_time.get(inv.company_id.id, False)
+    token_expire = last_tokens_expire.get(inv.company_id.id, 0)
     current_time = time.time()
 
-    if token and (current_time - token_time < 280):
+    if token and (current_time - token_time < token_expire-10):
         token_hacienda = token
     else:
         headers = {}
         data = {'client_id': tipo_ambiente,
                 'client_secret': '',
-                'grant_type': fe_enums.GrandTypes.TypePassword.value,
+                'grant_type': 'password',
                 'username': inv.company_id.frm_ws_identificador,
                 'password': inv.company_id.frm_ws_password
                 }
 
         # establecer el ambiente al cual me voy a conectar
-        if tipo_ambiente == 'api-stag':
-            endpoint = fe_enums.UrlHaciendaToken.apistag.value
-        else:
-            endpoint = fe_enums.UrlHaciendaToken.apiprod.value
+        endpoint = fe_enums.UrlHaciendaToken[tipo_ambiente]
 
         try:
             # enviando solicitud post y guardando la respuesta como un objeto json
@@ -244,6 +218,8 @@ def get_token_hacienda(inv, tipo_ambiente):
                 token_hacienda = response_json.get('access_token')
                 last_tokens[inv.company_id.id] = token
                 last_tokens_time[inv.company_id.id] = time.time()
+                last_tokens_expire[inv.company_id.id] = response_json.get('expires_in')
+                last_tokens_refresh[inv.company_id.id] = response_json.get('refresh_expires_in')
             else:
                 _logger.error(
                     'MAB - token_hacienda failed.  error: %s', response.status_code)
@@ -260,15 +236,12 @@ def refresh_token_hacienda(tipo_ambiente, token):
     headers = {}
     data = {'client_id': tipo_ambiente,
             'client_secret': '',
-            'grant_type': fe_enums.GrandTypes.TypeRefresh.value,
+            'grant_type': 'refresh_token',
             'refresh_token': token
             }
 
     # establecer el ambiente al cual me voy a conectar
-    if tipo_ambiente == 'api-stag':
-        endpoint = fe_enums.UrlHaciendaToken.apistag.value
-    else:
-        endpoint = fe_enums.UrlHaciendaToken.apiprod.value
+    endpoint = fe_enums.UrlHaciendaToken[tipo_ambiente]
 
     try:
         # enviando solicitud post y guardando la respuesta como un objeto json
@@ -480,7 +453,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     return base64UTF8Decoder(mr_to_base64)
 
 
-def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago,
+def gen_xml_fe_v42(inv, date_issuance, sale_conditions,
                    total_servicio_gravado, total_servicio_exento,
                    total_mercaderia_gravado, total_mercaderia_exento,
                    base_total, total_impuestos, total_descuento,
@@ -533,40 +506,56 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago,
     sb.Append('<CorreoElectronico>' +
               str(inv.company_id.email) + '</CorreoElectronico>')
     sb.Append('</Emisor>')
-    sb.Append('<Receptor>')
-    sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
 
-    if inv.partner_id.identification_id.code == '05':
-        sb.Append('<IdentificacionExtranjero>' +
-                  inv.partner_id.vat + '</IdentificacionExtranjero>')
-    else:
-        sb.Append('<Identificacion>')
-        sb.Append('<Tipo>' + inv.partner_id.identification_id.code + '</Tipo>')
-        sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
-        sb.Append('</Identificacion>')
+    vat = inv.partner_id and inv.partner_id.vat and re.sub('[^0-9]', '', inv.partner_id.vat)
+    if inv.partner_id and vat:
+        if not inv.partner_id.identification_id:
+            if len(vat) == 9:  # cedula fisica
+                id_code = '01'
+            elif len(vat) == 10:  # cedula juridica
+                id_code = '02'
+            elif len(vat) == 11 or len(vat) == 12:  # dimex
+                id_code = '03'
+            else:
+                id_code = '05'
+        else:
+            id_code = inv.partner_id.identification_id.code
 
-    sb.Append('<Ubicacion>')
-    sb.Append('<Provincia>' +
-              str(inv.partner_id.state_id.code or '') + '</Provincia>')
-    sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
-    sb.Append('<Distrito>' +
-              str(inv.partner_id.district_id.code or '') + '</Distrito>')
-    sb.Append(
-        '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
-    sb.Append('<OtrasSenas>' +
-              escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
-    sb.Append('</Ubicacion>')
-    sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
-    sb.Append('<NumTelefono>' +
-              re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
-    sb.Append('</Telefono>')
-    sb.Append('<CorreoElectronico>' +
-              str(inv.partner_id.email) + '</CorreoElectronico>')
-    sb.Append('</Receptor>')
+        sb.Append('<Receptor>')
+        sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+
+        if id_code == '05':
+            sb.Append('<IdentificacionExtranjero>' + vat + '</IdentificacionExtranjero>')
+        else:
+            sb.Append('<Identificacion>')
+            sb.Append('<Tipo>' + id_code + '</Tipo>')
+            sb.Append('<Numero>' + vat + '</Numero>')
+            sb.Append('</Identificacion>')
+
+        if inv.partner_id.state_id and inv.partner_id.county_id and inv.partner_id.district_id and inv.partner_id.neighborhood_id:
+            sb.Append('<Ubicacion>')
+            sb.Append('<Provincia>' + str(inv.partner_id.state_id.code or '') + '</Provincia>')
+            sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
+            sb.Append('<Distrito>' + str(inv.partner_id.district_id.code or '') + '</Distrito>')
+            sb.Append('<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
+            sb.Append('<OtrasSenas>' + escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
+            sb.Append('</Ubicacion>')
+        telefono_receptor = inv.partner_id.phone and re.sub('[^0-9]+', '', inv.partner_id.phone)
+        if telefono_receptor:
+            sb.Append('<Telefono>')
+            sb.Append('<CodigoPais>' + inv.partner_id.phone_code or '506' + '</CodigoPais>')
+            sb.Append('<NumTelefono>' + telefono_receptor + '</NumTelefono>')
+            sb.Append('</Telefono>')
+        match = inv.partner_id.email and re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
+        if match:
+            email_receptor = inv.partner_id.email
+        else:
+            email_receptor = 'indefinido@indefinido.com'
+        sb.Append('<CorreoElectronico>' + email_receptor + '</CorreoElectronico>')
+        sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' + str(plazo_credito) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -614,6 +603,7 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago,
                                   d['montoImpuesto'] + '</MontoImpuesto>')
                         sb.Append('<PorcentajeCompra>' +
                                   d['porcentajeCompra'] + '</PorcentajeCompra>')
+                        sb.Append('</Exoneracion>')
 
                 sb.Append('</Impuesto>')
         sb.Append('<MontoTotalLinea>' +
@@ -638,13 +628,13 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago,
     sb.Append('<TotalVenta>' + str(total_servicio_gravado + total_mercaderia_gravado +
                                    total_servicio_exento + total_mercaderia_exento) + '</TotalVenta>')
     sb.Append('<TotalDescuentos>' +
-              str(round(total_descuento, 2)) + '</TotalDescuentos>')
+              str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' +
-              str(round(base_total, 2)) + '</TotalVentaNeta>')
+              str(round(base_total, 5)) + '</TotalVentaNeta>')
     sb.Append('<TotalImpuesto>' +
-              str(round(total_impuestos, 2)) + '</TotalImpuesto>')
+              str(round(total_impuestos, 5)) + '</TotalImpuesto>')
     sb.Append('<TotalComprobante>' + str(round(base_total +
-                                               total_impuestos, 2)) + '</TotalComprobante>')
+                                               total_impuestos, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
     sb.Append('<Normativa>')
     sb.Append('<NumeroResolucion>DGT-R-48-2016</NumeroResolucion>')
@@ -662,10 +652,11 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions, medio_pago,
     # return stringToBase64(felectronica_bytes)
 
 
-def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
+def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_exento,
                    totalServExonerado, total_mercaderia_gravado, total_mercaderia_exento, totalMercExonerada,
                    totalOtrosCargos, base_total, total_impuestos, total_descuento, lines, otrosCargos,
-                   currency_rate, invoice_comments):
+                   currency_rate, invoice_comments
+):
 
     numero_linea = 0
 
@@ -679,7 +670,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
-    sb.Append('<NumeroConsecutivo>' + inv.number + '</NumeroConsecutivo>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
@@ -740,7 +731,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
               str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -751,7 +742,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
 
         sb.Append('<LineaDetalle>')
         sb.Append('<NumeroLinea>' + str(numero_linea) + '</NumeroLinea>')
-        #sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
+        # sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
                   str(v['unidadMedida']) + '</UnidadMedida>')
@@ -783,22 +774,24 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
                 sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
 
                 if b.get('exoneracion'):
-                    for (c, d) in b['exoneracion']:
-                        sb.Append('<Exoneracion>')
-                        sb.Append('<TipoDocumento>' +
-                                  d['tipoDocumento'] + '</TipoDocumento>')
-                        sb.Append('<NumeroDocumento>' +
-                                  d['numeroDocumento'] + '</NumeroDocumento>')
-                        sb.Append('<NombreInstitucion>' +
-                                  d['nombreInstitucion'] + '</NombreInstitucion>')
-                        sb.Append('<FechaEmision>' +
-                                  d['fechaEmision'] + '</FechaEmision>')
-                        sb.Append('<MontoImpuesto>' +
-                                  d['montoImpuesto'] + '</MontoImpuesto>')
-                        sb.Append('<PorcentajeCompra>' +
-                                  d['porcentajeCompra'] + '</PorcentajeCompra>')
+                    sb.Append('<Exoneracion>')
+                    sb.Append('<TipoDocumento>' +
+                              inv.partner_id.type_exoneration.code + '</TipoDocumento>')
+                    sb.Append('<NumeroDocumento>' +
+                              inv.partner_id.exoneration_number + '</NumeroDocumento>')
+                    sb.Append('<NombreInstitucion>' +
+                              inv.partner_id.institution_name + '</NombreInstitucion>')
+                    sb.Append('<FechaEmision>' +
+                              str(inv.partner_id.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                    sb.Append('<PorcentajeExoneracion>' +
+                              str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                    sb.Append( '<MontoExoneracion>' +
+                               str( b['exoneracion']['montoImpuesto'] ) + '</MontoExoneracion>' )
+                    sb.Append( '</Exoneracion>' )
 
                 sb.Append('</Impuesto>')
+        sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
+
         sb.Append('<MontoTotalLinea>' +
                   str(v['montoTotalLinea']) + '</MontoTotalLinea>')
         sb.Append('</LineaDetalle>')
@@ -807,30 +800,41 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     # TODO: ¿Cómo implementar otros cargos a nivel de UI y model en Odoo?
     if otrosCargos:
         sb.Append('<OtrosCargos>')
-        response_json = json.loads(otrosCargos)
-        for (k, v) in response_json.items():
+        for otro_cargo in otrosCargos:
             sb.Append('<TipoDocumento>' +
-                      str(v['TipoDocumento']) + '<TipoDocumento>')
+                      str(otrosCargos[otro_cargo]['TipoDocumento']) +
+                      '</TipoDocumento>')
 
-            if v.get('NumeroIdentidadTercero'):
+            if otrosCargos[otro_cargo].get('NumeroIdentidadTercero'):
                 sb.Append('<NumeroIdentidadTercero>' +
-                          str(v['NumeroIdentidadTercero']) + '<NumeroIdentidadTercero>')
+                          str(otrosCargos[otro_cargo]['NumeroIdentidadTercero']) +
+                          '</NumeroIdentidadTercero>')
 
-            if v.get('NombreTercero'):
+            if otrosCargos[otro_cargo].get('NombreTercero'):
                 sb.Append('<NombreTercero>' +
-                          str(v['NombreTercero']) + '<NombreTercero>')
+                          str(otrosCargos[otro_cargo]['NombreTercero']) +
+                          '</NombreTercero>')
 
-            sb.Append('<Detalle>' + str(v['Detalle']) + '<Detalle>')
-            if v.get('Porcentaje'):
+            sb.Append('<Detalle>' +
+                      str(otrosCargos[otro_cargo]['Detalle']) +
+                      '</Detalle>')
+
+            if otrosCargos[otro_cargo].get('Porcentaje'):
                 sb.Append('<Porcentaje>' +
-                          str(v['Porcentaje']) + '<Porcentaje>')
+                          str(otrosCargos[otro_cargo]['Porcentaje']) +
+                          '</Porcentaje>')
 
-            sb.Append('<MontoCargo>' + str(v['MontoCargo']) + '<MontoCargo>')
+            sb.Append('<MontoCargo>' +
+                      str(otrosCargos[otro_cargo]['MontoCargo']) +
+                      '</MontoCargo>')
         sb.Append('</OtrosCargos>')
 
     sb.Append('<ResumenFactura>')
-    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' + str(inv.currency_id.name) + '</CodigoMoneda><TipoCambio>' + str(
-        currency_rate) + '</TipoCambio></CodigoTipoMoneda>')
+    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
+              str(inv.currency_id.name) +
+              '</CodigoMoneda><TipoCambio>' +
+              str(currency_rate) +
+              '</TipoCambio></CodigoTipoMoneda>')
 
     sb.Append('<TotalServGravados>' +
               str(total_servicio_gravado) + '</TotalServGravados>')
@@ -838,7 +842,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
               str(total_servicio_exento) + '</TotalServExentos>')
 
     # TODO: Hay que calcular TotalServExonerado
-    # sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
+    sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
 
     sb.Append('<TotalMercanciasGravadas>' +
               str(total_mercaderia_gravado) + '</TotalMercanciasGravadas>')
@@ -846,7 +850,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
               str(total_mercaderia_exento) + '</TotalMercanciasExentas>')
 
     # TODO: Hay que calcular TotalMercExonerada
-    # sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
+    sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
 
     sb.Append('<TotalGravado>' + str(total_servicio_gravado +
                                      total_mercaderia_gravado) + '</TotalGravado>')
@@ -854,11 +858,11 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
                                     total_mercaderia_exento) + '</TotalExento>')
 
     # TODO: Hay que calcular TotalExonerado
-    # sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
+    sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
 
     # TODO: agregar los exonerados en la suma
     sb.Append('<TotalVenta>' + str(
-        total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) + '</TotalVenta>')
+        total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento + totalServExonerado + totalMercExonerada) + '</TotalVenta>')
 
     sb.Append('<TotalDescuentos>' +
               str(round(total_descuento, 2)) + '</TotalDescuentos>')
@@ -886,7 +890,7 @@ def gen_xml_fe_v43(inv, sale_conditions, medio_pago, total_servicio_gravado, tot
     return sb
 
 
-def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento, totalServExonerado,
+def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, total_servicio_gravado, total_servicio_exento, totalServExonerado,
                     total_mercaderia_gravado, total_mercaderia_exento, totalMercExonerada, totalOtrosCargos, base_total, total_impuestos, total_descuento,
                     lines, otrosCargos, currency_rate, invoice_comments):
 
@@ -964,7 +968,7 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_s
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
               str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1097,12 +1101,13 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_s
 
     sb.Append('</FacturaElectronica>')
 
-    felectronica_bytes = str(sb)
+    #felectronica_bytes = str(sb)
 
-    return stringToBase64(felectronica_bytes)
+    #return stringToBase64(felectronica_bytes)
+    return sb
 
 
-def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
+def gen_xml_te_42(inv, sale_conditions, total_servicio_gravado, total_servicio_exento,
                total_mercaderia_gravado, total_mercaderia_exento, base_total, total_impuestos, total_descuento,
                lines, currency_rate, invoice_comments):
 
@@ -1117,8 +1122,8 @@ def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
     sb.Append('xsi:schemaLocation="https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.2/TiqueteElectronico_V4.2.xsd">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1147,7 +1152,7 @@ def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
               str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1239,17 +1244,224 @@ def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
 
     sb.Append('</TiqueteElectronico>')
 
-    telectronico_bytes = str(sb)
+    #telectronico_bytes = str(sb)
+    #return stringToBase64(telectronico_bytes)
+    return sb
 
-    return stringToBase64(telectronico_bytes)
+def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_exento,
+               total_mercaderia_gravado, total_mercaderia_exento, base_total, total_impuestos, total_descuento,
+               lines, currency_rate, invoice_comments, otrosCargos):
+
+    numero_linea = 0
+
+    sb = StringBuilder()
+    sb.Append('<TiqueteElectronico xmlns="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/tiqueteElectronico" ')
+    sb.Append(
+        'xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ')
+    sb.Append('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
+    sb.Append('xsi:schemaLocation="https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/TiqueteElectronico_V4.3.xsd">')
+
+    sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
+    sb.Append('<CodigoActividad>' +
+              inv.company_id.activity_id.code + '</CodigoActividad>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
+    sb.Append('<Emisor>')
+    sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
+    sb.Append('<Identificacion>')
+    sb.Append('<Tipo>' + inv.company_id.identification_id.code + '</Tipo>')
+    sb.Append('<Numero>' + inv.company_id.vat + '</Numero>')
+    sb.Append('</Identificacion>')
+    sb.Append('<NombreComercial>' +
+              escape(str(inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
+    sb.Append('<Ubicacion>')
+    sb.Append('<Provincia>' + inv.company_id.state_id.code + '</Provincia>')
+    sb.Append('<Canton>' + inv.company_id.county_id.code + '</Canton>')
+    sb.Append('<Distrito>' + inv.company_id.district_id.code + '</Distrito>')
+    sb.Append(
+        '<Barrio>' + str(inv.company_id.neighborhood_id.code or '00') + '</Barrio>')
+    sb.Append('<OtrasSenas>' +
+              escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
+    sb.Append('</Ubicacion>')
+    sb.Append('<Telefono>')
+    sb.Append('<CodigoPais>' + inv.company_id.phone_code + '</CodigoPais>')
+    sb.Append('<NumTelefono>' +
+              re.sub('[^0-9]+', '', inv.company_id.phone) + '</NumTelefono>')
+    sb.Append('</Telefono>')
+    sb.Append('<CorreoElectronico>' +
+              str(inv.company_id.email) + '</CorreoElectronico>')
+    sb.Append('</Emisor>')
+    sb.Append('<Receptor>')
+    sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+    sb.Append('</Receptor>')
+    sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
+    sb.Append('<PlazoCredito>' +
+              str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
+    sb.Append('<DetalleServicio>')
+
+    detalle_factura = lines
+    response_json = json.loads(detalle_factura)
+
+    for (k, v) in response_json.items():
+        numero_linea = numero_linea + 1
+
+        sb.Append('<LineaDetalle>')
+        sb.Append('<NumeroLinea>' + str(numero_linea) + '</NumeroLinea>')
+        # sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
+        sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
+        sb.Append('<UnidadMedida>' +
+                  str(v['unidadMedida']) + '</UnidadMedida>')
+        sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
+        sb.Append('<PrecioUnitario>' +
+                  str(v['precioUnitario']) + '</PrecioUnitario>')
+        sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
+        if v.get('montoDescuento'):
+            sb.Append('<Descuento>')
+            sb.Append('<MontoDescuento>' +
+                      str(v['montoDescuento']) + '</MontoDescuento>')
+            if v.get('naturalezaDescuento'):
+                sb.Append('<NaturalezaDescuento>' +
+                          str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
+            sb.Append('</Descuento>')
+
+        sb.Append('<SubTotal>' + str(v['subtotal']) + '</SubTotal>')
+
+        # TODO: ¿qué es base imponible? ¿porqué podría ser diferente del subtotal?
+        # sb.Append('<BaseImponible>' + str(v['subtotal']) + '</BaseImponible>')
+
+        if v.get('impuesto'):
+            for (a, b) in v['impuesto'].items():
+                sb.Append('<Impuesto>')
+                sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
+                sb.Append('<CodigoTarifa>' +
+                          str(b['iva_tax_code']) + '</CodigoTarifa>')
+                sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
+                sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
+
+                if b.get('exoneracion'):
+                    for (c, d) in b['exoneracion']:
+                        sb.Append('<Exoneracion>')
+                        sb.Append('<TipoDocumento>' +
+                                  d['tipoDocumento'] + '</TipoDocumento>')
+                        sb.Append('<NumeroDocumento>' +
+                                  d['numeroDocumento'] + '</NumeroDocumento>')
+                        sb.Append('<NombreInstitucion>' +
+                                  d['nombreInstitucion'] + '</NombreInstitucion>')
+                        sb.Append('<FechaEmision>' +
+                                  d['fechaEmision'] + '</FechaEmision>')
+                        sb.Append('<MontoImpuesto>' +
+                                  d['montoImpuesto'] + '</MontoImpuesto>')
+                        sb.Append('<PorcentajeCompra>' +
+                                  d['porcentajeCompra'] + '</PorcentajeCompra>')
+
+                sb.Append('</Impuesto>')
+        sb.Append('<MontoTotalLinea>' +
+                  str(v['montoTotalLinea']) + '</MontoTotalLinea>')
+        sb.Append('</LineaDetalle>')
+    sb.Append('</DetalleServicio>')
+
+    # TODO: ¿Cómo implementar otros cargos a nivel de UI y model en Odoo?
+    if otrosCargos:
+        sb.Append('<OtrosCargos>')
+        for otro_cargo in otrosCargos:
+            sb.Append('<TipoDocumento>' +
+                      str(otrosCargos[otro_cargo]['TipoDocumento']) +
+                      '</TipoDocumento>')
+
+            if otrosCargos[otro_cargo].get('NumeroIdentidadTercero'):
+                sb.Append('<NumeroIdentidadTercero>' +
+                          str(otrosCargos[otro_cargo]['NumeroIdentidadTercero']) +
+                          '</NumeroIdentidadTercero>')
+
+            if otrosCargos[otro_cargo].get('NombreTercero'):
+                sb.Append('<NombreTercero>' +
+                          str(otrosCargos[otro_cargo]['NombreTercero']) +
+                          '</NombreTercero>')
+
+            sb.Append('<Detalle>' +
+                      str(otrosCargos[otro_cargo]['Detalle']) +
+                      '</Detalle>')
+
+            if otrosCargos[otro_cargo].get('Porcentaje'):
+                sb.Append('<Porcentaje>' +
+                          str(otrosCargos[otro_cargo]['Porcentaje']) +
+                          '</Porcentaje>')
+
+            sb.Append('<MontoCargo>' +
+                      str(otrosCargos[otro_cargo]['MontoCargo']) +
+                      '</MontoCargo>')
+        sb.Append('</OtrosCargos>')
+
+    sb.Append('<ResumenFactura>')
+    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
+              str(inv.currency_id.name) +
+              '</CodigoMoneda><TipoCambio>' +
+              str(currency_rate) +
+              '</TipoCambio></CodigoTipoMoneda>')
+
+    sb.Append('<TotalServGravados>' +
+              str(total_servicio_gravado) + '</TotalServGravados>')
+    sb.Append('<TotalServExentos>' +
+              str(total_servicio_exento) + '</TotalServExentos>')
+
+    # TODO: Hay que calcular TotalServExonerado
+    # sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
+
+    sb.Append('<TotalMercanciasGravadas>' +
+              str(total_mercaderia_gravado) + '</TotalMercanciasGravadas>')
+    sb.Append('<TotalMercanciasExentas>' +
+              str(total_mercaderia_exento) + '</TotalMercanciasExentas>')
+
+    # TODO: Hay que calcular TotalMercExonerada
+    # sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
+
+    sb.Append('<TotalGravado>' + str(total_servicio_gravado +
+                                     total_mercaderia_gravado) + '</TotalGravado>')
+    sb.Append('<TotalExento>' + str(total_servicio_exento +
+                                    total_mercaderia_exento) + '</TotalExento>')
+
+    # TODO: Hay que calcular TotalExonerado
+    # sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
+
+    # TODO: agregar los exonerados en la suma
+    sb.Append('<TotalVenta>' + str(
+        total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) + '</TotalVenta>')
+
+    sb.Append('<TotalDescuentos>' +
+              str(round(total_descuento, 2)) + '</TotalDescuentos>')
+    sb.Append('<TotalVentaNeta>' +
+              str(round(base_total, 2)) + '</TotalVentaNeta>')
+    sb.Append('<TotalImpuesto>' +
+              str(round(total_impuestos, 2)) + '</TotalImpuesto>')
+
+    # TODO: Hay que calcular el TotalIVADevuelto
+    # sb.Append('<TotalIVADevuelto>' + str(¿de dónde sacamos esto?) + '</TotalIVADevuelto>')
+
+    # TODO: Hay que calcular el TotalOtrosCargos
+    # sb.Append('<TotalOtrosCargos>' + str(¿de dónde sacamos esto?) + '</TotalOtrosCargos>')
+
+    sb.Append('<TotalComprobante>' + str(round(base_total +
+                                               total_impuestos, 2)) + '</TotalComprobante>')
+    sb.Append('</ResumenFactura>')
+    sb.Append('<Otros>')
+    sb.Append('<OtroTexto>' +
+              str(invoice_comments or 'Test FE V4.3') + '</OtroTexto>')
+    sb.Append('</Otros>')
+
+    sb.Append('</TiqueteElectronico>')
+
+    #telectronico_bytes = str(sb)
+    #return stringToBase64(telectronico_bytes)
+    return sb
 
 
 def gen_xml_nc_v43(
-    inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
+    inv, sale_conditions, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-    codigo_referencia, razon_referencia, currency_rate, invoice_comments
+    codigo_referencia, razon_referencia, currency_rate, invoice_comments, otrosCargos
 ):
 
     numero_linea = 0
@@ -1264,8 +1476,8 @@ def gen_xml_nc_v43(
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
-    sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1294,38 +1506,40 @@ def gen_xml_nc_v43(
     sb.Append('<Receptor>')
     sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
 
-    if inv.partner_id.identification_id.code == '05':
-        sb.Append('<IdentificacionExtranjero>' +
-                  inv.partner_id.vat + '</IdentificacionExtranjero>')
-    else:
-        sb.Append('<Identificacion>')
-        sb.Append('<Tipo>' + inv.partner_id.identification_id.code + '</Tipo>')
-        sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
-        sb.Append('</Identificacion>')
+    if inv.partner_id.identification_id:
+        if inv.partner_id.identification_id.code == '05':
+            sb.Append('<IdentificacionExtranjero>' +
+                    inv.partner_id.vat + '</IdentificacionExtranjero>')
+        else:
+            sb.Append('<Identificacion>')
+            sb.Append('<Tipo>' + inv.partner_id.identification_id.code + '</Tipo>')
+            sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
+            sb.Append('</Identificacion>')
 
-    sb.Append('<Ubicacion>')
-    sb.Append('<Provincia>' +
-              str(inv.partner_id.state_id.code or '') + '</Provincia>')
-    sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
-    sb.Append('<Distrito>' +
-              str(inv.partner_id.district_id.code or '') + '</Distrito>')
-    sb.Append(
-        '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
-    sb.Append('<OtrasSenas>' +
-              str(inv.partner_id.street or 'NA') + '</OtrasSenas>')
-    sb.Append('</Ubicacion>')
-    sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
-    sb.Append('<NumTelefono>' +
-              re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
-    sb.Append('</Telefono>')
-    sb.Append('<CorreoElectronico>' +
-              str(inv.partner_id.email) + '</CorreoElectronico>')
+        sb.Append('<Ubicacion>')
+        sb.Append('<Provincia>' +
+                str(inv.partner_id.state_id.code or '') + '</Provincia>')
+        sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
+        sb.Append('<Distrito>' +
+                str(inv.partner_id.district_id.code or '') + '</Distrito>')
+        sb.Append(
+            '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
+        sb.Append('<OtrasSenas>' +
+                str(inv.partner_id.street or 'NA') + '</OtrasSenas>')
+        sb.Append('</Ubicacion>')
+        sb.Append('<Telefono>')
+        sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
+        sb.Append('<NumTelefono>' +
+                re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
+        sb.Append('</Telefono>')
+        sb.Append('<CorreoElectronico>' +
+                str(inv.partner_id.email) + '</CorreoElectronico>')
+
     sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
-              str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+              str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1455,7 +1669,7 @@ def gen_xml_nc_v43(
 
 
 def gen_xml_nc(
-    inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
+    inv, sale_conditions, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
@@ -1474,8 +1688,8 @@ def gen_xml_nc(
     sb.Append(
         'https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/NotaCreditoElectronica_V4.2.xsd">')
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1535,7 +1749,7 @@ def gen_xml_nc(
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
               str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1640,7 +1854,7 @@ def gen_xml_nc(
 
 
 def gen_xml_nd(
-    inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
+    inv, consecutivo, date, sale_conditions, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
@@ -1718,7 +1932,7 @@ def gen_xml_nd(
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
               str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1823,7 +2037,7 @@ def gen_xml_nd(
 
 
 def gen_xml_nd_v43(
-    inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
+    inv, consecutivo, date, sale_conditions, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
@@ -1902,7 +2116,7 @@ def gen_xml_nd_v43(
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
               str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -2035,10 +2249,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
                token, 'Content-type': 'application/json'}
 
     # establecer el ambiente al cual me voy a conectar
-    if tipo_ambiente == 'api-stag':
-        endpoint = fe_enums.UrlHaciendaRecepcion.apistag.value
-    else:
-        endpoint = fe_enums.UrlHaciendaRecepcion.apiprod.value
+    endpoint = fe_enums.UrlHaciendaRecepcion[tipo_ambiente]
 
     xml_base64 = stringToBase64(xml)
 
@@ -2166,15 +2377,9 @@ class StringBuilder:
         return self._file_str.getvalue()
 
 
-def consulta_clave(clave, token, env):
+def consulta_clave(clave, token, tipo_ambiente):
 
-    if env == 'api-stag':
-        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/' + clave
-    elif env == 'api-prod':
-        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/' + clave
-    else:
-        _logger.error('MAB - Ambiente no definido')
-        return
+    endpoint = fe_enums.UrlHaciendaRecepcion[tipo_ambiente] + clave
 
     headers = {
         'Authorization': 'Bearer {}'.format(token),
@@ -2183,11 +2388,11 @@ def consulta_clave(clave, token, env):
         'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
     }
 
-    _logger.error('MAB - consulta_clave - url: %s' % url)
+    _logger.error('MAB - consulta_clave - url: %s' % endpoint)
 
     try:
         # response = requests.request("GET", url, headers=headers)
-        response = requests.get(url, headers=headers)
+        response = requests.get(endpoint, headers=headers)
         ############################
     except requests.exceptions.RequestException as e:
         _logger.error('Exception %s' % e)
@@ -2310,13 +2515,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
 
 def send_message(inv, date_cr, token, env):
 
-    if env == 'api-stag':
-        url = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
-    elif env == 'api-prod':
-        url = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
-    else:
-        _logger.error('MAB - Ambiente no definido')
-        return
+    endpoint = fe_enums.UrlHaciendaRecepcion[tipo_ambiente]
 
     comprobante = {}
     comprobante['clave'] = inv.number_electronic
@@ -2334,12 +2533,12 @@ def send_message(inv, date_cr, token, env):
     _logger.info('MAB - Comprobante : %s' % comprobante)
     headers = {'Content-Type': 'application/json',
                'Authorization': 'Bearer {}'.format(token)}
-    _logger.info('MAB - URL : %s' % url)
+    _logger.info('MAB - URL : %s' % endpoint)
     _logger.info('MAB - Headers : %s' % headers)
 
     try:
         response = requests.post(
-            url, data=json.dumps(comprobante), headers=headers)
+            endpoint, data=json.dumps(comprobante), headers=headers)
 
     except requests.exceptions.RequestException as e:
         _logger.info('Exception %s' % e)
