@@ -509,7 +509,8 @@ class PosOrder(models.Model):
                 invoice_comments = ''
                 if tipo_documento == 'TE':
                     xml_string_builder = api_facturae.gen_xml_fe_v42(doc, date_cr,
-                                                                    sale_conditions, medio_pago,
+#                                                                    sale_conditions, medio_pago,
+                                                                    sale_conditions,
                                                                     round(
                                                                         total_servicio_gravado, 5),
                                                                     round(
