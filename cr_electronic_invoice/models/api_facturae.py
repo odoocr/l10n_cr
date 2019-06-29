@@ -543,7 +543,7 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions,
         telefono_receptor = inv.partner_id.phone and re.sub('[^0-9]+', '', inv.partner_id.phone)
         if telefono_receptor:
             sb.Append('<Telefono>')
-            sb.Append('<CodigoPais>' + inv.partner_id.phone_code or '506' + '</CodigoPais>')
+            sb.Append('<CodigoPais>' + (inv.partner_id.phone_code or '506') + '</CodigoPais>')
             sb.Append('<NumTelefono>' + telefono_receptor + '</NumTelefono>')
             sb.Append('</Telefono>')
         match = inv.partner_id.email and re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
