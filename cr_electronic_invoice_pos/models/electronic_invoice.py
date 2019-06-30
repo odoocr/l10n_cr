@@ -389,7 +389,6 @@ class PosOrder(models.Model):
                         tipo_documento = 'NC'
                         tipo_documento_referencia = 'FE'
                         numero_documento_referencia = doc.pos_order_id.number_electronic
-                        fecha_emision_referencia = doc.pos_order_id.date_issuance
                         codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
                     tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
@@ -416,16 +415,19 @@ class PosOrder(models.Model):
                 else:
                     medio_pago = doc.statement_ids[0].statement_id.journal_id.payment_method_id and doc.statement_ids[0].statement_id.journal_id.payment_method_id.sequence 
                 sale_conditions = '01' #Contado !!   doc.sale_conditions_id.sequence,
-
                 currency_rate = 1  # 1 / doc.currency_id.rate
 
                 # Generamos las líneas de la factura
                 lines = dict()
+                otros_cargos = dict()
+                otros_cargos_id = 0
                 line_number = 0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
+                total_servicio_exonerado = 0.0
                 total_mercaderia_gravado = 0.0
                 total_mercaderia_exento = 0.0
+                total_mercaderia_exonerado = 0.0
                 total_descuento = 0.0
                 total_impuestos = 0.0
                 base_subtotal = 0.0
@@ -472,7 +474,7 @@ class PosOrder(models.Model):
                         taxes_lookup = {}
                         for i in tax_ids:
                             taxes_lookup[i.id] = {
-                                'tax_code': i.tax_code, 'tarifa': i.amount}
+                                'tax_code': i.tax_code, 'tarifa': i.amount,'iva_tax_desc': i.iva_tax_desc,'iva_tax_code': i.iva_tax_code}
                         for i in line_taxes['taxes']:
                             if taxes_lookup[i['id']]['tax_code'] != '00':
                                 tax_index += 1
@@ -482,6 +484,8 @@ class PosOrder(models.Model):
                                     'codigo': taxes_lookup[i['id']]['tax_code'],
                                     'tarifa': taxes_lookup[i['id']]['tarifa'],
                                     'monto': tax_amount,
+                                    'iva_tax_desc': taxes_lookup[i['id']]['iva_tax_desc'],
+                                    'iva_tax_code': taxes_lookup[i['id']]['iva_tax_code'],
                                 }
 
                     dline["impuesto"] = taxes
@@ -505,11 +509,11 @@ class PosOrder(models.Model):
                     dline["montoTotalLinea"] = subtotal_line + impuesto_linea
 
                     lines[line_number] = dline
+                doc.date_issuance = date_cr
                 doc.number_electronic = docName
                 invoice_comments = ''
                 if tipo_documento == 'TE':
-                    xml_string_builder = api_facturae.gen_xml_fe_v42(doc, date_cr,
-#                                                                    sale_conditions, medio_pago,
+                    xml_string_builder = api_facturae.gen_xml_te_43(doc,
                                                                     sale_conditions,
                                                                     round(
                                                                         total_servicio_gravado, 5),
@@ -522,9 +526,9 @@ class PosOrder(models.Model):
                                                                     total_impuestos, total_descuento,
                                                                     json.dumps(
                                                                         lines, ensure_ascii=False),
-                                                                    currency_rate, invoice_comments)
+                                                                    currency_rate, invoice_comments, otros_cargos)
                 else:
-                    xml_string_builder = api_facturae.gen_xml_nc(doc, date_cr,
+                    xml_string_builder = api_facturae.gen_xml_nc(doc, 
                                                                     sale_conditions, medio_pago,
                                                                     round(
                                                                         total_servicio_gravado, 5),
@@ -541,20 +545,6 @@ class PosOrder(models.Model):
                                                                     fecha_emision_referencia, codigo_referencia, 
                                                                     razon_referencia,
                                                                     currency_rate, invoice_comments)
-
-                # response_json = fxunctions.make_xml_invoice(doc, tipo_documento,
-                #                                           sale_conditions, medio_pago,
-                #                                           total_servicio_gravado,
-                #                                           total_servicio_exento, total_mercaderia_gravado,
-                #                                           total_mercaderia_exento, base_subtotal,
-                #                                           total_impuestos, total_descuento,
-                #                                           json.dumps(lines, ensure_ascii=False),
-                #                                           tipo_documento_referencia,
-                #                                           numero_documento_referencia,
-                #                                           fecha_emision_referencia,
-                #                                           codigo_referencia, razon_referencia, url,
-                #                                           currency_rate)
-
                 xml_to_sign = str(xml_string_builder)
                 xml_firmado = api_facturae.sign_xml(
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
@@ -573,7 +563,6 @@ class PosOrder(models.Model):
                 #    doc.state_tributacion = 'error'
                 #    continue
 
-                doc.date_issuance = date_cr
                 doc.fname_xml_comprobante = tipo_documento + '_' + docName + '.xml'
                 #doc.xml_comprobante = response_json.get('xmlFirmado')
                 doc.xml_comprobante = base64.encodestring(xml_firmado)

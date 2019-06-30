@@ -453,7 +453,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     return base64UTF8Decoder(mr_to_base64)
 
 
-def gen_xml_fe_v42(inv, date_issuance, sale_conditions,
+def gen_xml_fe_v42(inv, sale_conditions,
                    total_servicio_gravado, total_servicio_exento,
                    total_mercaderia_gravado, total_mercaderia_exento,
                    base_total, total_impuestos, total_descuento,
@@ -463,8 +463,10 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions,
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
+        payment_methods_id = '01'
         cod_moneda = inv.company_id.currency_id.name
     else:
+        payment_methods_id = inv.payment_methods_id.sequence
         plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
         cod_moneda = inv.currency_id.name
 
@@ -480,7 +482,7 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions,
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<NumeroConsecutivo>' +
               inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date_issuance + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -555,7 +557,7 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions,
         sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' + str(plazo_credito) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
+    sb.Append('<MedioPago>' + (payment_methods_id) + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -671,7 +673,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -865,11 +867,11 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
         total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento + totalServExonerado + totalMercExonerada) + '</TotalVenta>')
 
     sb.Append('<TotalDescuentos>' +
-              str(round(total_descuento, 2)) + '</TotalDescuentos>')
+              str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' +
-              str(round(base_total, 2)) + '</TotalVentaNeta>')
+              str(round(base_total, 5)) + '</TotalVentaNeta>')
     sb.Append('<TotalImpuesto>' +
-              str(round(total_impuestos, 2)) + '</TotalImpuesto>')
+              str(round(total_impuestos, 5)) + '</TotalImpuesto>')
 
     # TODO: Hay que calcular el TotalIVADevuelto
     # sb.Append('<TotalIVADevuelto>' + str(¿de dónde sacamos esto?) + '</TotalIVADevuelto>')
@@ -878,7 +880,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
     # sb.Append('<TotalOtrosCargos>' + str(¿de dónde sacamos esto?) + '</TotalOtrosCargos>')
 
     sb.Append('<TotalComprobante>' + str(round(base_total +
-                                               total_impuestos, 2)) + '</TotalComprobante>')
+                                               total_impuestos, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
     sb.Append('<Otros>')
     sb.Append('<OtroTexto>' +
@@ -1265,7 +1267,7 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1292,12 +1294,21 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
               str(inv.company_id.email) + '</CorreoElectronico>')
     sb.Append('</Emisor>')
     sb.Append('<Receptor>')
-    sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+    if 'inv.partner_id.name' in locals():
+        sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+    else:
+        sb.Append('<Nombre>No especificado</Nombre>')
     sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
-    sb.Append('<PlazoCredito>' +
-              str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
+    if 'inv.payment_term_id' in locals():
+        sb.Append('<PlazoCredito>' +
+                  str((inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0')) + '</PlazoCredito>')
+    else:
+        sb.Append('<PlazoCredito>0</PlazoCredito>')
+    if 'inv.payment_methods_id.sequence' in locals():
+        sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
+    else:
+        sb.Append('<MedioPago>01</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1394,11 +1405,16 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
         sb.Append('</OtrosCargos>')
 
     sb.Append('<ResumenFactura>')
-    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
-              str(inv.currency_id.name) +
-              '</CodigoMoneda><TipoCambio>' +
-              str(currency_rate) +
-              '</TipoCambio></CodigoTipoMoneda>')
+    if 'inv.currency_id' in locals():
+        sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
+                  str(inv.currency_id.name) +
+                  '</CodigoMoneda><TipoCambio>' +
+                  str(currency_rate) +
+                  '</TipoCambio></CodigoTipoMoneda>')
+    else:
+        sb.Append('<CodigoTipoMoneda><CodigoMoneda>CRC</CodigoMoneda><TipoCambio>' +
+                  str(currency_rate) +
+                  '</TipoCambio></CodigoTipoMoneda>')
 
     sb.Append('<TotalServGravados>' +
               str(total_servicio_gravado) + '</TotalServGravados>')
@@ -1477,7 +1493,7 @@ def gen_xml_nc_v43(
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1854,7 +1870,7 @@ def gen_xml_nc(
 
 
 def gen_xml_nd(
-    inv, consecutivo, date, sale_conditions, total_servicio_gravado,
+    inv, sale_conditions, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
@@ -1871,8 +1887,8 @@ def gen_xml_nd(
     sb.Append(
         'https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/NotaCreditoElectronica_V4.2.xsd">')
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -2037,7 +2053,7 @@ def gen_xml_nd(
 
 
 def gen_xml_nd_v43(
-    inv, consecutivo, date, sale_conditions, total_servicio_gravado,
+    inv, consecutivo, sale_conditions, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
@@ -2056,7 +2072,7 @@ def gen_xml_nd_v43(
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
