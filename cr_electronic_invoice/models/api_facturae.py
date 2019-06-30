@@ -878,7 +878,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
     # sb.Append('<TotalOtrosCargos>' + str(¿de dónde sacamos esto?) + '</TotalOtrosCargos>')
 
     sb.Append('<TotalComprobante>' + str(round(base_total +
-                                               total_impuestos, 2)) + '</TotalComprobante>')
+                                               total_impuestos, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
     sb.Append('<Otros>')
     sb.Append('<OtroTexto>' +
