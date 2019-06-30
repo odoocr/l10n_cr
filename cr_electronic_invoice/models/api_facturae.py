@@ -463,8 +463,10 @@ def gen_xml_fe_v42(inv, sale_conditions,
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
+        payment_methods_id = '01'
         cod_moneda = inv.company_id.currency_id.name
     else:
+        payment_methods_id = inv.payment_methods_id.sequence
         plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
         cod_moneda = inv.currency_id.name
 
@@ -555,7 +557,7 @@ def gen_xml_fe_v42(inv, sale_conditions,
         sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' + str(plazo_credito) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
+    sb.Append('<MedioPago>' + (payment_methods_id) + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1292,12 +1294,21 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
               str(inv.company_id.email) + '</CorreoElectronico>')
     sb.Append('</Emisor>')
     sb.Append('<Receptor>')
-    sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+    if 'inv.partner_id.name' in locals():
+        sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+    else:
+        sb.Append('<Nombre>No especificado</Nombre>')
     sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
-    sb.Append('<PlazoCredito>' +
-              str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0') + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
+    if 'inv.payment_term_id' in locals():
+        sb.Append('<PlazoCredito>' +
+                  str((inv.payment_term_id and inv.payment_term_id.line_ids[0].days or '0')) + '</PlazoCredito>')
+    else:
+        sb.Append('<PlazoCredito>0</PlazoCredito>')
+    if 'inv.payment_methods_id.sequence' in locals():
+        sb.Append('<MedioPago>' + (inv.payment_methods_id.sequence or '01') + '</MedioPago>')
+    else:
+        sb.Append('<MedioPago>01</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1394,11 +1405,16 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
         sb.Append('</OtrosCargos>')
 
     sb.Append('<ResumenFactura>')
-    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
-              str(inv.currency_id.name) +
-              '</CodigoMoneda><TipoCambio>' +
-              str(currency_rate) +
-              '</TipoCambio></CodigoTipoMoneda>')
+    if 'inv.currency_id' in locals():
+        sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
+                  str(inv.currency_id.name) +
+                  '</CodigoMoneda><TipoCambio>' +
+                  str(currency_rate) +
+                  '</TipoCambio></CodigoTipoMoneda>')
+    else:
+        sb.Append('<CodigoTipoMoneda><CodigoMoneda>CRC</CodigoMoneda><TipoCambio>' +
+                  str(currency_rate) +
+                  '</TipoCambio></CodigoTipoMoneda>')
 
     sb.Append('<TotalServGravados>' +
               str(total_servicio_gravado) + '</TotalServGravados>')
