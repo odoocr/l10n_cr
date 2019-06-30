@@ -416,16 +416,19 @@ class PosOrder(models.Model):
                 else:
                     medio_pago = doc.statement_ids[0].statement_id.journal_id.payment_method_id and doc.statement_ids[0].statement_id.journal_id.payment_method_id.sequence 
                 sale_conditions = '01' #Contado !!   doc.sale_conditions_id.sequence,
-
                 currency_rate = 1  # 1 / doc.currency_id.rate
 
                 # Generamos las líneas de la factura
                 lines = dict()
+                otros_cargos = dict()
+                otros_cargos_id = 0
                 line_number = 0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
+                total_servicio_exonerado = 0.0
                 total_mercaderia_gravado = 0.0
                 total_mercaderia_exento = 0.0
+                total_mercaderia_exonerado = 0.0
                 total_descuento = 0.0
                 total_impuestos = 0.0
                 base_subtotal = 0.0
@@ -472,7 +475,7 @@ class PosOrder(models.Model):
                         taxes_lookup = {}
                         for i in tax_ids:
                             taxes_lookup[i.id] = {
-                                'tax_code': i.tax_code, 'tarifa': i.amount}
+                                'tax_code': i.tax_code, 'tarifa': i.amount,'iva_tax_desc': i.iva_tax_desc,'iva_tax_code': i.iva_tax_code}
                         for i in line_taxes['taxes']:
                             if taxes_lookup[i['id']]['tax_code'] != '00':
                                 tax_index += 1
@@ -482,6 +485,8 @@ class PosOrder(models.Model):
                                     'codigo': taxes_lookup[i['id']]['tax_code'],
                                     'tarifa': taxes_lookup[i['id']]['tarifa'],
                                     'monto': tax_amount,
+                                    'iva_tax_desc': taxes_lookup[i['id']]['iva_tax_desc'],
+                                    'iva_tax_code': taxes_lookup[i['id']]['iva_tax_code'],
                                 }
 
                     dline["impuesto"] = taxes
@@ -508,8 +513,7 @@ class PosOrder(models.Model):
                 doc.number_electronic = docName
                 invoice_comments = ''
                 if tipo_documento == 'TE':
-                    xml_string_builder = api_facturae.gen_xml_fe_v42(doc, date_cr,
-#                                                                    sale_conditions, medio_pago,
+                    xml_string_builder = api_facturae.gen_xml_te_43(doc,
                                                                     sale_conditions,
                                                                     round(
                                                                         total_servicio_gravado, 5),
@@ -522,7 +526,7 @@ class PosOrder(models.Model):
                                                                     total_impuestos, total_descuento,
                                                                     json.dumps(
                                                                         lines, ensure_ascii=False),
-                                                                    currency_rate, invoice_comments)
+                                                                    currency_rate, invoice_comments, otros_cargos)
                 else:
                     xml_string_builder = api_facturae.gen_xml_nc(doc, date_cr,
                                                                     sale_conditions, medio_pago,
