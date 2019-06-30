@@ -5,27 +5,27 @@
         <!-- account tax -->
         <record id="iva_tax_0" 
             model="account.tax">
-            <field name="tax_code">00</field>
-            <field name="name">Exento</field>
+            <field name="tax_code">01</field>
+            <field name="name">IVA 0%</field>
             <field name="amount">0</field>
             <field name="type_tax_use">sale</field>
-            <field name="description">IVA 0% (Exento)</field>
+            <field name="description">IVA 0% </field>
             <field name="sequence">10</field>
             <field name="price_include">False</field>
-            <field name="iva_tax_desc">Tarifa 0% (Exento)</field>
+            <field name="iva_tax_desc">Tarifa 0%</field>
             <field name="iva_tax_code">01</field>
         </record>
 
         <record id="iva_tax_00" 
             model="account.tax">
-            <field name="tax_code">00</field>
-            <field name="name">Exento</field>
+            <field name="tax_code">01</field>
+            <field name="name">IVA 0% </field>
             <field name="amount">0</field>
             <field name="type_tax_use">purchase</field>
-            <field name="description">IVA 0% (Exento)</field>
+            <field name="description">IVA 0%</field>
             <field name="sequence">10</field>
             <field name="price_include">False</field>
-            <field name="iva_tax_desc">Tarifa 0% (Exento)</field>
+            <field name="iva_tax_desc">Tarifa 0%</field>
             <field name="iva_tax_code">01</field>
         </record>
 
@@ -460,6 +460,32 @@
             <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">06</field>
+        </record>
+
+        <record id="exempt_tax_sale"
+            model="account.tax">
+            <field name="tax_code">00</field>
+            <field name="name">Exento</field>
+            <field name="amount">0</field>
+            <field name="type_tax_use">sale</field>
+            <field name="description">Exento</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+            <field name="iva_tax_desc">N/A</field>
+            <field name="iva_tax_code">N/A</field>
+        </record>
+
+        <record id="exempt_tax_purchase"
+            model="account.tax">
+            <field name="tax_code">00</field>
+            <field name="name">Exento</field>
+            <field name="amount">0</field>
+            <field name="type_tax_use">purchase</field>
+            <field name="description">Exento</field>
+            <field name="sequence">10</field>
+            <field name="price_include">False</field>
+            <field name="iva_tax_desc">N/A</field>
+            <field name="iva_tax_code">N/A</field>
         </record>
     </data>
 </odoo>
