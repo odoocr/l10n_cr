@@ -389,7 +389,6 @@ class PosOrder(models.Model):
                         tipo_documento = 'NC'
                         tipo_documento_referencia = 'FE'
                         numero_documento_referencia = doc.pos_order_id.number_electronic
-                        fecha_emision_referencia = doc.pos_order_id.date_issuance
                         codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
                     tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
@@ -505,11 +504,11 @@ class PosOrder(models.Model):
                     dline["montoTotalLinea"] = subtotal_line + impuesto_linea
 
                     lines[line_number] = dline
+                doc.date_issuance = date_cr
                 doc.number_electronic = docName
                 invoice_comments = ''
                 if tipo_documento == 'TE':
-                    xml_string_builder = api_facturae.gen_xml_fe_v42(doc, date_cr,
-#                                                                    sale_conditions, medio_pago,
+                    xml_string_builder = api_facturae.gen_xml_fe_v42(doc, 
                                                                     sale_conditions,
                                                                     round(
                                                                         total_servicio_gravado, 5),
@@ -524,7 +523,7 @@ class PosOrder(models.Model):
                                                                         lines, ensure_ascii=False),
                                                                     currency_rate, invoice_comments)
                 else:
-                    xml_string_builder = api_facturae.gen_xml_nc(doc, date_cr,
+                    xml_string_builder = api_facturae.gen_xml_nc(doc, 
                                                                     sale_conditions, medio_pago,
                                                                     round(
                                                                         total_servicio_gravado, 5),
@@ -541,20 +540,6 @@ class PosOrder(models.Model):
                                                                     fecha_emision_referencia, codigo_referencia, 
                                                                     razon_referencia,
                                                                     currency_rate, invoice_comments)
-
-                # response_json = fxunctions.make_xml_invoice(doc, tipo_documento,
-                #                                           sale_conditions, medio_pago,
-                #                                           total_servicio_gravado,
-                #                                           total_servicio_exento, total_mercaderia_gravado,
-                #                                           total_mercaderia_exento, base_subtotal,
-                #                                           total_impuestos, total_descuento,
-                #                                           json.dumps(lines, ensure_ascii=False),
-                #                                           tipo_documento_referencia,
-                #                                           numero_documento_referencia,
-                #                                           fecha_emision_referencia,
-                #                                           codigo_referencia, razon_referencia, url,
-                #                                           currency_rate)
-
                 xml_to_sign = str(xml_string_builder)
                 xml_firmado = api_facturae.sign_xml(
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
@@ -573,7 +558,6 @@ class PosOrder(models.Model):
                 #    doc.state_tributacion = 'error'
                 #    continue
 
-                doc.date_issuance = date_cr
                 doc.fname_xml_comprobante = tipo_documento + '_' + docName + '.xml'
                 #doc.xml_comprobante = response_json.get('xmlFirmado')
                 doc.xml_comprobante = base64.encodestring(xml_firmado)

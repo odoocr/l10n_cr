@@ -453,7 +453,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     return base64UTF8Decoder(mr_to_base64)
 
 
-def gen_xml_fe_v42(inv, date_issuance, sale_conditions,
+def gen_xml_fe_v42(inv, sale_conditions,
                    total_servicio_gravado, total_servicio_exento,
                    total_mercaderia_gravado, total_mercaderia_exento,
                    base_total, total_impuestos, total_descuento,
@@ -480,7 +480,7 @@ def gen_xml_fe_v42(inv, date_issuance, sale_conditions,
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<NumeroConsecutivo>' +
               inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date_issuance + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -671,7 +671,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1265,7 +1265,7 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1477,7 +1477,7 @@ def gen_xml_nc_v43(
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + get_time_hacienda() + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -1854,7 +1854,7 @@ def gen_xml_nc(
 
 
 def gen_xml_nd(
-    inv, consecutivo, date, sale_conditions, total_servicio_gravado,
+    inv, sale_conditions, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
@@ -1871,8 +1871,8 @@ def gen_xml_nd(
     sb.Append(
         'https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/NotaCreditoElectronica_V4.2.xsd">')
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')
@@ -2037,7 +2037,7 @@ def gen_xml_nd(
 
 
 def gen_xml_nd_v43(
-    inv, consecutivo, date, sale_conditions, total_servicio_gravado,
+    inv, consecutivo, sale_conditions, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
@@ -2056,7 +2056,7 @@ def gen_xml_nd_v43(
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
     sb.Append('<Identificacion>')

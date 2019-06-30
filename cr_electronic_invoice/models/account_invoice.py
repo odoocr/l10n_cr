@@ -1289,6 +1289,7 @@ class AccountInvoiceElectronic(models.Model):
                 # convertir el monto de la factura a texto
                 inv.invoice_amount_text = extensions.text_converter.number_to_text_es(
                     base_subtotal + total_impuestos)
+                inv.date_issuance = date_cr
 
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
                 if not inv.origin:
@@ -1298,7 +1299,6 @@ class AccountInvoiceElectronic(models.Model):
                     # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
                     if inv.company_id.version_hacienda == '4.2':
                         xml_string_builder = api_facturae.gen_xml_fe_v42(inv,
-                                                                         date_cr,
                                                                          sale_conditions,
                                                                          round(
                                                                              total_servicio_gravado,
@@ -1398,7 +1398,6 @@ class AccountInvoiceElectronic(models.Model):
 
                     if inv.company_id.version_hacienda == '4.2':
                         xml_string_builder = api_facturae.gen_xml_nc(inv,
-                                                                     api_facturae.get_time_hacienda(),
                                                                      sale_conditions,
                                                                      round(
                                                                          total_servicio_gravado,
@@ -1458,8 +1457,6 @@ class AccountInvoiceElectronic(models.Model):
                 else:
                     if inv.company_id.version_hacienda == '4.2':
                         xml_string_builder = api_facturae.gen_xml_nd(inv,
-                                                                     inv.sequence,
-                                                                     api_facturae.get_time_hacienda(),
                                                                      sale_conditions,
                                                                      round(
                                                                          total_servicio_gravado,
@@ -1515,7 +1512,6 @@ class AccountInvoiceElectronic(models.Model):
                                                                          currency_rate,
                                                                          invoice_comments)
 
-                inv.date_issuance = date_cr
                 inv.fname_xml_comprobante = inv.tipo_documento + '_' + inv.number_electronic + '.xml'
 
                 xml_to_sign = str(xml_string_builder)
