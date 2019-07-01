@@ -464,11 +464,11 @@ def gen_xml_fe_v42(inv, sale_conditions,
     if inv._name == 'pos.order':
         plazo_credito = '0'
         payment_methods_id = '01'
-        cod_moneda = inv.company_id.currency_id.name
+        cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id = inv.payment_methods_id.sequence
-        plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
-        cod_moneda = inv.currency_id.name
+        payment_methods_id = str(inv.payment_methods_id.sequence)
+        plazo_credito = str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0)
+        cod_moneda = str(inv.currency_id.name)
 
     sb = StringBuilder()
     sb.Append(
@@ -665,11 +665,11 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
     if inv._name == 'pos.order':
         plazo_credito = '0'
         payment_methods_id = '01'
-        cod_moneda = inv.company_id.currency_id.name
+        cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id = inv.payment_methods_id.sequence
-        plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
-        cod_moneda = inv.currency_id.name
+        payment_methods_id = str(inv.payment_methods_id.sequence)
+        plazo_credito = str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0)
+        cod_moneda = str(inv.currency_id.name)
 
     sb = StringBuilder()
     sb.Append('<FacturaElectronica xmlns="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/facturaElectronica" ')
@@ -708,37 +708,49 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
     sb.Append('<CorreoElectronico>' +
               str(inv.company_id.email) + '</CorreoElectronico>')
     sb.Append('</Emisor>')
+
+    vat = re.sub('[^0-9]', '', inv.partner_id.vat)
+    if not inv.partner_id.identification_id:
+        if len(vat) == 9:  # cedula fisica
+            id_code = '01'
+        elif len(vat) == 10:  # cedula juridica
+            id_code = '02'
+        elif len(vat) == 11 or len(vat) == 12:  # dimex
+            id_code = '03'
+        else:
+            id_code = '05'
+    else:
+        id_code = inv.partner_id.identification_id.code
+
     sb.Append('<Receptor>')
     sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+    sb.Append('<Identificacion>')
+    sb.Append('<Tipo>' + id_code + '</Tipo>')
+    sb.Append('<Numero>' + vat + '</Numero>')
+    sb.Append('</Identificacion>')
 
-    if inv.partner_id.identification_id.code == '05':
-        sb.Append('<IdentificacionExtranjero>' +
-                  inv.partner_id.vat + '</IdentificacionExtranjero>')
+    if inv.partner_id.state_id and inv.partner_id.county_id and inv.partner_id.district_id and inv.partner_id.neighborhood_id:
+        sb.Append('<Ubicacion>')
+        sb.Append('<Provincia>' + str(inv.partner_id.state_id.code or '') + '</Provincia>')
+        sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
+        sb.Append('<Distrito>' + str(inv.partner_id.district_id.code or '') + '</Distrito>')
+        sb.Append('<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
+        sb.Append('<OtrasSenas>' + escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
+        sb.Append('</Ubicacion>')
+    telefono_receptor = inv.partner_id.phone and re.sub('[^0-9]+', '', inv.partner_id.phone)
+    if telefono_receptor:
+        sb.Append('<Telefono>')
+        sb.Append('<CodigoPais>' + (inv.partner_id.phone_code or '506') + '</CodigoPais>')
+        sb.Append('<NumTelefono>' + telefono_receptor + '</NumTelefono>')
+        sb.Append('</Telefono>')
+    match = inv.partner_id.email and re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
+    if match:
+        email_receptor = inv.partner_id.email
     else:
-        sb.Append('<Identificacion>')
-        sb.Append('<Tipo>' + inv.partner_id.identification_id.code + '</Tipo>')
-        sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
-        sb.Append('</Identificacion>')
-
-    sb.Append('<Ubicacion>')
-    sb.Append('<Provincia>' +
-              str(inv.partner_id.state_id.code or '') + '</Provincia>')
-    sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
-    sb.Append('<Distrito>' +
-              str(inv.partner_id.district_id.code or '') + '</Distrito>')
-    sb.Append(
-        '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
-    sb.Append('<OtrasSenas>' +
-              escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
-    sb.Append('</Ubicacion>')
-    sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
-    sb.Append('<NumTelefono>' +
-              re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
-    sb.Append('</Telefono>')
-    sb.Append('<CorreoElectronico>' +
-              str(inv.partner_id.email) + '</CorreoElectronico>')
+        email_receptor = 'indefinido@indefinido.com'
+    sb.Append('<CorreoElectronico>' + email_receptor + '</CorreoElectronico>')
     sb.Append('</Receptor>')
+
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' + plazo_credito + '</PlazoCredito>')
     sb.Append('<MedioPago>' + payment_methods_id + '</MedioPago>')
@@ -956,25 +968,29 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, total_servicio_grav
         sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
         sb.Append('</Identificacion>')
 
-    sb.Append('<Ubicacion>')
-    sb.Append('<Provincia>' +
-              str(inv.partner_id.state_id.code or '') + '</Provincia>')
-    sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
-    sb.Append('<Distrito>' +
-              str(inv.partner_id.district_id.code or '') + '</Distrito>')
-    sb.Append(
-        '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
-    sb.Append('<OtrasSenas>' +
-              escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
-    sb.Append('</Ubicacion>')
-    sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
-    sb.Append('<NumTelefono>' +
-              re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
-    sb.Append('</Telefono>')
-    sb.Append('<CorreoElectronico>' +
-              str(inv.partner_id.email) + '</CorreoElectronico>')
+    if inv.partner_id.state_id and inv.partner_id.county_id and inv.partner_id.district_id and inv.partner_id.neighborhood_id:
+        sb.Append('<Ubicacion>')
+        sb.Append('<Provincia>' + str(inv.partner_id.state_id.code or '') + '</Provincia>')
+        sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
+        sb.Append('<Distrito>' + str(inv.partner_id.district_id.code or '') + '</Distrito>')
+        sb.Append('<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
+        sb.Append('<OtrasSenas>' + escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
+        sb.Append('</Ubicacion>')
+    telefono_receptor = inv.partner_id.phone and re.sub('[^0-9]+', '', inv.partner_id.phone)
+    if telefono_receptor:
+        sb.Append('<Telefono>')
+        sb.Append('<CodigoPais>' + (inv.partner_id.phone_code or '506') + '</CodigoPais>')
+        sb.Append('<NumTelefono>' + telefono_receptor + '</NumTelefono>')
+        sb.Append('</Telefono>')
+    match = inv.partner_id.email and re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
+    if match:
+        email_receptor = inv.partner_id.email
+    else:
+        email_receptor = 'indefinido@indefinido.com'
+    sb.Append('<CorreoElectronico>' + email_receptor + '</CorreoElectronico>')
     sb.Append('</Receptor>')
+
+
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
               str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
@@ -1126,11 +1142,11 @@ def gen_xml_te_42(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     if inv._name == 'pos.order':
         plazo_credito = '0'
         payment_methods_id = '01'
-        cod_moneda = inv.company_id.currency_id.name
+        cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id = inv.payment_methods_id.sequence
-        plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
-        cod_moneda = inv.currency_id.name
+        payment_methods_id = str(inv.payment_methods_id.sequence)
+        plazo_credito = str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0)
+        cod_moneda = str(inv.currency_id.name)
 
     sb = StringBuilder()
     sb.Append('<?xml version="1.0" encoding="utf-8"?>')
@@ -1275,11 +1291,11 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     if inv._name == 'pos.order':
         plazo_credito = '0'
         payment_methods_id = '01'
-        cod_moneda = inv.company_id.currency_id.name
+        cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id = inv.payment_methods_id.sequence
-        plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
-        cod_moneda = inv.currency_id.name
+        payment_methods_id = str(inv.payment_methods_id.sequence)
+        plazo_credito = str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0)
+        cod_moneda = str(inv.currency_id.name)
 
     sb = StringBuilder()
     sb.Append('<TiqueteElectronico xmlns="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/tiqueteElectronico" ')
@@ -1498,11 +1514,11 @@ def gen_xml_nc_v43(
     if inv._name == 'pos.order':
         plazo_credito = '0'
         payment_methods_id = '01'
-        cod_moneda = inv.company_id.currency_id.name
+        cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id = inv.payment_methods_id.sequence
-        plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
-        cod_moneda = inv.currency_id.name
+        payment_methods_id = str(inv.payment_methods_id.sequence)
+        plazo_credito = str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0)
+        cod_moneda = str(inv.currency_id.name)
 
     sb = StringBuilder()
 
@@ -1541,39 +1557,54 @@ def gen_xml_nc_v43(
     sb.Append('<CorreoElectronico>' +
               str(inv.company_id.email) + '</CorreoElectronico>')
     sb.Append('</Emisor>')
-    sb.Append('<Receptor>')
-    sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
 
-    if inv.partner_id.identification_id:
-        if inv.partner_id.identification_id.code == '05':
-            sb.Append('<IdentificacionExtranjero>' +
-                    inv.partner_id.vat + '</IdentificacionExtranjero>')
+    vat = inv.partner_id and inv.partner_id.vat and re.sub('[^0-9]', '', inv.partner_id.vat)
+    if inv.partner_id and vat:
+        if not inv.partner_id.identification_id:
+            if len(vat) == 9:  # cedula fisica
+                id_code = '01'
+            elif len(vat) == 10:  # cedula juridica
+                id_code = '02'
+            elif len(vat) == 11 or len(vat) == 12:  # dimex
+                id_code = '03'
+            else:
+                id_code = '05'
+        else:
+            id_code = inv.partner_id.identification_id.code
+
+        sb.Append('<Receptor>')
+        sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+
+        if id_code == '05':
+            sb.Append('<IdentificacionExtranjero>' + vat + '</IdentificacionExtranjero>')
         else:
             sb.Append('<Identificacion>')
-            sb.Append('<Tipo>' + inv.partner_id.identification_id.code + '</Tipo>')
-            sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
+            sb.Append('<Tipo>' + id_code + '</Tipo>')
+            sb.Append('<Numero>' + vat + '</Numero>')
             sb.Append('</Identificacion>')
 
-        sb.Append('<Ubicacion>')
-        sb.Append('<Provincia>' +
-                str(inv.partner_id.state_id.code or '') + '</Provincia>')
-        sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
-        sb.Append('<Distrito>' +
-                str(inv.partner_id.district_id.code or '') + '</Distrito>')
-        sb.Append(
-            '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
-        sb.Append('<OtrasSenas>' +
-                str(inv.partner_id.street or 'NA') + '</OtrasSenas>')
-        sb.Append('</Ubicacion>')
-        sb.Append('<Telefono>')
-        sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
-        sb.Append('<NumTelefono>' +
-                re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
-        sb.Append('</Telefono>')
-        sb.Append('<CorreoElectronico>' +
-                str(inv.partner_id.email) + '</CorreoElectronico>')
+        if inv.partner_id.state_id and inv.partner_id.county_id and inv.partner_id.district_id and inv.partner_id.neighborhood_id:
+            sb.Append('<Ubicacion>')
+            sb.Append('<Provincia>' + str(inv.partner_id.state_id.code or '') + '</Provincia>')
+            sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
+            sb.Append('<Distrito>' + str(inv.partner_id.district_id.code or '') + '</Distrito>')
+            sb.Append('<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
+            sb.Append('<OtrasSenas>' + escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
+            sb.Append('</Ubicacion>')
+        telefono_receptor = inv.partner_id.phone and re.sub('[^0-9]+', '', inv.partner_id.phone)
+        if telefono_receptor:
+            sb.Append('<Telefono>')
+            sb.Append('<CodigoPais>' + (inv.partner_id.phone_code or '506') + '</CodigoPais>')
+            sb.Append('<NumTelefono>' + telefono_receptor + '</NumTelefono>')
+            sb.Append('</Telefono>')
+        match = inv.partner_id.email and re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', inv.partner_id.email.lower())
+        if match:
+            email_receptor = inv.partner_id.email
+        else:
+            email_receptor = 'indefinido@indefinido.com'
+        sb.Append('<CorreoElectronico>' + email_receptor + '</CorreoElectronico>')
+        sb.Append('</Receptor>')
 
-    sb.Append('</Receptor>')
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' + plazo_credito + '</PlazoCredito>')
     sb.Append('<MedioPago>' + payment_methods_id + '</MedioPago>')
@@ -1718,11 +1749,11 @@ def gen_xml_nc(
     if inv._name == 'pos.order':
         plazo_credito = '0'
         payment_methods_id = '01'
-        cod_moneda = inv.company_id.currency_id.name
+        cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id = inv.payment_methods_id.sequence
-        plazo_credito = inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0
-        cod_moneda = inv.currency_id.name
+        payment_methods_id = str(inv.payment_methods_id.sequence)
+        plazo_credito = str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0)
+        cod_moneda = str(inv.currency_id.name)
 
     sb = StringBuilder()
 
