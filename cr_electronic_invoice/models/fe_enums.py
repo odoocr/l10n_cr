@@ -1,40 +1,40 @@
 # -*- coding: utf-8 -*-
+
 from enum import Enum
 
 
-class UrlHaciendaToken(Enum):
-    apistag = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
-    apiprod = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
+UrlHaciendaToken = {
+    'api-stag' : 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token',
+    'api-prod' : 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token',
+}
 
+UrlHaciendaRecepcion = {
+    'api-stag' : 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/',
+    'api-prod' : 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/',
+}
 
-class UrlHaciendaRecepcion(Enum):
-    apistag = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
-    apiprod = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
+TipoCedula = {   # no se está usando !!
+    'Fisico' : 'fisico',
+    'Juridico' : 'juridico',
+    'Dimex' : 'dimex',
+    'Nite' : 'nite',
+    'Extranjero' : 'extranjero',
+}
 
+SituacionComprobante = {
+    'normal' : '1',
+    'contingencia' : '2',
+    'sininternet' : '3',
+}
 
-class GrandTypes(Enum):
-    TypePassword = 'password'
-    TypeRefresh = 'refresh_token'
-
-
-class TipoCedula(Enum):
-    Fisico = 'fisico'
-    Juridico = 'juridico'
-    Dimex = 'dimex'
-    Nite = 'nite'
-
-
-class SituacionComprobante(Enum):
-    Normal = '1'
-    Contingencia = '2'
-    SinInternet = '3'
-
-
-class TipoDocumento(Enum):
-    FE = '01'
-    ND = '02'
-    NC = '03'
-    TE = '04'
-    CCE = '05' #confirmacion comprobante electronico
-    CPCE = '06' #confirmacion parcial comprobante electronico
-    RCE = '07' #rechazo comprobante electronico
+TipoDocumento = {
+    'FE' : '01',  # Factura Electrónica
+    'ND' : '02',  # Nota de Débito
+    'NC' : '03',  # Nota de Crédito
+    'TE' : '04',  # Tiquete Electrónico
+    'CCE' : '05',  # confirmacion comprobante electronico
+    'CPCE' : '06',  # confirmacion parcial comprobante electronico
+    'RCE' : '07',  # rechazo comprobante electronico
+    'FEC' : '08',  # Factura Electrónica de Compra
+    'FEE' : '09',  # Factura Electrónica de Exportación
+}

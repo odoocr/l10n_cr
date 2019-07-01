@@ -2,10 +2,10 @@
 
 {
 	'name': 'Facturación electrónica Costa Rica POS',
-	'version': '0.1',
-	'author': 'DelfixCR',
+	'version': '10.0.0.0.0',
+	'author': 'TechMicro Inc S.A.',
     'license': 'OPL-1',
-	'website': 'http://www.delfixcr.com',
+	'website': 'http://www.techmicrocr.com',
 	'category': 'Account',
 	'description':
 		'''

@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 
-import electronic_invoice
+from . import electronic_invoice
+

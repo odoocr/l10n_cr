@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="product_category_otros_cargos" model="product.category">
+            <field name="name">Otros Cargos</field>
+        </record>
+    </data>
+</odoo>

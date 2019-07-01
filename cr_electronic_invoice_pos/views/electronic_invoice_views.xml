@@ -1,204 +1,201 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<data>
-		<record id="view_account_journal_pos_electronic_invoice_form" model="ir.ui.view">
-			<field name="name">account.journal.pos.electronic.invoice.form</field>
-			<field name="model">account.journal</field>
-			<field name="inherit_id" ref="point_of_sale.view_account_journal_pos_user_form"/>
-			<field name="arch" type="xml">
-				<field name="amount_authorized_diff" position="after">
-					<field name="payment_method_id"/>
-				</field>
-			</field>
-		</record>
+    <data>
+        <record id="view_account_journal_pos_electronic_invoice_form" model="ir.ui.view">
+            <field name="name">account.journal.pos.electronic.invoice.form</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="point_of_sale.view_account_journal_pos_user_form"/>
+            <field name="arch" type="xml">
+                <field name="amount_authorized_diff" position="after">
+                    <field name="payment_method_id"/>
+                </field>
+            </field>
+        </record>
 
-		<record id="view_pos_config_electronic_invoice_form" model="ir.ui.view">
-			<field name="name">pos.config.electronic.invoice.form</field>
-			<field name="model">pos.config</field>
-			<field name="inherit_id" ref="point_of_sale.view_pos_config_form"/>
-			<field name="arch" type="xml">
-				<field name="default_fiscal_position_id" position="after">
-					<field name="sucursal"/>
-					<field name="terminal"/>
-				</field>
-				<field name="sequence_id" position="after">
-					<field name="return_sequence_id"/>
-				</field>
-			</field>
-		</record>
+        <!--record id="view_pos_config_electronic_invoice_form" model="ir.ui.view">
+            <field name="name">pos.config.electronic.invoice.form</field>
+            <field name="model">pos.config</field>
+            <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+            <field name="arch" type="xml">
+                <field name="default_fiscal_position_id" position="after">
+                    <field name="sucursal"/>
+                    <field name="terminal"/>
+                </field>
+                <field name="sequence_id" position="after">
+                    <field name="return_sequence_id"/>
+                </field>
+            </field>
+        </record-->
 
-		<record id="view_pos_order_electronic_invoice_form" model="ir.ui.view">
-			<field name="name">pos.order.electronic.invoice.form</field>
-			<field name="model">pos.order</field>
-			<field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
-			<field name="arch" type="xml">
-				<field name="name" position="after">
-					<field name="number_electronic" readonly="1"/>
-				</field>
-				<field name="date_order" position="after">
-					<field name="date_issuance" readonly="1"/>
-				</field>
-				<field name="account_move" position="after">
-					<field name="reference_code_id" attrs="{'required':[('pos_order_id','!=',False)]}"/>
-					<field name="pos_order_id"/>
-					<field name="state_tributacion" readonly="1"/>
-					<field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
-					<field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
-					<field name="fname_xml_comprobante" invisible="1" readonly="1"/>
-					<field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
-				</field>
-				<xpath expr="//sheet[1]" position="after">
-					<div class="oe_chatter">
-						<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
-						<field name="message_ids" widget="mail_thread"/>
-					</div>
-				</xpath>
-			</field>
-		</record>
-		<record id="view_pos_order_electronic_invoice_tree" model="ir.ui.view">
-			<field name="name">pos.order.electronic.invoice.tree</field>
-			<field name="model">pos.order</field>
-			<field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
-			<field name="arch" type="xml">
-				<field name="state" position="before">
-					<field name="state_tributacion"/>
-					<field name="state_email"/>
-				</field>
-			</field>
-		</record>
+        <record id="view_pos_order_electronic_invoice_form" model="ir.ui.view">
+            <field name="name">pos.order.electronic.invoice.form</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="number_electronic" readonly="1"/>
+                </field>
+                <field name="date_order" position="after">
+                    <field name="date_issuance" readonly="1"/>
+                </field>
+                <field name="account_move" position="after">
+                    <field name="reference_code_id" attrs="{'required':[('pos_order_id','!=',False)]}"/>
+                    <field name="pos_order_id"/>
+                    <field name="state_tributacion" readonly="1"/>
+                    <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
+                    <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
+                    <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
+                    <field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
+                </field>
+                <xpath expr="//sheet[1]" position="after">
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_pos_order_electronic_invoice_tree" model="ir.ui.view">
+            <field name="name">pos.order.electronic.invoice.tree</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="state" position="before">
+                    <field name="state_tributacion"/>
+                    <field name="state_email"/>
+                </field>
+            </field>
+        </record>
 
-	<!--/data>
+    <!--/data>
 
     <data noupdate="0"-->
-	<template id="pos_order_report">
-        <t t-foreach="docs" t-as="o">
-            <div class="page">
-                <div class="text-center">
-                    FACTURA ELECTRONICA<br/>
-                    Version Documento: 4.2<br/>
-					<h2 t-esc="o.user_id.company_id.commercial_name"/>
-                    <t t-esc="o.user_id.company_id.name"/><br/>
-                    Ced.Jur: <t t-esc="o.user_id.company_id.vat"/><br/>
-                    Tel: <t t-esc="o.user_id.company_id.phone"/><br/>
-                    <t t-esc="o.user_id.company_id.email"/><br/>
-                    <br/>
-                    <table class="text-center">
-                        <tr>
-                            <td>Clave Numerica:</td>
-                        </tr>
-                        <tr>
-                            <td><t t-esc="o.name[0:25]"/></td>
-                        </tr>
-                        <tr>
-                            <td><t t-esc="o.name[25:]"/></td>
-                        </tr>
-                    </table>
-                </div>
-                <br/>
-                    <table >
-                        <tr>
-                            <td>Factura:</td>
-                            <td><t t-esc="o.name[21:41]"/></td>
-                        </tr>
-                        <tr>
-                            <td>Cajero:</td>
-                            <td><span t-field="o.user_id"/></td>
-                        </tr>
-                        <tr>
-                            <td>Fecha:</td>
-                            <td><span t-field="o.date_order"/></td>
-                        </tr>
-            						<t t-if="o.partner_id">
-                                    <tr>
-                                        <td>Cliente:</td>
-                                        <td><span t-field="o.partner_id.name"/></td>
-                                    </tr>
-             						</t>
-            						<t t-if="o.partner_id.vat">
-                                    <tr>
-                                        <td>Cedula:</td>
-                                        <td><span t-field="o.partner_id.vat"/><br/></td>
-                                    </tr>
-            						</t>
-                    </table>
+    <template id="pos_order_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+                    <div class="page">
+                        <div class="text-center">
+                            FACTURA ELECTRONICA<br/>
+                            Version Documento: 4.2<br/>
+                            <h2 t-esc="o.user_id.company_id.commercial_name"/>
+                            <t t-esc="o.user_id.company_id.name"/><br/>
+                            Ced.Jur: <t t-esc="o.user_id.company_id.vat"/><br/>
+                            Tel: <t t-esc="o.user_id.company_id.phone"/><br/>
+                            <t t-esc="o.user_id.company_id.email"/><br/>
+                            <br/>
+                            <table class="text-center">
+                                <tr>
+                                    <td>Clave Numerica:</td>
+                                </tr>
+                                <tr>
+                                    <td><t t-esc="o.name[0:25]"/></td>
+                                </tr>
+                                <tr>
+                                    <td><t t-esc="o.name[25:]"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <br/>
+                            <table >
+                                <tr>
+                                    <td>Factura:</td>
+                                    <td><t t-esc="o.name[21:41]"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Cajero:</td>
+                                    <td><span t-field="o.user_id"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Fecha:</td>
+                                    <td><span t-field="o.date_order"/></td>
+                                </tr>
+                                            <t t-if="o.partner_id">
+                                            <tr>
+                                                <td>Cliente:</td>
+                                                <td><span t-field="o.partner_id.name"/></td>
+                                            </tr>
+                                            </t>
+                                            <t t-if="o.partner_id.vat">
+                                            <tr>
+                                                <td>Cedula:</td>
+                                                <td><span t-field="o.partner_id.vat"/><br/></td>
+                                            </tr>
+                                            </t>
+                            </table>
 
-                <div class="row">
-                </div>
+                        <div class="row">
+                        </div>
 
-                <table class="table table-condensed">
-                    <thead>
-                        <tr>
-                            <th>Descripcion</th>
-                            <th class="text-right">Cant</th>
-                            <th class="text-right">Precio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="o.lines" t-as="line">
-                            <td><span t-field="line.product_id"/></td>
-                            <td class="text-right">
-                                <t t-if="o.state != 'cancel' and o.statement_ids">
-                                    <span t-field="line.qty"/>
-                                </t>
-                            </td>
-                            <td class="text-right">
-                                <t t-if="o.state != 'cancel' and o.statement_ids">
-                                    <span t-esc="line.price_subtotal_incl"/>
-                                </t>
-                                <t t-if="line.discount != 0.0">
-                                    <span t-esc="line.discount"/>%
-                                </t>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="row">
-                    <div class="col-xs-12 pull-right">
                         <table class="table table-condensed">
-                            <tr>
-                                <td><strong>Total</strong></td>
-                                <td class="text-right">
-                                    <strong t-esc="o.amount_total"/>
-                                </td>
-                            </tr>
-                            <tr class="border-black">
-                                <td><strong>I.V.I.</strong></td>
-                                <td class="text-right">
-                                    <strong t-esc="o.amount_tax"/>
-                                </td>
-                            </tr>
+                            <thead>
+                                <tr>
+                                    <th>Descripcion</th>
+                                    <th class="text-right">Cant</th>
+                                    <th class="text-right">Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.lines" t-as="line">
+                                    <td><span t-field="line.product_id"/></td>
+                                    <td class="text-right">
+                                        <t t-if="o.state != 'cancel' and o.statement_ids">
+                                            <span t-field="line.qty"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.state != 'cancel' and o.statement_ids">
+                                            <span t-esc="line.price_subtotal_incl"/>
+                                        </t>
+                                        <t t-if="line.discount != 0.0">
+                                            <span t-esc="line.discount"/>%
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><strong>Total</strong></td>
+                                    <td class="text-right">
+                                        <strong t-esc="o.amount_total"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td colspan="2"><strong>I.V.I.</strong></td>
+                                    <td class="text-right">
+                                        <strong t-esc="o.amount_tax"/>
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Pago</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.statement_ids" t-as="d">
+                                    <td>
+                                        <span t-esc="d.statement_id.journal_id.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="d.amount"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="text-align:center">
+                            Res DGT-R-48-2016 del 07/10/2016
+                        </div>
+
                     </div>
                 </div>
-
-                <table class="table table-condensed">
-                    <thead>
-                        <tr>
-                            <th>Pago</th>
-                            <th>Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="o.statement_ids" t-as="d">
-                            <td>
-                                <span t-esc="d.statement_id.journal_id.name"/>
-                            </td>
-                            <td>
-                                <span t-esc="d.amount"/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div style="text-align:center">
-                    Res DGT-R-48-2016 del 07/10/2016
-                </div>
-
-            </div>
+            </t>
         </t>
-	</template>
+    </template>
 
-		<report
+        <report
             id="pos_orders"
             model="pos.order"
             string="PosOrders"

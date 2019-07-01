@@ -1,7 +1,0 @@
-id,code,name,active
-AutEx_1,01,Compras autorizadas,true
-AutEx_2,02,Ventas exentas a diplomáticos,true
-AutEx_3,03,Orden de compra (Instituciones Públicas y otros organismos),true
-AutEx_4,04,Exenciones Dirección General de Hacienda,true
-AutEx_5,05,Zonas Francas,true
-AutEx_99,99,Otros,true

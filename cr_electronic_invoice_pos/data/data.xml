@@ -1,41 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-	<data noupdate="1">
-		<record id="ir_cron_consultahacienda_pos" model="ir.cron">
-			<field name="name">Consulta Hacienda POS</field>
-			<field eval="True" name="active"/>
-			<field name="user_id" ref="base.user_root"/>
-			<field name="interval_number">5</field>
-			<field name="interval_type">minutes</field>
-			<field name="numbercall">-1</field>
-			<field eval="True" name="doall"/>
-			<field name="model">pos.order</field>
-			<field name="function">_consultahacienda_pos</field>
-			<field name="args">(250,)</field>
-		</record>
-		<record id="ir_cron_valida_hacienda_pos" model="ir.cron">
-			<field name="name">Valida Hacienda POS</field>
-			<field eval="True" name="active"/>
-			<field name="user_id" ref="base.user_root"/>
-			<field name="interval_number">5</field>
-			<field name="interval_type">minutes</field>
-			<field name="numbercall">-1</field>
-			<field eval="True" name="doall"/>
-			<field name="model">pos.order</field>
-			<field name="function">_validahacienda_pos</field>
-			<field name="args">(250,)</field>
-		</record>
-		<record id="ir_cron_reenvia_correos_pos" model="ir.cron">
-			<field name="name">Reenvia Correos POS</field>
-			<field eval="False" name="active"/>
-			<field name="user_id" ref="base.user_root"/>
-			<field name="interval_number">5</field>
-			<field name="interval_type">minutes</field>
-			<field name="numbercall">-1</field>
-			<field eval="True" name="doall"/>
-			<field name="model">pos.order</field>
-			<field name="function">_reenviacorreos_pos</field>
-			<field name="args">(1,)</field>
-		</record>
-	</data>
-</openerp>
+<odoo>
+    <data noupdate="1">
+        <record id="ir_cron_consultahacienda_pos" model="ir.cron">
+            <field name="name">Consulta Hacienda POS</field>
+            <field name="model_id" ref="model_pos_order" />
+            <field name="state">code</field>
+            <field name="code">model._consultahacienda_pos(20)</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+        <record id="ir_cron_valida_hacienda_pos" model="ir.cron">
+            <field name="name">Valida Hacienda POS</field>
+            <field name="model_id" ref="model_pos_order" />
+            <field name="state">code</field>
+            <field name="code">model._validahacienda_pos(20)</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+        <record id="ir_cron_reenvia_correos_pos" model="ir.cron">
+            <field name="name">Reenvia Correos POS</field>
+            <field name="model_id" ref="model_pos_order" />
+            <field name="state">code</field>
+            <field name="code">model._reenviacorreos_pos()</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+    </data>
+</odoo>
