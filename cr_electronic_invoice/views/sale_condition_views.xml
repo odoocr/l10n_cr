@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sale_conditions_form" model="ir.ui.view">
+            <field name="name">sale.conditions.form</field>
+            <field name="model">sale.conditions</field>
+            <field name="arch" type="xml">
+                <form string="Condiciones de venta">
+                    <sheet string="Condiciones de venta">
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group col="4">
+                            <field name="active"/>
+                            <field name="notes"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_sale_conditions_tree" model="ir.ui.view">
+            <field name="name">sale.conditions.tree</field>
+            <field name="model">sale.conditions</field>
+            <field name="arch" type="xml">
+                <tree string="Condiciones de venta">
+                    <field name="sequence"/>
+                    <field name="name"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_sale_conditions" model="ir.actions.act_window">
+            <field name="name">Condiciones de Venta</field>
+            <field name="res_model">sale.conditions</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 
-import models
+from . import models
+from .hooks import pre_init_hook

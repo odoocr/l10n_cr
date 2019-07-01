@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_reference_document_form" 
+            model="ir.ui.view">
+            <field name="name">reference.document.form</field>
+            <field name="model">reference.document</field>
+            <field name="arch" 
+                type="xml">
+                <form string="Documentos de referencia">
+                    <sheet string="Documentos de referencia">
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="active"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_reference_document_tree" 
+            model="ir.ui.view">
+            <field name="name">reference.document.tree</field>
+            <field name="model">reference.document</field>
+            <field name="arch" 
+                type="xml">
+                <tree string="Documentos de referencia">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_reference_code_tree" 
+            model="ir.ui.view">
+            <field name="name">reference.code.tree</field>
+            <field name="model">reference.code</field>
+            <field name="arch" 
+                type="xml">
+                <tree string="Código de referencia">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_reference_document" 
+            model="ir.actions.act_window">
+            <field name="name">Documentos de referencia</field>
+            <field name="res_model">reference.document</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="action_reference_code" 
+            model="ir.actions.act_window">
+            <field name="name">Código de Referencia</field>
+            <field name="res_model">reference.code</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

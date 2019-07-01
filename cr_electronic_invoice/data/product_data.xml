@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="product_parafiscal" model="product.template">
+            <field name="name">Contribución parafiscal</field>
+            <field name="type">consu</field>
+            <field name="default_code">01</field>
+            <field name="categ_id" ref="product_category_otros_cargos" />
+            <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+            <field name="taxes_id" eval="[(5)]" />
+        </record>
+        <record id="product_cruz_roja" model="product.template">
+            <field name="name">Timbre de la Cruz Roja</field>
+            <field name="type">consu</field>
+            <field name="default_code">02</field>
+            <field name="categ_id" ref="product_category_otros_cargos" />
+            <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+            <field name="taxes_id" eval="[(5)]" />
+        </record>
+        <record id="product_bomberos" model="product.template">
+            <field name="name">Timbre de Benemérito Cuerpo de Bomberos de Costa Rica</field>
+            <field name="type">consu</field>
+            <field name="default_code">03</field>
+            <field name="categ_id" ref="product_category_otros_cargos" />
+            <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+            <field name="taxes_id" eval="[(5)]" />
+        </record>
+        <record id="product_tercero" model="product.template">
+            <field name="name">Cobro de un tercero</field>
+            <field name="type">consu</field>
+            <field name="default_code">04</field>
+            <field name="categ_id" ref="product_category_otros_cargos" />
+            <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+            <field name="taxes_id" eval="[(5)]" />
+        </record>
+        <record id="product_exportacion" model="product.template">
+            <field name="name">Costos de Exportación</field>
+            <field name="type">consu</field>
+            <field name="default_code">05</field>
+            <field name="categ_id" ref="product_category_otros_cargos" />
+            <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+            <field name="taxes_id" eval="[(5)]" />
+        </record>
+        <record id="product_profesionales" model="product.template">
+            <field name="name">Timbre de Colegios Profesionales</field>
+            <field name="type">consu</field>
+            <field name="default_code">07</field>
+            <field name="categ_id" ref="product_category_otros_cargos" />
+            <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+            <field name="taxes_id" eval="[(5)]" />
+        </record>
+        <record id="product_otros_cargos" model="product.template">
+            <field name="name">Otros Cargos</field>
+            <field name="type">consu</field>
+            <field name="default_code">99</field>
+            <field name="categ_id" ref="product_category_otros_cargos" />
+            <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+            <field name="taxes_id" eval="[(5)]" />
+        </record>
+    </data>
+</odoo>

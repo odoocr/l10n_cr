@@ -36,7 +36,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             'month': moment().format('MM'),
             'day': moment().format('DD'),
             'y': moment().format('YY'),
-            'h12': moment().format('hh'),
+            'h12': moment().format('hh')
         };
         var format = function(s, dict){
             s = s || '';
