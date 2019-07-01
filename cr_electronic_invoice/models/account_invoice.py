@@ -1042,7 +1042,7 @@ class AccountInvoiceElectronic(models.Model):
             _logger.info(
                 'E-INV CR - Valida Hacienda - Invoice %s / %s  -  number:%s',
                 current_invoice, total_invoices, inv.number_electronic)
-                
+
             if not inv.sequence.isdigit():  # or (len(inv.number) == 10):
                 _logger.info(
                     'E-INV CR - Valida Hacienda - skipped Invoice %s',
@@ -1535,6 +1535,8 @@ class AccountInvoiceElectronic(models.Model):
                 inv.xml_comprobante = base64.encodestring(xml_firmado)
                 _logger.info('E-INV CR - SIGNED XML:%s',
                              inv.fname_xml_comprobante)
+            else:
+                xml_firmado = inv.xml_comprobante
 
             # Obtenemos el token con el api interna
             token_m_h = api_facturae.get_token_hacienda(
