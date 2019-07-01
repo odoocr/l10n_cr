@@ -244,7 +244,7 @@ class AccountInvoiceElectronic(models.Model):
         help='Indica el tipo de documento de acuerdo a la '
              'clasificación del Ministerio de Hacienda')
 
-    sequence = fields.Char(string='Consecutivo', readonly=True, )
+    sequence = fields.Char(string='Consecutivo', readonly=True, copy=False)
 
     state_email = fields.Selection([('no_email', 'Sin cuenta de correo'), (
         'sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email',
@@ -1588,12 +1588,18 @@ class AccountInvoiceElectronic(models.Model):
                         #
                         # else:
                         
-                        if inv.tipo_documento == 'FE':
+                        if inv.tipo_documento in ('FE', 'TE'):
+                            if inv.company_id.version_hacienda == '4.2':
+                                inv.tipo_documento = 'FE'
                                 sequence = inv.journal_id.FE_sequence_id.next_by_id()
+                            elif inv.partner_id.vat:
+                                inv.tipo_documento = 'FE'
+                                sequence = inv.journal_id.FE_sequence_id.next_by_id()
+                            else:
+                                inv.tipo_documento = 'TE'
+                                sequence = inv.journal_id.TE_sequence_id.next_by_id()
                         elif inv.tipo_documento == 'FEE':
-                                sequence = inv.journal_id.FE_sequence_id.next_by_id()
-                        elif inv.tipo_documento == 'TE':
-                            sequence = inv.journal_id.TE_sequence_id.next_by_id()
+                            sequence = inv.journal_id.FEE_sequence_id.next_by_id()
 
                     # Si es Nota de Crédito
                     elif inv.type == 'out_refund':
@@ -1634,7 +1640,7 @@ class AccountInvoiceElectronic(models.Model):
                             raise UserError(
                                 'La identificación NITE del emisor debe de tener 10 dígitos')
 
-                        if not inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
+                        if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
                             raise UserError(
                                 'No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para' +
                                 inv.payment_term_id.name)
@@ -1654,4 +1660,4 @@ class AccountInvoiceElectronic(models.Model):
                                                                     inv.journal_id.terminal)
 
                     inv.number_electronic = response_json.get('clave')
-                    inv.sequence = sequence
+                    inv.sequence = response_json.get('consecutivo')
