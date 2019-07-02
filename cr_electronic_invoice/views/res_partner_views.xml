@@ -1,34 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <odoo>
-	<data>
+    <data>
+        <record id="view_res_partner_inherit" 
+            model="ir.ui.view">
+            <field name="name">res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" 
+                ref="base.view_partner_form"/>
+            <field name="arch" 
+                type="xml">
+                <data>
 
-        <record id="view_partner_form_inherit" model="ir.ui.view">
-			<field name="name">res.partner.form.inherit</field>
-			<field name="model">res.partner</field>
-			<field name="inherit_id" ref="base.view_partner_form"/>
-			<field name="arch" type="xml">
-				<field name="phone" position="before">
-					<field name="phone_code"/>
-				</field>
-				<field name="website" position="before">
-					<field name="identification_id" widget="selection"/>
-					<field name="vat" string="Cédula"/>
-					<field name="commercial_name"/>
-					<field name="county_id" domain="[('state_id', '=', state_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
-					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
-					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
-				</field>
-				<field name="property_payment_term_id" position="before">
-					<field name="payment_methods_id"/>
-				</field>
-				<field name="country_id" position="attributes">
-					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
-				</field>
-				<field name="state_id" position="attributes">
-					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
-				</field>
-			</field>
-		</record>
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='city']" 
+                        position="attributes">
+                        <attribute name="attrs">{'invisible': [('country_id','=',%(base.cr)d)]}</attribute>
+                    </xpath>
 
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='zip']" 
+                        position="attributes">
+                        <attribute name="attrs">{'invisible': [('country_id','=',%(base.cr)d)]}</attribute>
+                    </xpath>
+
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='state_id']" 
+                        position="after">
+                        <field name="county_id" 
+                            class="o_address_state" 
+                            placeholder="Canton" 
+                            options='{"no_open": True, "no_create": True}' 
+                            attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)], 'invisible': [('country_id','!=',%(base.cr)d)]}" 
+                            domain="[('state_id', '=', state_id)]"
+                            context="{'country_id': country_id, 'state_id': state_id, 'zip': zip}"/>
+                        <field name="district_id" 
+                            class="o_address_state" 
+                            placeholder="District" 
+                            options='{"no_open": True, "no_create": True}' 
+                            attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)], 'invisible': [('country_id','!=',%(base.cr)d)]}"
+                            domain="[('county_id', '=', county_id)]" 
+                            context="{'country_id': country_id, 'state_id': state_id, 'county_id': county_id, 'zip': zip}"/>
+                        <field name="neighborhood_id" 
+                            class="o_address_state" 
+                            placeholder="Neighborhood" 
+                            options='{"no_open": True, "no_create": True}' 
+                            attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)], 'invisible': [('country_id','!=',%(base.cr)d)]}" 
+                            domain="[('district_id', '=', district_id)]" 
+                            context="{'country_id': country_id, 'state_id': state_id, 'county_id': county_id, 'district_id': district_id, 'zip': zip}"/>
+                    </xpath>
+
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='state_id']" 
+                        position="attributes">
+                        <attribute name="context">{'country_id': country_id, 'zip': zip}</attribute>
+                    </xpath>
+
+                    <field name="phone" 
+                        position="before">
+                        <field name="phone_code"/>
+                    </field>
+
+                    <field name="property_payment_term_id" 
+                        position="after">
+                        <field name="payment_methods_id" 
+                            groups="account.group_account_invoice"/>
+                    </field>
+
+                    <field name="vat"
+                        position="after">
+                        <field name="identification_id"/>
+                    </field>
+
+                    <field name="category_id" position="after">
+                        <field name="has_exoneration"/>
+                    </field>
+                </data>
+                <xpath expr="//page[3]" position="after">
+                    <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">
+                        <group col="3">
+                            <field name="exoneration_number"/>
+                            <field name="type_exoneration"/>
+                            <field name="institution_name"/>
+                            <field name="date_issue"/>
+                            <field name="date_expiration"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>

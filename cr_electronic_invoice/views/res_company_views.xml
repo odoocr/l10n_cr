@@ -1,66 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<data>
+    <data>
         <record id="view_company_form_inherit" model="ir.ui.view">
             <field name="name">res.company.form.inherit</field>
-			<field name="model">res.company</field>
-			<field name="inherit_id" ref="base.view_company_form"/>
-			<field name="arch" type="xml">
-				<xpath expr="/form/*" position="before">
-					<header>
-						<field name="state" widget="statusbar"  nolabel="1" readonly="1" />
-					</header>
-				</xpath>
-				<xpath expr="//sheet[1]" position="after">
-					<div class="oe_chatter">
-						<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
-						<field name="message_ids" widget="mail_thread"/>
-					</div>
-				</xpath>
-				<field name="partner_id" position="after">
-					<field name="commercial_name"/>
-				</field>
-				<field name="vat" position="replace"/>
-				<field name="country_id" position="attributes">
-					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
-				</field>
-				<field name="state_id" position="attributes">
-					<attribute name="options">{"no_open": True,"no_create": 1, "no_create_edit": 1}</attribute>
-				</field>
-				<field name="website" position="after">
-					<field name="county_id" domain="[('state_id', '=', state_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
-					<field name="district_id" domain="[('county_id', '=', county_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
-					<field name="neighborhood_id" domain="[('district_id', '=', district_id)]" options="{'no_open': 1,'no_create': 1, 'no_create_edit': 1}"/>
-				</field>
-				<field name="phone" position="before">
-					<field name="phone_code"/>
-				</field>
-				<field name="email" position="after">
-					<field name="identification_id"/>
-					<field name="vat"/>
-				</field>
-				<xpath expr="//page[1]" position="after">
-					<page string="Facturación Electrónica">
-						<group cols="2" >
-							<group cols="2" >
-								<field name="signature"/>
-								<field name="frm_ws_identificador"/>
-								<field name="frm_ws_password" password="True"/>
-								<field name="frm_pin" password="True"/>
-								<field name="frm_apicr_username" />
-								<field name="frm_apicr_password" password="True"/>
-							</group>
-							<group cols="2" >
-								<field name="frm_callback_url"/>
-								<field name="activated" readonly="True" />
-								<field name="frm_ws_ambiente"  widget="radio"/>
-                                <field name="frm_apicr_signaturecode"/>
-							</group>
-						</group>
-					</page>
-				</xpath>
-			</field>
-		</record>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
 
+                <xpath expr="//sheet[1]" position="after">
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"
+                               widget="mail_followers"
+                               groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </xpath>
+
+                <field name="website" position="before">
+                    <field name="commercial_name"/>
+                    <field name="activity_id"/>
+                </field>
+
+                <field name="city" position="attributes">
+                    <attribute name="attrs">{'invisible':
+                        [('country_id','=',%(base.cr)d)]}
+                    </attribute>
+                </field>
+
+                <field name="zip" position="attributes">
+                    position="attributes">
+                    <attribute name="attrs">{'invisible':
+                        [('country_id','=',%(base.cr)d)]}
+                    </attribute>
+                </field>
+
+                <field name="state_id" position="after">
+                    <field name="county_id" class="o_address_state"
+                           placeholder="Canton"
+                           options='{"no_open": True, "no_create": True}'
+                           attrs="{'invisible': [('country_id','!=',%(base.cr)d)]}"
+                           domain="[('state_id', '=', state_id)]"
+                           context="{'country_id': country_id, 'state_id': state_id, 'zip': zip}"/>
+                    <field name="district_id"
+                           class="o_address_state"
+                           placeholder="District"
+                           options='{"no_open": True, "no_create": True}'
+                           attrs="{'invisible': [('country_id','!=',%(base.cr)d)]}"
+                           domain="[('county_id', '=', county_id)]" 
+                           context="{'country_id': country_id, 'state_id': state_id, 'county_id': county_id, 'zip': zip}"/>
+                    <field name="neighborhood_id"
+                           class="o_address_state"
+                           placeholder="Neighborhood"
+                           options='{"no_open": True, "no_create": True}'
+                           attrs="{'invisible': [('country_id','!=',%(base.cr)d)]}"
+                           domain="[('district_id', '=', district_id)]" 
+                           context="{'country_id': country_id, 'state_id': state_id, 'county_id': county_id, 'district_id': district_id, 'zip': zip}"/>
+                </field>
+
+                <field name="phone" position="before">
+                    <field name="phone_code"/>
+                </field>
+
+                <field name="partner_id" position="after">
+                    <field name="identification_id"/>
+                    <field name="vat"/>
+                </field>
+
+                <xpath expr="//page[1]" position="after">
+                    <page string="Facturación Electrónica">
+                        <group cols="2">
+                            <group cols="2">
+                                <field name="signature"/>
+                                <field name="frm_ws_identificador"/>
+                                <field name="frm_ws_password" password="True"/>
+                                <field name="frm_pin" password="True"/>
+                            </group>
+                            <group cols="2">
+                                <field name="frm_ws_ambiente" widget="radio"/>
+                                <field name="version_hacienda" widget="radio"/>
+                            </group>
+                            <group cols="2">
+                                <field name="CCE_sequence_id"/>
+                                <field name="CPCE_sequence_id"/>
+                                <field name="RCE_sequence_id"/>
+                            </group>
+                            <group cols="2">
+                                <field name="sucursal_MR"/>
+                                <field name="terminal_MR"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>

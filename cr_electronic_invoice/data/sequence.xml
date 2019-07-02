@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="seq_electronic_doc_confirmation" model="ir.sequence">
-            <field name="name">Secuencia de Confirmacion de Aceptacion Comprobante Electrónico</field>
-            <field name="code">sequece.electronic.doc.confirmation</field>
+        <!-- TODO-->
+        <!-- Secuencias de MR para asignar a la primera compañía.  Si hay más compañías, debemos generar las secuencias-->
+        <function model="res.company" name="try_create_confirmation_sequeces">
+          <value model="res.company" search="[]"/>
+        </function>
+        <record id="seq_electronic_invoice" model="ir.sequence">
+            <field name="name">Secuencia de Factura Electrónica</field>
+            <field name="code">sequece.FE</field>
             <field name="prefix"></field>
             <field name="padding">10</field>
         </record>
-        <record id="seq_electronic_doc_partial_confirmation" model="ir.sequence">
-            <field name="name">Secuencia de Confirmacion de Aceptacion Parcial Comprobante Electrónico</field>
-            <field name="code">sequece.electronic.doc.partial.confirmation</field>
+        <record id="seq_electronic_debit_note" model="ir.sequence">
+            <field name="name">Secuencia de Nota Débito Electrónica</field>
+            <field name="code">sequece.ND</field>
             <field name="prefix"></field>
             <field name="padding">10</field>
         </record>
-        <record id="seq_electronic_doc_reject" model="ir.sequence">
-            <field name="name">Secuencia de Rechazo Comprobante Electrónico</field>
-            <field name="code">sequece.electronic.doc.reject</field>
+        <record id="seq_electronic_credit_note" model="ir.sequence">
+            <field name="name">Secuencia de Nota Crédito Electrónica</field>
+            <field name="code">sequece.NC</field>
+            <field name="prefix"></field>
+            <field name="padding">10</field>
+        </record>
+        <record id="seq_electronic_ticket" model="ir.sequence">
+            <field name="name">Secuencia de Tiquete Electrónico</field>
+            <field name="code">sequece.TE</field>
+            <field name="prefix"></field>
+            <field name="padding">10</field>
+        </record>
+        <record id="seq_electronic_exportation_invoice" model="ir.sequence">
+            <field name="name">Secuencia de Factura Electrónica de Exportación</field>
+            <field name="code">sequece.FEE</field>
             <field name="prefix"></field>
             <field name="padding">10</field>
         </record>

@@ -1,9 +1,0 @@
-
-functions.py
-- Pasar make_msj_receptor a que se haga en Python
-- Pasar make_xml_invoice a que se haga en Python. Ya está implementado en api_facturae, revisar como hacer el cambio correctamente
-- Pasar sign_xml a que se firme en Python
-
-
-electronic_invoice.py
-- 
