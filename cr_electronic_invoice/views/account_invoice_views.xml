@@ -40,9 +40,12 @@
                     
                     <!--<field name="electronic_invoice_return_message" readonly="1"/>-->
                 </field>
-                <!-- <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
-                    <field name="third_party_id"/>
-                </xpath> -->
+                <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+                    <field name="categ_name" invisible="1" readonly="1" />
+                    <field name="product_code" invisible="1" readonly="1" />
+                    <field name="third_party_id" attrs="{'invisible':[ '|', ('categ_name', '!=', 'Otros Cargos'),('product_code', '!=', '04')]}"/>
+                    <!-- <field name="tariff_head" attrs="{'invisible':[ ('categ_name', '!=', 'Otros Cargos')]}"/> -->
+                </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
                     <field name="discount_note"/>
                 </xpath>
