@@ -151,10 +151,7 @@ class InvoiceLineElectronic(models.Model):
     discount_note = fields.Char(string="Nota de descuento", required=False, )
     total_tax = fields.Float(string="Total impuesto", required=False, )
 
-    exoneration_id = fields.Many2one(
-        comodel_name="exoneration", string="Exoneración", required=False, )
-
-    third_party_id = fields.Many2one(comodel_name="res_partner",
+    third_party_id = fields.Many2one(comodel_name="res.partner",
                                      string="Tercero otros cargos",)
 
     tariff_head = fields.Char(string="Partida arancelaria para factura"
@@ -245,7 +242,10 @@ class AccountInvoiceElectronic(models.Model):
                    ('FEE', 'Factura Electrónica de Exportación'),
                    ('TE', 'Tiquete Electrónico'),
                    ('NC', 'Nota de Crédito'),
-                   ('ND', 'Nota de Crédito')],
+                   ('ND', 'Nota de Débito'),
+                   ('CCE', 'MR Aceptación'),
+                   ('CPCE', 'MR Aceptación Parcial'),
+                   ('RCE', 'MR Rechazo')],
         string="Tipo Comprobante",
         required=False, default='FE',
         help='Indica el tipo de documento de acuerdo a la '
@@ -603,7 +603,7 @@ class AccountInvoiceElectronic(models.Model):
                         raise UserError(
                             'Aviso!.\n No se ha cargado archivo XML')
 
-                    elif not inv.journal_id.sucursal or not inv.journal_id.terminal:
+                    elif not inv.company_id.sucursal_MR or not inv.company_id.terminal_MR:
                         inv.state_send_invoice = 'error'
                         inv.message_post(subject='Error',
                                          body='Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
@@ -618,22 +618,13 @@ class AccountInvoiceElectronic(models.Model):
                         # raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para .'
                         #                'el archivo cargado.')
 
-                    _logger.error('E-INV CR - send_acceptance_message - 02')
-
                     if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
-
-                        _logger.error(
-                            'E-INV CR - send_acceptance_message - 03')
 
                         # url = self.company_id.frm_callback_url
                         message_description = "<p><b>Enviando Mensaje Receptor</b></p>"
 
                         '''Si por el contrario es un documento nuevo, asignamos todos los valores'''
-                        if not inv.xml_comprobante or inv.state_invoice_partner not in [
-                            'procesando', 'aceptado']:
-
-                            _logger.error(
-                                'E-INV CR - send_acceptance_message - 04')
+                        if not inv.xml_comprobante or inv.state_invoice_partner not in ['procesando', 'aceptado']:
 
                             if inv.state_invoice_partner == '1':
                                 detalle_mensaje = 'Aceptado'
@@ -641,24 +632,16 @@ class AccountInvoiceElectronic(models.Model):
                                 tipo_documento = 'CCE'
                                 sequence = inv.company_id.CCE_sequence_id.next_by_id()
 
-                                _logger.error(
-                                    'E-INV CR - send_acceptance_message - 05a')
                             elif inv.state_invoice_partner == '2':
                                 detalle_mensaje = 'Aceptado parcial'
                                 tipo = 2
                                 tipo_documento = 'CPCE'
                                 sequence = inv.company_id.CPCE_sequence_id.next_by_id()
-
-                                _logger.error(
-                                    'E-INV CR - send_acceptance_message - 05b')
                             else:
                                 detalle_mensaje = 'Rechazado'
                                 tipo = 3
                                 tipo_documento = 'RCE'
                                 sequence = inv.company_id.RCE_sequence_id.next_by_id()
-
-                                _logger.error(
-                                    'E-INV CR - send_acceptance_message - 05c')
 
                             '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
                             if inv.state_send_invoice == 'rechazado' or inv.state_send_invoice == 'error':
@@ -673,21 +656,9 @@ class AccountInvoiceElectronic(models.Model):
                                 inv.company_id.sucursal_MR,
                                 inv.company_id.terminal_MR)
 
-                            _logger.info(
-                                'E-INV CR - JSON Clave Mensaje Receptor:%s',
-                                response_json)
-
                             inv.consecutive_number_receiver = response_json.get(
                                 'consecutivo')
                             '''Generamos el Mensaje Receptor'''
-
-                            # xml = api_facturae.gen_xml_mr(
-                            #    inv.number_electronic, inv.partner_id.vat,
-                            #    inv.date_issuance,
-                            #    tipo, detalle_mensaje, inv.company_id.vat,
-                            #    inv.consecutive_number_receiver,
-                            #    inv.amount_tax_electronic_invoice,
-                            #    inv.amount_total_electronic_invoice)
 
                             if inv.company_id.version_hacienda == '4.2':
                                 xml = api_facturae.gen_xml_mr_42(
@@ -705,51 +676,27 @@ class AccountInvoiceElectronic(models.Model):
                                     inv.consecutive_number_receiver,
                                     inv.amount_tax_electronic_invoice,
                                     inv.amount_total_electronic_invoice,
-                                    inv.company_id.activity_id.code)
+                                    inv.company_id.activity_id.code,
+                                    '01')
 
-                            # TODO: Sign using any python library
-                            response_json = api_facturae.sign_xml(
+                            xml_firmado = api_facturae.sign_xml(
                                 inv.company_id.signature,
                                 inv.company_id.frm_pin, xml)
 
-                            if response_json['status'] != 200:
-                                _logger.info(
-                                    'E-INV CR - API Error signing XML:%s',
-                                    response_json['text'])
-                                inv.state_send_invoice = 'error'
-                                inv.message_post(subject='Error',
-                                                 body='MAB - API Error signing XML:' +
-                                                      response_json['text'])
-                                continue
-
-                            xml_firmado = response_json.get('xmlFirmado')
-
                             inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
 
-                            inv.xml_comprobante = xml_firmado
+                            inv.xml_comprobante = base64.encodestring(xml_firmado)
                             inv.tipo_documento = tipo_documento
 
-                            _logger.info('E-INV CR - SIGNED XML:%s',
-                                         inv.fname_xml_comprobante)
-
                             if inv.state_send_invoice != 'procesando':
-                                _logger.error(
-                                    'E-INV CR - send_acceptance_message - 09')
 
                                 env = inv.company_id.frm_ws_ambiente
                                 token_m_h = api_facturae.get_token_hacienda(
                                     inv, inv.company_id.frm_ws_ambiente)
 
-                                if response_json['status'] != 200:
-                                    _logger.error(
-                                        'E-INV CR - Send Acceptance Message - HALTED - Failed to get token')
-                                    return
-
-                                _logger.error(
-                                    'E-INV CR - send_acceptance_message - 10')
-
                                 response_json = api_facturae.send_message(
                                     inv, api_facturae.get_time_hacienda(),
+                                    xml_firmado,
                                     token_m_h, env)
                                 status = response_json.get('status')
 
@@ -761,9 +708,6 @@ class AccountInvoiceElectronic(models.Model):
                                         'E-INV CR - Invoice: %s  Error sending Acceptance Message: %s',
                                         inv.number_electronic,
                                         response_json.get('text'))
-
-                                _logger.error(
-                                    'E-INV CR - send_acceptance_message - 12')
 
                                 if inv.state_send_invoice == 'procesando':
                                     token_m_h = api_facturae.get_token_hacienda(
@@ -788,7 +732,7 @@ class AccountInvoiceElectronic(models.Model):
                                             'ind-estado')
                                         inv.xml_respuesta_tributacion = response_json.get(
                                             'respuesta-xml')
-                                        inv.fname_xml_respuesta_tributacion = 'Aceptacion_' + \
+                                        inv.fname_xml_respuesta_tributacion = 'ACH_' + \
                                                                               inv.number_electronic + '-' + inv.consecutive_number_receiver + '.xml'
 
                                         _logger.error(
@@ -1539,6 +1483,8 @@ class AccountInvoiceElectronic(models.Model):
                 inv.xml_comprobante = base64.encodestring(xml_firmado)
                 _logger.info('E-INV CR - SIGNED XML:%s',
                              inv.fname_xml_comprobante)
+            else:
+                xml_firmado = inv.xml_comprobante.decode("UTF-8")
 
             # Obtenemos el token con el api interna
             token_m_h = api_facturae.get_token_hacienda(
