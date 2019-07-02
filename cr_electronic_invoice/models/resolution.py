@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api, _
 
 
 class Resolution(models.Model):
@@ -6,4 +7,5 @@ class Resolution(models.Model):
 
     active = fields.Boolean(string="Activo", required=False, default=True)
     name = fields.Char(string="Nombre", required=False, )
-    date_resolution = fields.Date(string="Fecha de resolución", required=False, )
+    date_resolution = fields.Date(
+        string="Fecha de resolución", required=False, )

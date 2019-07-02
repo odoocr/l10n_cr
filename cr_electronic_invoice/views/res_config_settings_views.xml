@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<data>
-        <record id="res_config_settings_view_form_inherit_account_invoicing_fecr" model="ir.ui.view">
-			<field name="name">res.config.settings.view.form.inherit.account.invoicing.fecr</field>
-			<field name="model">res.config.settings</field>
-			<field name="inherit_id" ref="account.res_config_settings_view_form"/>
-			<field name="arch" type="xml">
+    <data>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
                 <xpath expr="//div[@data-key='account_invoicing']" position="inside">
-					<h2>Product Catalog</h2>
-					<div class="row mt16 o_settings_container">
+                    <h2>Product Catalog</h2>
+                    <div class="row mt16 o_settings_container">
                         <div class="col-xs-12 col-md-6 o_setting_box">
                             <div class="o_setting_left_pane">
                                 <field name="group_product_variant"/>
@@ -64,17 +64,17 @@
                             </div>
                         </div>
                     </div>
-                    <h2>Costa Rica Electronic Invoice</h2>
+                     <h2>Costa Rica Electronic Invoice</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="col-xs-12 col-md-12 o_setting_box" title="Loading Costa Rica Electronic Invoice from XML">
                             <div class="o_setting_right_pane" id="fe-reimburse" title="Default expense account when importing Costa Rican electronic invoices automatically">
-                                <label class="o_form_label col-xs-12" for="default_expense_account_id" data-original-title="" title="">Default account for expenses when importing electronic invoice</label>
-                                <field class="col-xs-12" name="default_expense_account_id" string="Default account for expenses when importing electronic invoice" />
+                                <label class="o_form_label col-xs-12" for="expense_account_id" data-original-title="" title="">Default account for expenses when importing electronic invoice</label>
+                                <field class="col-xs-12" name="expense_account_id" string="Default account for expenses when importing electronic invoice" />
                             </div>
                         </div>
                     </div>
-				</xpath>
-			</field>
-    	</record>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>

@@ -1,47 +1,57 @@
 from enum import Enum
 
 
-class UrlHaciendaToken(Enum):
-    apistag = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token'
-    apiprod = 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token'
+UrlHaciendaToken = {
+    'api-stag': 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token',
+    'api-prod': 'https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token',
+}
 
+UrlHaciendaRecepcion = {
+    'api-stag': 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/',
+    'api-prod': 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/',
+}
 
-class UrlHaciendaRecepcion(Enum):
-    apistag = 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/'
-    apiprod = 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/'
+TipoCedula = {   # no se está usando !!
+    'Fisico': 'fisico',
+    'Juridico': 'juridico',
+    'Dimex': 'dimex',
+    'Nite': 'nite',
+    'Extranjero': 'extranjero',
+}
 
+SituacionComprobante = {
+    'normal': '1',
+    'contingencia': '2',
+    'sininternet': '3',
+}
 
-class GrandTypes(Enum):
-    TypePassword = 'password'
-    TypeRefresh = 'refresh_token'
+TipoDocumento = {
+    'FE': '01',  # Factura Electrónica
+    'ND': '02',  # Nota de Débito
+    'NC': '03',  # Nota de Crédito
+    'TE': '04',  # Tiquete Electrónico
+    'CCE': '05',  # confirmacion comprobante electronico
+    'CPCE': '06',  # confirmacion parcial comprobante electronico
+    'RCE': '07',  # rechazo comprobante electronico
+    'FEC': '08',  # Factura Electrónica de Compra
+    'FEE': '09',  # Factura Electrónica de Exportación
+}
 
+# Xmlns used by Hacienda, the space at the end is very important
+XmlnsHacienda = {
+    'FE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/facturaElectronica ',  # Factura Electrónica
+    'ND': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/notaDebitoElectronica ',  # Nota de Débito
+    'NC': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/notaCreditoElectronica ',  # Nota de Crédito
+    'TE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/tiqueteElectronico ',  # Tiquete Electrónico
+    'FEC': '',  # Factura Electrónica de Compra
+    'FEE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/facturaElectronicaExportacion ',  # Factura Electrónica de Exportación
+}
 
-class TipoCedula(Enum):
-    Fisico = 'fisico'
-    Juridico = 'juridico'
-    Dimex = 'dimex'
-    Nite = 'nite'
-
-
-class SituacionComprobante(Enum):
-    normal = '1'
-    contingencia = '2'
-    sininternet = '3'
-
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
-
-
-class TipoDocumento(Enum):
-    FE = '01'    # Factura Electrónica
-    ND = '02'    # Nota de Débito
-    NC = '03'    # Nota de Crédito
-    TE = '04'    # Tiquete Electrónico
-    CCE = '05'   # confirmacion comprobante electronico
-    CPCE = '06'  # confirmacion parcial comprobante electronico
-    RCE = '07'   # rechazo comprobante electronico
-
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
+schemaLocation = {
+    'FE': 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/FacturaElectronica_V4.3.xsd',  # Factura Electrónica
+    'ND': 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/NotaDebitoElectronica_V4.3.xsd',  # Nota de Débito
+    'NC': 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/NotaCreditoElectronica_V4.3.xsd',  # Nota de Crédito
+    'TE': 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/TiqueteElectronico_V4.3.xsd',  # Tiquete Electrónico
+    'FEC': '08',  # Factura Electrónica de Compra
+    'FEE': 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/FacturaElectronicaExportacion_V4.3.xsd',  # Factura Electrónica de Exportación
+}

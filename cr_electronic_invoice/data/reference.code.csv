@@ -1,7 +1,0 @@
-id,code,name,active
-ReferenceCode_1,01,Anula Documento de Referencia,true
-ReferenceCode_2,02,Corrige texto de referencia,true
-ReferenceCode_3,03,Corrige monto,true
-ReferenceCode_4,04,Referencia a otro documento,true
-ReferenceCode_5,05,Sustituye comprobante provisional por contingencia,true
-ReferenceCode_99,99,Otros,true

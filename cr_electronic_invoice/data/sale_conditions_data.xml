@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- sale conditions -->
+        <record id="cr_electronic_invoice.SaleConditions_1" 
+            model="sale.conditions">
+            <field name="code">01</field>
+            <field name="name">Contado</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_2" 
+            model="sale.conditions">
+            <field name="code">02</field>
+            <field name="name">Crédito</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_3" 
+            model="sale.conditions">
+            <field name="code">03</field>
+            <field name="name">Consignación</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_4" 
+            model="sale.conditions">
+            <field name="code">04</field>
+            <field name="name">Apartado</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_5" 
+            model="sale.conditions">
+            <field name="code">05</field>
+            <field name="name">Arrendamiento con opción de compra</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_6" 
+            model="sale.conditions">
+            <field name="code">06</field>
+            <field name="name">Arrendamiento en función financiera</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_7" 
+            model="sale.conditions">
+            <field name="code">07</field>
+            <field name="name">Cobro a Favor de un Tercero</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_8" 
+            model="sale.conditions">
+            <field name="code">08</field>
+            <field name="name">Servicios prestados al Estado a Crédito</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_9" 
+            model="sale.conditions">
+            <field name="code">09</field>
+            <field name="name">Pago del servicios prestado al Estado</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.SaleConditions_99" 
+            model="sale.conditions">
+            <field name="code">99</field>
+            <field name="name">Otros (se debe indicar la condición de la venta)</field>
+            <field name="active">true</field>
+        </record>
+
+    </data>
+</odoo>

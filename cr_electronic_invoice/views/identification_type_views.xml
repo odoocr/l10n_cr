@@ -1,41 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<data>
-
+    <data>
         <record id="view_identification_type_form" model="ir.ui.view">
-			<field name="name">identification.type.form</field>
-			<field name="model">identification.type</field>
-			<field name="arch" type="xml">
-				<form string="Tipo de identificación">
-					<sheet string="Tipo de identificación">
-						<group col="4">
-							<field name="code"/>
-							<field name="name"/>
-							<field name="notes"/>
-						</group>
-					</sheet>
-				</form>
-			</field>
-		</record>
-
+            <field name="name">identification.type.form</field>
+            <field name="model">identification.type</field>
+            <field name="arch" type="xml">
+                <form string="Tipo de identificación">
+                    <sheet string="Tipo de identificación">
+                        <group col="4">
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="notes"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
         <record id="view_identification_type_tree" model="ir.ui.view">
-			<field name="name">identification.type.tree</field>
-			<field name="model">identification.type</field>
-			<field name="arch" type="xml">
-				<tree string="Tipo de identificación">
-					<field name="code"/>
-					<field name="name"/>
-					<field name="notes"/>
-				</tree>
-			</field>
-		</record>
+            <field name="name">identification.type.tree</field>
+            <field name="model">identification.type</field>
+            <field name="arch" type="xml">
+                <tree string="Tipo de identificación">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="notes"/>
+                </tree>
+            </field>
+        </record>
 
-		<record id="action_identification_type" model="ir.actions.act_window">
-			<field name="name">Tipo de identificación</field>
-			<field name="res_model">identification.type</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
-		</record>
-
+        <record id="action_identification_type" model="ir.actions.act_window">
+            <field name="name">Tipo de identificación</field>
+            <field name="res_model">identification.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
     </data>
 </odoo>
