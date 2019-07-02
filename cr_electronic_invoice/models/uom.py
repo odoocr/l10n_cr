@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 
 
-class UoM(models.Model):
+class ProductUom(models.Model):
     _inherit = "product.uom"
     code = fields.Char(string="Código", required=False, )
