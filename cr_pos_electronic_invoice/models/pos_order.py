@@ -164,9 +164,8 @@ class PosOrder(models.Model):
                 unidad_medida = line.product_id.commercial_measurement or 'Sp'
                 total = line.qty * line.price_unit
                 total_linea = line.price_subtotal + impuestos_acumulados
-                descuento = (round(line.qty * line.price_unit, 2)
-                             - round(line.price_subtotal, 2)) or 0
-                natu_descuento = ''
+                descuento = round((line.qty * line.price_unit)-line.price_subtotal,2) or 0 
+                natu_descuento = 'Descuento Comercial'
                 _logger.info(impuestos)
 
                 line_obj = ('{' +
@@ -229,7 +228,7 @@ class PosOrder(models.Model):
             payload['total_gravados'] = total_servicio_gravado + total_mercaderia_gravado
             payload['total_exentos'] = total_servicio_exento + total_mercaderia_exento
             payload['total_ventas'] = total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento
-            payload['total_descuentos'] = round(base_total, 2) - round(amount_untaxed, 2)
+            payload['total_descuentos'] = round(base_total - amount_untaxed, 2) 
             payload['total_ventas_neta'] = (total_servicio_gravado + total_mercaderia_gravado
                                             + total_servicio_exento + total_mercaderia_exento) \
                                            - (base_total - amount_untaxed)
