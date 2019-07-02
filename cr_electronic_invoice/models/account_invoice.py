@@ -150,23 +150,23 @@ class InvoiceLineElectronic(models.Model):
     total_discount = fields.Float(string="Total descuento", required=False, )
     discount_note = fields.Char(string="Nota de descuento", required=False, )
     total_tax = fields.Float(string="Total impuesto", required=False, )
-    #   exoneration_total = fields.Float(string="Exoneración total", required=False, )
-    #   total_line_exoneration = fields.Float(string="Exoneración total de la línea", required=False, )
+
     exoneration_id = fields.Many2one(
         comodel_name="exoneration", string="Exoneración", required=False, )
 
     third_party_id = fields.Many2one(comodel_name="res_partner",
                                      string="Tercero otros cargos",)
 
-    tariff_head = fields.Char(
-        string=u'Partida Arancelaria', size=15,
-        help="Partida arancelaria para facturas de exportación"
-    )
+    tariff_head = fields.Char(string="Partida arancelaria para factura"
+                                     " de exportación",
+                              required=False, )
 
-    @api.onchange('product_id')
-    def _onchange_product_id(self):
-        if self.product_id.tariff_head:
-            self.tariff_head = self.product_id.tariff_head
+    categ_name = fields.Char(
+        related='product_id.categ_id.name',
+    )
+    product_code = fields.Char(
+        related='product_id.default_code',
+    )
 
 
 class AccountInvoiceElectronic(models.Model):
@@ -1042,7 +1042,7 @@ class AccountInvoiceElectronic(models.Model):
             _logger.info(
                 'E-INV CR - Valida Hacienda - Invoice %s / %s  -  number:%s',
                 current_invoice, total_invoices, inv.number_electronic)
-
+                
             if not inv.sequence.isdigit():  # or (len(inv.number) == 10):
                 _logger.info(
                     'E-INV CR - Valida Hacienda - skipped Invoice %s',
@@ -1115,14 +1115,13 @@ class AccountInvoiceElectronic(models.Model):
                 otros_cargos = dict()
                 otros_cargos_id = 0
                 line_number = 0
+                total_otros_cargos = 0.0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
                 total_servicio_exonerado = 0.0
                 total_mercaderia_gravado = 0.0
                 total_mercaderia_exento = 0.0
                 total_mercaderia_exonerado = 0.0
-                total_servicio_gravado = 0.0
-                total_otros_cargos = 0.0
                 total_descuento = 0.0
                 total_impuestos = 0.0
                 base_subtotal = 0.0
@@ -1135,13 +1134,13 @@ class AccountInvoiceElectronic(models.Model):
                             'Detalle' : escape(inv_line.name[:150]),
                             'MontoCargo' : inv_line.total_amount
                         }
-
-                        if inv_line.third_party_id:
-                            otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.third_party_id.vat
-                            otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.third_party_id.name
-
+                        # TODO: Cómo meter esto en la línea
+                        # otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.partner_id.vat
+                        # otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.partner_id.name
                         total_otros_cargos += inv_line.total_amount
+
                     else:
+
                         line_number += 1
                         # price = inv_line.price_unit * (1 - inv_line.discount / 100.0)
                         price = inv_line.price_unit
@@ -1386,12 +1385,15 @@ class AccountInvoiceElectronic(models.Model):
                                                                      round(
                                                                          total_servicio_exento,
                                                                          5),
+                                                                         total_servicio_exonerado,
                                                                      round(
                                                                          total_mercaderia_gravado,
                                                                          5),
                                                                      round(
                                                                          total_mercaderia_exento,
                                                                          5),
+                                                                         total_mercaderia_exonerado,
+                                                                         total_otros_cargos,
                                                                      base_subtotal,
                                                                      total_impuestos,
                                                                      total_descuento,
@@ -1442,12 +1444,15 @@ class AccountInvoiceElectronic(models.Model):
                                                                          round(
                                                                              total_servicio_exento,
                                                                              5),
+                                                                             total_servicio_exonerado,
                                                                          round(
                                                                              total_mercaderia_gravado,
                                                                              5),
                                                                          round(
                                                                              total_mercaderia_exento,
                                                                              5),
+                                                                         total_mercaderia_exonerado,
+                                                                         total_otros_cargos,
                                                                          base_subtotal,
                                                                          total_impuestos,
                                                                          total_descuento,
@@ -1501,12 +1506,15 @@ class AccountInvoiceElectronic(models.Model):
                                                                          round(
                                                                              total_servicio_exento,
                                                                              5),
+                                                                             total_servicio_exonerado,
                                                                          round(
                                                                              total_mercaderia_gravado,
                                                                              5),
                                                                          round(
                                                                              total_mercaderia_exento,
                                                                              5),
+                                                                         total_mercaderia_exonerado,
+                                                                         total_otros_cargos,
                                                                          base_subtotal,
                                                                          total_impuestos,
                                                                          total_descuento,
@@ -1531,8 +1539,6 @@ class AccountInvoiceElectronic(models.Model):
                 inv.xml_comprobante = base64.encodestring(xml_firmado)
                 _logger.info('E-INV CR - SIGNED XML:%s',
                              inv.fname_xml_comprobante)
-            else:
-                xml_firmado = inv.xml_comprobante
 
             # Obtenemos el token con el api interna
             token_m_h = api_facturae.get_token_hacienda(

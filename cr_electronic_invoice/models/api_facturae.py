@@ -654,11 +654,12 @@ def gen_xml_fe_v42(inv, sale_conditions,
     # return stringToBase64(felectronica_bytes)
 
 
-def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_exento,
-                   totalServExonerado, total_mercaderia_gravado, total_mercaderia_exento, totalMercExonerada,
-                   totalOtrosCargos, base_total, total_impuestos, total_descuento, lines, otrosCargos,
-                   currency_rate, invoice_comments
-):
+def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
+                   total_servicio_exento, totalServExonerado,
+                   total_mercaderia_gravado, total_mercaderia_exento,
+                   totalMercExonerada, totalOtrosCargos, base_total,
+                   total_impuestos, total_descuento, lines, otrosCargos,
+                   currency_rate, invoice_comments):
 
     numero_linea = 0
 
@@ -681,7 +682,8 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<CodigoActividad>' +
               inv.company_id.activity_id.code + '</CodigoActividad>')
-    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<NumeroConsecutivo>' +
+              inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
     sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
@@ -862,30 +864,21 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
               str(total_servicio_gravado) + '</TotalServGravados>')
     sb.Append('<TotalServExentos>' +
               str(total_servicio_exento) + '</TotalServExentos>')
-
-    # TODO: Hay que calcular TotalServExonerado
     sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
 
     sb.Append('<TotalMercanciasGravadas>' +
               str(total_mercaderia_gravado) + '</TotalMercanciasGravadas>')
     sb.Append('<TotalMercanciasExentas>' +
               str(total_mercaderia_exento) + '</TotalMercanciasExentas>')
-
-    # TODO: Hay que calcular TotalMercExonerada
     sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
 
     sb.Append('<TotalGravado>' + str(total_servicio_gravado +
                                      total_mercaderia_gravado) + '</TotalGravado>')
     sb.Append('<TotalExento>' + str(total_servicio_exento +
                                     total_mercaderia_exento) + '</TotalExento>')
-
-    # TODO: Hay que calcular TotalExonerado
     sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
-
-    # TODO: agregar los exonerados en la suma
     sb.Append('<TotalVenta>' + str(
         total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento + totalServExonerado + totalMercExonerada) + '</TotalVenta>')
-
     sb.Append('<TotalDescuentos>' +
               str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' +
@@ -896,11 +889,10 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
     # TODO: Hay que calcular el TotalIVADevuelto
     # sb.Append('<TotalIVADevuelto>' + str(¿de dónde sacamos esto?) + '</TotalIVADevuelto>')
 
-    # TODO: Hay que calcular el TotalOtrosCargos
-    # sb.Append('<TotalOtrosCargos>' + str(¿de dónde sacamos esto?) + '</TotalOtrosCargos>')
+    sb.Append('<TotalOtrosCargos>' + str(totalOtrosCargos) + '</TotalOtrosCargos>')
 
     sb.Append('<TotalComprobante>' + str(round(base_total +
-                                               total_impuestos, 5)) + '</TotalComprobante>')
+                                               total_impuestos+ totalOtrosCargos, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
     sb.Append('<Otros>')
     sb.Append('<OtroTexto>' +
@@ -914,7 +906,8 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado, total_servicio_
 
 def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, total_servicio_gravado, total_servicio_exento, totalServExonerado,
                     total_mercaderia_gravado, total_mercaderia_exento, totalMercExonerada, totalOtrosCargos, base_total, total_impuestos, total_descuento,
-                    lines, otrosCargos, currency_rate, invoice_comments):
+                    lines, otrosCargos, currency_rate, invoice_comments
+):
 
     numero_linea = 0
 
@@ -1282,9 +1275,10 @@ def gen_xml_te_42(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     #return stringToBase64(telectronico_bytes)
     return sb
 
-def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_exento,
-               total_mercaderia_gravado, total_mercaderia_exento, base_total, total_impuestos, total_descuento,
-               lines, currency_rate, invoice_comments, otrosCargos):
+def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_exento, totalServExonerado,
+               total_mercaderia_gravado, total_mercaderia_exento, totalMercExonerada, totalOtrosCargos, base_total, total_impuestos, total_descuento,
+               lines, currency_rate, invoice_comments, otrosCargos
+):
 
     numero_linea = 0
 
@@ -1385,28 +1379,28 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
                 sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
 
                 if b.get('exoneracion'):
-                    for (c, d) in b['exoneracion']:
-                        sb.Append('<Exoneracion>')
-                        sb.Append('<TipoDocumento>' +
-                                  d['tipoDocumento'] + '</TipoDocumento>')
-                        sb.Append('<NumeroDocumento>' +
-                                  d['numeroDocumento'] + '</NumeroDocumento>')
-                        sb.Append('<NombreInstitucion>' +
-                                  d['nombreInstitucion'] + '</NombreInstitucion>')
-                        sb.Append('<FechaEmision>' +
-                                  d['fechaEmision'] + '</FechaEmision>')
-                        sb.Append('<MontoImpuesto>' +
-                                  d['montoImpuesto'] + '</MontoImpuesto>')
-                        sb.Append('<PorcentajeCompra>' +
-                                  d['porcentajeCompra'] + '</PorcentajeCompra>')
+                    sb.Append('<Exoneracion>')
+                    sb.Append('<TipoDocumento>' +
+                              inv.partner_id.type_exoneration.code + '</TipoDocumento>')
+                    sb.Append('<NumeroDocumento>' +
+                              inv.partner_id.exoneration_number + '</NumeroDocumento>')
+                    sb.Append('<NombreInstitucion>' +
+                              inv.partner_id.institution_name + '</NombreInstitucion>')
+                    sb.Append('<FechaEmision>' +
+                              str(inv.partner_id.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                    sb.Append('<PorcentajeExoneracion>' +
+                              str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                    sb.Append( '<MontoExoneracion>' +
+                               str( b['exoneracion']['montoImpuesto'] ) + '</MontoExoneracion>' )
+                    sb.Append( '</Exoneracion>' )
 
                 sb.Append('</Impuesto>')
+        sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
         sb.Append('<MontoTotalLinea>' +
                   str(v['montoTotalLinea']) + '</MontoTotalLinea>')
         sb.Append('</LineaDetalle>')
     sb.Append('</DetalleServicio>')
 
-    # TODO: ¿Cómo implementar otros cargos a nivel de UI y model en Odoo?
     if otrosCargos:
         sb.Append('<OtrosCargos>')
         for otro_cargo in otrosCargos:
@@ -1449,45 +1443,35 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
               str(total_servicio_gravado) + '</TotalServGravados>')
     sb.Append('<TotalServExentos>' +
               str(total_servicio_exento) + '</TotalServExentos>')
-
-    # TODO: Hay que calcular TotalServExonerado
-    # sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
-
+    sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
     sb.Append('<TotalMercanciasGravadas>' +
               str(total_mercaderia_gravado) + '</TotalMercanciasGravadas>')
     sb.Append('<TotalMercanciasExentas>' +
               str(total_mercaderia_exento) + '</TotalMercanciasExentas>')
-
-    # TODO: Hay que calcular TotalMercExonerada
-    # sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
+    sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
 
     sb.Append('<TotalGravado>' + str(total_servicio_gravado +
                                      total_mercaderia_gravado) + '</TotalGravado>')
     sb.Append('<TotalExento>' + str(total_servicio_exento +
                                     total_mercaderia_exento) + '</TotalExento>')
-
-    # TODO: Hay que calcular TotalExonerado
-    # sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
-
-    # TODO: agregar los exonerados en la suma
+    sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
     sb.Append('<TotalVenta>' + str(
         total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) + '</TotalVenta>')
 
     sb.Append('<TotalDescuentos>' +
-              str(round(total_descuento, 2)) + '</TotalDescuentos>')
+              str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' +
-              str(round(base_total, 2)) + '</TotalVentaNeta>')
+              str(round(base_total, 5)) + '</TotalVentaNeta>')
     sb.Append('<TotalImpuesto>' +
-              str(round(total_impuestos, 2)) + '</TotalImpuesto>')
+              str(round(total_impuestos, 5)) + '</TotalImpuesto>')
 
     # TODO: Hay que calcular el TotalIVADevuelto
     # sb.Append('<TotalIVADevuelto>' + str(¿de dónde sacamos esto?) + '</TotalIVADevuelto>')
 
-    # TODO: Hay que calcular el TotalOtrosCargos
-    # sb.Append('<TotalOtrosCargos>' + str(¿de dónde sacamos esto?) + '</TotalOtrosCargos>')
+    sb.Append('<TotalOtrosCargos>' + str(totalOtrosCargos) + '</TotalOtrosCargos>')
 
     sb.Append('<TotalComprobante>' + str(round(base_total +
-                                               total_impuestos, 2)) + '</TotalComprobante>')
+                                               total_impuestos + totalOtrosCargos, 2)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
     sb.Append('<Otros>')
     sb.Append('<OtroTexto>' +
@@ -1496,15 +1480,14 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
 
     sb.Append('</TiqueteElectronico>')
 
-    #telectronico_bytes = str(sb)
-    #return stringToBase64(telectronico_bytes)
     return sb
 
 
 def gen_xml_nc_v43(
     inv, sale_conditions, total_servicio_gravado,
-    total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
-    total_impuestos, total_descuento, lines,
+    total_servicio_exento, totalServExonerado, total_mercaderia_gravado,
+    total_mercaderia_exento, totalMercExonerada, totalOtrosCargos,
+    base_total, total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
     codigo_referencia, razon_referencia, currency_rate, invoice_comments, otrosCargos
 ):
@@ -1525,7 +1508,6 @@ def gen_xml_nc_v43(
     sb.Append('<NotaCreditoElectronica xmlns="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/notaCreditoElectronica" ')
     sb.Append('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
     sb.Append('xsi:schemaLocation="https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/NotaCreditoElectronica_V4.3.xsd">')
-    # sb.Append('https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
     sb.Append('<CodigoActividad>' +
@@ -1645,75 +1627,68 @@ def gen_xml_nc_v43(
                 sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
 
                 if b.get('exoneracion'):
-                    for (c, d) in b['exoneracion']:
-                        sb.Append('<Exoneracion>')
-                        sb.Append('<TipoDocumento>' +
-                                  d['tipoDocumento'] + '</TipoDocumento>')
-                        sb.Append('<NumeroDocumento>' +
-                                  d['numeroDocumento'] + '</NumeroDocumento>')
-                        sb.Append('<NombreInstitucion>' +
-                                  d['nombreInstitucion'] + '</NombreInstitucion>')
-                        sb.Append('<FechaEmision>' +
-                                  d['fechaEmision'] + '</FechaEmision>')
-                        sb.Append('<MontoImpuesto>' +
-                                  str(d['montoImpuesto']) + '</MontoImpuesto>')
-                        sb.Append(
-                            '<PorcentajeCompra>' + str(d['porcentajeCompra']) + '</PorcentajeCompra>')
+                    sb.Append('<Exoneracion>')
+                    sb.Append('<TipoDocumento>' +
+                              inv.partner_id.type_exoneration.code + '</TipoDocumento>')
+                    sb.Append('<NumeroDocumento>' +
+                              inv.partner_id.exoneration_number + '</NumeroDocumento>')
+                    sb.Append('<NombreInstitucion>' +
+                              inv.partner_id.institution_name + '</NombreInstitucion>')
+                    sb.Append('<FechaEmision>' +
+                              str(inv.partner_id.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                    sb.Append('<PorcentajeExoneracion>' +
+                              str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                    sb.Append( '<MontoExoneracion>' +
+                               str( b['exoneracion']['montoImpuesto'] ) + '</MontoExoneracion>' )
+                    sb.Append( '</Exoneracion>' )
 
                 sb.Append('</Impuesto>')
+        sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
         sb.Append('<MontoTotalLinea>' +
                   str(v['montoTotalLinea']) + '</MontoTotalLinea>')
         sb.Append('</LineaDetalle>')
     sb.Append('</DetalleServicio>')
 
     sb.Append('<ResumenFactura>')
-    #sb.Append('<CodigoMoneda>' + str(inv.currency_id.name) + '</CodigoMoneda>')
-    #sb.Append('<TipoCambio>' + str(currency_rate) + '</TipoCambio>')
-
-    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' + cod_moneda + '</CodigoMoneda><TipoCambio>' + str(
-        currency_rate) + '</TipoCambio></CodigoTipoMoneda>')
+    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
+              cod_moneda +
+              '</CodigoMoneda><TipoCambio>' +
+              str(currency_rate) +
+              '</TipoCambio></CodigoTipoMoneda>')
 
     sb.Append('<TotalServGravados>' +
               str(total_servicio_gravado) + '</TotalServGravados>')
     sb.Append('<TotalServExentos>' +
               str(total_servicio_exento) + '</TotalServExentos>')
-
-    # TODO: Hay que calcular TotalServExonerado
-    # sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
+    sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
 
     sb.Append('<TotalMercanciasGravadas>' +
               str(total_mercaderia_gravado) + '</TotalMercanciasGravadas>')
     sb.Append('<TotalMercanciasExentas>' +
               str(total_mercaderia_exento) + '</TotalMercanciasExentas>')
-
-    # TODO: Hay que calcular TotalMercExonerada
-    # sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
+    sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
 
     sb.Append('<TotalGravado>' + str(total_servicio_gravado +
                                      total_mercaderia_gravado) + '</TotalGravado>')
     sb.Append('<TotalExento>' + str(total_servicio_exento +
                                     total_mercaderia_exento) + '</TotalExento>')
-
-    # TODO: Hay que calcular TotalExonerado
-    # sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
-
+    sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
     sb.Append('<TotalVenta>' + str(
-        total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) + '</TotalVenta>')
+        total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento + totalServExonerado + totalMercExonerada) + '</TotalVenta>')
     sb.Append('<TotalDescuentos>' +
-              str(round(total_descuento, 2)) + '</TotalDescuentos>')
+              str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' +
-              str(round(base_total, 2)) + '</TotalVentaNeta>')
+              str(round(base_total, 5)) + '</TotalVentaNeta>')
     sb.Append('<TotalImpuesto>' +
-              str(round(total_impuestos, 2)) + '</TotalImpuesto>')
+              str(round(total_impuestos, 5)) + '</TotalImpuesto>')
 
     # TODO: Hay que calcular el TotalIVADevuelto
     # sb.Append('<TotalIVADevuelto>' + str(¿de dónde sacamos esto?) + '</TotalIVADevuelto>')
 
-    # TODO: Hay que calcular el TotalOtrosCargos
-    # sb.Append('<TotalOtrosCargos>' + str(¿de dónde sacamos esto?) + '</TotalOtrosCargos>')
+    sb.Append('<TotalOtrosCargos>' + str(totalOtrosCargos) + '</TotalOtrosCargos>')
 
     sb.Append('<TotalComprobante>' + str(round(base_total +
-                                               total_impuestos, 2)) + '</TotalComprobante>')
+                                               total_impuestos+ totalOtrosCargos, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
 
     sb.Append('<InformacionReferencia>')
@@ -1723,10 +1698,7 @@ def gen_xml_nc_v43(
     sb.Append('<Codigo>' + str(codigo_referencia) + '</Codigo>')
     sb.Append('<Razon>' + str(razon_referencia) + '</Razon>')
     sb.Append('</InformacionReferencia>')
-    # sb.Append('<Normativa>')
-    # sb.Append('<NumeroResolucion>DGT-R-48-2016</NumeroResolucion>')
-    #sb.Append('<FechaResolucion>07-10-2016 08:00:00</FechaResolucion>')
-    # sb.Append('</Normativa>')
+
     if invoice_comments:
         sb.Append('<Otros>')
         sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
@@ -1741,8 +1713,7 @@ def gen_xml_nc(
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
     total_impuestos, total_descuento, lines,
     tipo_documento_referencia, numero_documento_referencia, fecha_emision_referencia,
-    codigo_referencia, razon_referencia, currency_rate, invoice_comments
-):
+    codigo_referencia, razon_referencia, currency_rate, invoice_comments):
 
     numero_linea = 0
 
@@ -1924,9 +1895,6 @@ def gen_xml_nc(
     sb.Append('</NotaCreditoElectronica>')
 
     return sb
-    #ncelectronica_bytes = str(sb)
-
-    # return stringToBase64(ncelectronica_bytes)
 
 
 def gen_xml_nd(
@@ -2107,10 +2075,6 @@ def gen_xml_nd(
     sb.Append('</NotaDebitoElectronica>')
 
     return sb
-    #ncelectronica_bytes = str(sb)
-
-    # return stringToBase64(ncelectronica_bytes)
-
 
 def gen_xml_nd_v43(
     inv, consecutivo, sale_conditions, total_servicio_gravado,
@@ -2253,8 +2217,6 @@ def gen_xml_nd_v43(
     sb.Append('</DetalleServicio>')
 
     sb.Append('<ResumenFactura>')
-    # sb.Append('<CodigoMoneda>' + str(inv.currency_id.name) + '</CodigoMoneda>')
-    # sb.Append('<TipoCambio>' + str(currency_rate) + '</TipoCambio>')
 
     sb.Append('<CodigoTipoMoneda><CodigoMoneda>' + str(inv.currency_id.name) + '</CodigoMoneda><TipoCambio>' + str(
         currency_rate) + '</TipoCambio></CodigoTipoMoneda>')
@@ -2264,42 +2226,36 @@ def gen_xml_nd_v43(
     sb.Append('<TotalServExentos>' +
               str(total_servicio_exento) + '</TotalServExentos>')
 
-    # TODO: Hay que calcular TotalServExonerado
-    # sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
+    sb.Append('<TotalServExonerado>' + str(totalServExonerado) + '</TotalServExonerado>')
 
     sb.Append('<TotalMercanciasGravadas>' +
               str(total_mercaderia_gravado) + '</TotalMercanciasGravadas>')
     sb.Append('<TotalMercanciasExentas>' +
               str(total_mercaderia_exento) + '</TotalMercanciasExentas>')
-
-    # TODO: Hay que calcular TotalMercExonerada
-    # sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
+    sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
 
     sb.Append('<TotalGravado>' + str(total_servicio_gravado +
                                      total_mercaderia_gravado) + '</TotalGravado>')
     sb.Append('<TotalExento>' + str(total_servicio_exento +
                                     total_mercaderia_exento) + '</TotalExento>')
-
-    # TODO: Hay que calcular TotalExonerado
-    # sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
+    sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
 
     sb.Append('<TotalVenta>' + str(
         total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento) + '</TotalVenta>')
     sb.Append('<TotalDescuentos>' +
-              str(round(total_descuento, 2)) + '</TotalDescuentos>')
+              str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' +
-              str(round(base_total, 2)) + '</TotalVentaNeta>')
+              str(round(base_total, 5)) + '</TotalVentaNeta>')
     sb.Append('<TotalImpuesto>' +
-              str(round(total_impuestos, 2)) + '</TotalImpuesto>')
+              str(round(total_impuestos, 5)) + '</TotalImpuesto>')
 
     # TODO: Hay que calcular el TotalIVADevuelto
     # sb.Append('<TotalIVADevuelto>' + str(¿de dónde sacamos esto?) + '</TotalIVADevuelto>')
 
-    # TODO: Hay que calcular el TotalOtrosCargos
-    # sb.Append('<TotalOtrosCargos>' + str(¿de dónde sacamos esto?) + '</TotalOtrosCargos>')
+    sb.Append('<TotalOtrosCargos>' + str(totalOtrosCargos) + '</TotalOtrosCargos>')
 
     sb.Append('<TotalComprobante>' + str(round(base_total +
-                                               total_impuestos, 2)) + '</TotalComprobante>')
+                                               total_impuestos + totalOtrosCargos, 2)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
 
     sb.Append('<InformacionReferencia>')
