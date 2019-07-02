@@ -983,7 +983,6 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, total_servicio_grav
     sb.Append('<CorreoElectronico>' + email_receptor + '</CorreoElectronico>')
     sb.Append('</Receptor>')
 
-
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' +
               str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
