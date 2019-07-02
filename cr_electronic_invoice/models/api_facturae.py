@@ -2556,14 +2556,16 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
 
     # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
     # se carga el xml devuelto por Hacienda
-    last_state = inv.state_send_invoice
+    last_state = False
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
+        last_state = inv.state_tributacion
         inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
         inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
         inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
+        last_state = inv.state_send_invoice
         inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
         inv.xml_comprobante = xml_firmado
         inv.state_send_invoice = estado_m_h
@@ -2575,7 +2577,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
-    if inv.state_send_invoice == 'aceptado' and (last_state is False or last_state == 'procesando'):
+    if estado_m_h == 'aceptado' and (last_state is False or last_state == 'procesando'):
         # if not inv.partner_id.opt_out:
         if inv.type == 'in_invoice' or inv.type == 'in_refund':
             email_template = self.env.ref(

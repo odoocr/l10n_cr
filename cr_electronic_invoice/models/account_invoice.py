@@ -569,7 +569,7 @@ class AccountInvoiceElectronic(models.Model):
             if inv.xml_supplier_approval:
 
                 '''Verificar si el MR ya fue enviado y estamos esperando la confirmación'''
-                if inv.state_send_invoice is False or inv.state_send_invoice == 'procesando':
+                if inv.state_send_invoice == 'procesando':
 
                     token_m_h = api_facturae.get_token_hacienda(
                         inv, inv.company_id.frm_ws_ambiente)
@@ -940,9 +940,7 @@ class AccountInvoiceElectronic(models.Model):
             limit=max_invoices)
         total_invoices = len(invoices)
         current_invoice = 0
-        _logger.debug(
-            'E-INV CR - Confirma Hacienda - Invoices to check: %s',
-            total_invoices)
+
         for i in invoices:
             current_invoice += 1
             _logger.debug(
@@ -954,7 +952,7 @@ class AccountInvoiceElectronic(models.Model):
 
             if not i.amount_total_electronic_invoice:
                 i.charge_xml_data()
-                _logger.error(
+                _logger.info(
                     'MAB - Confirma Hacienda - Invoice %s / %s  -  number:%s',
                     current_invoice,
                     total_invoices, i.number_electronic)
