@@ -1,6 +1,0 @@
-id,code,name,notes
-Identificationtype_01,01,Cédula física,Se agrega tres ceros antes de iniciar con el número de cédula para completar 12 dígitos
-Identificationtype_02,02,Cédula jurídica,Se debe agregar dos ceros antes de iniciar con el número de cédula para completar 12 dígitos
-Identificationtype_03,03,DIMEX,En aquellos casos donde la cédula se encuentre compuesta de 11 dígitos se debe agregar un cero al inicio para completar 12 dígitos
-Identificationtype_04,04,NITE,Se debe agregar dos ceros antes de iniciar con el número de identificación para completar 12 dígitos
-Identificationtype_05,05,Extranjero,Número de identificación en caso de que el receptor sea un extranjero. Máximo 20 caracteres

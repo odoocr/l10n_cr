@@ -1,7 +1,0 @@
-id,sequence,name,notes,active
-PaymentMethods_1,01,Efectivo,,true
-PaymentMethods_2,02,Tarjeta,,true
-PaymentMethods_3,03,Cheque,,true
-PaymentMethods_4,04,Transferencia – depósito bancario,,true
-PaymentMethods_5,05,Recaudado por tercero,,true
-PaymentMethods_99,99,Otros (se debe indicar el medio de pago),,true

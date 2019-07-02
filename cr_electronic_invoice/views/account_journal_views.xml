@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<data>
-		<record id="view_account_journal_inherit_form" model="ir.ui.view">
-			<field name="name">account.journal.form.inherit</field>
-			<field name="model">account.journal</field>
-			<field name="inherit_id" ref="account.view_account_journal_form"/>
-			<field name="arch" type="xml">
-				<xpath expr="//field[@name='type']" position="after">
-					<field name="terminal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
-					<field name="sucursal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
-				</xpath>
-			</field>
-		</record>
-	</data>
+    <data>
+        <record id="view_account_journal_inherit_form" model="ir.ui.view">
+            <field name="name">account.journal.form.inherit</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[1]" position="after">
+                    <page string="Facturación Electrónica" attrs="{'invisible':[('type','!=','sale')]}">
+                        <group cols="2">
+                            <group cols="2">
+                                <field name="FE_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
+                                <field name="ND_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
+                                <field name="NC_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
+                            </group>
+                            <group cols="2">
+                                <field name="TE_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
+                                <field name="FEE_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
+                            </group>
+                            <group cols="2">
+                                <field name="terminal" attrs="{'required':[('type','=','sale')]}"/>
+                                <field name="sucursal" attrs="{'required':[('type','=','sale')]}"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
 </odoo>
