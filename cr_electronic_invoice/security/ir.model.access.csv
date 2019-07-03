@@ -7,5 +7,4 @@ access_ReferenceDocument,reference.document,model_reference_document,account.gro
 access_ReferenceCode,reference.code,model_reference_code,account.group_account_invoice,1,0,0,0
 access_resolution,access_resolution,model_resolution,base.group_user,1,0,0,0
 access_AutEx,aut.ex,model_aut_ex,account.group_account_invoice,1,1,1,0
-access_Exoneration,exoneration,model_exoneration,account.group_account_invoice,1,1,1,0
 access_economic_activity,economic.activity,model_economic_activity,account.group_account_invoice,1,1,1,0
