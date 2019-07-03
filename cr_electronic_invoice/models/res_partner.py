@@ -94,3 +94,4 @@ class PartnerElectronic(models.Model):
                     if self.vat.isdigit() and len(self.vat) != 9:
                         raise UserError(
                             'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
+                        

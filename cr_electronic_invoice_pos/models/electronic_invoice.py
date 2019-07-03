@@ -25,12 +25,20 @@ class AccountJournal(models.Model):
 
 class PosConfig(models.Model):
     _inherit = 'pos.config'
-    #sucursal = fields.Char(string='Point of Sale Sucursal', required=True, help="Sucursal for this point of sale")
-    #terminal = fields.Char(string='Point of Sale Terminal Number', required=True, help="Terminal number for this point of sale")
-    return_sequence_id = fields.Many2one('ir.sequence', string='Order IDs Return Sequence', readonly=False,
-                                         help="This sequence is automatically created by Odoo but you can change it "
-                                         "to customize the reference numbers of your orders.", copy=False)
 
+    sucursal = fields.Integer(string="Sucursal", required=False, default="1")
+    terminal = fields.Integer(string="Terminal", required=False, default="1")
+
+    FE_sequence_id = fields.Many2one(comodel_name="ir.sequence",
+                                     string="Secuencia de Facturas Electrónicas",
+                                     required=False)
+    NC_sequence_id = fields.Many2one(oldname='return_sequence_id',
+                                     comodel_name="ir.sequence",
+                                     string="Secuencia de Notas de Crédito Electrónicas",
+                                     required=False)
+    TE_sequence_id = fields.Many2one(comodel_name="ir.sequence",
+                                     string="Secuencia de Tiquetes Electrónicos",
+                                     required=False)
 
 class PosOrder(models.Model):
     _name = "pos.order"
@@ -38,46 +46,40 @@ class PosOrder(models.Model):
 
     @api.model
     def sequence_number_sync(self, vals):
-        next = vals.get('_sequence_ref_number', False)
-        next = int(next) if next else False
-        if vals.get('session_id') and next is not False:
+        doc_type = vals.get('doc_type', False)
+        sequence = vals.get('sequence', False)
+        sequence = int(sequence) if sequence else False
+        if vals.get('session_id') and sequence is not False:
             session = self.env['pos.session'].sudo().browse(vals['session_id'])
-            if next > session.config_id.sequence_id.number_next_actual:
-                session.config_id.sequence_id.number_next_actual = next
-        if vals.get('_sequence_ref_number') is not None:
-            del vals['_sequence_ref_number']
-        if vals.get('_sequence_ref') is not None:
-            del vals['_sequence_ref']
+            if doc_type == 'FE' and sequence >= session.config_id.FE_sequence_id.number_next_actual:
+                    session.config_id.FE_sequence_id.number_next_actual = sequence + 1
+            elif doc_type == 'TE' and sequence >= session.config_id.TE_sequence_id.number_next_actual:
+                    session.config_id.TE_sequence_id.number_next_actual = sequence + 1
+        return
+        if vals.get('_sequence') is not None:
+            del vals['_sequence']
+        if vals.get('_number_electronic') is not None:
+            del vals['_number_electronic']
 
     @api.model
     def _order_fields(self, ui_order):
         vals = super(PosOrder, self)._order_fields(ui_order)
-        vals['_sequence_ref_number'] = ui_order.get('sequence_ref_number')
-        vals['_sequence_ref'] = ui_order.get('sequence_ref')
+        vals['doc_type'] = ui_order.get('doc_type')
+        vals['sequence'] = ui_order.get('sequence')
+        vals['number_electronic'] = ui_order.get('number_electronic')
         return vals
 
     @api.model
     def create(self, vals):
-        real_name = vals.get('_sequence_ref', False)
-        if real_name:
+        number_electronic = vals.get('_number_electronic', False)
+        if number_electronic:
             self.sequence_number_sync(vals)
-            order = super(PosOrder, self).create(vals)
-            _logger.error('MAB - Previous name: %s    New name: %s',
-                          order.name, real_name)
-            if self.env['pos.order'].search([('name', 'like', real_name[21:41])]):
-                real_name = self.env['ir.sequence'].next_by_code(
+            if self.env['pos.order'].search([('number_electronic', 'like', number_electronic[21:41])]):
+                vals['number_electronic'] = self.env['ir.sequence'].next_by_code(
                     'pos.order.recovery')
-            order.name = real_name
-        else:
-            if vals.get('pos_order_id', False):
-                # set name based on the sequence specified on the config
-                session = self.env['pos.session'].browse(vals['session_id'])
-                vals['name'] = '/'
-                vals.setdefault(
-                    'pricelist_id', session.config_id.pricelist_id.id)
-                # TODO check if call to super is not needed for create
-            else:
-                order = super(PosOrder, self).create(vals)
+        elif vals.get('pos_order_id', False):
+            vals['number_electronic'] = '/'
+        order = super(PosOrder, self).create(vals)
         return order
 
     number_electronic = fields.Char(
@@ -109,6 +111,18 @@ class PosOrder(models.Model):
         'sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
     error_count = fields.Integer(
         string="Cantidad de errores", required=False, default="0")
+    doc_type = fields.Selection(
+        selection=[('FE', 'Factura Electrónica Normal'),
+                   #('FEE', 'Factura Electrónica de Exportación'),
+                   ('TE', 'Tiquete Electrónico'),
+                   #('ND', 'Nota de Dédito'),
+                   ('NC', 'Nota de Crédito')],
+        string="Tipo Comprobante",
+        required=False, default='FE',
+        help='Indica el tipo de documento de acuerdo a la '
+             'clasificación del Ministerio de Hacienda')
+
+    sequence = fields.Char(string='Consecutivo', readonly=True, )
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)',
@@ -357,7 +371,7 @@ class PosOrder(models.Model):
             _logger.error('MAB - Valida Hacienda - POS Order %s / %s',
                           current_order, total_orders)
 
-            docName = doc.name
+            docName = doc.number_electronic
 
             # if doc.company_id.frm_ws_ambiente != 'disabled' and docName.isdigit():
 
@@ -368,30 +382,23 @@ class PosOrder(models.Model):
 
             if not doc.xml_comprobante:
                 #url = doc.company_id.frm_callback_url
-                if not doc.pos_order_id.number_electronic:
-                    if doc.amount_total >= 0:
-                        tipo_documento = 'TE'
-                        #tipo_documento_referencia = ''
-                        #numero_documento_referencia = ''
-                        #fecha_emision_referencia = ''
-                        #codigo_referencia = ''
-                        #razon_referencia = ''
-                    else:
+                if not doc.pos_order_id:   #.number_electronic:
+                    if doc.amount_total < 0:
                         doc.state_tributacion = 'error'
                         _logger.error(
                             'MAB - Error documento %s tiene monto negativo pero no tiene documento referencia', doc.number_electronic)
                         continue
                 else:
                     if doc.amount_total >= 0:
-                        tipo_documento = 'ND'
+                        doc.doc_type = 'ND'
                         razon_referencia = 'nota debito'
                     else:
-                        tipo_documento = 'NC'
+                        doc.doc_type = 'NC'
                         tipo_documento_referencia = 'FE'
                         numero_documento_referencia = doc.pos_order_id.number_electronic
                         codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
-                    tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
+                    #tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
                     numero_documento_referencia = doc.pos_order_id.number_electronic
                     fecha_emision_referencia = doc.pos_order_id.date_issuance
                     codigo_referencia = doc.reference_code_id.code
@@ -510,9 +517,9 @@ class PosOrder(models.Model):
 
                     lines[line_number] = dline
                 doc.date_issuance = date_cr
-                doc.number_electronic = docName
+                #doc.number_electronic = docName
                 invoice_comments = ''
-                if tipo_documento == 'TE':
+                if doc.doc_type == 'TE':
                     xml_string_builder = api_facturae.gen_xml_te_43(doc,
                                                                     sale_conditions,
                                                                     round(
@@ -527,6 +534,26 @@ class PosOrder(models.Model):
                                                                     json.dumps(
                                                                         lines, ensure_ascii=False),
                                                                     currency_rate, invoice_comments, otros_cargos)
+                elif doc.doc_type == 'FE':
+                    xml_string_builder = api_facturae.gen_xml_fe_v43(doc,
+                                                                    sale_conditions,
+                                                                    round(
+                                                                        total_servicio_gravado, 5),
+                                                                    round(
+                                                                        total_servicio_exento, 5),
+                                                                    0, #totalServExonerado
+                                                                    round(
+                                                                        total_mercaderia_gravado, 5),
+                                                                    round(
+                                                                        total_mercaderia_exento, 5), 
+                                                                    0, #totalMercExonerada
+                                                                    0, #totalOtrosCargos,
+                                                                    base_subtotal,
+                                                                    total_impuestos, total_descuento,
+                                                                    json.dumps(
+                                                                        lines, ensure_ascii=False),
+                                                                    otros_cargos,
+                                                                    currency_rate, invoice_comments )
                 else:
                     xml_string_builder = api_facturae.gen_xml_nc(doc, 
                                                                     sale_conditions, medio_pago,
@@ -563,7 +590,7 @@ class PosOrder(models.Model):
                 #    doc.state_tributacion = 'error'
                 #    continue
 
-                doc.fname_xml_comprobante = tipo_documento + '_' + docName + '.xml'
+                doc.fname_xml_comprobante = doc.doc_type + '_' + docName + '.xml'
                 #doc.xml_comprobante = response_json.get('xmlFirmado')
                 doc.xml_comprobante = base64.encodestring(xml_firmado)
 
