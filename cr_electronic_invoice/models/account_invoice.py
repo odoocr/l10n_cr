@@ -1490,7 +1490,7 @@ class AccountInvoiceElectronic(models.Model):
                 _logger.info('E-INV CR - SIGNED XML:%s',
                              inv.fname_xml_comprobante)
             else:
-                xml_firmado = inv.xml_comprobante.decode("UTF-8")
+                xml_firmado = inv.xml_comprobante
 
             # Obtenemos el token con el api interna
             token_m_h = api_facturae.get_token_hacienda(
