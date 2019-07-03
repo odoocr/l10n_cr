@@ -14,7 +14,7 @@
                     <field name="number_electronic" readonly="1"/>
                 </field>
                 <field name="payment_term_id" position="before">
-                    <field name="tipo_documento" required="1" domain="[('id', 'not in', ('CCE','CPCE','RCE')),]"/>
+                    <field name="tipo_documento" required="1" domain="[('id', 'in', ('FE','FEE','TE')),]" attrs="{'readonly':[('state','!=','draft')]}"/>
                 </field>
                 <field name="payment_term_id" position="after">
                     <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
@@ -41,11 +41,9 @@
                     <!--<field name="electronic_invoice_return_message" readonly="1"/>-->
                 </field>
                 <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
-                    <field name="categ_name" invisible="0" readonly="1" />
+                    <field name="categ_name" invisible="1" readonly="1" />
                     <field name="product_code" invisible="1" readonly="1" />
-                    <field name="third_party_id" attrs="{'invisible':[('categ_name', '!=', 'Otros Cargos')]}"/>
-                    <!-- <field name="third_party_id" attrs="{'invisible':[ '|', ('categ_name', '!=', 'Otros Cargos'),('product_code', '!=', '04')]}"/> -->
-                    <!-- <field name="tariff_head" attrs="{'invisible':[ ('categ_name', '!=', 'Otros Cargos')]}"/> -->
+                    <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
                 </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
                     <field name="discount_note"/>
