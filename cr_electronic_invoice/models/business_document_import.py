@@ -9,7 +9,7 @@ class BusinessDocumentImportCR(models.AbstractModel):
 
     @api.model
     def _match_uom(self, uom_dict, chatter_msg, product=False):
-        uuo = self.env['product.uom']
+        uuo = self.env['uom.uom']
         uoms = uuo.search([('code', '=', uom_dict['cr_code'])])
 
         if uoms:
