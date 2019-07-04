@@ -1367,7 +1367,6 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
 
                 sb.Append('</Impuesto>')
 
-        if v.get('impuestoNeto'):
             sb.Append('<ImpuestoNeto>' +
                     str(v['impuestoNeto']) + '</ImpuestoNeto>')
 
@@ -1563,7 +1562,6 @@ def gen_xml_fee_v43(inv, sale_conditions, total_servicio_gravado,
                 sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
                 sb.Append('</Impuesto>')
         
-        if v.get('impuestoNeto'):
             sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
 
         sb.Append('<MontoTotalLinea>' + str(v['montoTotalLinea']) + '</MontoTotalLinea>')
@@ -1744,7 +1742,6 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
 
                 sb.Append('</Impuesto>')
 
-        if v.get('impuestoNeto'):
             sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
 
         sb.Append('<MontoTotalLinea>' + str(v['montoTotalLinea']) + '</MontoTotalLinea>')
@@ -2011,7 +2008,6 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
                     sb.Append('</Exoneracion>')
 
                 sb.Append('</Impuesto>')
-        if v.get('impuestoNeto'):
             sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
         sb.Append('<MontoTotalLinea>' +
                   str(v['montoTotalLinea']) + '</MontoTotalLinea>')
@@ -2453,11 +2449,9 @@ def gen_xml_fec_v43(inv, sale_conditions, total_servicio_gravado,
                     sb.Append('</Exoneracion>')
 
                 sb.Append('</Impuesto>')
-        if v.get('impuestoNeto'):
             sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
 
-        sb.Append('<MontoTotalLinea>' +
-                  str(v['montoTotalLinea']) + '</MontoTotalLinea>')
+        sb.Append('<MontoTotalLinea>' + str(v['montoTotalLinea']) + '</MontoTotalLinea>')
         sb.Append('</LineaDetalle>')
     sb.Append('</DetalleServicio>')
 
