@@ -838,8 +838,11 @@ class AccountInvoiceElectronic(models.Model):
         total_invoices = len(invoices)
         current_invoice = 0
 
+        _logger.info('E-INV CR - Consulta Hacienda - Facturas a Verificar: %s', total_invoices)
+
         for i in invoices:
             current_invoice += 1
+            _logger.info('E-INV CR - Consulta Hacienda - Invoice %s / %s  -  number:%s', current_invoice, total_invoices, i.number_electronic)
 
             token_m_h = api_facturae.get_token_hacienda(
                 i, i.company_id.frm_ws_ambiente)
