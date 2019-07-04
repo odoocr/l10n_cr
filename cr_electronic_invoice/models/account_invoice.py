@@ -386,8 +386,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.multi
     def load_xml_data(self):
-        if (
-                self.type == 'out_invoice' or self.type == 'out_refund') and self.xml_comprobante:
+        if (self.type == 'out_invoice' or self.type == 'out_refund') and self.xml_comprobante:
             # remove any character not a number digit in the invoice sequence
             self.sequence = re.sub(r"[^0-9]+", "", self.sequence)
             root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(
@@ -463,8 +462,7 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError(
                     'El receptor no corresponde con la compañía actual con identificación ' + receptor + '. Por favor active la compañía correcta.')  # noqa
 
-            date_time_obj = datetime.datetime.strptime(
-                self.date_issuance, '%Y-%m-%dT%H:%M:%S-06:00')
+            date_time_obj = datetime.datetime.strptime(self.date_issuance, '%Y-%m-%dT%H:%M:%S')
             invoice_date = date_time_obj.date()
 
             self.date_invoice = invoice_date
@@ -486,82 +484,92 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError('El proveedor con identificación ' + emisor +
                                 ' no existe. Por favor creelo primero en el sistema.')
 
-            lines = root.find('DetalleServicio').findall('LineaDetalle')
+            load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
+            if load_lines:
+                lines = root.find('DetalleServicio').findall('LineaDetalle')
 
-            new_lines = self.env['account.invoice.line']
+                new_lines = self.env['account.invoice.line']
 
-            for line in lines:
-                product_uom = self.env['uom.uom'].search(
-                    [('code', '=', line.find('UnidadMedida').text)],
-                    limit=1).id
-                total_amount = float(line.find('MontoTotal').text)
+                for line in lines:
+                    product_uom = self.env['uom.uom'].search(
+                        [('code', '=', line.find('UnidadMedida').text)],
+                        limit=1).id
+                    total_amount = float(line.find('MontoTotal').text)
 
-                discount_percentage = 0.0
-                discount_note = None
-                discount_node = line.find('MontoDescuento')
-                if discount_node:
-                    discount_amount = float(discount_node.text or '0.0')
-                    discount_percentage = discount_amount / total_amount * 100
-                    discount_note = line.find('NaturalezaDescuento').text
+                    discount_percentage = 0.0
+                    discount_note = None
 
-                taxes = self.env['account.tax']
-                tax_nodes = line.findall('Impuesto')
-                total_tax = 0.0
-                if tax_nodes:
-                    for tax_node in tax_nodes:
-                        if tax_node:
-                            tax_amount = float(tax_node.find('Monto').text)
-                            if tax_amount > 0:
-                                tax = self.env['account.tax'].search(
-                                    [('tax_code', '=', re.sub(r"[^0-9]+", "",
-                                                              tax_node.find(
-                                                                  'Codigo').text)),
-                                     ('amount', '=',
-                                      tax_node.find('Tarifa').text),
-                                     ('type_tax_use', '=', 'purchase')],
-                                    limit=1)
+                    discount_node = line.find('Descuento')
+                    if discount_node:
+                        discount_amount_node = discount_node.find('MontoDescuento')
+                        discount_amount = float(discount_amount_node.text or '0.0')
+                        discount_percentage = discount_amount / total_amount * 100
+                        discount_note = discount_node.find('NaturalezaDescuento').text
+                    else:
+                        discount_amount_node = line.find('MontoDescuento')
+                        if discount_amount_node:
+                            discount_amount = float(discount_amount_node.text or '0.0')
+                            discount_percentage = discount_amount / total_amount * 100
+                            discount_note = line.find('NaturalezaDescuento').text
+
+                    taxes = self.env['account.tax']
+                    tax_nodes = line.findall('Impuesto')
+                    total_tax = 0.0
+                    if tax_nodes:
+                        for tax_node in tax_nodes:
+                            if tax_node:
                                 tax_amount = float(tax_node.find('Monto').text)
-                                if tax and tax.amount == float(
-                                        re.sub(r"[^0-9.]+", "",
-                                               tax_node.find('Tarifa').text)):
-                                    taxes += tax
-                                    total_tax += tax_amount
-                                else:
-                                    raise UserError(
-                                        'Un tipo de impuesto en el XML no existe en la configuración: ' + tax_node.find(
-                                            'Codigo').text)
-                            # TODO: insert exonerations
+                                if tax_amount > 0:
+                                    tax = self.env['account.tax'].search(
+                                        [('tax_code', '=', re.sub(r"[^0-9]+", "",
+                                                                tax_node.find(
+                                                                    'Codigo').text)),
+                                        ('amount', '=',
+                                        tax_node.find('Tarifa').text),
+                                        ('type_tax_use', '=', 'purchase')],
+                                        limit=1)
+                                    tax_amount = float(tax_node.find('Monto').text)
+                                    if tax and tax.amount == float(
+                                            re.sub(r"[^0-9.]+", "",
+                                                tax_node.find('Tarifa').text)):
+                                        taxes += tax
+                                        total_tax += tax_amount
+                                    else:
+                                        raise UserError(
+                                            'Un tipo de impuesto en el XML no existe en la configuración: ' + tax_node.find(
+                                                'Codigo').text)
+                                # TODO: insert exonerations
 
-                invoice_line = self.env['account.invoice.line'].new({
-                    'name': line.find('Detalle').text,
-                    'invoice_id': self.id,
-                    'price_unit': line.find('PrecioUnitario').text,
-                    'quantity': line.find('Cantidad').text,
-                    'uom_id': product_uom,
-                    'sequence': line.find('NumeroLinea').text,
-                    'discount': discount_percentage,
-                    'discount_note': discount_note,
-                    'total_amount': total_amount,
-                    'amount_untaxed': float(line.find('SubTotal').text),
-                    'invoice_line_tax_ids': taxes,
-                    'total_tax': total_tax,
-                    'account_id': default_account_id,
-                })
-                new_lines += invoice_line
+                    invoice_line = self.env['account.invoice.line'].new({
+                        'name': line.find('Detalle').text,
+                        'invoice_id': self.id,
+                        'price_unit': line.find('PrecioUnitario').text,
+                        'quantity': line.find('Cantidad').text,
+                        'uom_id': product_uom,
+                        'sequence': line.find('NumeroLinea').text,
+                        'discount': discount_percentage,
+                        'discount_note': discount_note,
+                        'total_amount': total_amount,
+                        'amount_untaxed': float(line.find('SubTotal').text),
+                        'invoice_line_tax_ids': taxes,
+                        'total_tax': total_tax,
+                        'account_id': default_account_id,
+                    })
+                    new_lines += invoice_line
 
-            self.invoice_line_ids = new_lines
+                self.invoice_line_ids = new_lines
 
-            # tax_node = root.findall('ResumenFactura')[0].findall('TotalImpuesto')
-            tax_node = factura.xpath(
-                "inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
+                # tax_node = root.findall('ResumenFactura')[0].findall('TotalImpuesto')
+                tax_node = factura.xpath(
+                    "inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
 
-            if tax_node:
-                self.amount_tax_electronic_invoice = tax_node[0].text
-            # self.amount_total_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
-            self.amount_total_electronic_invoice = factura.xpath(
-                "inv:ResumenFactura/inv:TotalComprobante",
-                namespaces=namespaces)[0].text
-        self.compute_taxes()
+                if tax_node:
+                    self.amount_tax_electronic_invoice = tax_node[0].text
+                # self.amount_total_electronic_invoice = root.findall('ResumenFactura')[0].findall('TotalComprobante')[0].text
+                self.amount_total_electronic_invoice = factura.xpath(
+                    "inv:ResumenFactura/inv:TotalComprobante",
+                    namespaces=namespaces)[0].text
+                self.compute_taxes()
 
     @api.multi
     def send_mrs_to_hacienda(self):
@@ -1508,8 +1516,7 @@ class AccountInvoiceElectronic(models.Model):
                     xml_to_sign)
 
                 inv.xml_comprobante = base64.encodestring(xml_firmado)
-                _logger.info('E-INV CR - SIGNED XML:%s',
-                             inv.fname_xml_comprobante)
+                _logger.debug('E-INV CR - SIGNED XML:%s', inv.fname_xml_comprobante)
             else:
                 xml_firmado = inv.xml_comprobante.decode("UTF-8")
 
@@ -1544,6 +1551,10 @@ class AccountInvoiceElectronic(models.Model):
                     inv.message_post(subject='Error', body=response_text)
                     inv.electronic_invoice_return_message = response_text
                     inv.state_tributacion = 'error'
+                    _logger.error(
+                        'E-INV CR  - Invoice: %s  Status: %s Error sending XML: %s',
+                        inv.number_electronic,
+                        response_status, response_text)
                 else:
                     inv.error_count += 1
                     if inv.tipo_documento == 'FEC':
@@ -1551,6 +1562,10 @@ class AccountInvoiceElectronic(models.Model):
                     else:
                         inv.state_tributacion = 'procesando'
                     inv.message_post(subject='Error', body=response_text)
+                    _logger.error(
+                        'E-INV CR  - Invoice: %s  Status: %s Error sending XML: %s',
+                        inv.number_electronic,
+                        response_status, response_text)
 
     @api.multi
     def action_invoice_open(self):

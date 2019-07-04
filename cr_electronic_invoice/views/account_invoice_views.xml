@@ -78,7 +78,7 @@
                             <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')], 'invisible':[('tipo_documento','!=', 'FEC')]}"/>
                             <field name="fname_xml_supplier_approval" invisible="1" />
                             <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}" />
-                            <button name="charge_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('state','!=', 'draft')]}" />
+                            <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('state','!=', 'draft')]}" />
                         </group>
                         <group>
                             <field name="state_invoice_partner" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}"/>

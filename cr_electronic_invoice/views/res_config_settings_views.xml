@@ -70,6 +70,9 @@
                     <div class="row mt16 o_settings_container" id="fecr_xml_charge">
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_right_pane">
+                            
+                                <div class="o_form_label">Load invoice lines?</div>
+                                <field name="load_lines" />
                                 <div class="o_form_label">Account used for expenses when importing electronic invoice</div>
                                 <field name="expense_account_id" string="Default account for expenses when importing electronic invoice" />
                             </div>

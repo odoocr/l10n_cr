@@ -31,7 +31,7 @@ class AccountInvoiceImport(models.TransientModel):
         if xml_root.tag:
             try:
                 document_type = re.search(
-                    'FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica', xml_root.tag).group(0)
+                    'FacturaElectronica|NotaCreditoElectronica|NotaDebitoElectronica', xml_root.tag).group(0)
                 return self.parse_fe_cr_invoice(xml_root, document_type)
             except AttributeError:
                 return super(AccountInvoiceImport, self).parse_xml_invoice(xml_root)
@@ -55,20 +55,28 @@ class AccountInvoiceImport(models.TransientModel):
         price_unit = float(price_unit_xpath[0].text)
         MontoTotal = iline.xpath("inv:MontoTotal", namespaces=namespaces)
         total_line = float(MontoTotal[0].text)
-        discount_xpath = iline.xpath(
-            "inv:MontoDescuento", namespaces=namespaces)
+
+        
+        discount = 0
+        discount_details = ''
+        discount_xpath = iline.xpath("inv:Descuento/MontoDescuento", namespaces=namespaces)
         if discount_xpath:
             discount_amount = float(discount_xpath[0].text)
             discount = discount_amount / total_line * 100
-            discount_details_xpath = iline.xpath(
-                "inv:NaturalezaDescuento", namespaces=namespaces)
+            discount_details_xpath = iline.xpath("inv:Descuento/NaturalezaDescuento", namespaces=namespaces)
             discount_details = discount_details_xpath[0].text
         else:
-            discount = 0
-            discount_details = ''
-        price_subtotal_xpath = iline.xpath(
-            "inv:SubTotal", namespaces=namespaces)
+            discount_xpath = iline.xpath("inv:MontoDescuento", namespaces=namespaces)
+            if discount_xpath:
+                discount_amount = float(discount_xpath[0].text)
+                discount = discount_amount / total_line * 100
+                discount_details_xpath = iline.xpath("inv:NaturalezaDescuento", namespaces=namespaces)
+                discount_details = discount_details_xpath[0].text
+            
+        
+        price_subtotal_xpath = iline.xpath("inv:SubTotal", namespaces=namespaces)
         price_subtotal = float(price_subtotal_xpath[0].text)
+        
         # if not price_subtotal:
         #    return False
         counters['lines'] += price_subtotal
@@ -86,6 +94,7 @@ class AccountInvoiceImport(models.TransientModel):
                 'amount_type': 'percent',
                 'amount': percentage,
                 'tax_code': tax_code,
+                'type_tax_use': 'purchase',
             }
             taxes.append(tax_dict)
         product_code_xpath = iline.xpath(
@@ -122,37 +131,26 @@ class AccountInvoiceImport(models.TransientModel):
         xml_string = etree.tostring(
             xml_root, pretty_print=True, encoding='UTF-8',
             xml_declaration=True)
-        # fe_cr_version_xpath = xml_root.xpath(
-        #    "//cbc:UBLVersionID", namespaces=namespaces)
-        # fe_cr_version = fe_cr_version_xpath and fe_cr_version_xpath[0].text or '2.1'
-        fe_cr_version = '4.2'
-        # Check XML schema to avoid headaches trying to import invalid files
-        # not working !
-        # self._fe_cr_check_xml_schema(xml_string, document_type, version=fe_cr_version)
+
         prec = self.env['decimal.precision'].precision_get('Account')
 
-        document_type = re.search('FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica',
-                                  xml_root.tag).group(0)
+        document_type = re.search('FacturaElectronica|NotaCreditoElectronica|NotaDebitoElectronica',xml_root.tag).group(0)
         inv_type = 'in_invoice'
+
         if document_type == 'NotaCreditoElectronica':
             inv_type = 'in_refund'
-        number_electronic = xml_root.xpath(
-            "inv:Clave", namespaces=namespaces)[0].text
+
+        number_electronic = xml_root.xpath("inv:Clave", namespaces=namespaces)[0].text
         reference = number_electronic[21:41]
-        date_issuance = xml_root.xpath(
-            "inv:FechaEmision", namespaces=namespaces)[0].text
-        currency_xpath = xml_root.xpath(
-            "inv:ResumenFactura/inv:CodigoMoneda", namespaces=namespaces)
+        date_issuance = xml_root.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
+        currency_xpath = xml_root.xpath("inv:ResumenFactura/inv:CodigoMoneda", namespaces=namespaces)
         currency = currency_xpath and currency_xpath[0].text or 'CRC'
-        currency_id = self.env['res.currency'].search(
-            [('name', '=', currency)], limit=1).id
+        currency_id = self.env['res.currency'].search([('name', '=', currency)], limit=1).id
         date_invoice = parse(date_issuance)
 
         origin = False
-        supplier_dict = self.fe_cr_parse_party(xml_root.xpath(
-            'inv:Emisor', namespaces=namespaces)[0], namespaces)
-        company_dict_full = self.fe_cr_parse_party(xml_root.xpath(
-            'inv:Receptor', namespaces=namespaces)[0], namespaces)
+        supplier_dict = self.fe_cr_parse_party(xml_root.xpath('inv:Emisor', namespaces=namespaces)[0], namespaces)
+        company_dict_full = self.fe_cr_parse_party(xml_root.xpath('inv:Receptor', namespaces=namespaces)[0], namespaces)
         company_dict = {}
 
         # We only take the "official references" for company_dict
@@ -325,7 +323,7 @@ class AccountInvoiceImport(models.TransientModel):
                     inv_xmlns = namespaces.pop(None)
                     namespaces['inv'] = inv_xmlns
                     document_type = re.search(
-                        'FacturaElectronica|TiqueteElectronico|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda', xml_root.tag).group(0)
+                        'FacturaElectronica|NotaCreditoElectronica|NotaDebitoElectronica|MensajeHacienda', xml_root.tag).group(0)
                     if document_type != 'MensajeHacienda':
                         clave = xml_root.xpath(
                             "inv:Clave", namespaces=namespaces)[0].text
