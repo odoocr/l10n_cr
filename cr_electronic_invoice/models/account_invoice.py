@@ -521,17 +521,11 @@ class AccountInvoiceElectronic(models.Model):
                                 tax_amount = float(tax_node.find('Monto').text)
                                 if tax_amount > 0:
                                     tax = self.env['account.tax'].search(
-                                        [('tax_code', '=', re.sub(r"[^0-9]+", "",
-                                                                tax_node.find(
-                                                                    'Codigo').text)),
-                                        ('amount', '=',
-                                        tax_node.find('Tarifa').text),
+                                        [('tax_code', '=', re.sub(r"[^0-9]+", "", tax_node.find('Codigo').text)),
+                                        ('amount', '=', tax_node.find('Tarifa').text),
                                         ('type_tax_use', '=', 'purchase')],
                                         limit=1)
-                                    tax_amount = float(tax_node.find('Monto').text)
-                                    if tax and tax.amount == float(
-                                            re.sub(r"[^0-9.]+", "",
-                                                tax_node.find('Tarifa').text)):
+                                    if tax:
                                         taxes += tax
                                         total_tax += tax_amount
                                     else:

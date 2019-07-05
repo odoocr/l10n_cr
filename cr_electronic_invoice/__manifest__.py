@@ -2,7 +2,7 @@
 
 {
     'name': 'Facturación electrónica Costa Rica',
-    'version': '12.0.2.0.0',
+    'version': '12.0.2.0.1',
     'author': 'CRLibre.org',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
@@ -54,6 +54,7 @@
         'views/sale_condition_views.xml',
         'views/account_tax_views.xml',
         'views/menu_views.xml',
+        'views/account_invoice_import_wizard_view.xml',
         'security/ir.model.access.csv',
         'wizard/account_invoice_import_view.xml',
     ],
