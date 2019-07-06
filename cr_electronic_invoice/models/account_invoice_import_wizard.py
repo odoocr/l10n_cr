@@ -26,10 +26,12 @@ class ImportInvoiceImportWizardCR(models.TransientModel):
 
     @api.multi
     def _create_invoice_from_file(self, attachment):
-        self = self.with_context(default_journal_id= self.journal_id.id)
-        # invoice_form = Form(self.env['account.invoice'], view='account.invoice_supplier_form')
-        # invoice = invoice_form.save()
-        invoice = self.env['account.invoice'].create({})
+        self = self.with_context(default_journal_id=self.journal_id.id)
+        invoice_form = Form(self.env['account.invoice'], view='account.invoice_supplier_form')
+        invoice = invoice_form.save()
+        # invoice = self.env['account.invoice'].new({})
+        # invoice.journal_id = self.journal_id
+        # invoice.company_id = self.journal_id.company_id
         self.load_xml_data(invoice, attachment)
         attachment.write({'res_model': 'account.invoice', 'res_id': invoice.id})
         invoice.message_post(attachment_ids=[attachment.id])
@@ -43,7 +45,7 @@ class ImportInvoiceImportWizardCR(models.TransientModel):
         except Exception as e:
             raise UserError(_("This XML file is not XML-compliant. Error: %s") % e)
 
-        invoice.fname_xml_supplier_approval = attachment.datas_name
+        invoice.fname_xml_supplier_approval = attachment.datas_fname
         invoice.xml_supplier_approval = base64.encodestring(attachment.index_content.encode('UTF-8'))
         namespaces = invoice_xml.nsmap
         inv_xmlns = namespaces.pop(None)
@@ -82,7 +84,7 @@ class ImportInvoiceImportWizardCR(models.TransientModel):
                                                  limit=1)
 
         if partner:
-            invoice.partner_id = partner.id
+            invoice.partner_id = partner
         else:
             raise UserError(_('The provider with ID %s does not exists. Please review it.', emisor))
 
@@ -130,7 +132,7 @@ class ImportInvoiceImportWizardCR(models.TransientModel):
                                     tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text,
                                     tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text))
 
-            invoice_line = self.env['account.invoice.line'].new({
+            invoice_line = self.env['account.invoice.line'].create({
                 'name': line.xpath("inv:Detalle", namespaces=namespaces)[0].text,
                 'invoice_id': invoice.id,
                 'price_unit': line.xpath("inv:PrecioUnitario", namespaces=namespaces)[0].text,
@@ -140,11 +142,16 @@ class ImportInvoiceImportWizardCR(models.TransientModel):
                 'discount': discount_percentage,
                 'discount_note': discount_note,
                 'total_amount': total_amount,
-                'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
-                'invoice_line_tax_ids': taxes,
-                'total_tax': total_tax,
-                'account_id': self.account_id,
+                'product_id': self.static_product_id.id,
+                'account_id': self.account_id.id,
+                'account_analytic_id': self.account_analytic_id.id,
             })
+
+            # This must be assigned after line is created
+            invoice_line.invoice_line_tax_ids = taxes
+            invoice_line.total_tax = total_tax
+            invoice_line.amount_untaxed = float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text)
+
             new_lines += invoice_line
 
         invoice.invoice_line_ids = new_lines
