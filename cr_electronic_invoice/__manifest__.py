@@ -21,8 +21,7 @@
         'l10n_cr_country_codes',
         'account_cancel',
         'res_currency_cr_adapter',
-        'account_invoice_import',
-        'base_business_document_import', ],
+        ],
     'data': [
         'data/account_tax_data.xml',
         'data/aut_ex_data.xml',
@@ -39,6 +38,8 @@
         'data/uom_data.xml',
         'data/economic_activity_data.xml',
         'data/sequence.xml',
+        'data/res.currency.xml',
+        'data/decimal_precision.xml',
         'views/uom_views.xml',
         'views/account_invoice_views.xml',
         'views/account_journal_views.xml',
@@ -56,7 +57,6 @@
         'views/menu_views.xml',
         'views/account_invoice_import_wizard_view.xml',
         'security/ir.model.access.csv',
-        'wizard/account_invoice_import_view.xml',
     ],
     'external_dependencies': {
         "python": [

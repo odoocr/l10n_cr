@@ -11,16 +11,16 @@
                         <group cols="2">
                             <group cols="2">
                                 <field name="FE_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
-                                <field name="ND_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
-                                <field name="NC_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
-                            </group>
-                            <group cols="2">
                                 <field name="TE_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
                                 <field name="FEE_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
                             </group>
                             <group cols="2">
-                                <field name="terminal" attrs="{'required':[('type','=','sale')]}"/>
+                                <field name="NC_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
+                                <field name="ND_sequence_id" attrs="{'required':[('type','=','sale')]}"/>
+                            </group>
+                            <group cols="2">
                                 <field name="sucursal" attrs="{'required':[('type','=','sale')]}"/>
+                                <field name="terminal" attrs="{'required':[('type','=','sale')]}"/>
                             </group>
                         </group>
                     </page>
