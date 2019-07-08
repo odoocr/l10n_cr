@@ -463,6 +463,13 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError(
                     'El receptor no corresponde con la compañía actual con identificación ' + receptor + '. Por favor active la compañía correcta.')  # noqa
 
+            currency_node = factura.xpath("inv:ResumenFactura/inv:CodigoTipoMoneda/inv:CodigoMoneda", namespaces=namespaces)
+
+            if currency_node:
+                self.currency_id = self.env['res.currency'].search([('name', '=', currency_node[0].text)], limit=1).id
+            else:
+                self.currency_id = self.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
+            
             date_time_obj = datetime.datetime.strptime(
                 self.date_issuance, '%Y-%m-%dT%H:%M:%S-06:00')
             invoice_date = date_time_obj.date()
