@@ -498,7 +498,7 @@ class AccountInvoiceElectronic(models.Model):
             new_lines = self.env['account.invoice.line']
 
             for line in lines:
-                product_uom = self.env['uom.uom'].search(
+                product_uom = self.env['product.uom'].search(
                     [('code', '=', line.find('UnidadMedida').text)],
                     limit=1).id
                 total_amount = float(line.find('MontoTotal').text)
