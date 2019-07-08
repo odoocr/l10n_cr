@@ -469,9 +469,8 @@ class AccountInvoiceElectronic(models.Model):
                 self.currency_id = self.env['res.currency'].search([('name', '=', currency_node[0].text)], limit=1).id
             else:
                 self.currency_id = self.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
-            
-            date_time_obj = datetime.datetime.strptime(
-                self.date_issuance, '%Y-%m-%dT%H:%M:%S-06:00')
+
+            date_time_obj = datetime.datetime.strptime(self.date_issuance, '%Y-%m-%dT%H:%M:%S')
             invoice_date = date_time_obj.date()
 
             self.date_invoice = invoice_date
