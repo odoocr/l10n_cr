@@ -29,7 +29,7 @@
             <field name="iva_tax_code">01</field>
         </record>
 
-        <record id="iva_tax_01" 
+        <record id="l10n_cr.1_account_tax_template_IV_0" 
             model="account.tax">
             <field name="tax_code">01</field>
             <field name="name">IVA</field>
@@ -42,7 +42,7 @@
             <field name="iva_tax_code">08</field>
         </record>
 
-        <record id="iva_tax_02" 
+        <record id="l10n_cr.1_account_tax_template_IV_1" 
             model="account.tax">
             <field name="tax_code">01</field>
             <field name="name">IVA</field>
@@ -486,6 +486,12 @@
             <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
+        </record>
+
+        <record id="AccountTax_1"
+            model="account.tax">
+            <field name="tax_code">00</field>
+            <field name="active">False</field>
         </record>
     </data>
 </odoo>
