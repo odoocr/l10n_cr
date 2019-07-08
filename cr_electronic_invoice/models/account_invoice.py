@@ -415,6 +415,8 @@ class AccountInvoiceElectronic(models.Model):
                 self.date_issuance = date_issuance
                 self.date_invoice = date_issuance
 
+            self.currency_id = self.env['res.currency'].search([('name', '=', root.find('ResumenFactura').find('CodigoMoneda').text)], limit=1).id
+
         elif self.xml_supplier_approval:
             root = ET.fromstring(re.sub(' xmlns="[^"]+"', '', base64.b64decode(
                 self.xml_supplier_approval).decode("utf-8"),
@@ -458,9 +460,15 @@ class AccountInvoiceElectronic(models.Model):
                 "inv:Receptor/inv:Identificacion/inv:Numero",
                 namespaces=namespaces)[0].text
 
+            currency_node = factura.xpath("inv:ResumenFactura/inv:CodigoTipoMoneda/inv:CodigoMoneda", namespaces=namespaces)
+
+            if currency_node:
+                self.currency_id = self.env['res.currency'].search([('name', '=', currency_node[0].text)], limit=1).id
+            else:
+                self.currency_id = self.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
+
             if receptor != self.company_id.vat:
-                raise UserError(
-                    'El receptor no corresponde con la compañía actual con identificación ' + receptor + '. Por favor active la compañía correcta.')  # noqa
+                raise UserError('El receptor no corresponde con la compañía actual con identificación ' + receptor + '. Por favor active la compañía correcta.')  # noqa
 
             date_time_obj = datetime.datetime.strptime(self.date_issuance, '%Y-%m-%dT%H:%M:%S')
             invoice_date = date_time_obj.date()

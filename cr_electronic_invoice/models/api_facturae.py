@@ -1512,14 +1512,6 @@ def gen_xml_fee_v43(inv, sale_conditions, total_servicio_gravado,
         if inv.partner_id.vat:
             sb.Append('<IdentificacionExtranjero>' + inv.partner_id.vat + '</IdentificacionExtranjero>')
 
-        if inv.partner_id.state_id and inv.partner_id.county_id and inv.partner_id.district_id and inv.partner_id.neighborhood_id:
-            sb.Append('<Ubicacion>')
-            sb.Append('<Provincia>' + str(inv.partner_id.state_id.code or '') + '</Provincia>')
-            sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
-            sb.Append('<Distrito>' + str(inv.partner_id.district_id.code or '') + '</Distrito>')
-            sb.Append('<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
-            sb.Append('<OtrasSenas>' + escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
-            sb.Append('</Ubicacion>')
         sb.Append('</Receptor>')
 
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
