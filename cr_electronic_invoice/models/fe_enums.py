@@ -55,3 +55,12 @@ schemaLocation = {
     'FEC': 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/FacturaElectronicaCompra_V4.3.xsd',  # Factura Electrónica de Compra
     'FEE': 'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/FacturaElectronicaExportacion_V4.3.xsd',  # Factura Electrónica de Exportación
 }
+
+tagName = {
+    'FE': 'FacturaElectronica',  # Factura Electrónica
+    'ND': 'NotaDebitoElectronica',  # Nota de Débito
+    'NC': 'NotaCreditoElectronica',  # Nota de Crédito
+    'TE': 'TiqueteElectronico',  # Tiquete Electrónico
+    'FEC': 'FacturaElectronicaCompra',  # Factura Electrónica de Compra
+    'FEE': 'FacturaElectronicaExportacion',  # Factura Electrónica de Exportación
+}

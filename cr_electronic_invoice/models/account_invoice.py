@@ -448,20 +448,14 @@ class AccountInvoiceElectronic(models.Model):
                 "inv:NumeroConsecutivo", namespaces=namespaces)[0].text
 
             self.reference = self.consecutive_number_receiver
+            self.number_electronic = factura.xpath("inv:Clave", namespaces=namespaces)[0].text
+            self.date_issuance = factura.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
+            self.date_invoice = self.date_issuance
 
-            self.number_electronic = factura.xpath(
-                "inv:Clave", namespaces=namespaces)[0].text
-            self.date_issuance = factura.xpath(
-                "inv:FechaEmision", namespaces=namespaces)[0].text
-            emisor = factura.xpath(
-                "inv:Emisor/inv:Identificacion/inv:Numero",
-                namespaces=namespaces)[0].text
-            receptor = factura.xpath(
-                "inv:Receptor/inv:Identificacion/inv:Numero",
-                namespaces=namespaces)[0].text
+            emisor = factura.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+            receptor = factura.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
             currency_node = factura.xpath("inv:ResumenFactura/inv:CodigoTipoMoneda/inv:CodigoMoneda", namespaces=namespaces)
-
             if currency_node:
                 self.currency_id = self.env['res.currency'].search([('name', '=', currency_node[0].text)], limit=1).id
             else:
@@ -469,11 +463,6 @@ class AccountInvoiceElectronic(models.Model):
 
             if receptor != self.company_id.vat:
                 raise UserError('El receptor no corresponde con la compañía actual con identificación ' + receptor + '. Por favor active la compañía correcta.')  # noqa
-
-            date_time_obj = datetime.datetime.strptime(self.date_issuance, '%Y-%m-%dT%H:%M:%S')
-            invoice_date = date_time_obj.date()
-
-            self.date_invoice = invoice_date
 
             partner = self.env['res.partner'].search([('vat', '=', emisor),
                                                       ('supplier', '=', True),
