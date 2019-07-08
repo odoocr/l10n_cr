@@ -302,6 +302,11 @@ class AccountInvoiceImport(models.TransientModel):
                 uom = bdio._match_uom(
                     line.get('uom'), parsed_inv['chatter_msg'])
                 il_vals['uom_id'] = uom.id
+                
+                taxes = bdio._match_taxes(
+                        line.get('taxes'), parsed_inv['chatter_msg'])
+                il_vals['invoice_line_tax_ids'] = [(6, 0, taxes.ids)]
+
                 il_vals.update({
                     'quantity': line['qty'],
                     'price_unit': line['price_unit'],  # TODO fix for tax incl
@@ -587,7 +592,8 @@ class AccountInvoiceImport(models.TransientModel):
             assert self.import_config_id
             import_config = self.import_config_id.convert_to_import_config()
         invoice = self.create_invoice(parsed_inv, import_config)
-        invoice.message_post(body=_("This invoice has been created automatically via file import"))
+        invoice.message_post(_(
+            "This invoice has been created automatically via file import"))
         action = iaao.for_xml_id('account', 'action_invoice_tree2')
         action.update({
             'view_mode': 'form,tree,calendar,graph',
@@ -723,10 +729,10 @@ class AccountInvoiceImport(models.TransientModel):
                 parsed_inv['amount_untaxed']
             invoice.tax_line_ids[0].amount = tax_amount
             cur_symbol = invoice.currency_id.symbol
-            invoice.message_post(_(
+            invoice.message_post(body=(_(
                 'The total tax amount has been forced to %s %s '
                 '(amount computed by Odoo was: %s %s).')
-                % (tax_amount, cur_symbol, initial_tax_amount, cur_symbol))
+                % (tax_amount, cur_symbol, initial_tax_amount, cur_symbol)))
 
     @api.multi
     def update_invoice_lines(self, parsed_inv, invoice, seller):
@@ -954,6 +960,7 @@ class AccountInvoiceImport(models.TransientModel):
             msg_dict.get('email_from'), msg_dict.get('subject'),
             msg_dict.get('date'), msg_dict.get('message_id'),
             self.env.user.name, self.env.user.id)
+            
         # It seems that the "Odoo-way" to handle multi-company in E-mail
         # gateways is by using mail.aliases associated with users that
         # don't switch company (I haven't found any other way), which
