@@ -830,9 +830,15 @@ class AccountInvoiceElectronic(models.Model):
 
         total_invoices = len(invoices)
         current_invoice = 0
+        _logger.info(
+            'E-INV CR - Consulta Hacienda - Facturas a Verificar: %s',
+            total_invoices)
 
         for i in invoices:
             current_invoice += 1
+            _logger.info(
+                'E-INV CR - Consulta Hacienda - Invoice %s / %s  -  number:%s',
+                current_invoice, total_invoices, i.number_electronic)
 
             token_m_h = api_facturae.get_token_hacienda(
                 i, i.company_id.frm_ws_ambiente)
@@ -1545,6 +1551,10 @@ class AccountInvoiceElectronic(models.Model):
                     inv.message_post(subject='Error', body=response_text)
                     inv.electronic_invoice_return_message = response_text
                     inv.state_tributacion = 'error'
+                    _logger.error(
+                        'MAB - Invoice: %s  Status: %s Error sending XML: %s',
+                        inv.number_electronic,
+                        response_status, response_text)
                 else:
                     inv.error_count += 1
                     if inv.tipo_documento == 'FEC':
@@ -1552,6 +1562,12 @@ class AccountInvoiceElectronic(models.Model):
                     else:
                         inv.state_tributacion = 'procesando'
                     inv.message_post(subject='Error', body=response_text)
+                    _logger.error(
+                        'MAB - Invoice: %s  Status: %s Error sending XML: %s',
+                        inv.number_electronic,
+                        response_status, response_text)
+
+        _logger.info('MAB - Valida Hacienda - Finalizado Exitosamente')
 
     @api.multi
     def action_invoice_open(self):

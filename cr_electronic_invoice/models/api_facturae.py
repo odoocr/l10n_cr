@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import datetime
 import json
 from . import fe_enums
-import io
+#import io
+from io import BytesIO as StringIO
 import re
 import base64
 import hashlib
@@ -378,7 +381,7 @@ def gen_xml_fe_v42(inv, sale_conditions,
     sb.Append('<Numero>' + inv.company_id.vat + '</Numero>')
     sb.Append('</Identificacion>')
     sb.Append('<NombreComercial>' +
-              escape(str(inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
+              escape((inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
     sb.Append('<Ubicacion>')
     sb.Append('<Provincia>' + inv.company_id.state_id.code + '</Provincia>')
     sb.Append('<Canton>' + inv.company_id.county_id.code + '</Canton>')
@@ -386,13 +389,13 @@ def gen_xml_fe_v42(inv, sale_conditions,
     sb.Append(
         '<Barrio>' + str(inv.company_id.neighborhood_id.code or '00') + '</Barrio>')
     sb.Append('<OtrasSenas>' +
-              escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
+              escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
 
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -416,7 +419,7 @@ def gen_xml_fe_v42(inv, sale_conditions,
 
         sb.Append('<Receptor>')
         sb.Append(
-            '<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+            '<Nombre>' + escape((inv.partner_id.name[:80])) + '</Nombre>')
 
         if id_code == '05':
             sb.Append('<IdentificacionExtranjero>' +
@@ -438,14 +441,14 @@ def gen_xml_fe_v42(inv, sale_conditions,
             sb.Append(
                 '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
             sb.Append(
-                '<OtrasSenas>' + escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
+                '<OtrasSenas>' + escape((inv.partner_id.street or 'NA')) + '</OtrasSenas>')
             sb.Append('</Ubicacion>')
 
         if inv.partner_id.phone:
             phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
             sb.Append('<Telefono>')
-            sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-            sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+            sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+            sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
             sb.Append('</Telefono>')
             
         match = inv.partner_id.email and re.match(
@@ -473,7 +476,7 @@ def gen_xml_fe_v42(inv, sale_conditions,
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
                   str(v['unidadMedida']) + '</UnidadMedida>')
-        sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
+        sb.Append('<Detalle>' + (v['detalle']) + '</Detalle>')
         sb.Append('<PrecioUnitario>' +
                   str(v['precioUnitario']) + '</PrecioUnitario>')
         sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
@@ -546,7 +549,7 @@ def gen_xml_fe_v42(inv, sale_conditions,
     sb.Append('</Normativa>')
     if invoice_comments:
         sb.Append('<Otros>')
-        sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        sb.Append('<OtroTexto>' + (invoice_comments) + '</OtroTexto>')
         sb.Append('</Otros>')
 
     sb.Append('</FacturaElectronica>')
@@ -604,8 +607,8 @@ def gen_xml_te_42(inv, sale_conditions, total_servicio_gravado, total_servicio_e
 
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -762,8 +765,8 @@ def gen_xml_nc(
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -795,8 +798,8 @@ def gen_xml_nc(
     
     phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
     
     sb.Append('<CorreoElectronico>' +
@@ -1236,19 +1239,19 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<Tipo>' + inv.company_id.identification_id.code + '</Tipo>')
     sb.Append('<Numero>' + inv.company_id.vat + '</Numero>')
     sb.Append('</Identificacion>')
-    sb.Append('<NombreComercial>' + escape(str(inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
+    sb.Append('<NombreComercial>' + escape((inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
     sb.Append('<Ubicacion>')
     sb.Append('<Provincia>' + inv.company_id.state_id.code + '</Provincia>')
     sb.Append('<Canton>' + inv.company_id.county_id.code + '</Canton>')
     sb.Append('<Distrito>' + inv.company_id.district_id.code + '</Distrito>')
     sb.Append('<Barrio>' + str(inv.company_id.neighborhood_id.code or '00') + '</Barrio>')
-    sb.Append('<OtrasSenas>' + escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
+    sb.Append('<OtrasSenas>' + escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' + str(inv.company_id.email) + '</CorreoElectronico>')
@@ -1268,7 +1271,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
         id_code = inv.partner_id.identification_id.code
 
     sb.Append('<Receptor>')
-    sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+    sb.Append('<Nombre>' + escape((inv.partner_id.name[:80])) + '</Nombre>')
     sb.Append('<Identificacion>')
     sb.Append('<Tipo>' + id_code + '</Tipo>')
     sb.Append('<Numero>' + vat + '</Numero>')
@@ -1285,14 +1288,14 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
         sb.Append(
             '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
         sb.Append('<OtrasSenas>' +
-                  escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
+                  escape((inv.partner_id.street or 'NA')) + '</OtrasSenas>')
         sb.Append('</Ubicacion>')
     
     if inv.partner_id.phone:
         phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
         sb.Append('<Telefono>')
-        sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-        sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+        sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+        sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
         sb.Append('</Telefono>')
 
     match = inv.partner_id.email and re.match(
@@ -1322,7 +1325,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
                   str(v['unidadMedida']) + '</UnidadMedida>')
-        sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
+        sb.Append('<Detalle>' + (v['detalle']) + '</Detalle>')
         sb.Append('<PrecioUnitario>' +
                   str(v['precioUnitario']) + '</PrecioUnitario>')
         sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
@@ -1393,7 +1396,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
                           '</NombreTercero>')
 
             sb.Append('<Detalle>' +
-                      str(otrosCargos[otro_cargo]['Detalle']) +
+                      (otrosCargos[otro_cargo]['Detalle']) +
                       '</Detalle>')
 
             if otrosCargos[otro_cargo].get('Porcentaje'):
@@ -1453,7 +1456,7 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('</ResumenFactura>')
     sb.Append('<Otros>')
     sb.Append('<OtroTexto>' +
-              str(invoice_comments or 'Test FE V4.3') + '</OtroTexto>')
+              (invoice_comments or 'Test FE V4.3') + '</OtroTexto>')
     sb.Append('</Otros>')
 
     sb.Append('</FacturaElectronica>')
@@ -1487,19 +1490,19 @@ def gen_xml_fee_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<Tipo>' + inv.company_id.identification_id.code + '</Tipo>')
     sb.Append('<Numero>' + inv.company_id.vat + '</Numero>')
     sb.Append('</Identificacion>')
-    sb.Append('<NombreComercial>' + escape(str(inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
+    sb.Append('<NombreComercial>' + escape((inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
     sb.Append('<Ubicacion>')
     sb.Append('<Provincia>' + inv.company_id.state_id.code + '</Provincia>')
     sb.Append('<Canton>' + inv.company_id.county_id.code + '</Canton>')
     sb.Append('<Distrito>' + inv.company_id.district_id.code + '</Distrito>')
-    sb.Append('<Barrio>' + str(inv.company_id.neighborhood_id.code or '00') + '</Barrio>')
-    sb.Append('<OtrasSenas>' + escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
+    sb.Append('<Barrio>' + (inv.company_id.neighborhood_id.code or '00') + '</Barrio>')
+    sb.Append('<OtrasSenas>' + escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' + str(inv.company_id.email) + '</CorreoElectronico>')
@@ -1507,7 +1510,7 @@ def gen_xml_fee_v43(inv, sale_conditions, total_servicio_gravado,
 
     if inv.partner_id.name:
         sb.Append('<Receptor>')
-        sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:99])) + '</Nombre>')
+        sb.Append('<Nombre>' + escape((inv.partner_id.name[:99])) + '</Nombre>')
 
         if inv.partner_id.vat:
             sb.Append('<IdentificacionExtranjero>' + inv.partner_id.vat + '</IdentificacionExtranjero>')
@@ -1609,7 +1612,7 @@ def gen_xml_fee_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos + totalOtrosCargos, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
     sb.Append('<Otros>')
-    sb.Append('<OtroTexto>' + str(invoice_comments or 'Test FE V4.3') + '</OtroTexto>')
+    sb.Append('<OtroTexto>' + (invoice_comments or 'Test FE V4.3') + '</OtroTexto>')
     sb.Append('</Otros>')
 
     sb.Append('</FacturaElectronicaExportacion>')
@@ -1653,7 +1656,7 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     sb.Append('<Numero>' + inv.company_id.vat + '</Numero>')
     sb.Append('</Identificacion>')
     sb.Append('<NombreComercial>' +
-              escape(str(inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
+              escape((inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
     sb.Append('<Ubicacion>')
     sb.Append('<Provincia>' + inv.company_id.state_id.code + '</Provincia>')
     sb.Append('<Canton>' + inv.company_id.county_id.code + '</Canton>')
@@ -1661,13 +1664,13 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     sb.Append(
         '<Barrio>' + str(inv.company_id.neighborhood_id.code or '00') + '</Barrio>')
     sb.Append('<OtrasSenas>' +
-              escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
+              escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -1676,7 +1679,7 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     sb.Append('<Receptor>')
     if 'inv.partner_id.name' in locals():
         sb.Append(
-            '<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+            '<Nombre>' + escape((inv.partner_id.name[:80])) + '</Nombre>')
     else:
         sb.Append('<Nombre>No especificado</Nombre>')
     sb.Append('</Receptor>')
@@ -1697,7 +1700,7 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
                   str(v['unidadMedida']) + '</UnidadMedida>')
-        sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
+        sb.Append('<Detalle>' + (v['detalle']) + '</Detalle>')
         sb.Append('<PrecioUnitario>' +
                   str(v['precioUnitario']) + '</PrecioUnitario>')
         sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
@@ -1762,11 +1765,11 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
 
             if otrosCargos[otro_cargo].get('NombreTercero'):
                 sb.Append('<NombreTercero>' +
-                          str(otrosCargos[otro_cargo]['NombreTercero']) +
+                          (otrosCargos[otro_cargo]['NombreTercero']) +
                           '</NombreTercero>')
 
             sb.Append('<Detalle>' +
-                      str(otrosCargos[otro_cargo]['Detalle']) +
+                      (otrosCargos[otro_cargo]['Detalle']) +
                       '</Detalle>')
 
             if otrosCargos[otro_cargo].get('Porcentaje'):
@@ -1826,7 +1829,7 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     sb.Append('</ResumenFactura>')
     sb.Append('<Otros>')
     sb.Append('<OtroTexto>' +
-              str(invoice_comments or 'Test FE V4.3') + '</OtroTexto>')
+              (invoice_comments or 'Test FE V4.3') + '</OtroTexto>')
     sb.Append('</Otros>')
 
     sb.Append('</TiqueteElectronico>')
@@ -1872,7 +1875,7 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<Numero>' + inv.company_id.vat + '</Numero>')
     sb.Append('</Identificacion>')
     sb.Append('<NombreComercial>' +
-              escape(str(inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
+              escape((inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
     sb.Append('<Ubicacion>')
     sb.Append('<Provincia>' + inv.company_id.state_id.code + '</Provincia>')
     sb.Append('<Canton>' + inv.company_id.county_id.code + '</Canton>')
@@ -1880,13 +1883,13 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append(
         '<Barrio>' + str(inv.company_id.neighborhood_id.code or '00') + '</Barrio>')
     sb.Append('<OtrasSenas>' +
-              escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
+              escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
 
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -1910,7 +1913,7 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
 
         sb.Append('<Receptor>')
         sb.Append(
-            '<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+            '<Nombre>' + escape((inv.partner_id.name[:80])) + '</Nombre>')
 
         if id_code == '05':
             sb.Append('<IdentificacionExtranjero>' +
@@ -1932,14 +1935,14 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
             sb.Append(
                 '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
             sb.Append(
-                '<OtrasSenas>' + escape(str(inv.partner_id.street or 'NA')) + '</OtrasSenas>')
+                '<OtrasSenas>' + escape((inv.partner_id.street or 'NA')) + '</OtrasSenas>')
             sb.Append('</Ubicacion>')
 
         if inv.partner_id.phone:
             phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
             sb.Append('<Telefono>')
-            sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-            sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+            sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+            sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
             sb.Append('</Telefono>')
 
         match = inv.partner_id.email and re.match(
@@ -1968,7 +1971,7 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
                   str(v['unidadMedida']) + '</UnidadMedida>')
-        sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
+        sb.Append('<Detalle>' + (v['detalle']) + '</Detalle>')
         sb.Append('<PrecioUnitario>' +
                   str(v['precioUnitario']) + '</PrecioUnitario>')
 
@@ -2070,7 +2073,7 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
 
     if invoice_comments:
         sb.Append('<Otros>')
-        sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        sb.Append('<OtroTexto>' + (invoice_comments) + '</OtroTexto>')
         sb.Append('</Otros>')
     sb.Append('</NotaCreditoElectronica>')
 
@@ -2104,7 +2107,7 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
     sb.Append('<Numero>' + inv.company_id.vat + '</Numero>')
     sb.Append('</Identificacion>')
     sb.Append('<NombreComercial>' +
-              escape(str(inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
+              escape((inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
     sb.Append('<Ubicacion>')
     sb.Append('<Provincia>' + inv.company_id.state_id.code + '</Provincia>')
     sb.Append('<Canton>' + inv.company_id.county_id.code + '</Canton>')
@@ -2112,13 +2115,13 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
     sb.Append(
         '<Barrio>' + str(inv.company_id.neighborhood_id.code or '00') + '</Barrio>')
     sb.Append('<OtrasSenas>' +
-              escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
+              escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -2145,14 +2148,14 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
     sb.Append(
         '<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
     sb.Append('<OtrasSenas>' +
-              str(inv.partner_id.street or 'NA') + '</OtrasSenas>')
+              (inv.partner_id.street or 'NA') + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
     if inv.partner_id.phone:
         phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
         sb.Append('<Telefono>')
-        sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-        sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+        sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
+        sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
         sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -2176,7 +2179,7 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
                   str(v['unidadMedida']) + '</UnidadMedida>')
-        sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
+        sb.Append('<Detalle>' + (v['detalle']) + '</Detalle>')
         sb.Append('<PrecioUnitario>' +
                   str(v['precioUnitario']) + '</PrecioUnitario>')
         sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
@@ -2277,7 +2280,7 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
     sb.Append('</InformacionReferencia>')
     if invoice_comments:
         sb.Append('<Otros>')
-        sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        sb.Append('<OtroTexto>' + (invoice_comments) + '</OtroTexto>')
         sb.Append('</Otros>')
 
     sb.Append('</NotaDebitoElectronica>')
@@ -2578,7 +2581,8 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
         raise Warning('Error enviando el XML al Ministerior de Hacienda')
 
 
-def schema_validator(xml_file, xsd_file) -> bool:
+#def schema_validator(xml_file, xsd_file) -> bool:
+def schema_validator(xml_file, xsd_file):
     """
     verifies a xml
     :param xml_invoice: Invoice xml
@@ -2655,10 +2659,14 @@ class StringBuilder:
     _file_str = None
 
     def __init__(self):
-        self._file_str = io.StringIO()
+#        self._file_str = io.StringIO()
+        self._file_str = StringIO()
 
-    def Append(self, str):
-        self._file_str.write(str)
+    def Append(self, text):
+        type_text = type(text)
+        if type_text==unicode:
+            text = text.encode('ascii', 'xmlcharrefreplace')
+        self._file_str.write(str(text))
 
     def __str__(self):
         return self._file_str.getvalue()
