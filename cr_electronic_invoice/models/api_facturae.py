@@ -394,8 +394,8 @@ def gen_xml_fe_v42(inv, sale_conditions,
 
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -447,8 +447,8 @@ def gen_xml_fe_v42(inv, sale_conditions,
         if inv.partner_id.phone:
             phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
             sb.Append('<Telefono>')
-            sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-            sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+            sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+            sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
             sb.Append('</Telefono>')
             
         match = inv.partner_id.email and re.match(
@@ -607,8 +607,8 @@ def gen_xml_te_42(inv, sale_conditions, total_servicio_gravado, total_servicio_e
 
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -765,8 +765,8 @@ def gen_xml_nc(
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -798,8 +798,8 @@ def gen_xml_nc(
     
     phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
     
     sb.Append('<CorreoElectronico>' +
@@ -1250,8 +1250,8 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' + str(inv.company_id.email) + '</CorreoElectronico>')
@@ -1294,8 +1294,8 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
     if inv.partner_id.phone:
         phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
         sb.Append('<Telefono>')
-        sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-        sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+        sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+        sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
         sb.Append('</Telefono>')
 
     match = inv.partner_id.email and re.match(
@@ -1501,8 +1501,8 @@ def gen_xml_fee_v43(inv, sale_conditions, total_servicio_gravado,
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' + str(inv.company_id.email) + '</CorreoElectronico>')
@@ -1669,8 +1669,8 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -1888,8 +1888,8 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
 
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -1941,8 +1941,8 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
         if inv.partner_id.phone:
             phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
             sb.Append('<Telefono>')
-            sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-            sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+            sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+            sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
             sb.Append('</Telefono>')
 
         match = inv.partner_id.email and re.match(
@@ -2120,8 +2120,8 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
     
     phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
     sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
     sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
@@ -2154,8 +2154,8 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
     if inv.partner_id.phone:
         phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
         sb.Append('<Telefono>')
-        sb.Append('<CodigoPais>' + (phone.country_code) + '</CodigoPais>')
-        sb.Append('<NumTelefono>' + (phone.national_number) + '</NumTelefono>')
+        sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+        sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
         sb.Append('</Telefono>')
 
     sb.Append('<CorreoElectronico>' +
