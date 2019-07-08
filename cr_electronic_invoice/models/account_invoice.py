@@ -452,6 +452,9 @@ class AccountInvoiceElectronic(models.Model):
                 "inv:Clave", namespaces=namespaces)[0].text
             self.date_issuance = factura.xpath(
                 "inv:FechaEmision", namespaces=namespaces)[0].text
+
+            self.date_invoice = self.date_issuance
+
             emisor = factura.xpath(
                 "inv:Emisor/inv:Identificacion/inv:Numero",
                 namespaces=namespaces)[0].text
@@ -470,11 +473,6 @@ class AccountInvoiceElectronic(models.Model):
             else:
                 self.currency_id = self.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
 
-            date_time_obj = datetime.datetime.strptime(self.date_issuance, '%Y-%m-%dT%H:%M:%S')
-            invoice_date = date_time_obj.date()
-
-            self.date_invoice = invoice_date
-
             partner = self.env['res.partner'].search([('vat', '=', emisor),
                                                       ('supplier', '=', True),
                                                       '|',
@@ -483,8 +481,7 @@ class AccountInvoiceElectronic(models.Model):
                                                       ('company_id', '=',
                                                        False)], limit=1)
 
-            default_account_id = self.env['ir.config_parameter'].sudo(
-            ).get_param('expense_account_id')
+            default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
 
             if partner:
                 self.partner_id = partner.id
@@ -497,9 +494,7 @@ class AccountInvoiceElectronic(models.Model):
             new_lines = self.env['account.invoice.line']
 
             for line in lines:
-                product_uom = self.env['product.uom'].search(
-                    [('code', '=', line.find('UnidadMedida').text)],
-                    limit=1).id
+                product_uom = self.env['product.uom'].search([('code', '=', line.find('UnidadMedida').text)], limit=1).id
                 total_amount = float(line.find('MontoTotal').text)
 
                 discount_percentage = 0.0
