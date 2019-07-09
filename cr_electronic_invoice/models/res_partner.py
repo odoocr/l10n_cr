@@ -36,7 +36,8 @@ class PartnerElectronic(models.Model):
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:
-            phone = phonenumbers.parse(self.phone, self.country_id.code)
+            phone = phonenumbers.parse(self.phone, 
+                self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(phone)
             if not valid:
                 alert = {
@@ -48,7 +49,8 @@ class PartnerElectronic(models.Model):
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:
-            mobile = phonenumbers.parse(self.mobile, self.country_id.code)
+            mobile = phonenumbers.parse(self.mobile, 
+                self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(mobile)
             if not valid:
                 alert = {
