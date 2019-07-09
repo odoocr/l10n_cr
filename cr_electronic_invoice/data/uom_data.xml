@@ -16,13 +16,32 @@
         <record id="product_uom_categ_rent" model="product.uom.categ">
             <field name="name">Rent</field>
         </record>
-        -->
+
+        <record id="product.product_uom_categ_unit" model="product.uom.categ">
+            <field name="name">Unidad</field>
+        </record>
+
+        <record id="product.product_uom_categ_kgm" model="product.uom.categ">
+            <field name="name">Peso</field>
+        </record>
+
+        <record id="product.uom_categ_wtime" model="product.uom.categ">
+            <field name="name">Horario de trabajo</field>
+        </record>
+
+        <record id="product.uom_categ_length" model="product.uom.categ">
+            <field name="name">Longitud  Distancia</field>
+        </record>
+
+        <record id="product.product_uom_categ_vol" model="product.uom.categ">
+            <field name="name">Volumen</field>
+        </record>
 
         <!--
             Resource: uom.uom
         -->
         <record id="product.product_uom_cm" model="product.uom">
-            <!--field name="category_id" ref="uom.uom_categ_length"/-->
+            <field name="category_id" ref="product.uom_categ_length"/>
             <field name="name">Centímetro</field>
             <field name="code">cm</field>
             <field name="uom_type">smaller</field>
@@ -30,7 +49,7 @@
         </record>
 
         <record id="product.product_uom_day" model="product.uom">
-            <!--field name="category_id" ref="uom.uom_categ_wtime"/-->
+            <field name="category_id" ref="product.uom_categ_wtime"/>
             <field name="name">Día(s)</field>
             <field name="code">d</field>
             <field name="active">True</field>
@@ -38,7 +57,7 @@
         </record>
 
         <record id="product.product_uom_gram" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_kgm"/-->
+            <field name="category_id" ref="product.product_uom_categ_kgm"/>
             <field name="name">Gramo</field>
             <field name="code">g</field>
             <field name="uom_type">smaller</field>
@@ -46,7 +65,7 @@
         </record>
 
         <record id="product.product_uom_gal" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_vol"/-->
+            <field name="category_id" ref="product.product_uom_categ_vol"/>
             <field name="name">Galón</field>
             <field name="code">Gal</field>
             <field name="uom_type">bigger</field>
@@ -54,7 +73,7 @@
         </record>
 
         <record id="product.product_uom_hour" model="product.uom">
-            <!--field name="category_id" ref="uom.uom_categ_wtime"/-->
+            <field name="category_id" ref="product.uom_categ_wtime"/>
             <field name="name">Hora(s)</field>
             <field name="code">h</field>
             <field name="uom_type">smaller</field>
@@ -62,7 +81,7 @@
         </record>
 
         <record id="product.product_uom_kgm" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_kgm"/-->
+            <field name="category_id" ref="product.product_uom_categ_kgm"/>
             <field name="name">Kilogramo</field>
             <field name="code">kg</field>
             <field name="uom_type">reference</field>
@@ -70,7 +89,7 @@
         </record>
 
         <record id="product.product_uom_km" model="product.uom">
-            <!--field name="category_id" ref="uom.uom_categ_length"/-->
+            <field name="category_id" ref="product.uom_categ_length"/>
             <field name="name">Kilómetro</field>
             <field name="code">km</field>
             <field name="uom_type">bigger</field>
@@ -78,7 +97,7 @@
         </record>
 
         <record id="product.product_uom_litre" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_vol"/-->
+            <field name="category_id" ref="product.product_uom_categ_vol"/>
             <field name="name">Litro</field>
             <field name="code">L</field>
             <field name="uom_type">reference</field>
@@ -86,7 +105,7 @@
         </record>
 
         <record id="product.product_uom_inch" model="product.uom">
-            <!--field name="category_id" ref="uom.uom_categ_length"/-->
+            <field name="category_id" ref="product.uom_categ_length"/>
             <field name="name">Pulgada</field>
             <field name="code">ln</field>
             <field name="uom_type">smaller</field>
@@ -94,7 +113,7 @@
         </record>
 
         <record id="product.product_uom_meter" model="product.uom">
-            <!--field name="category_id" ref="uom.uom_categ_length"/-->
+            <field name="category_id" ref="product.uom_categ_length"/>
             <field name="name">Metro</field>
             <field name="code">m</field>
             <field name="uom_type">reference</field>
@@ -102,7 +121,7 @@
         </record>
 
         <record id="product.product_uom_oz" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_kgm"/-->
+            <field name="category_id" ref="product.product_uom_categ_kgm"/>
             <field name="name">Onzas</field>
             <field name="code">Oz</field>
             <field name="uom_type">smaller</field>
@@ -110,7 +129,7 @@
         </record>
 
         <record id="product.product_uom_ton" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_kgm"/-->
+            <field name="category_id" ref="product.product_uom_categ_kgm"/>
             <field name="name">Tonelada</field>
             <field name="code">t</field>
             <field name="uom_type">bigger</field>
@@ -118,7 +137,7 @@
         </record>
 
         <record id="product.product_uom_unit" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_unit"/-->
+            <field name="category_id" ref="product.product_uom_categ_unit"/>
             <field name="name">Unidad</field>
             <field name="code">Unid</field>
             <field name="uom_type">reference</field>
@@ -126,7 +145,7 @@
         </record>
 
         <record id="product_uom_mcubico" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_vol"/-->
+            <field name="category_id" ref="product.product_uom_categ_vol"/>
             <field name="name">Metro Cubico</field>
             <field name="factor" eval="1.0"/>
             <field name="rounding" eval="0.01"/>
@@ -204,7 +223,7 @@
         </record>
 
         <record id="product.product_uom_qt" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_vol"/-->
+            <field name="category_id" ref="product.product_uom_categ_vol"/>
             <field name="name">Cuarto(s) de Galón</field>
             <field name="code">cuarto(s) de galón</field>
             <field name="uom_type">smaller</field>
@@ -212,7 +231,7 @@
         </record>
 
         <record id="product.product_uom_dozen" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_unit"/-->
+            <field name="category_id" ref="product.product_uom_categ_unit"/>
             <field name="name">Docena(s)</field>
             <field name="code">Docena(s)</field>
             <field name="uom_type">bigger</field>
@@ -220,7 +239,7 @@
         </record>
 
        <record id="product.product_uom_floz" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_vol"/-->
+            <field name="category_id" ref="product.product_uom_categ_vol"/>
             <field name="name">fl oz</field>
             <field name="code">fl oz</field>
             <field name="uom_type">smaller</field>
@@ -228,7 +247,7 @@
         </record>
 
         <record id="product.product_uom_lb" model="product.uom">
-            <!--field name="category_id" ref="uom.product_uom_categ_kgm"/-->
+            <field name="category_id" ref="product.product_uom_categ_kgm"/>
             <field name="name">Libra(s)</field>
             <field name="code">libra(s)</field>
             <field name="uom_type">smaller</field>
@@ -236,7 +255,7 @@
         </record>
 
         <record id="product.product_uom_mile" model="product.uom">
-            <!--field name="category_id" ref="uom.uom_categ_length"/-->
+            <field name="category_id" ref="product.uom_categ_length"/>
             <field name="name">Milla(s)</field>
             <field name="code">milla(s)</field>
             <field name="uom_type">bigger</field>
@@ -244,7 +263,7 @@
         </record>
 
         <record id="product.product_uom_foot" model="product.uom">
-            <!--field name="category_id" ref="uom.uom_categ_length"/-->
+            <field name="category_id" ref="product.uom_categ_length"/>
             <field name="name">Pie(s)</field>
             <field name="code">pie(s)</field>
             <field name="uom_type">smaller</field>
