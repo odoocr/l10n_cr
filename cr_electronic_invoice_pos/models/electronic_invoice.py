@@ -46,8 +46,8 @@ class PosOrder(models.Model):
 
     @api.model
     def sequence_number_sync(self, vals):
-        doc_type = vals.get('_doc_type', False)
-        sequence = vals.get('_sequence', False)
+        doc_type = vals.get('doc_type', False)
+        sequence = vals.get('sequence', False)
         sequence = int(sequence) if sequence else False
         if vals.get('session_id') and sequence:
             session = self.env['pos.session'].sudo().browse(vals['session_id'])
