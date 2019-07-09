@@ -166,7 +166,8 @@ def get_clave_hacienda(self, tipo_documento, consecutivo, sucursal_id, terminal_
 
     cur_date = now_cr.strftime("%d%m%y")
 
-    phone = phonenumbers.parse(self.company_id.phone, self.company_id.country_id.code)
+    phone = phonenumbers.parse(self.company_id.phone, 
+        self.company_id.country_id and self.company_id.country_id.code or 'CR')
     codigo_pais = str(phone and phone.country_code or 506)
 
     '''Creamos un código de seguridad random'''
@@ -392,7 +393,8 @@ def gen_xml_fe_v42(inv, sale_conditions,
               escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
 
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -445,7 +447,8 @@ def gen_xml_fe_v42(inv, sale_conditions,
             sb.Append('</Ubicacion>')
 
         if inv.partner_id.phone:
-            phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
+            phone = phonenumbers.parse(inv.partner_id.phone, 
+                inv.partner_id.country_id and inv.partner_id.country_id.code or 'CR')
             sb.Append('<Telefono>')
             sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
             sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -605,7 +608,8 @@ def gen_xml_te_42(inv, sale_conditions, total_servicio_gravado, total_servicio_e
               escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
 
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -763,7 +767,8 @@ def gen_xml_nc(
               escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -796,7 +801,8 @@ def gen_xml_nc(
               str(inv.partner_id.street or 'NA') + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
-    phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
+    phone = phonenumbers.parse(inv.partner_id.phone, 
+        inv.partner_id.country_id and inv.partner_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -947,7 +953,8 @@ def gen_xml_nd(
               escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
 
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -1248,7 +1255,8 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<OtrasSenas>' + escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -1292,7 +1300,8 @@ def gen_xml_fe_v43(inv, sale_conditions, total_servicio_gravado,
         sb.Append('</Ubicacion>')
     
     if inv.partner_id.phone:
-        phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
+        phone = phonenumbers.parse(inv.partner_id.phone, 
+            inv.partner_id.country_id and inv.partner_id.country_id.code or 'CR')
         sb.Append('<Telefono>')
         sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
         sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -1499,7 +1508,8 @@ def gen_xml_fee_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<OtrasSenas>' + escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -1667,7 +1677,8 @@ def gen_xml_te_43(inv, sale_conditions, total_servicio_gravado, total_servicio_e
               escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -1886,7 +1897,8 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
               escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
 
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -1939,7 +1951,8 @@ def gen_xml_nc_v43(inv, sale_conditions, total_servicio_gravado,
             sb.Append('</Ubicacion>')
 
         if inv.partner_id.phone:
-            phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
+            phone = phonenumbers.parse(inv.partner_id.phone, 
+                inv.partner_id.country_id and inv.partner_id.country_id.code or 'CR')
             sb.Append('<Telefono>')
             sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
             sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -2118,7 +2131,8 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
               escape((inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
     
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -2152,7 +2166,8 @@ def gen_xml_nd_v43(inv, consecutivo, sale_conditions, total_servicio_gravado,
     sb.Append('</Ubicacion>')
     
     if inv.partner_id.phone:
-        phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
+        phone = phonenumbers.parse(inv.partner_id.phone, 
+            inv.partner_id.country_id and inv.partner_id.country_id.code or 'CR')
         sb.Append('<Telefono>')
         sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
         sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -2352,7 +2367,8 @@ def gen_xml_fec_v43(inv, sale_conditions, total_servicio_gravado,
         sb.Append('</Ubicacion>')
  
     if inv.partner_id.phone:
-        phone = phonenumbers.parse(inv.partner_id.phone, inv.partner_id.country_id.code)
+        phone = phonenumbers.parse(inv.partner_id.phone, 
+            inv.partner_id.country_id and inv.partner_id.country_id.code or 'CR')
         sb.Append('<Telefono>')
         sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
         sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
@@ -2382,7 +2398,8 @@ def gen_xml_fec_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<OtrasSenas>' + escape(str(inv.company_id.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
 
-    phone = phonenumbers.parse(inv.company_id.phone, inv.company_id.country_id.code)
+    phone = phonenumbers.parse(inv.company_id.phone, 
+        inv.company_id.country_id and inv.company_id.country_id.code or 'CR')
     sb.Append('<Telefono>')
     sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
     sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
