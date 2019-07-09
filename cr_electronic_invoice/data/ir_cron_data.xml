@@ -10,7 +10,7 @@
             <field name="numbercall">-1</field>
             <field eval="False" name="doall"/>
             <field name="model">account.invoice</field>
-            <field name="function">__check_hacienda_for_invoices</field>
+            <field name="function">_check_hacienda_for_invoices</field>
             <field name="args">(1,)</field>
         </record>
 
