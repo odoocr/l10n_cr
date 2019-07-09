@@ -25,9 +25,6 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
     var ajax = require('web.ajax');
     var core = require('web.core');
     var models = require('point_of_sale.models');
-    var Model = require('web.DataModel');
-    var QWeb = core.qweb;
-    var _t = core._t;
     var exports = {};
 
     var _sequence_next = function(seq){
@@ -69,16 +66,9 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             self.models.push({
                 model: 'ir.sequence',
                 fields: [],
-                ids:    function(self){ return [self.config.sequence_id[0],self.config.return_sequence_id[0]]; },
-                loaded: function(self, sequence){ self.pos_order_sequence = sequence[0];self.pos_return_order_sequence = sequence[1]; },
+                ids:    function(self){ return [self.config.FE_sequence_id[0],self.config.TE_sequence_id[0]]; },
+                loaded: function(self, sequence){ self.FE_sequence = sequence[0];self.TE_sequence = sequence[1]; },
             });
-            //self.models.push({
-            //    model: 'ir.sequence',
-            //    fields: [],
-            //    ids:    function(self){ return [self.config.return_sequence_id[0]]; },
-            //    loaded: function(self, sequence){ self.pos_order_return_sequence = sequence[0]; },
-            //});
-            //return PosModelParent.prototype.load_server_data.apply(this, arguments);
             //debugger;
             return PosModelParent.load_server_data.apply(this, arguments);
         },
@@ -86,13 +76,15 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             debugger;
             if (order !== undefined) {
                 // revisar si es normal o devolucion . Pendiente !!!
-                if (order.return_ref) {
-                    order.set({'sequence_ref_number': this.pos_return_order_sequence.number_next_actual});
-                    order.set({'sequence_ref': _sequence_next(this.pos_return_order_sequence)});
+                if (order.client) {
+                    order.set({'sequence': this.FE_sequence.number_next_actual});
+                    order.set({'number_electronic': _sequence_next(this.FE_sequence)});
+                    order.set({'doc_type': 'FE'});
                 }
                 else{
-                    order.set({'sequence_ref_number': this.pos_order_sequence.number_next_actual});
-                    order.set({'sequence_ref': _sequence_next(this.pos_order_sequence)});
+                    order.set({'sequence': this.TE_sequence.number_next_actual});
+                    order.set({'number_electronic': _sequence_next(this.TE_sequence)});
+                    order.set({'doc_type': 'TE'});
                 }
             };
             debugger;
@@ -105,16 +97,18 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
     models.Order = models.Order.extend({
         export_for_printing: function(attributes){
             var order = OrderParent.export_for_printing.apply(this, arguments);
-            order['sequence_ref'] = this.get('sequence_ref');
-            order['sequence_ref_number'] = this.get('sequence_ref_number');
-            //debugger;
+            order['number_electronic'] = this.get('number_electronic');
+            order['sequence'] = this.get('sequence');
+            order['doc_type'] = this.get('doc_type');
+            debugger;
             return order;
         },
         export_as_JSON: function() {
             var order = OrderParent.export_as_JSON.apply(this, arguments);
-            order['sequence_ref'] = this.get('sequence_ref');
-            order['sequence_ref_number'] = this.get('sequence_ref_number');
-            //debugger;
+            order['number_electronic'] = this.get('number_electronic');
+            order['sequence'] = this.get('sequence');
+            order['doc_type'] = this.get('doc_type');
+            debugger;
             return order;
         }
     });
