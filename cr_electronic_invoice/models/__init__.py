@@ -19,6 +19,5 @@ from . import sale_condition
 from . import uom
 from . import aut_ex
 from . import account_tax
-from . import base_import_fe_cr
-from . import business_document_import
 from . import economic_activity
+from . import account_invoice_import_wizard

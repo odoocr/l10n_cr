@@ -2,7 +2,7 @@
 
 ### Localización de Costa Rica para Odoo que incluye:
 
-- Facturación electrónica para Costa Rica [4.2](https://www.hacienda.go.cr/ATV/ComprobanteElectronico/frmAnexosyEstructuras.aspx)
+- Facturación electrónica para Costa Rica [4.3](https://www.hacienda.go.cr/ATV/ComprobanteElectronico/frmAnexosyEstructuras.aspx)
 
 #### Debe hacer clone del branch con la versión de Odoo que desea utilizar. 
 
