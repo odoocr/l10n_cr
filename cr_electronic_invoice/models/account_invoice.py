@@ -387,7 +387,7 @@ class AccountInvoiceElectronic(models.Model):
     @api.multi
     def load_xml_data(self):
         default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
-        load_lines = bool(invoice.env['ir.config_parameter'].sudo().get_param('load_lines'))
+        load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
         api_facturae.load_xml_data(self, load_lines, default_account_id)
 
     @api.multi
@@ -808,24 +808,23 @@ class AccountInvoiceElectronic(models.Model):
             if not inv.xml_comprobante:
                 date_cr = api_facturae.get_time_hacienda()
 
-                numero_documento_referencia = ''
-                fecha_emision_referencia = ''
-                codigo_referencia = ''
-                razon_referencia = ''
+                numero_documento_referencia = False
+                fecha_emision_referencia = False
+                codigo_referencia = False
+                razon_referencia = False
                 currency = inv.currency_id
                 invoice_comments = inv.comment
+                tipo_documento_referencia = False
 
                 # Es Factura de cliente o nota de débito
                 if inv.type == 'out_invoice':
                     if inv.tipo_documento == 'ND':
-
                         numero_documento_referencia = inv.invoice_id.number_electronic
                         tipo_documento_referencia = inv.invoice_id.number_electronic[29:31]
                         fecha_emision_referencia = inv.invoice_id.date_issuance
                         codigo_referencia = inv.reference_code_id.code
                         razon_referencia = inv.reference_code_id.name
-                    else:
-                        tipo_documento_referencia = ''
+                       
 
                 # Si es Nota de Crédito
                 elif inv.tipo_documento == 'NC':
