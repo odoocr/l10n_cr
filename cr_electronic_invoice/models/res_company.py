@@ -49,13 +49,6 @@ class CompanyElectronic(models.Model):
         help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
              'de calidad (stag), para el ambiente de producción (prod). Requerido.')
 
-    version_hacienda = fields.Selection(
-        selection=[('4.2', 'Utilizar XMLs version 4.2'),
-                   ('4.3', 'Utilizar XMLs version 4.3')],
-        string="Versión de Hacienda a utilizar",
-        required=True, default='4.2',
-        help='Indica si se quiere utilizar la versión 4.2 o 4.3 de Hacienda')
-
     frm_pin = fields.Char(string="Pin", required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
 
