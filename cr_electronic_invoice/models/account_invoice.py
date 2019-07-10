@@ -487,24 +487,15 @@ class AccountInvoiceElectronic(models.Model):
                                 'consecutivo')
                             '''Generamos el Mensaje Receptor'''
 
-                            if inv.company_id.version_hacienda == '4.2':
-                                xml = api_facturae.gen_xml_mr_42(
-                                    inv.number_electronic,
-                                    inv.partner_id.vat, inv.date_issuance,
-                                    tipo, detalle_mensaje, inv.company_id.vat,
-                                    inv.consecutive_number_receiver,
-                                    inv.amount_tax_electronic_invoice,
-                                    inv.amount_total_electronic_invoice)
-                            else:
-                                xml = api_facturae.gen_xml_mr_43(
-                                    inv.number_electronic, inv.partner_id.vat,
-                                    inv.date_issuance,
-                                    tipo, detalle_mensaje, inv.company_id.vat,
-                                    inv.consecutive_number_receiver,
-                                    inv.amount_tax_electronic_invoice,
-                                    inv.amount_total_electronic_invoice,
-                                    inv.company_id.activity_id.code,
-                                    '01')
+                            xml = api_facturae.gen_xml_mr_43(
+                                inv.number_electronic, inv.partner_id.vat,
+                                inv.date_issuance,
+                                tipo, detalle_mensaje, inv.company_id.vat,
+                                inv.consecutive_number_receiver,
+                                inv.amount_tax_electronic_invoice,
+                                inv.amount_total_electronic_invoice,
+                                inv.company_id.activity_id.code,
+                                '01')
 
                             xml_firmado = api_facturae.sign_xml(
                                 inv.company_id.signature,
@@ -888,7 +879,7 @@ class AccountInvoiceElectronic(models.Model):
                         }
                         if inv_line.third_party_id:
                             otros_cargos[otros_cargos_id]['NombreTercero'] = inv_line.third_party_id.name
-                            
+
                             if inv_line.third_party_id.vat:
                                 otros_cargos[otros_cargos_id]['NumeroIdentidadTercero'] = inv_line.third_party_id.vat
 
@@ -935,7 +926,7 @@ class AccountInvoiceElectronic(models.Model):
                             line["unidadMedida"] = inv_line.product_id.uom_id.code or 'Sp'
                             line["codigo"] = inv_line.product_id.default_code or ''
                             line["codigoProducto"] = inv_line.product_id.code or ''
-                        
+
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
 
@@ -1013,7 +1004,7 @@ class AccountInvoiceElectronic(models.Model):
                             line["impuestoNeto"] = _line_tax
 
                         # Si no hay product_id se asume como mercaderia
-                        if inv_line.product_id and inv_line.product_id.type == 'service':
+                        if inv_line.product_id and inv_line.product_id.uom_id.category_id.name == 'Services':
                             if taxes:
                                 if _tax_exoneration:
                                     if _percentage_exoneration < 1:
@@ -1056,126 +1047,16 @@ class AccountInvoiceElectronic(models.Model):
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
 
-                if inv.tipo_documento == 'FE':
-                    # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
-                    xml_string_builder = api_facturae.gen_xml_fe_v43(
-                        inv=inv,
-                        sale_conditions=sale_conditions,
-                        total_servicio_gravado=round(total_servicio_gravado, 5),
-                        total_servicio_exento=round(total_servicio_exento, 5),
-                        totalServExonerado=total_servicio_exonerado,
-                        total_mercaderia_gravado=round(total_mercaderia_gravado, 5),
-                        total_mercaderia_exento=round(total_mercaderia_exento, 5),
-                        totalMercExonerada=total_mercaderia_exonerado,
-                        totalOtrosCargos=total_otros_cargos,
-                        base_total=base_subtotal,
-                        total_impuestos=total_impuestos,
-                        total_descuento=total_descuento,
-                        lines=json.dumps(lines, ensure_ascii=False),
-                        otrosCargos=otros_cargos,
-                        currency_rate=currency_rate,
-                        invoice_comments=invoice_comments)
-                elif inv.tipo_documento == 'FEC':
-                    xml_string_builder = api_facturae.gen_xml_fec_v43(
-                        inv=inv,
-                        sale_conditions=sale_conditions,
-                        total_servicio_gravado=round(total_servicio_gravado, 5),
-                        total_servicio_exento=round(total_servicio_exento, 5),
-                        totalServExonerado=total_servicio_exonerado,
-                        total_mercaderia_gravado=round(total_mercaderia_gravado, 5),
-                        total_mercaderia_exento=round(total_mercaderia_exento, 5),
-                        totalMercExonerada=total_mercaderia_exonerado,
-                        totalOtrosCargos=total_otros_cargos,
-                        base_total=base_subtotal,
-                        total_impuestos=total_impuestos,
-                        total_descuento=total_descuento,
-                        lines=json.dumps(lines, ensure_ascii=False),
-                        otrosCargos=otros_cargos,
-                        currency_rate=currency_rate,
-                        invoice_comments=invoice_comments)
-            elif inv.tipo_documento == 'FEE':
-                    xml_string_builder = api_facturae.gen_xml_fee_v43(
-                        inv=inv,
-                        sale_conditions=sale_conditions,
-                        total_servicio_gravado=round(total_servicio_gravado, 5),
-                        total_servicio_exento=round(total_servicio_exento, 5),
-                        totalServExonerado=total_servicio_exonerado,
-                        total_mercaderia_gravado=round(total_mercaderia_gravado, 5),
-                        total_mercaderia_exento=round(total_mercaderia_exento, 5),
-                        totalMercExonerada=total_mercaderia_exonerado,
-                        totalOtrosCargos=total_otros_cargos,
-                        base_total=base_subtotal,
-                        total_impuestos=total_impuestos,
-                        total_descuento=total_descuento,
-                        lines=json.dumps(lines, ensure_ascii=False),
-                        otrosCargos=otros_cargos,
-                        currency_rate=currency_rate,
-                        invoice_comments=invoice_comments)
-                elif inv.tipo_documento == 'TE':
-                    xml_string_builder = api_facturae.gen_xml_te_43(
-                        inv,
-                        sale_conditions,
-                        round(total_servicio_gravado, 5),
-                        round(total_servicio_exento, 5),
-                        total_servicio_exonerado,
-                        round(total_mercaderia_gravado, 5),
-                        round(total_mercaderia_exento, 5),
-                        total_mercaderia_exonerado,
-                        total_otros_cargos,
-                        base_subtotal,
-                        total_impuestos,
-                        total_descuento,
-                        json.dumps(lines, ensure_ascii=False),
-                        currency_rate,
-                        invoice_comments,
-                        otros_cargos)
-                elif inv.tipo_documento == 'NC':
-                        xml_string_builder = api_facturae.gen_xml_nc_v43(
-                            inv,
-                            sale_conditions,
-                            round(total_servicio_gravado, 5),
-                            round(total_servicio_exento, 5),
-                            total_servicio_exonerado,
-                            round(total_mercaderia_gravado, 5),
-                            round(total_mercaderia_exento, 5),
-                            total_mercaderia_exonerado,
-                            total_otros_cargos,
-                            base_subtotal,
-                            total_impuestos,
-                            total_descuento,
-                            json.dumps(lines, ensure_ascii=False),
-                            tipo_documento_referencia,
-                            numero_documento_referencia,
-                            fecha_emision_referencia,
-                            codigo_referencia,
-                            razon_referencia,
-                            currency_rate,
-                            invoice_comments,
-                            otros_cargos)
-                else:
-                    xml_string_builder = api_facturae.gen_xml_nd_v43(
-                        inv,
-                        sale_conditions,
-                        round(total_servicio_gravado, 5),
-                        round(total_servicio_exento, 5),
-                        total_servicio_exonerado,
-                        round(total_mercaderia_gravado, 5),
-                        round(total_mercaderia_exento, 5),
-                        total_mercaderia_exonerado,
-                        total_otros_cargos,
-                        base_subtotal,
-                        total_impuestos,
-                        total_descuento,
-                        json.dumps(lines, ensure_ascii=False),
-                        tipo_documento_referencia,
-                        numero_documento_referencia,
-                        fecha_emision_referencia,
-                        codigo_referencia,
-                        razon_referencia,
-                        currency_rate,
-                        invoice_comments)
-
-                inv.fname_xml_comprobante = inv.tipo_documento + '_' + inv.number_electronic + '.xml'
+                # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
+                xml_string_builder = api_facturae.gen_xml_v43(
+                    inv, sale_conditions, round(total_servicio_gravado, 5),
+                    round(total_servicio_exento, 5), total_servicio_exonerado,
+                    round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5),
+                    total_mercaderia_exonerado, total_otros_cargos, base_subtotal,
+                    total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
+                    otros_cargos, currency_rate, invoice_comments,
+                    tipo_documento_referencia, numero_documento_referencia,
+                    fecha_emision_referencia, codigo_referencia, razon_referencia)
 
                 xml_to_sign = str(xml_string_builder)
                 xml_firmado = api_facturae.sign_xml(
@@ -1184,6 +1065,8 @@ class AccountInvoiceElectronic(models.Model):
                     xml_to_sign)
 
                 inv.xml_comprobante = base64.encodestring(xml_firmado)
+                inv.fname_xml_comprobante = inv.tipo_documento + '_' + inv.number_electronic + '.xml'
+
                 _logger.debug('E-INV CR - SIGNED XML:%s', inv.fname_xml_comprobante)
             else:
                 xml_firmado = inv.xml_comprobante
@@ -1255,18 +1138,14 @@ class AccountInvoiceElectronic(models.Model):
                     #     sequence = inv.journal_id.ND_sequence_id.next_by_id()
                     #
                     # else:
-                    
                     if inv.tipo_documento in ('FE', 'TE'):
-                        if inv.company_id.version_hacienda == '4.2':
-                            inv.tipo_documento = 'FE'
-                            sequence = inv.journal_id.FE_sequence_id.next_by_id()
-                        elif inv.partner_id.vat:
+                        if inv.partner_id.vat:
                             inv.tipo_documento = 'FE'
                             sequence = inv.journal_id.FE_sequence_id.next_by_id()
                         else:
                             inv.tipo_documento = 'TE'
                             sequence = inv.journal_id.TE_sequence_id.next_by_id()
-                            
+
                     elif inv.tipo_documento == 'FEE':
                         sequence = inv.journal_id.FEE_sequence_id.next_by_id()
 
