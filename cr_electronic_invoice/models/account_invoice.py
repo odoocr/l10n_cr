@@ -1207,7 +1207,6 @@ class AccountInvoiceElectronic(models.Model):
                         raise UserError(
                             'No hay tipo de cambio registrado para la moneda ' + currency.name)
 
-                # Generamos los datos utilizando el API de CRLIBRE
                 response_json = api_facturae.get_clave_hacienda(self,
                                                                 inv.tipo_documento,
                                                                 sequence,
