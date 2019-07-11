@@ -10,14 +10,13 @@ class ResConfigSettings(models.TransientModel):
     expense_account_id = fields.Many2one(
         'account.account',
         company_dependent=True,
-        string=_("Default Expense Account for FE invoice import"),
+        string=_("Default Expense Account for loading data from XML"),
         domain=[('deprecated', '=', False)],
-        help=_("The expense account used when importing Costa Rican electronic invoice automatically"))
+        help=_("The expense account used when loading Costa Rican digital invoice"))
 
     load_lines = fields.Boolean(
         string=_('Indicates if invoice lines should be load when loading a Costa Rican Digital Invoice'),
     )
-  
 
     @api.model
     def get_values(self):
@@ -35,4 +34,3 @@ class ResConfigSettings(models.TransientModel):
         set_param = self.env['ir.config_parameter'].sudo().set_param
         set_param('expense_account_id', self.expense_account_id.id)
         set_param('load_lines', self.load_lines)
-
