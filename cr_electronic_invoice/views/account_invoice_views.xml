@@ -12,6 +12,7 @@
                 </field>
                 <field name="partner_id" position="before">
                     <field name="number_electronic" readonly="1"/>
+                    <field name="sequence" readonly="1"/>
                 </field>
                 <field name="payment_term_id" position="before">
                     <field name="tipo_documento" required="1" domain="[('id', 'in', ('FE','FEE','TE')),]" attrs="{'readonly':[('state','!=','draft')]}"/>
