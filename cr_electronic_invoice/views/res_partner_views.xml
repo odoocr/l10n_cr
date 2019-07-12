@@ -56,9 +56,9 @@
                             groups="account.group_account_invoice"/>
                     </field>
 
-                    <field name="vat"
-                        position="after">
+                    <field name="vat" position="after">
                         <field name="identification_id"/>
+                        <field name="activity_id" attrs="{'invisible': [('supplier', '!=', True)]}"/>
                     </field>
 
                     <field name="category_id" position="after">
