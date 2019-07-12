@@ -53,9 +53,7 @@ class AccountInvoiceRefund(models.TransientModel):
                 created_inv = []
                 for inv in inv_obj.browse(context.get('active_ids')):
                     if inv.state in ['draft', 'proforma2', 'cancel']:
-                        raise UserError(
-                            _(
-                                'Cannot refund draft/proforma/cancelled invoice.'))
+                        raise UserError(_('Cannot refund draft/proforma/cancelled invoice.'))
                     if inv.reconciled and mode in ('cancel', 'modify'):
                         raise UserError(_(
                             'Cannot refund invoice which is already reconciled, invoice should be unreconciled first. You can only refund this invoice.'))
@@ -389,6 +387,13 @@ class AccountInvoiceElectronic(models.Model):
         default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
         load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
         api_facturae.load_xml_data(self, load_lines, default_account_id)
+
+    @api.multi
+    def action_send_mrs_to_hacienda(self):
+        if self.state_invoice_partner:
+            self.send_mrs_to_hacienda()
+        else:
+            raise UserError(_('You must select the aceptance state: Accepted, Parcial Accepted or Rejected'))
 
     @api.multi
     def send_mrs_to_hacienda(self):
@@ -755,14 +760,11 @@ class AccountInvoiceElectronic(models.Model):
     def _check_hacienda_for_mrs(self, max_invoices=10):  # cron
         invoices = self.env['account.invoice'].search(
             [('type', 'in', ('in_invoice', 'in_refund')),
-             ('state', 'in',
-              ('open', 'paid')),
-             ('xml_supplier_approval',
-              '!=', False),
-             ('state_invoice_partner',
-              '!=', False),
-             ('state_send_invoice', 'not in',
-              ('aceptado', 'rechazado', 'error', 'na'))],
+             ('tipo_documento', '!=', 'FEC'),
+             ('state', 'in', ('open', 'paid')),
+             ('xml_supplier_approval', '!=', False),
+             ('state_invoice_partner', '!=', False),
+             ('state_send_invoice', 'not in', ('aceptado', 'rechazado', 'error', 'na'))],
             limit=max_invoices)
         total_invoices = len(invoices)
         current_invoice = 0
