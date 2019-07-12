@@ -67,7 +67,7 @@
             <field name="inherit_id" ref="account.invoice_supplier_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='action_invoice_draft']" position="after">
-                    <button name="send_mrs_to_hacienda" type="object" string="Enviar Mensaje Receptor" colspan="2" attrs="{'invisible':['|', ('tipo_documento','==','FEC'),('state_send_invoice','!=', False), ('state_send_invoice','!=','rechazado'),('state_send_invoice','!=','error')]}"/>
+                    <button name="action_send_mrs_to_hacienda" type="object" string="Enviar Mensaje Receptor" colspan="2" attrs="{'invisible':['|', ('tipo_documento','==','FEC'),('state_send_invoice','!=', False), ('state_send_invoice','!=','rechazado'),('state_send_invoice','!=','error')]}"/>
                     <button name="action_create_fec" type="object" string="Enviar FEC" colspan="2" attrs="{'invisible':['|', ('tipo_documento','!=','FEC'), ('state_send_invoice','not in', (False,'rechazado', 'error'))]}"/>
                     <button name="action_check_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
                 </xpath>
