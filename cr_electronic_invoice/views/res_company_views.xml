@@ -79,13 +79,12 @@
                             </group>
                             <group cols="2">
                                 <field name="frm_ws_ambiente" widget="radio"/>
-                                <field name="version_hacienda" widget="radio"/>
                             </group>
                             <group cols="2">
-                                <field name="FEC_sequence_id"/>
                                 <field name="CCE_sequence_id"/>
                                 <field name="CPCE_sequence_id"/>
                                 <field name="RCE_sequence_id"/>
+                                <field name="FEC_sequence_id"/>
                             </group>
 
                             <group cols="2">

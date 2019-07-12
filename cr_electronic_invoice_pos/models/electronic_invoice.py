@@ -49,7 +49,7 @@ class PosOrder(models.Model):
         doc_type = vals.get('doc_type', False)
         sequence = vals.get('sequence', False)
         sequence = int(sequence) if sequence else False
-        if vals.get('session_id') and sequence is not False:
+        if vals.get('session_id') and sequence:
             session = self.env['pos.session'].sudo().browse(vals['session_id'])
             if doc_type == 'FE' and sequence >= session.config_id.FE_sequence_id.number_next_actual:
                     session.config_id.FE_sequence_id.number_next_actual = sequence + 1
@@ -71,7 +71,7 @@ class PosOrder(models.Model):
 
     @api.model
     def create(self, vals):
-        number_electronic = vals.get('_number_electronic', False)
+        number_electronic = vals.get('number_electronic', False)
         if number_electronic:
             self.sequence_number_sync(vals)
             if self.env['pos.order'].search([('number_electronic', 'like', number_electronic[21:41])]):
@@ -438,6 +438,7 @@ class PosOrder(models.Model):
                 total_descuento = 0.0
                 total_impuestos = 0.0
                 base_subtotal = 0.0
+                total_otros_cargos = 0.0
 
                 for line in doc.lines:
                     line_number += 1
@@ -474,7 +475,7 @@ class PosOrder(models.Model):
 
                     # Se generan los impuestos
                     taxes = dict()
-                    impuesto_linea = 0.0
+                    _line_tax = 0.0
                     if tax_ids:
                         tax_index = 0
 
@@ -483,10 +484,14 @@ class PosOrder(models.Model):
                             taxes_lookup[i.id] = {
                                 'tax_code': i.tax_code, 'tarifa': i.amount,'iva_tax_desc': i.iva_tax_desc,'iva_tax_code': i.iva_tax_code}
                         for i in line_taxes['taxes']:
-                            if taxes_lookup[i['id']]['tax_code'] != '00':
+
+                            if taxes_lookup[i['id']]['tax_code'] == 'service':
+                                total_otros_cargos += tax_amount
+
+                            elif taxes_lookup[i['id']]['tax_code'] != '00':
                                 tax_index += 1
                                 tax_amount = abs(round(i['amount'], 5) * qty)
-                                impuesto_linea += tax_amount
+                                _line_tax += tax_amount
                                 taxes[tax_index] = {
                                     'codigo': taxes_lookup[i['id']]['tax_code'],
                                     'tarifa': taxes_lookup[i['id']]['tarifa'],
@@ -496,82 +501,70 @@ class PosOrder(models.Model):
                                 }
 
                     dline["impuesto"] = taxes
+                    dline["impuestoNeto"] = _line_tax
 
                     # Si no hay product_id se asume como mercaderia
                     if line.product_id and line.product_id.type == 'service':
                         if taxes:
                             total_servicio_gravado += base_line
-                            total_impuestos += impuesto_linea
+                            total_impuestos += _line_tax
                         else:
                             total_servicio_exento += base_line
                     else:
                         if taxes:
                             total_mercaderia_gravado += base_line
-                            total_impuestos += impuesto_linea
+                            total_impuestos += _line_tax
                         else:
                             total_mercaderia_exento += base_line
 
                     base_subtotal += subtotal_line
 
-                    dline["montoTotalLinea"] = subtotal_line + impuesto_linea
+                    dline["montoTotalLinea"] = subtotal_line + _line_tax
 
                     lines[line_number] = dline
+                if total_otros_cargos:
+                    otros_cargos_id = 1
+                    tax_amount = abs(round(i['amount'], 5) * qty)
+                    otros_cargos[otros_cargos_id]= {
+                        'TipoDocumento': taxes_lookup[i['id']]['iva_tax_code'],
+                        'Detalle': escape(taxes_lookup[i['id']]['iva_tax_desc']),
+                        'MontoCargo': total_otros_cargos
+                    }
+
                 doc.date_issuance = date_cr
                 #doc.number_electronic = docName
                 invoice_comments = ''
                 if doc.doc_type == 'TE':
-                    xml_string_builder = api_facturae.gen_xml_te_43(doc,
-                                                                    sale_conditions,
-                                                                    round(
-                                                                        total_servicio_gravado, 5),
-                                                                    round(
-                                                                        total_servicio_exento, 5),
-                                                                    round(
-                                                                        total_mercaderia_gravado, 5),
-                                                                    round(
-                                                                        total_mercaderia_exento, 5), base_subtotal,
-                                                                    total_impuestos, total_descuento,
-                                                                    json.dumps(
-                                                                        lines, ensure_ascii=False),
-                                                                    currency_rate, invoice_comments, otros_cargos)
+                    xml_string_builder = api_facturae.gen_xml_te_43(
+                        doc, sale_conditions, round(total_servicio_gravado, 5), round(total_servicio_exento, 5), 
+                        0, #totalServExonerado 
+                        round(total_mercaderia_gravado, 5), round( total_mercaderia_exento, 5), 
+                        0, #totalMercExonerada 
+                        total_otros_cargos, base_subtotal, total_impuestos, total_descuento,
+                        json.dumps( lines, ensure_ascii=False), currency_rate, invoice_comments, otros_cargos)
                 elif doc.doc_type == 'FE':
-                    xml_string_builder = api_facturae.gen_xml_fe_v43(doc,
-                                                                    sale_conditions,
-                                                                    round(
-                                                                        total_servicio_gravado, 5),
-                                                                    round(
-                                                                        total_servicio_exento, 5),
-                                                                    0, #totalServExonerado
-                                                                    round(
-                                                                        total_mercaderia_gravado, 5),
-                                                                    round(
-                                                                        total_mercaderia_exento, 5), 
-                                                                    0, #totalMercExonerada
-                                                                    0, #totalOtrosCargos,
-                                                                    base_subtotal,
-                                                                    total_impuestos, total_descuento,
-                                                                    json.dumps(
-                                                                        lines, ensure_ascii=False),
-                                                                    otros_cargos,
-                                                                    currency_rate, invoice_comments )
+                    xml_string_builder = api_facturae.gen_xml_fe_v43(
+                        doc, sale_conditions, round( total_servicio_gravado, 5),
+                        round(total_servicio_exento, 5),
+                        0, #totalServExonerado
+                        round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5), 
+                        0, #totalMercExonerada
+                        total_otros_cargos, base_subtotal, total_impuestos, total_descuento,
+                        json.dumps(lines, ensure_ascii=False),
+                        otros_cargos, currency_rate, invoice_comments )
                 else:
-                    xml_string_builder = api_facturae.gen_xml_nc(doc, 
-                                                                    sale_conditions, medio_pago,
-                                                                    round(
-                                                                        total_servicio_gravado, 5),
-                                                                    round(
-                                                                        total_servicio_exento, 5),
-                                                                    round(
-                                                                        total_mercaderia_gravado, 5),
-                                                                    round(
-                                                                        total_mercaderia_exento, 5), base_subtotal,
-                                                                    total_impuestos, total_descuento,
-                                                                    json.dumps(
-                                                                        lines, ensure_ascii=False),
-                                                                    tipo_documento_referencia, numero_documento_referencia, 
-                                                                    fecha_emision_referencia, codigo_referencia, 
-                                                                    razon_referencia,
-                                                                    currency_rate, invoice_comments)
+                    xml_string_builder = api_facturae.gen_xml_nc(
+                        doc, sale_conditions, round(total_servicio_gravado, 5),
+                        round(total_servicio_exento, 5),
+                        0, #totalServExonerado
+                        round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5), 
+                        0, #totalMercExonerada
+                        total_otros_cargos, base_subtotal,
+                        total_impuestos, total_descuento,
+                        json.dumps(lines, ensure_ascii=False),
+                        tipo_documento_referencia, numero_documento_referencia, 
+                        fecha_emision_referencia, codigo_referencia, 
+                        razon_referencia, currency_rate, invoice_comments, otros_cargos)
                 xml_to_sign = str(xml_string_builder)
                 xml_firmado = api_facturae.sign_xml(
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
