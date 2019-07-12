@@ -51,7 +51,7 @@
                 </xpath>
                 <xpath expr="//button[@name='action_invoice_draft']" position="after">
                     <button name="load_xml_data" type="object" string="Cargar datos desde XMLs" colspan="2" attrs="{'invisible':['|', ('state_tributacion','!=', False), '|', ('xml_comprobante', '=', False), ('xml_respuesta_tributacion', '=', False)]}" />
-                    <button name="action_consultar_hacienda" type="object" string="Consultar Hacienda" colspan="2" attrs="{'invisible':[('state_tributacion','=', False)]}"/>
+                    <button name="action_check_hacienda" type="object" string="Consultar Hacienda" colspan="2" attrs="{'invisible':[('state_tributacion','=', False)]}"/>
                 </xpath>
 
                 <xpath expr="//button[@name='action_invoice_sent']" position="attributes">
