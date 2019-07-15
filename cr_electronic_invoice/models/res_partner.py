@@ -2,7 +2,7 @@
 import re
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
+import phonenumbers
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -11,8 +11,6 @@ class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
-    phone_code = fields.Char(string="Código de teléfono",
-                             required=False, default="506")
     state_id = fields.Many2one(
         comodel_name="res.country.state", string="Provincia", required=False, )
     district_id = fields.Many2one(
@@ -26,34 +24,39 @@ class PartnerElectronic(models.Model):
     payment_methods_id = fields.Many2one(
         comodel_name="payment.methods", string="Métodos de Pago", required=False, )
 
-    has_exoneration = fields.Boolean( string="Posee exoneración", required=False )
-    type_exoneration = fields.Many2one(
-        comodel_name="aut.ex", string="Tipo Autorizacion", required=False, )
-    exoneration_number = fields.Char(
-        string="Número de exoneración", required=False, )
+    has_exoneration = fields.Boolean(string="Posee exoneración", required=False)
+    type_exoneration = fields.Many2one(comodel_name="aut.ex", string="Tipo Autorizacion", required=False, )
+    exoneration_number = fields.Char(string="Número de exoneración", required=False, )
     institution_name = fields.Char(string="Institucion Emisora", required=False, )
-    date_issue = fields.Date( string="Fecha de Emisión", required=False, )
-    date_expiration = fields.Date( string="Fecha de Vencimiento", required=False, )
+    date_issue = fields.Date(string="Fecha de Emisión", required=False, )
+    date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
+
+    activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica",
+                                  required=False, )
 
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:
-            self.phone = re.sub(r"[^0-9]+", "", self.phone)
-            if not self.phone.isdigit():
+            phone = phonenumbers.parse(self.phone, 
+                self.country_id and self.country_id.code or 'CR')
+            valid = phonenumbers.is_valid_number(phone)
+            if not valid:
                 alert = {
                     'title': 'Atención',
-                    'message': 'Favor no introducir letras, espacios ni guiones en los números telefónicos.'
+                    'message': _('Número de teléfono inválido')
                 }
                 return {'value': {'phone': ''}, 'warning': alert}
 
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:
-            self.mobile = re.sub(r"[^0-9]+", "", self.mobile)
-            if not self.mobile.isdigit():
+            mobile = phonenumbers.parse(self.mobile, 
+                self.country_id and self.country_id.code or 'CR')
+            valid = phonenumbers.is_valid_number(mobile)
+            if not valid:
                 alert = {
                     'title': 'Atención',
-                    'message': 'Favor no introducir letras, espacios ni guiones en los números telefónicos.'
+                    'message': 'Número de teléfono inválido'
                 }
                 return {'value': {'mobile': ''}, 'warning': alert}
 

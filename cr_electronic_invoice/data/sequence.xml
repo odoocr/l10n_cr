@@ -36,5 +36,19 @@
             <field name="prefix"></field>
             <field name="padding">10</field>
         </record>
+        <record id="seq_electronic_supplier_invoice" model="ir.sequence">
+            <field name="name">Secuencia de Factura Electrónica de Compra</field>
+            <field name="code">sequece.FEC</field>
+            <field name="prefix"></field>
+            <field name="padding">10</field>
+        </record>
+
+        <!-- <record id="/" model="account.journal">
+            <field name="FE_sequence_id" ref="seq_electronic_invoice" />
+            <field name="TE_sequence_id" ref="seq_electronic_invoice" />
+            <field name="FEE_sequence_id" ref="seq_electronic_invoice" />
+            <field name="NC_sequence_id" ref="seq_electronic_invoice" />
+            <field name="ND_sequence_id" ref="seq_electronic_invoice" />
+        </record> -->
     </data>
 </odoo>

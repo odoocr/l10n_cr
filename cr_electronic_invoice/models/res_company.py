@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import phonenumbers
 from odoo import models, fields, api
 _logger = logging.getLogger(__name__)
 
@@ -22,13 +23,10 @@ class CompanyElectronic(models.Model):
     _inherit = ['res.company', 'mail.thread', ]
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
-    # phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506")
 
     activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica",
                                   required=False, )
 
-    phone_code = fields.Char(string="Código de teléfono", required=False, size=3, default="506",
-                             help="Sin espacios ni guiones")
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(
         comodel_name="identification.type", string="Tipo de identificacion", required=False)
@@ -50,13 +48,6 @@ class CompanyElectronic(models.Model):
         required=True, default='disabled',
         help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
              'de calidad (stag), para el ambiente de producción (prod). Requerido.')
-
-    version_hacienda = fields.Selection(
-        selection=[('4.2', 'Utilizar XMLs version 4.2'),
-                   ('4.3', 'Utilizar XMLs version 4.3')],
-        string="Versión de Hacienda a utilizar",
-        required=True, default='4.2',
-        help='Indica si se quiere utilizar la versión 4.2 o 4.3 de Hacienda')
 
     frm_pin = fields.Char(string="Pin", required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
@@ -92,6 +83,30 @@ class CompanyElectronic(models.Model):
         string='Secuencia de Facturas Electrónicas de Compra',
         readonly=False, copy=False,
     )
+
+    @api.onchange('mobile')
+    def _onchange_mobile(self):
+        if self.mobile:
+            mobile = phonenumbers.parse(self.mobile, self.country_id.code)
+            valid = phonenumbers.is_valid_number(mobile)
+            if not valid:
+                alert = {
+                    'title': 'Atención',
+                    'message': 'Número de teléfono inválido'
+                }
+                return {'value': {'mobile': ''}, 'warning': alert}
+
+    @api.onchange('phone')
+    def _onchange_phone(self):
+        if self.phone:
+            phone = phonenumbers.parse(self.phone, self.country_id.code)
+            valid = phonenumbers.is_valid_number(phone)
+            if not valid:
+                alert = {
+                    'title': 'Atención',
+                    'message': _('Número de teléfono inválido')
+                }
+                return {'value': {'phone': ''}, 'warning': alert}
 
     @api.model
     def create(self, vals):

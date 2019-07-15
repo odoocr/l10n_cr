@@ -458,7 +458,7 @@
             <field name="description">Impuesto de servicio utilizado por los restraurantes</field>
             <field name="sequence">10</field>
             <field name="price_include">False</field>
-            <field name="iva_tax_desc">N/A</field>
+            <field name="iva_tax_desc">Impuesto Servicio 10%</field>
             <field name="iva_tax_code">06</field>
         </record>
 
