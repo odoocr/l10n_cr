@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<template id="assets" name="actualizar_pos assets" inherit_id="point_of_sale.assets">
+		<xpath expr="." position="inside">
+			<script src="/actualizar_clientes/static/src/js/actualizar_pos.js" type="text/javascript"/>
+		</xpath>
+		<xpath expr="//link[@id='pos-stylesheet']" position="after">
+			<link href="/actualizar_clientes/static/src/css/actualizar_pos.css" rel="stylesheet"/>
+		</xpath>
+	</template>
+</odoo>
