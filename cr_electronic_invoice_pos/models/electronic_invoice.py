@@ -156,16 +156,20 @@ class PosOrder(models.Model):
         for order in self:
             if order.doc_type in ('FE', 'TE'):
                 doc_type = 'NC'
+                referenced_order = order.id
             elif order.partner_id and order.partner_id.vat:
                 doc_type = 'FE'
+                referenced_order = order.pos_order_id and order.pos_order_id.id or order.id
             else:
                 doc_type = 'TE'
+                referenced_order = order.pos_order_id and order.pos_order_id.id or order.id
+
             clone = order.copy({
                 # ot used, name forced by create
-                'name': order.name + _(' REFUND'),
+                'name': order.name + (doc_type == 'NC' and _(' REFUND') or ''),
                 'session_id': current_session.id,
                 'date_order': fields.Datetime.now(),
-                'pos_order_id': order.id,
+                'pos_order_id': referenced_order,
                 'reference_code_id': reference_code_id.id,
                 'doc_type': doc_type,
             })
@@ -543,37 +547,17 @@ class PosOrder(models.Model):
 
                 doc.date_issuance = date_cr
                 invoice_comments = ''
-                if doc.doc_type == 'TE':
-                    xml_string_builder = api_facturae.gen_xml_te_43(
-                        doc, sale_conditions, round(total_servicio_gravado, 5), round(total_servicio_exento, 5), 
-                        0, #totalServExonerado 
-                        round(total_mercaderia_gravado, 5), round( total_mercaderia_exento, 5), 
-                        0, #totalMercExonerada 
-                        total_otros_cargos, base_subtotal, total_impuestos, total_descuento,
-                        json.dumps( lines, ensure_ascii=False), currency_rate, invoice_comments, otros_cargos)
-                elif doc.doc_type == 'FE':
-                    xml_string_builder = api_facturae.gen_xml_fe_v43(
-                        doc, sale_conditions, round( total_servicio_gravado, 5),
-                        round(total_servicio_exento, 5),
-                        0, #totalServExonerado
-                        round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5), 
-                        0, #totalMercExonerada
-                        total_otros_cargos, base_subtotal, total_impuestos, total_descuento,
-                        json.dumps(lines, ensure_ascii=False),
-                        otros_cargos, currency_rate, invoice_comments )
-                else:
-                    xml_string_builder = api_facturae.gen_xml_nc(
-                        doc, sale_conditions, round(total_servicio_gravado, 5),
-                        round(total_servicio_exento, 5),
-                        0, #totalServExonerado
-                        round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5), 
-                        0, #totalMercExonerada
-                        total_otros_cargos, base_subtotal,
-                        total_impuestos, total_descuento,
-                        json.dumps(lines, ensure_ascii=False),
-                        tipo_documento_referencia, numero_documento_referencia, 
-                        fecha_emision_referencia, codigo_referencia, 
-                        razon_referencia, currency_rate, invoice_comments, otros_cargos)
+
+                xml_string_builder = api_facturae.gen_xml_v43(
+                    inv, sale_conditions, round(total_servicio_gravado, 5),
+                    round(total_servicio_exento, 5), total_servicio_exonerado,
+                    round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5),
+                    total_mercaderia_exonerado, total_otros_cargos, base_subtotal,
+                    total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
+                    otros_cargos, currency_rate, invoice_comments,
+                    tipo_documento_referencia, numero_documento_referencia,
+                    fecha_emision_referencia, codigo_referencia, razon_referencia)
+
                 xml_to_sign = str(xml_string_builder)
                 xml_firmado = api_facturae.sign_xml(
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
