@@ -794,6 +794,7 @@ class AccountInvoiceElectronic(models.Model):
                                                       '|', ('state_tributacion', '=', False),('state_tributacion', '=', 'ne')],
                                                       order='number', limit=max_invoices)
         self.generate_and_send_invoices(invoices)
+        _logger.debug('E-INV CR - Valida Hacienda - Finalizado Exitosamente')
 
     @api.multi
     def generate_and_send_invoices(self, invoices):
@@ -1005,7 +1006,7 @@ class AccountInvoiceElectronic(models.Model):
                             line["impuestoNeto"] = _line_tax
 
                         # Si no hay product_id se asume como mercaderia
-                        if inv_line.product_id and inv_line.product_id.uom_id.category_id.name == 'Services':
+                        if inv_line.product_id and inv_line.product_id.uom_id.category_id.name == 'Services':  #inv_line.product_id.type == 'service'
                             if taxes:
                                 if _tax_exoneration:
                                     if _percentage_exoneration < 1:
@@ -1118,6 +1119,7 @@ class AccountInvoiceElectronic(models.Model):
                         'E-INV CR  - Invoice: %s  Status: %s Error sending XML: %s',
                         inv.number_electronic,
                         response_status, response_text)
+
 
     @api.multi
     def action_invoice_open(self):

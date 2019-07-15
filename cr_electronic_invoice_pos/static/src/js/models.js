@@ -76,7 +76,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             debugger;
             if (order !== undefined) {
                 // revisar si es normal o devolucion . Pendiente !!!
-                if (order.client) {
+                if (order.get('client') && order.get('client').vat) {
                     order.set({'sequence': this.FE_sequence.number_next_actual});
                     order.set({'number_electronic': _sequence_next(this.FE_sequence)});
                     order.set({'doc_type': 'FE'});
