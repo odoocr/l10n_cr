@@ -34,6 +34,3 @@ class IvaCodeType(models.Model):
         else:
             raise UserError(
                 'El porcentaje no puede ser mayor a 100')
-
-
-

@@ -24,22 +24,21 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
-    activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica",
-                                  required=False, )
+    activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica", required=False)
 
     signature = fields.Binary(string="Llave Criptográfica", )
-    identification_id = fields.Many2one(
-        comodel_name="identification.type", string="Tipo de identificacion", required=False)
-    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito",
-                                  required=False)
-    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón",
-                                required=False)
-    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios",
-                                      required=False, )
-    frm_ws_identificador = fields.Char(
-        string="Usuario de Factura Electrónica", required=False)
-    frm_ws_password = fields.Char(
-        string="Password de Factura Electrónica", required=False)
+
+    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion", required=False)
+
+    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False)
+
+    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False)
+
+    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False)
+
+    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False)
+
+    frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False)
 
     frm_ws_ambiente = fields.Selection(
         selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'),
@@ -59,10 +58,8 @@ class CompanyElectronic(models.Model):
     frm_pin = fields.Char(string="Pin", required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
 
-    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False,
-                                 default="1")
-    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False,
-                                 default="1")
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False, default="1")
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False, default="1")
 
     CCE_sequence_id = fields.Many2one(
         'ir.sequence',
