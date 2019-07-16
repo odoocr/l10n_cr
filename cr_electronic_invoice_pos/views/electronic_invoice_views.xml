@@ -104,6 +104,8 @@
             <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
             <field name="arch" type="xml">
                 <field name="state" position="before">
+                    <field name="tipo_documento"/>
+                    <field name="number_electronic"/>
                     <field name="state_tributacion"/>
                     <field name="state_email"/>
                 </field>
