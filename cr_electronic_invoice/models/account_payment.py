@@ -14,4 +14,4 @@ class PaymentMethods(models.Model):
 class AccountPaymentTerm(models.Model):
     _inherit = "account.payment.term"
     sale_conditions_id = fields.Many2one(
-        comodel_name="sale.conditions", string="Condiciones de venta")
+        "sale.conditions", string="Condiciones de venta")

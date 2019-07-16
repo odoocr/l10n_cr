@@ -20,7 +20,7 @@ class AccountJournal(models.Model):
     _inherit = 'account.journal'
 
     payment_method_id = fields.Many2one(
-        comodel_name="payment.methods", string="Payment Methods", required=False, )
+        "payment.methods", string="Payment Methods", required=False, )
 
 
 class PosConfig(models.Model):
@@ -29,14 +29,14 @@ class PosConfig(models.Model):
     sucursal = fields.Integer(string="Sucursal", required=False, default="1")
     terminal = fields.Integer(string="Terminal", required=False, default="1")
 
-    FE_sequence_id = fields.Many2one(comodel_name="ir.sequence",
+    FE_sequence_id = fields.Many2one("ir.sequence",
                                      string="Secuencia de Facturas Electrónicas",
                                      required=False)
     NC_sequence_id = fields.Many2one(oldname='return_sequence_id',
-                                     comodel_name="ir.sequence",
+                                     "ir.sequence",
                                      string="Secuencia de Notas de Crédito Electrónicas",
                                      required=False)
-    TE_sequence_id = fields.Many2one(comodel_name="ir.sequence",
+    TE_sequence_id = fields.Many2one("ir.sequence",
                                      string="Secuencia de Tiquetes Electrónicos",
                                      required=False)
 
@@ -92,9 +92,9 @@ class PosOrder(models.Model):
                                           ('procesando', 'Procesando')], 'Estado FE', copy=False)
 
     reference_code_id = fields.Many2one(
-        comodel_name="reference.code", string="Código de referencia", required=False)
+        "reference.code", string="Código de referencia", required=False)
     pos_order_id = fields.Many2one(
-        comodel_name="pos.order", string="Documento de referencia", required=False, copy=False)
+        "pos.order", string="Documento de referencia", required=False, copy=False)
     xml_respuesta_tributacion = fields.Binary(
         string="Respuesta Tributación XML", required=False, copy=False, attachment=True)
     fname_xml_respuesta_tributacion = fields.Char(

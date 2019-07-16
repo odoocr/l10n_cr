@@ -31,9 +31,9 @@ class AccountInvoiceRefund(models.TransientModel):
         return ''
 
     reference_code_id = fields.Many2one(
-        comodel_name="reference.code", string="Código de referencia",
+        "reference.code", string="Código de referencia",
         required=True, )
-    invoice_id = fields.Many2one(comodel_name="account.invoice",
+    invoice_id = fields.Many2one("account.invoice",
                                  string="Documento de referencia",
                                  default=_get_invoice_id, required=False, )
 
@@ -149,7 +149,7 @@ class InvoiceLineElectronic(models.Model):
     discount_note = fields.Char(string="Nota de descuento", required=False, )
     total_tax = fields.Float(string="Total impuesto", required=False, )
 
-    third_party_id = fields.Many2one(comodel_name="res.partner",
+    third_party_id = fields.Many2one("res.partner",
                                      string="Tercero otros cargos",)
 
     tariff_head = fields.Char(string="Partida arancelaria para factura"
@@ -198,14 +198,14 @@ class AccountInvoiceElectronic(models.Model):
         [('1', 'Aceptado'), ('3', 'Rechazado'), ('2', 'Aceptacion parcial')],
         'Respuesta del Cliente')
     reference_code_id = fields.Many2one(
-        comodel_name="reference.code", string="Código de referencia",
+        "reference.code", string="Código de referencia",
         required=False, )
 
     payment_methods_id = fields.Many2one(
-        comodel_name="payment.methods", string="Métodos de Pago",
+        "payment.methods", string="Métodos de Pago",
         required=False, )
 
-    invoice_id = fields.Many2one(comodel_name="account.invoice",
+    invoice_id = fields.Many2one("account.invoice",
                                  string="Documento de referencia",
                                  required=False,
                                  copy=False)
