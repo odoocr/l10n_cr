@@ -272,9 +272,6 @@ class AccountInvoiceElectronic(models.Model):
     def action_invoice_sent(self):
         self.ensure_one()
 
-        invoice_id = self.id
-        # context = dict(self._context or {})
-
         if self.invoice_id.type == 'in_invoice' or self.invoice_id.type == 'in_refund':
             email_template = self.env.ref(
                 'cr_electronic_invoice.email_template_invoice_vendor', False)
@@ -420,6 +417,7 @@ class AccountInvoiceElectronic(models.Model):
 
                     if abs(
                             self.amount_total_electronic_invoice - self.amount_total) > 1:
+                        inv.state_send_invoice = 'error'
                         inv.message_post(
                             subject='Error',
                             body='Aviso!.\n Monto total no concuerda con monto del XML')
@@ -428,6 +426,7 @@ class AccountInvoiceElectronic(models.Model):
                             'Aviso!.\n Monto total no concuerda con monto del XML')
 
                     elif not inv.xml_supplier_approval:
+                        inv.state_send_invoice = 'error'
                         inv.message_post(
                             subject='Error',
                             body='Aviso!.\n No se ha cargado archivo XML')
@@ -626,7 +625,9 @@ class AccountInvoiceElectronic(models.Model):
         super(AccountInvoiceElectronic, self)._onchange_partner_id()
         self.payment_methods_id = self.partner_id.payment_methods_id
 
-        if self.partner_id and self.partner_id.identification_id and self.partner_id.vat:
+        if self.type == 'out_refund':
+            self.tipo_documento = 'NC'
+        elif self.partner_id and self.partner_id.vat:
             if self.partner_id.country_id.code == 'CR':
                 self.tipo_documento = 'FE'
             else:
@@ -771,13 +772,12 @@ class AccountInvoiceElectronic(models.Model):
 
         for inv in invoices:
             # CWong: esto no debe llamarse porque cargaría de nuevo los impuestos y ya se pusieron como debería
-            # current_invoice += 1
             # if not i.amount_total_electronic_invoice:
             #     i.charge_xml_data()
-            #     _logger.info(
-            #         'MAB - Confirma Hacienda - Invoice %s / %s  -  number:%s',
-            #         current_invoice,
-            #         total_invoices, i.number_electronic)
+            current_invoice += 1
+            _logger.debug(
+                '_check_hacienda_for_mrs - Invoice %s / %s  -  number:%s',
+                current_invoice, total_invoices, inv.number_electronic)
             inv.send_mrs_to_hacienda()
 
     @api.multi
@@ -786,7 +786,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
-        _logger.info('FECR - Ejecutando Valida Hacienda')
+        _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
         invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
                                                       ('state', 'in', ('open', 'paid')),
                                                       ('number_electronic', '!=', False),
@@ -794,7 +794,7 @@ class AccountInvoiceElectronic(models.Model):
                                                       '|', ('state_tributacion', '=', False),('state_tributacion', '=', 'ne')],
                                                       order='number', limit=max_invoices)
         self.generate_and_send_invoices(invoices)
-        _logger.debug('E-INV CR - Valida Hacienda - Finalizado Exitosamente')
+        _logger.debug('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
     @api.multi
     def generate_and_send_invoices(self, invoices):
@@ -807,6 +807,10 @@ class AccountInvoiceElectronic(models.Model):
             if not inv.sequence.isdigit():  # or (len(inv.number) == 10):
                 inv.state_tributacion = 'na'
                 continue
+
+            _logger.debug(
+                'generate_and_send_invoices - Invoice %s / %s  -  number:%s',
+                current_invoice, total_invoices, inv.number_electronic)
 
             if not inv.xml_comprobante:
                 date_cr = api_facturae.get_time_hacienda()
@@ -861,6 +865,7 @@ class AccountInvoiceElectronic(models.Model):
                 otros_cargos_id = 0
                 line_number = 0
                 total_otros_cargos = 0.0
+                total_servicio_salon = 0.0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
                 total_servicio_exonerado = 0.0
@@ -964,7 +969,13 @@ class AccountInvoiceElectronic(models.Model):
                                                           'iva_tax_code': i.iva_tax_code}
 
                             for i in line_taxes['taxes']:
-                                if taxes_lookup[i['id']]['tax_code'] != '00':
+                                if taxes_lookup[i['id']]['tax_code'] == 'service':
+                                    #total_otros_cargos += round(abs(i['amount'] * qty), 5)
+                                    total_servicio_salon += round(
+                                        subtotal_line * taxes_lookup[i['id']][
+                                            'tarifa'] / 100, 5)
+
+                                elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     # tax_amount = round(i['amount'], 5) * quantity
                                     tax_amount = round(
@@ -1039,6 +1050,15 @@ class AccountInvoiceElectronic(models.Model):
                             "montoTotalLinea"] = round(subtotal_line + _line_tax, 5)
 
                         lines[line_number] = line
+                if total_servicio_salon:
+                    total_servicio_salon = round( total_servicio_salon, 5)
+                    total_otros_cargos += total_servicio_salon
+                    otros_cargos_id += 1
+                    otros_cargos[otros_cargos_id]= {
+                        'TipoDocumento': '06',
+                        'Detalle': escape('Servicio salon 10%'),
+                        'MontoCargo': total_servicio_salon
+                    }
 
                 # convertir el monto de la factura a texto
                 inv.invoice_amount_text = extensions.text_converter.number_to_text_es(

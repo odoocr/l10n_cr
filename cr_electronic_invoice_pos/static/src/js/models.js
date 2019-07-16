@@ -79,12 +79,12 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
                 if (order.get('client') && order.get('client').vat) {
                     order.set({'sequence': this.FE_sequence.number_next_actual});
                     order.set({'number_electronic': _sequence_next(this.FE_sequence)});
-                    order.set({'doc_type': 'FE'});
+                    order.set({'tipo_documento': 'FE'});
                 }
                 else{
                     order.set({'sequence': this.TE_sequence.number_next_actual});
                     order.set({'number_electronic': _sequence_next(this.TE_sequence)});
-                    order.set({'doc_type': 'TE'});
+                    order.set({'tipo_documento': 'TE'});
                 }
             };
             debugger;
@@ -99,7 +99,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             var order = OrderParent.export_for_printing.apply(this, arguments);
             order['number_electronic'] = this.get('number_electronic');
             order['sequence'] = this.get('sequence');
-            order['doc_type'] = this.get('doc_type');
+            order['tipo_documento'] = this.get('tipo_documento');
             debugger;
             return order;
         },
@@ -107,7 +107,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             var order = OrderParent.export_as_JSON.apply(this, arguments);
             order['number_electronic'] = this.get('number_electronic');
             order['sequence'] = this.get('sequence');
-            order['doc_type'] = this.get('doc_type');
+            order['tipo_documento'] = this.get('tipo_documento');
             debugger;
             return order;
         }
