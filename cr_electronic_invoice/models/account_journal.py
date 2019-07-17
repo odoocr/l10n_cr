@@ -5,8 +5,8 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 class AccountJournalInherit(models.Model):
-    _name = 'account.journal'
     _inherit = 'account.journal'
 
     sucursal = fields.Integer(string="Sucursal", required=False, default="1")
@@ -27,4 +27,3 @@ class AccountJournalInherit(models.Model):
     ND_sequence_id = fields.Many2one(comodel_name="ir.sequence",
                                      string="Secuencia de Notas de Débito Electrónicas",
                                      required=False)
-

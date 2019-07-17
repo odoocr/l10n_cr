@@ -15,8 +15,8 @@
                  <xpath expr="//page[2]" position="after">
                     <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">
                         <group>
-                            <field name="tax_root"/>
-                             <field name="percentage_exoneration"/>
+                            <field name="tax_root" domain="[('type', '=', 'sale')]"/>
+                             <field name="percentage_exoneration" />
                         </group>
                     </page>
                 </xpath>
