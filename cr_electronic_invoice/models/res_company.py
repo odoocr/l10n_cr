@@ -3,6 +3,8 @@
 import logging
 import phonenumbers
 from odoo import models, fields, api
+from . import api_facturae
+
 _logger = logging.getLogger(__name__)
 
 _TIPOS_CONFIRMACION = (
@@ -24,8 +26,9 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
-    activity_id = fields.Many2one("economic_activity", string="Actividad Económica",
-                                  required=False, )
+    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
+
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
 
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(
@@ -151,3 +154,24 @@ class CompanyElectronic(models.Model):
 
         if to_write:
             self.write(to_write)
+
+    @api.multi
+    def action_get_economic_activities(self):
+        if self.vat:
+            json_response = api_facturae.get_economic_activities(self)
+
+            activities = json_response["activities"]
+            activities_codes = list()
+            for activity in activities:
+                if activity["estado"] == "A":
+                    activities_codes.append(activity["codigo"])
+            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
+
+            self.economic_activities_ids = economic_activities
+            print(economic_activities)
+        else:
+            alert = {
+                'title': 'Atención',
+                'message': _('Company VAT is invalid')
+            }
+            return {'value': {'vat': ''}, 'warning': alert}

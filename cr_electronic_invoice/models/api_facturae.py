@@ -769,7 +769,6 @@ def consulta_clave(clave, token, tipo_ambiente):
         'Authorization': 'Bearer {}'.format(token),
         'Cache-Control': 'no-cache',
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
     }
 
     _logger.debug('MAB - consulta_clave - url: %s' % endpoint)
@@ -797,6 +796,34 @@ def consulta_clave(clave, token, tipo_ambiente):
                          'text': 'token_hacienda failed: %s' % response.reason}
     return response_json
 
+
+def get_economic_activities(company):
+    endpoint = "https://api.hacienda.go.cr/fe/ae?identificacion=" + company.vat
+
+    headers = {
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/x-www-form-urlencoded',
+    }
+
+    try:
+        response = requests.get(endpoint, headers=headers)
+    except requests.exceptions.RequestException as e:
+        _logger.error('Exception %s' % e)
+        return {'status': -1, 'text': 'Excepcion %s' % e}
+
+    if 200 <= response.status_code <= 299:
+        response_json = {
+            'status': 200,
+            'activities': response.json().get('actividades')
+        }
+    elif 400 <= response.status_code <= 499:
+        response_json = {'status': 400, 'ind-estado': 'error'}
+    else:
+        _logger.error('MAB - get_economic_activities failed.  error: %s',
+                      response.status_code)
+        response_json = {'status': response.status_code,
+                         'text': 'get_economic_activities failed: %s' % response.reason}
+    return response_json
 
 def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     if (inv.type == 'in_invoice' or inv.type == 'in_refund') and (inv.tipo_documento != 'FEC'):
