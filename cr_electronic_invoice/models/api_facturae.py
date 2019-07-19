@@ -389,7 +389,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('xsi:schemaLocation="' + fe_enums.schemaLocation[inv.tipo_documento] + '">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<CodigoActividad>' + issuing_company.activity_id.code + '</CodigoActividad>')
+    sb.Append('<CodigoActividad>' + inv.economic_activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
