@@ -24,18 +24,18 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
-    activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica",
+    activity_id = fields.Many2one("economic_activity", string="Actividad Económica",
                                   required=False, )
 
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(
-        comodel_name="identification.type", string="Tipo de identificacion", required=False)
-    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito",
+        "identification.type", string="Tipo de identificacion", required=False)
+    district_id = fields.Many2one("res.country.district", string="Distrito",
                                   required=False)
-    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón",
+    county_id = fields.Many2one("res.country.county", string="Cantón",
                                 required=False)
-    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios",
-                                      required=False, )
+    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Barrios",
+                                      required=False)
     frm_ws_identificador = fields.Char(
         string="Usuario de Factura Electrónica", required=False)
     frm_ws_password = fields.Char(
