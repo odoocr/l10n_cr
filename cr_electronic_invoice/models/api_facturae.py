@@ -389,7 +389,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('xsi:schemaLocation="' + fe_enums.schemaLocation[inv.tipo_documento] + '">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<CodigoActividad>' + issuing_company.activity_id.code + '</CodigoActividad>')
+    sb.Append('<CodigoActividad>' + inv.economic_activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
@@ -693,6 +693,34 @@ def schema_validator(xml_file, xsd_file) -> bool:
 
     return result
 
+
+def get_economic_activities(company):
+    endpoint = "https://api.hacienda.go.cr/fe/ae?identificacion=" + company.vat
+
+    headers = {
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/x-www-form-urlencoded',
+    }
+
+    try:
+        response = requests.get(endpoint, headers=headers)
+    except requests.exceptions.RequestException as e:
+        _logger.error('Exception %s' % e)
+        return {'status': -1, 'text': 'Excepcion %s' % e}
+
+    if 200 <= response.status_code <= 299:
+        response_json = {
+            'status': 200,
+            'activities': response.json().get('actividades')
+        }
+    elif 400 <= response.status_code <= 499:
+        response_json = {'status': 400, 'ind-estado': 'error'}
+    else:
+        _logger.error('MAB - get_economic_activities failed.  error: %s',
+                      response.status_code)
+        response_json = {'status': response.status_code,
+                         'text': 'get_economic_activities failed: %s' % response.reason}
+    return response_json
 
 # Obtener Attachments para las Facturas Electrónicas
 def get_invoice_attachments(invoice, record_id):

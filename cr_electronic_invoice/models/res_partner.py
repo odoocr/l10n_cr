@@ -4,8 +4,9 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import phonenumbers
 import logging
-_logger = logging.getLogger(__name__)
+from . import api_facturae
 
+_logger = logging.getLogger(__name__)
 
 class PartnerElectronic(models.Model):
     _inherit = "res.partner"
@@ -23,7 +24,8 @@ class PartnerElectronic(models.Model):
     institution_name = fields.Char(string="Institucion Emisora", required=False, )
     date_issue = fields.Date(string="Fecha de Emisión", required=False, )
     date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
-    activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica", required=False, )
+    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
 
     @api.onchange('phone')
     def _onchange_phone(self):
@@ -86,3 +88,24 @@ class PartnerElectronic(models.Model):
                     if self.vat.isdigit() and len(self.vat) != 9:
                         raise UserError(
                             'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
+
+    @api.multi
+    def action_get_economic_activities(self):
+        if self.vat:
+            json_response = api_facturae.get_economic_activities(self)
+
+            activities = json_response["activities"]
+            activities_codes = list()
+            for activity in activities:
+                if activity["estado"] == "A":
+                    activities_codes.append(activity["codigo"])
+            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
+
+            self.economic_activities_ids = economic_activities
+            print(economic_activities)
+        else:
+            alert = {
+                'title': 'Atención',
+                'message': _('Company VAT is invalid')
+            }
+            return {'value': {'vat': ''}, 'warning': alert}

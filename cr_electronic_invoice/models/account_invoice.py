@@ -263,6 +263,10 @@ class AccountInvoiceElectronic(models.Model):
     error_count = fields.Integer(
         string="Cantidad de errores", required=False, default="0")
 
+    economic_activity_id = fields.Many2one("economic_activity", string="Actividad Económica", required=False, )
+
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas', compute='_get_economic_activities')
+
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
