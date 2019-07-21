@@ -32,8 +32,8 @@ class PosConfig(models.Model):
     FE_sequence_id = fields.Many2one("ir.sequence",
                                      string="Secuencia de Facturas Electrónicas",
                                      required=False)
-    NC_sequence_id = fields.Many2one(oldname='return_sequence_id',
-                                     "ir.sequence",
+    NC_sequence_id = fields.Many2one("ir.sequence",
+                                     oldname='return_sequence_id',
                                      string="Secuencia de Notas de Crédito Electrónicas",
                                      required=False)
     TE_sequence_id = fields.Many2one("ir.sequence",
