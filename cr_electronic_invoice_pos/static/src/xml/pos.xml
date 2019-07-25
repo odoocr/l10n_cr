@@ -25,8 +25,11 @@
 
     <t t-extend="PosTicket">
         <t t-jquery="div.pos-center-align:first" t-operation="after">
-            <div class="pos-center-align" t-if="!order.is_to_invoice()">
-                  Simplified invoice: <t t-esc="order.simplified_invoice"/>
+            <div class="pos-center-align">
+                  Clave: <t t-esc="order.attributes.number_electronic"/>
+            </div>
+            <div class="pos-center-align">
+                  Consecutivo: <t t-esc="order.attributes.consecutive"/>
             </div>
         </t>
         <t t-jquery="t[t-esc='widget.pos.company.name']" t-operation="after">
