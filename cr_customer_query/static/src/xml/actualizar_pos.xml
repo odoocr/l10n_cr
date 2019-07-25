@@ -29,16 +29,11 @@
                         </t>
                     </select>
                 </div>
-                <!--t t-name="CustomButton"><div class="control-button">Obtener Nombre
-                    </div></t-->
-                <!--button class="input-button number-char" name="custom_button" onchange="widget.custom_button(this.value)">Hola</button-->
             </div>
         </t>
         <t t-jquery="div.client-picture" t-operation="after">
             <input class="detail client-name" id="vat" name="vat" onchange="obtener_nombre(this.value)" placeholder="Cédula" t-att-value="partner.vat"/>
-<!--            <input class="detail" id="vat" name="vat" hidden="hidden" t-att-value="partner.vat"/>-->
             <input class="detail" id="identification_id" hidden="hidden" name="identification_id"  t-att-value="ninguno"/>
-<!--            <input class="detail client-name" id="cedula" name="cedula" onchange="obtener_nombre(this.value)" placeholder="Cédula" t-att-value="partner.cedula"/>-->
         </t>
         <t t-jquery="div.client-details-box" t-operation="before">
             <div class="client-detail">

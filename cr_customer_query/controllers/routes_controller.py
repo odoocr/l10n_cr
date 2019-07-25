@@ -49,8 +49,8 @@ class actualizar_pos_api(http.Controller):
 
                         id_type = http.request.env['identification.type']
 
-                        if 'clasificacion' in contenido:
-                                clasificacion = contenido.get('clasificacion')
+                        if 'tipoIdentificacion' in contenido:
+                                clasificacion = contenido.get('tipoIdentificacion')
                                 if clasificacion == '01':#Cedula Fisicaclasificacion
                                     identification_id = id_type.search([('code', '=', '01')], limit=1).id
                                 elif clasificacion == '02':#Cedula Juridica
@@ -61,7 +61,6 @@ class actualizar_pos_api(http.Controller):
                                     identification_id = id_type.search([('code', '=', '04')], limit=1).id
                                 elif clasificacion == '05':#Cedula Juridica
                                     identification_id = id_type.search([('code', '=', '05')], limit=1).id
-                    identification_id = '01'
                     if contenido.get('nombre') != None:
                         name = contenido.get('nombre')
                         retorno = {"nombre":str(name),"identification_id":str(identification_id)}

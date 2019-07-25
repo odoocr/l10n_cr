@@ -67,11 +67,11 @@ class res_partner(models.Model):
                 if peticion.status_code in (200,202) and len(peticion._content) > 0:
                     contenido = json.loads(str(peticion._content,'utf-8'))
                     actividades = contenido.get('actividades')
-                    _logger.info(contenido)
+# Dejo un ejemplo de logger para futuros debugs
+#                    _logger.info(contenido)
                     self.env.cr.execute("UPDATE  res_company SET ultima_respuesta='%s' WHERE id=%s" % (ultimo_mensaje,self.company_id.id))
 
                     if 'nombre' in contenido:
-                        _logger.info(contenido)
 
                         #Compatibilidad con FE
                         if 'identification_id' in self._fields:
@@ -93,9 +93,6 @@ class res_partner(models.Model):
                             self.name = name
                             for act in actividades:
                                 if act.get('estado') == 'A':
-                                    _logger.info('Estado '+str(act.get('estado')))
-                                    _logger.info('Codigo '+str(act.get('codigo')))
-                                    _logger.info('Descripcion '+str(act.get('descripcion')))
                                     self.activity_id = self.env['economic_activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
 
                 #Si la petición arroja error se almacena en el campo ultima_respuesta de res_company. Nota: se usa execute ya que el metodo por objeto no funciono
