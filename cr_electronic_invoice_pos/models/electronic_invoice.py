@@ -20,7 +20,7 @@ class AccountJournal(models.Model):
     _inherit = 'account.journal'
 
     payment_method_id = fields.Many2one(
-        comodel_name="payment.methods", string="Payment Methods", required=False, )
+        "payment.methods", string="Payment Methods", required=False, )
 
 
 class PosConfig(models.Model):
@@ -29,14 +29,14 @@ class PosConfig(models.Model):
     sucursal = fields.Integer(string="Sucursal", required=False, default="1")
     terminal = fields.Integer(string="Terminal", required=False, default="1")
 
-    FE_sequence_id = fields.Many2one(comodel_name="ir.sequence",
+    FE_sequence_id = fields.Many2one("ir.sequence",
                                      string="Secuencia de Facturas Electrónicas",
                                      required=False)
-    NC_sequence_id = fields.Many2one(oldname='return_sequence_id',
-                                     comodel_name="ir.sequence",
+    NC_sequence_id = fields.Many2one("ir.sequence",
+                                     oldname='return_sequence_id',
                                      string="Secuencia de Notas de Crédito Electrónicas",
                                      required=False)
-    TE_sequence_id = fields.Many2one(comodel_name="ir.sequence",
+    TE_sequence_id = fields.Many2one("ir.sequence",
                                      string="Secuencia de Tiquetes Electrónicos",
                                      required=False)
 
@@ -46,25 +46,20 @@ class PosOrder(models.Model):
 
     @api.model
     def sequence_number_sync(self, vals):
-        doc_type = vals.get('doc_type', False)
+        tipo_documento = vals.get('tipo_documento', False)
         sequence = vals.get('sequence', False)
         sequence = int(sequence) if sequence else False
         if vals.get('session_id') and sequence:
             session = self.env['pos.session'].sudo().browse(vals['session_id'])
-            if doc_type == 'FE' and sequence >= session.config_id.FE_sequence_id.number_next_actual:
+            if tipo_documento == 'FE' and sequence >= session.config_id.FE_sequence_id.number_next_actual:
                     session.config_id.FE_sequence_id.number_next_actual = sequence + 1
-            elif doc_type == 'TE' and sequence >= session.config_id.TE_sequence_id.number_next_actual:
+            elif tipo_documento == 'TE' and sequence >= session.config_id.TE_sequence_id.number_next_actual:
                     session.config_id.TE_sequence_id.number_next_actual = sequence + 1
-        return
-        if vals.get('_sequence') is not None:
-            del vals['_sequence']
-        if vals.get('_number_electronic') is not None:
-            del vals['_number_electronic']
 
     @api.model
     def _order_fields(self, ui_order):
         vals = super(PosOrder, self)._order_fields(ui_order)
-        vals['doc_type'] = ui_order.get('doc_type')
+        vals['tipo_documento'] = ui_order.get('tipo_documento')
         vals['sequence'] = ui_order.get('sequence')
         vals['number_electronic'] = ui_order.get('number_electronic')
         return vals
@@ -90,15 +85,16 @@ class PosOrder(models.Model):
                                           ('rechazado', 'Rechazado'),
                                           ('rejected', 'Rechazado2'),
                                           ('no_encontrado', 'No encontrado'),
+                                          ('no_aplica', 'No aplica'),
                                           ('recibido', 'Recibido'),
                                           ('firma_invalida', 'Firma Inválida'),
                                           ('error', 'Error'),
                                           ('procesando', 'Procesando')], 'Estado FE', copy=False)
 
     reference_code_id = fields.Many2one(
-        comodel_name="reference.code", string="Código de referencia", required=False)
+        "reference.code", string="Código de referencia", required=False)
     pos_order_id = fields.Many2one(
-        comodel_name="pos.order", string="Documento de referencia", required=False, copy=False)
+        "pos.order", string="Documento de referencia", required=False, copy=False)
     xml_respuesta_tributacion = fields.Binary(
         string="Respuesta Tributación XML", required=False, copy=False, attachment=True)
     fname_xml_respuesta_tributacion = fields.Char(
@@ -111,8 +107,9 @@ class PosOrder(models.Model):
         'sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
     error_count = fields.Integer(
         string="Cantidad de errores", required=False, default="0")
-    doc_type = fields.Selection(
-        selection=[('FE', 'Factura Electrónica Normal'),
+    tipo_documento = fields.Selection(
+        oldname='doc_type',
+        selection=[('FE', 'Factura Electrónica'),
                    #('FEE', 'Factura Electrónica de Exportación'),
                    ('TE', 'Tiquete Electrónico'),
                    #('ND', 'Nota de Dédito'),
@@ -132,9 +129,13 @@ class PosOrder(models.Model):
     @api.multi
     def action_pos_order_paid(self):
         for order in self:
-            if order.pos_order_id:
-                # set name based on the sequence specified on the config
-                order.name = order.session_id.config_id.return_sequence_id._next()
+            if order.tipo_documento == 'NC':
+                order.number_electronic = order.session_id.config_id.NC_sequence_id._next()
+            elif order.tipo_documento == 'TE':
+                order.number_electronic = order.session_id.config_id.TE_sequence_id._next()
+            elif order.tipo_documento == 'FE':
+                order.number_electronic = order.session_id.config_id.FE_sequence_id._next()
+            order.sequence = order.number_electronic[21:41]
         return super(PosOrder, self).action_pos_order_paid()
 
     @api.multi
@@ -154,13 +155,24 @@ class PosOrder(models.Model):
             raise UserError(
                 _('To return product(s), you need to open a session that will be used to register the refund.'))
         for order in self:
+            if order.tipo_documento in ('FE', 'TE'):
+                tipo_documento = 'NC'
+                referenced_order = order.id
+            elif order.partner_id and order.partner_id.vat:
+                tipo_documento = 'FE'
+                referenced_order = order.pos_order_id and order.pos_order_id.id or order.id
+            else:
+                tipo_documento = 'TE'
+                referenced_order = order.pos_order_id and order.pos_order_id.id or order.id
+
             clone = order.copy({
                 # ot used, name forced by create
-                'name': order.name + _(' REFUND'),
+                'name': order.name + (tipo_documento == 'NC' and _(' REFUND') or ''),
                 'session_id': current_session.id,
                 'date_order': fields.Datetime.now(),
-                'pos_order_id': order.id,
+                'pos_order_id': referenced_order,
                 'reference_code_id': reference_code_id.id,
+                'tipo_documento': tipo_documento,
             })
             PosOrder += clone
 
@@ -359,6 +371,7 @@ class PosOrder(models.Model):
                                                          True), ('partner_id', '!=', False),
                                                    #('date_order', '>=', '2019-01-01'),
                                                    #('id', '=', 22145),
+                                                   ('tipo_documento', 'in', ('TE','FE')),
                                                    ('state_tributacion', '=', False)],
                                                   order="date_order",
                                                   limit=max_orders)
@@ -378,10 +391,18 @@ class PosOrder(models.Model):
             if not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
                 _logger.error(
                     'MAB - Valida Hacienda - skipped Invoice %s', docName)
+                doc.state_tributacion = 'no_aplica'
                 continue
 
             if not doc.xml_comprobante:
                 #url = doc.company_id.frm_callback_url
+                numero_documento_referencia = False
+                fecha_emision_referencia = False
+                codigo_referencia = False
+                razon_referencia = False
+                invoice_comments = False
+                tipo_documento_referencia = False
+
                 if not doc.pos_order_id:   #.number_electronic:
                     if doc.amount_total < 0:
                         doc.state_tributacion = 'error'
@@ -390,15 +411,15 @@ class PosOrder(models.Model):
                         continue
                 else:
                     if doc.amount_total >= 0:
-                        doc.doc_type = 'ND'
+                        doc.tipo_documento = 'ND'
                         razon_referencia = 'nota debito'
                     else:
-                        doc.doc_type = 'NC'
-                        tipo_documento_referencia = 'FE'
+                        doc.tipo_documento = 'NC'
+                        #tipo_documento_referencia = 'FE'
                         numero_documento_referencia = doc.pos_order_id.number_electronic
                         codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
-                    #tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
+                    tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
                     numero_documento_referencia = doc.pos_order_id.number_electronic
                     fecha_emision_referencia = doc.pos_order_id.date_issuance
                     codigo_referencia = doc.reference_code_id.code
@@ -413,14 +434,14 @@ class PosOrder(models.Model):
                 date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
                 #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
                 #date_cr = api_facturae.get_time_hacienda()
-                codigo_seguridad = docName[-8:]  # ,doc.company_id.security_code,
+                #codigo_seguridad = docName[-8:]  # ,doc.company_id.security_code,
                 #if not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
-                if not doc.statement_ids or not doc.statement_ids[0].statement_id or not doc.statement_ids[0].statement_id.journal_id or not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
-                    _logger.error(
-                        'MAB 001 - codigo seguridad : %s  -- Pedido: %s Metodo de pago de diario no definido, utilizando efectivo', codigo_seguridad, docName)
-                    medio_pago = '01'
-                else:
-                    medio_pago = doc.statement_ids[0].statement_id.journal_id.payment_method_id and doc.statement_ids[0].statement_id.journal_id.payment_method_id.sequence 
+                #if not doc.statement_ids or not doc.statement_ids[0].statement_id or not doc.statement_ids[0].statement_id.journal_id or not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
+                #    _logger.error(
+                #        'MAB 001 - codigo seguridad : %s  -- Pedido: %s Metodo de pago de diario no definido, utilizando efectivo', codigo_seguridad, docName)
+                #    medio_pago = '01'
+                #else:
+                #    medio_pago = doc.statement_ids[0].statement_id.journal_id.payment_method_id and doc.statement_ids[0].statement_id.journal_id.payment_method_id.sequence 
                 sale_conditions = '01' #Contado !!   doc.sale_conditions_id.sequence,
                 currency_rate = 1  # 1 / doc.currency_id.rate
 
@@ -482,15 +503,19 @@ class PosOrder(models.Model):
                         taxes_lookup = {}
                         for i in tax_ids:
                             taxes_lookup[i.id] = {
-                                'tax_code': i.tax_code, 'tarifa': i.amount,'iva_tax_desc': i.iva_tax_desc,'iva_tax_code': i.iva_tax_code}
+                                'tax_code': i.tax_code, 
+                                'tarifa': i.amount,
+                                'iva_tax_desc': i.iva_tax_desc,
+                                'iva_tax_code': i.iva_tax_code}
                         for i in line_taxes['taxes']:
 
                             if taxes_lookup[i['id']]['tax_code'] == 'service':
-                                total_otros_cargos += tax_amount
+                                #total_otros_cargos += round(tax_amount,5)
+                                total_otros_cargos += round(abs(i['amount'] * qty), 5)
 
                             elif taxes_lookup[i['id']]['tax_code'] != '00':
                                 tax_index += 1
-                                tax_amount = abs(round(i['amount'], 5) * qty)
+                                tax_amount = round(abs(i['amount'] * qty), 5)
                                 _line_tax += tax_amount
                                 taxes[tax_index] = {
                                     'codigo': taxes_lookup[i['id']]['tax_code'],
@@ -519,52 +544,31 @@ class PosOrder(models.Model):
 
                     base_subtotal += subtotal_line
 
-                    dline["montoTotalLinea"] = subtotal_line + _line_tax
+                    dline["montoTotalLinea"] = round(subtotal_line + _line_tax, 5)
 
                     lines[line_number] = dline
                 if total_otros_cargos:
+                    total_otros_cargos = round( total_otros_cargos, 5)
                     otros_cargos_id = 1
-                    tax_amount = abs(round(i['amount'], 5) * qty)
                     otros_cargos[otros_cargos_id]= {
-                        'TipoDocumento': taxes_lookup[i['id']]['iva_tax_code'],
-                        'Detalle': escape(taxes_lookup[i['id']]['iva_tax_desc']),
+                        'TipoDocumento': '06',
+                        'Detalle': escape('Servicio salon 10%'),
                         'MontoCargo': total_otros_cargos
                     }
 
                 doc.date_issuance = date_cr
-                #doc.number_electronic = docName
                 invoice_comments = ''
-                if doc.doc_type == 'TE':
-                    xml_string_builder = api_facturae.gen_xml_te_43(
-                        doc, sale_conditions, round(total_servicio_gravado, 5), round(total_servicio_exento, 5), 
-                        0, #totalServExonerado 
-                        round(total_mercaderia_gravado, 5), round( total_mercaderia_exento, 5), 
-                        0, #totalMercExonerada 
-                        total_otros_cargos, base_subtotal, total_impuestos, total_descuento,
-                        json.dumps( lines, ensure_ascii=False), currency_rate, invoice_comments, otros_cargos)
-                elif doc.doc_type == 'FE':
-                    xml_string_builder = api_facturae.gen_xml_fe_v43(
-                        doc, sale_conditions, round( total_servicio_gravado, 5),
-                        round(total_servicio_exento, 5),
-                        0, #totalServExonerado
-                        round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5), 
-                        0, #totalMercExonerada
-                        total_otros_cargos, base_subtotal, total_impuestos, total_descuento,
-                        json.dumps(lines, ensure_ascii=False),
-                        otros_cargos, currency_rate, invoice_comments )
-                else:
-                    xml_string_builder = api_facturae.gen_xml_nc(
-                        doc, sale_conditions, round(total_servicio_gravado, 5),
-                        round(total_servicio_exento, 5),
-                        0, #totalServExonerado
-                        round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5), 
-                        0, #totalMercExonerada
-                        total_otros_cargos, base_subtotal,
-                        total_impuestos, total_descuento,
-                        json.dumps(lines, ensure_ascii=False),
-                        tipo_documento_referencia, numero_documento_referencia, 
-                        fecha_emision_referencia, codigo_referencia, 
-                        razon_referencia, currency_rate, invoice_comments, otros_cargos)
+
+                xml_string_builder = api_facturae.gen_xml_v43(
+                    doc, sale_conditions, round(total_servicio_gravado, 5),
+                    round(total_servicio_exento, 5), total_servicio_exonerado,
+                    round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5),
+                    total_mercaderia_exonerado, total_otros_cargos, base_subtotal,
+                    total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
+                    otros_cargos, currency_rate, invoice_comments,
+                    tipo_documento_referencia, numero_documento_referencia,
+                    fecha_emision_referencia, codigo_referencia, razon_referencia)
+
                 xml_to_sign = str(xml_string_builder)
                 xml_firmado = api_facturae.sign_xml(
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
@@ -583,7 +587,7 @@ class PosOrder(models.Model):
                 #    doc.state_tributacion = 'error'
                 #    continue
 
-                doc.fname_xml_comprobante = doc.doc_type + '_' + docName + '.xml'
+                doc.fname_xml_comprobante = doc.tipo_documento + '_' + docName + '.xml'
                 #doc.xml_comprobante = response_json.get('xmlFirmado')
                 doc.xml_comprobante = base64.encodestring(xml_firmado)
 

@@ -104,6 +104,8 @@
             <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
             <field name="arch" type="xml">
                 <field name="state" position="before">
+                    <field name="tipo_documento"/>
+                    <field name="number_electronic"/>
                     <field name="state_tributacion"/>
                     <field name="state_email"/>
                 </field>
@@ -119,8 +121,10 @@
                 <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
                     <div class="page">
                         <div class="text-center">
-                            FACTURA ELECTRONICA<br/>
-                            Version Documento: 4.2<br/>
+                            <t t-if="o.tipo_documento=='FE'">FACTURA ELECTRONICA</t>
+                            <t t-if="o.tipo_documento=='TE'">TIQUETE ELECTRONICO</t>
+                            <br/>
+                            Version Documento: 4.3<br/>
                             <h2 t-esc="o.user_id.company_id.commercial_name"/>
                             <t t-esc="o.user_id.company_id.name"/><br/>
                             Ced.Jur: <t t-esc="o.user_id.company_id.vat"/><br/>
@@ -132,18 +136,18 @@
                                     <td>Clave Numerica:</td>
                                 </tr>
                                 <tr>
-                                    <td><t t-esc="o.name[0:25]"/></td>
+                                    <td><t t-esc="o.number_electronic[0:25]"/></td>
                                 </tr>
                                 <tr>
-                                    <td><t t-esc="o.name[25:]"/></td>
+                                    <td><t t-esc="o.number_electronic[25:]"/></td>
                                 </tr>
                             </table>
                         </div>
                         <br/>
-                            <table >
+                            <table>
                                 <tr>
                                     <td>Factura:</td>
-                                    <td><t t-esc="o.name[21:41]"/></td>
+                                    <td><t t-esc="o.number_electronic[21:41]"/></td>
                                 </tr>
                                 <tr>
                                     <td>Cajero:</td>
@@ -153,18 +157,18 @@
                                     <td>Fecha:</td>
                                     <td><span t-field="o.date_order"/></td>
                                 </tr>
-                                            <t t-if="o.partner_id">
-                                            <tr>
-                                                <td>Cliente:</td>
-                                                <td><span t-field="o.partner_id.name"/></td>
-                                            </tr>
-                                            </t>
-                                            <t t-if="o.partner_id.vat">
-                                            <tr>
-                                                <td>Cedula:</td>
-                                                <td><span t-field="o.partner_id.vat"/><br/></td>
-                                            </tr>
-                                            </t>
+                                <t t-if="o.partner_id">
+                                    <tr>
+                                        <td>Cliente:</td>
+                                        <td><span t-field="o.partner_id.name"/></td>
+                                    </tr>
+                                    </t>
+                                    <t t-if="o.partner_id.vat">
+                                    <tr>
+                                        <td>Cedula:</td>
+                                        <td><span t-field="o.partner_id.vat"/><br/></td>
+                                    </tr>
+                                </t>
                             </table>
 
                         <div class="row">
@@ -202,7 +206,7 @@
                                     </td>
                                 </tr>
                                 <tr class="border-black">
-                                    <td colspan="2"><strong>I.V.I.</strong></td>
+                                    <td colspan="2"><strong>IVA y Servicio incluidos</strong></td>
                                     <td class="text-right">
                                         <strong t-esc="o.amount_tax"/>
                                     </td>

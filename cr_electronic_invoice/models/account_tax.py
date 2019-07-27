@@ -15,7 +15,7 @@ class IvaCodeType(models.Model):
     has_exoneration = fields.Boolean(string="Impuesto Exonerado", required=False)
     percentage_exoneration = fields.Integer(string="Porcentaje de Exoneracion", required=False)
     tax_root = fields.Many2one(
-        comodel_name="account.tax", string="Impuesto Padre", required=False, )
+        "account.tax", string="Impuesto Padre", required=False, )
 
     @api.onchange('percentage_exoneration')
     def _onchange_percentage_exoneration(self):
