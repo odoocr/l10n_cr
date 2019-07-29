@@ -15,6 +15,7 @@ import logging
 import xmlsig
 import random
 
+from odoo import _
 from odoo.exceptions import UserError
 from xml.sax.saxutils import escape
 from ..xades.context2 import XAdESContext2, PolicyId2, create_xades_epes_signature
