@@ -273,6 +273,15 @@ class AccountInvoiceElectronic(models.Model):
     ]
 
     @api.multi
+    @api.onchange('partner_id', 'company_id')
+    def _get_economic_activities(self):
+        if self.type in ('in_invoice', 'in_refund'):
+            if self.partner_id:
+                self.economic_activities_ids = self.partner_id.economic_activities_ids
+        else:
+            self.economic_activities_ids = self.company_id.economic_activities_ids
+
+    @api.multi
     def action_invoice_sent(self):
         self.ensure_one()
 
