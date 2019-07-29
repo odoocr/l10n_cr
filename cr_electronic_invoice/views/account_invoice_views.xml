@@ -20,7 +20,7 @@
                     <field name="tipo_documento" required="1" domain="[('id', 'in', ('FE','FEE','TE')),]" attrs="{'readonly':[('state','!=','draft')]}"/>
                 </field>
                 <field name="payment_term_id" position="after">
-                    <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}" />
                     <!--field name="sale_conditions_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/-->
                 </field>
                 <field name="date_invoice" position="attributes">

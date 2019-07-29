@@ -242,7 +242,7 @@ class AccountInvoiceElectronic(models.Model):
                    ('CCE', 'MR Aceptación'),
                    ('CPCE', 'MR Aceptación Parcial'),
                    ('RCE', 'MR Rechazo'),
-                   ('FEC', 'Factura Electrónica de Exportación')],
+                   ('FEC', 'Factura Electrónica de Compra')],
         string="Tipo Comprobante",
         required=False, default='FE',
         help='Indica el tipo de documento de acuerdo a la '
