@@ -1,10 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
+   <t t-extend="ClientDetailsEdit">
+       <t t-jquery="div.client-details-left" t-operation="before">
+          <span class="label">Tipo de identificación</span>
+          <select class="detail" name="identification_id">
+             <option t-att-value="1">
+                 Cédula física
+             </option>
+             <option t-att-value="2">
+                 Cédula jurídica
+             </option>
+             <option t-att-value="3">
+                 DIMEX
+             </option>
+             <option t-att-value="4">
+                 NITE
+             </option>
+             <option t-att-value="5">
+                 Extranjero
+             </option>
+          </select>
+       </t>
+   </t>
 
     <t t-extend="PosTicket">
         <t t-jquery="div.pos-center-align:first" t-operation="after">
-            <div class="pos-center-align" t-if="!order.is_to_invoice()">
-                  Simplified invoice: <t t-esc="order.simplified_invoice"/>
+            <div class="pos-center-align">
+                  Clave: <t t-esc="order.attributes.number_electronic"/>
+            </div>
+            <div class="pos-center-align">
+                  Consecutivo: <t t-esc="order.attributes.consecutive"/>
             </div>
         </t>
         <t t-jquery="t[t-esc='widget.pos.company.name']" t-operation="after">
