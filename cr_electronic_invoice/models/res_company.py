@@ -3,6 +3,8 @@
 import logging
 import phonenumbers
 from odoo import models, fields, api
+from . import api_facturae
+
 _logger = logging.getLogger(__name__)
 
 _TIPOS_CONFIRMACION = (
@@ -24,22 +26,23 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
-    activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica",
-                                  required=False, )
+    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
+
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
 
     signature = fields.Binary(string="Llave Criptográfica", )
-    identification_id = fields.Many2one(
-        comodel_name="identification.type", string="Tipo de identificacion", required=False)
-    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito",
-                                  required=False)
-    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón",
-                                required=False)
-    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios",
-                                      required=False, )
-    frm_ws_identificador = fields.Char(
-        string="Usuario de Factura Electrónica", required=False)
-    frm_ws_password = fields.Char(
-        string="Password de Factura Electrónica", required=False)
+
+    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion", required=False)
+
+    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False)
+
+    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False)
+
+    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False)
+
+    frm_ws_identificador = fields.Char(string="Usuario de Factura Electrónica", required=False)
+
+    frm_ws_password = fields.Char(string="Password de Factura Electrónica", required=False)
 
     frm_ws_ambiente = fields.Selection(
         selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'),
@@ -59,10 +62,8 @@ class CompanyElectronic(models.Model):
     frm_pin = fields.Char(string="Pin", required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
 
-    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False,
-                                 default="1")
-    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False,
-                                 default="1")
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False, default="1")
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False, default="1")
 
     CCE_sequence_id = fields.Many2one(
         'ir.sequence',
@@ -158,3 +159,24 @@ class CompanyElectronic(models.Model):
 
         if to_write:
             self.write(to_write)
+
+    @api.multi
+    def action_get_economic_activities(self):
+        if self.vat:
+            json_response = api_facturae.get_economic_activities(self)
+
+            activities = json_response["activities"]
+            activities_codes = list()
+            for activity in activities:
+                if activity["estado"] == "A":
+                    activities_codes.append(activity["codigo"])
+            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
+
+            self.economic_activities_ids = economic_activities
+            print(economic_activities)
+        else:
+            alert = {
+                'title': 'Atención',
+                'message': _('Company VAT is invalid')
+            }
+            return {'value': {'vat': ''}, 'warning': alert}

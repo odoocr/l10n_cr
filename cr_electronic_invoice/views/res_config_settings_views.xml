@@ -68,6 +68,8 @@
                     <div class="row mt16 o_settings_container">
                         <div class="col-xs-12 col-md-12 o_setting_box" title="Loading Costa Rica Electronic Invoice from XML">
                             <div class="o_setting_right_pane" id="fe-reimburse" title="Default expense account when importing Costa Rican electronic invoices automatically">
+                                <div class="o_form_label  col-xs-12" for="load_lines">Load invoice lines?</div>
+                                <field name="load_lines" />
                                 <label class="o_form_label col-xs-12" for="expense_account_id" data-original-title="" title="">Default account for expenses when importing electronic invoice</label>
                                 <field class="col-xs-12" name="expense_account_id" string="Default account for expenses when importing electronic invoice" />
                             </div>

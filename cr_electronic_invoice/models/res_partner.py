@@ -4,39 +4,33 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import phonenumbers
 import logging
-_logger = logging.getLogger(__name__)
+from . import api_facturae
 
+_logger = logging.getLogger(__name__)
 
 class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
-    state_id = fields.Many2one(
-        comodel_name="res.country.state", string="Provincia", required=False, )
-    district_id = fields.Many2one(
-        comodel_name="res.country.district", string="Distrito", required=False, )
-    county_id = fields.Many2one(
-        comodel_name="res.country.county", string="Cantón", required=False, )
-    neighborhood_id = fields.Many2one(
-        comodel_name="res.country.neighborhood", string="Barrios", required=False, )
-    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
-                                        required=False, )
-    payment_methods_id = fields.Many2one(
-        comodel_name="payment.methods", string="Métodos de Pago", required=False, )
-
-    has_exoneration = fields.Boolean( string="Posee exoneración", required=False )
-    type_exoneration = fields.Many2one(
-        comodel_name="aut.ex", string="Tipo Autorizacion", required=False, )
-    exoneration_number = fields.Char(
-        string="Número de exoneración", required=False, )
+    state_id = fields.Many2one(comodel_name="res.country.state", string="Provincia", required=False, )
+    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito", required=False, )
+    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón", required=False, )
+    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
+    identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion", required=False, )
+    payment_methods_id = fields.Many2one(comodel_name="payment.methods", string="Métodos de Pago", required=False, )
+    has_exoneration = fields.Boolean(string="Posee exoneración", required=False )
+    type_exoneration = fields.Many2one(comodel_name="aut.ex", string="Tipo Autorizacion", required=False, )
+    exoneration_number = fields.Char(string="Número de exoneración", required=False, )
     institution_name = fields.Char(string="Institucion Emisora", required=False, )
-    date_issue = fields.Date( string="Fecha de Emisión", required=False, )
-    date_expiration = fields.Date( string="Fecha de Vencimiento", required=False, )
+    date_issue = fields.Date(string="Fecha de Emisión", required=False, )
+    date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
+    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
 
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:
-            phone = phonenumbers.parse(self.phone, self.country_id.code)
+            phone = phonenumbers.parse(self.phone, self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(phone)
             if not valid:
                 alert = {
@@ -48,7 +42,7 @@ class PartnerElectronic(models.Model):
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:
-            mobile = phonenumbers.parse(self.mobile, self.country_id.code)
+            mobile = phonenumbers.parse(self.mobile, self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(mobile)
             if not valid:
                 alert = {
@@ -94,3 +88,24 @@ class PartnerElectronic(models.Model):
                     if self.vat.isdigit() and len(self.vat) != 9:
                         raise UserError(
                             'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
+
+    @api.multi
+    def action_get_economic_activities(self):
+        if self.vat:
+            json_response = api_facturae.get_economic_activities(self)
+
+            activities = json_response["activities"]
+            activities_codes = list()
+            for activity in activities:
+                if activity["estado"] == "A":
+                    activities_codes.append(activity["codigo"])
+            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
+
+            self.economic_activities_ids = economic_activities
+            print(economic_activities)
+        else:
+            alert = {
+                'title': 'Atención',
+                'message': _('Company VAT is invalid')
+            }
+            return {'value': {'vat': ''}, 'warning': alert}

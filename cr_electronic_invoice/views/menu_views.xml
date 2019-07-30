@@ -18,6 +18,9 @@
 
         <menuitem id="menu_identification_type" name="Tipo de identificación" parent="menu_electronic_invoice"
                   sequence="7" action="action_identification_type"/>
+        
+        <menuitem id="menu_economic_activity" name="Actividad Económica" parent="menu_electronic_invoice"
+                  sequence="8" action="action_economic_activity"/>
 
     </data>
 </odoo>
