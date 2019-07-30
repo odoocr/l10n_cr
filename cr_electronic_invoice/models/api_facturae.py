@@ -4,6 +4,7 @@ import json
 from . import fe_enums
 import io
 import re
+import os
 import base64
 import hashlib
 import urllib
@@ -15,6 +16,7 @@ import logging
 import xmlsig
 import random
 
+from odoo import _
 from odoo.exceptions import UserError
 from xml.sax.saxutils import escape
 from ..xades.context2 import XAdESContext2, PolicyId2, create_xades_epes_signature
@@ -193,7 +195,7 @@ def get_token_hacienda(inv, tipo_ambiente):
     token_expire = last_tokens_expire.get(inv.company_id.id, 0)
     current_time = time.time()
 
-    if token and (current_time - token_time < token_expire-10):
+    if token and (current_time - token_time < token_expire - 10):
         token_hacienda = token
     else:
         headers = {}
@@ -256,6 +258,7 @@ def refresh_token_hacienda(tipo_ambiente, token):
         return token_hacienda
     except ImportError:
         raise Warning('Error Refrescando el Token desde MH')
+
 
 def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
                   detalle_mensaje, cedula_receptor,
@@ -352,8 +355,8 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     sb.Append('<NumeroConsecutivoReceptor>' + mr_consecutivo_receptor + '</NumeroConsecutivoReceptor>')
     sb.Append('</MensajeReceptor>')
 
-
     return str(sb)
+
 
 def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 total_servicio_exento, totalServExonerado,
@@ -825,6 +828,7 @@ def get_economic_activities(company):
                          'text': 'get_economic_activities failed: %s' % response.reason}
     return response_json
 
+
 def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     if (inv.type == 'in_invoice' or inv.type == 'in_refund') and (inv.tipo_documento != 'FEC'):
         clave = inv.number_electronic + "-" + inv.consecutive_number_receiver
@@ -978,11 +982,11 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
 
         partner = invoice.env['res.partner'].search([('vat', '=', emisor),
-                                                  ('supplier', '=', True),
-                                                  '|',
-                                                  ('company_id', '=', invoice.company_id.id),
-                                                  ('company_id', '=', False)],
-                                                 limit=1)
+                                                    ('supplier', '=', True),
+                                                    '|',
+                                                     ('company_id', '=', invoice.company_id.id),
+                                                     ('company_id', '=', False)],
+                                                    limit=1)
 
         if partner:
             invoice.partner_id = partner
@@ -1023,8 +1027,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 for tax_node in tax_nodes:
                     tax = invoice.env['account.tax'].search(
                         [('tax_code', '=', re.sub(r"[^0-9]+", "", tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text)),
-                        ('amount', '=', tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text),
-                        ('type_tax_use', '=', 'purchase')],
+                         ('amount', '=', tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text),
+                         ('type_tax_use', '=', 'purchase')],
                         limit=1)
                     if tax:
                         total_tax += float(tax_node.xpath("inv:Monto", namespaces=namespaces)[0].text)
