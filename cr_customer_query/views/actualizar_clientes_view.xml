@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--Herencia de Compañia-->
+        <record id="view_company_form_inherit" model="ir.ui.view">
+            <field name="name">res.company.form.inherit</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[1]" position="after">
+                    <page string="Nombre de Cliente Automático">
+                        <separator string="URL Base"/>
+                        <group col="4" colspan="2">
+                            <group col="2">
+                                <field name="url_base" nolabel="1"/>
+                            </group>
+                            <group col="2"/>
+                        </group>
+                        <group col="4">
+                            <field attrs="{'invisible' : [('ultima_respuesta', 'in', (False,''))], 'readonly' : [('ultima_respuesta', '!=', False)]}" colspan="4" name="ultima_respuesta"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
