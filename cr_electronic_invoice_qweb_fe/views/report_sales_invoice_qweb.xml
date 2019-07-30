@@ -396,7 +396,7 @@
                 </div>
                 <p class="text-center" style="padding:2px 2px 2px 2px">
                   Clave:<span t-field="o.number_electronic"/> // Usuario:<span t-field="o.create_uid.name"/><br/>
-                  Autorizada mediante resolución No DGT-R-48-2016 del 7 de octubre de 2016</p>
+                  Autorizada mediante resolución No DGT-R-033-2019 del 20 de junio de 2019</p>
             </t>
             <link href="http://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css"/>
             <style type="text/css">

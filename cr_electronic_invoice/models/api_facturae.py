@@ -163,8 +163,9 @@ def get_clave_hacienda(self, tipo_documento, consecutivo, sucursal_id, terminal_
 
     cur_date = now_cr.strftime("%d%m%y")
 
-    phone = phonenumbers.parse(self.company_id.phone, self.company_id.country_id.code)
-    codigo_pais = str(phone.country_code)
+    phone = phonenumbers.parse(self.company_id.phone, 
+        self.company_id.country_id and self.company_id.country_id.code or 'CR')
+    codigo_pais = str(phone and phone.country_code or 506)
 
     '''Creamos un código de seguridad random'''
     codigo_seguridad = str(random.randint(1, 99999999)).zfill(8)
