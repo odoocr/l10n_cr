@@ -696,7 +696,6 @@ class AccountInvoiceElectronic(models.Model):
                     i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
                     i.xml_respuesta_tributacion = response_json.get(
                         'respuesta-xml')
-
                     if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
                         email_template = self.env.ref(
                             'account.email_template_edi_invoice', False)
@@ -742,10 +741,18 @@ class AccountInvoiceElectronic(models.Model):
                     i.state_email = 'fe_error'
                     i.state_tributacion = estado_m_h
                     i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
-                    i.xml_respuesta_tributacion = response_json.get(
-                        'respuesta-xml')
-                elif estado_m_h == 'error':
-                    i.state_tributacion = estado_m_h
+                    i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+                else:
+                    if i.error_count > 10:
+                        i.state_tributacion = 'error'
+                    elif i.error_count < 4:
+                        i.error_count += 1
+                        i.state_tributacion = 'procesando'
+                    else:
+                        i.error_count += 1
+                        i.state_tributacion = ''
+                    #doc.state_tributacion = 'no_encontrado'
+                    _logger.error('MAB - Consulta Hacienda - Invoice not found: %s  -  Estado Hacienda: %s', i.number_electronic, estado_m_h)
 
     @api.multi
     def action_check_hacienda(self):
@@ -893,7 +900,6 @@ class AccountInvoiceElectronic(models.Model):
                         total_otros_cargos += inv_line.total_amount
 
                     else:
-
                         line_number += 1
                         price = inv_line.price_unit
                         quantity = inv_line.quantity
@@ -938,7 +944,6 @@ class AccountInvoiceElectronic(models.Model):
                             line["partidaArancelaria"] = inv_line.tariff_head
 
                         if inv_line.discount:
-                            # descuento = round(base_line - subtotal_line, 5)
                             total_descuento += descuento
                             line["montoDescuento"] = descuento
                             line[
@@ -1238,5 +1243,6 @@ class AccountInvoiceElectronic(models.Model):
                                                                 inv.journal_id.terminal)
 
                 inv.number_electronic = response_json.get('clave')
+                inv.number = inv.number_electronic
                 inv.sequence = response_json.get('consecutivo')
                 inv.state_send_invoice = False
