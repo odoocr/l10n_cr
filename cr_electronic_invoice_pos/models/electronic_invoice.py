@@ -131,8 +131,6 @@ class PosOrder(models.Model):
         for order in self:
             if not order.pos_order_id:
                 continue
-            _logger.error(
-                'MAB - action_pos_order_paid: %s', order.name)
             if order.tipo_documento == 'NC':
                 order.number_electronic = order.session_id.config_id.NC_sequence_id._next()
             elif order.tipo_documento == 'TE':
