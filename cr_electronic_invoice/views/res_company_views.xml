@@ -82,7 +82,6 @@
                             </group>
                             <group cols="2">
                                 <field name="frm_ws_ambiente" widget="radio"/>
-                                <field name="version_hacienda" widget="radio"/>
                             </group>
                             <group cols="2">
                                 <field name="FEC_sequence_id"/>
