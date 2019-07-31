@@ -167,8 +167,6 @@ class PosOrder(models.Model):
                 tipo_documento = 'TE'
                 referenced_order = order.pos_order_id and order.pos_order_id.id or order.id
 
-            _logger.error(
-                'MAB - refund: %s', order.name)
             clone = order.copy({
                 # ot used, name forced by create
                 'name': order.name + (tipo_documento == 'NC' and _(' REFUND') or ''),
