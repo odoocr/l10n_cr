@@ -54,8 +54,9 @@
         'views/resolution_views.xml',
         'views/sale_condition_views.xml',
         'views/account_tax_views.xml',
-        'views/menu_views.xml',
         'views/account_invoice_import_wizard_view.xml',
+        'views/economic_activity_views.xml',
+        'views/menu_views.xml',
         'security/ir.model.access.csv',
     ],
     'external_dependencies': {

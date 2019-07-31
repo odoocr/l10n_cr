@@ -21,7 +21,7 @@
         <record id="cr_electronic_invoice.AutEx_3" 
             model="aut.ex">
             <field name="code">03</field>
-            <field name="name">Orden de compra (Instituciones Públicas y otros organismos)</field>
+            <field name="name">Autorizado por Ley Especial</field>
             <field name="active" 
                 eval="True"/>
         </record>
@@ -37,7 +37,23 @@
         <record id="cr_electronic_invoice.AutEx_5" 
             model="aut.ex">
             <field name="code">05</field>
-            <field name="name">Zonas Francas</field>
+            <field name="name">Transitorio V</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_6" 
+            model="aut.ex">
+            <field name="code">06</field>
+            <field name="name">Transitorio IX</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_7" 
+            model="aut.ex">
+            <field name="code">07</field>
+            <field name="name">Transitorio XVII</field>
             <field name="active" 
                 eval="True"/>
         </record>

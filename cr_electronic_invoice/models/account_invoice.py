@@ -171,7 +171,8 @@ class AccountInvoiceElectronic(models.Model):
     date_issuance = fields.Char(
         string="Fecha de emisión", required=False, copy=False)
     consecutive_number_receiver = fields.Char(
-        string="Número Consecutivo Receptor", required=False, copy=False,
+        string="Número Consecutivo Receptor",
+        required=False, copy=False,
         readonly=True, index=True)
     state_send_invoice = fields.Selection([('aceptado', 'Aceptado'),
                                            ('rechazado', 'Rechazado'),
@@ -259,13 +260,25 @@ class AccountInvoiceElectronic(models.Model):
     ignore_total_difference = fields.Boolean(
         string="Ingorar Diferencia en Totales", required=False, default=False)
 
-    error_count = fields.Integer(
-        string="Cantidad de errores", required=False, default="0")
+    error_count = fields.Integer(string="Cantidad de errores", required=False, default="0")
+
+    economic_activity_id = fields.Many2one("economic_activity", string="Actividad Económica", required=False, )
+
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas', compute='_get_economic_activities')
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
     ]
+
+    @api.multi
+    @api.onchange('partner_id', 'company_id')
+    def _get_economic_activities(self):
+        if self.type in ('in_invoice', 'in_refund'):
+            if self.partner_id:
+                self.economic_activities_ids = self.partner_id.economic_activities_ids
+        else:
+            self.economic_activities_ids = self.company_id.economic_activities_ids
 
     @api.multi
     def action_invoice_sent(self):
@@ -635,6 +648,11 @@ class AccountInvoiceElectronic(models.Model):
                 self.tipo_documento = 'FE'
         else:
             self.tipo_documento = 'TE'
+
+        if self.type in ('in_invoice', 'in_refund'):
+            self.economic_activity_id = self.partner_id.activity_id
+        else:
+            self.economic_activity_id = self.company_id.activity_id
 
     @api.model
     # cron Job that verifies if the invoices are Validated at Tributación

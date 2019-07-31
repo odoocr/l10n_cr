@@ -11,6 +11,8 @@
                     <field name="invoice_amount_text"/>
                 </field>
                 <field name="partner_id" position="before">
+                    <field name="economic_activities_ids" invisible="1" readonly="1"  />
+                    <field name="economic_activity_id" required="1" domain="[('id', 'in', economic_activities_ids),]" options='{"no_open": True, "no_create": True}' />
                     <field name="number_electronic" readonly="1"/>
                     <field name="sequence" readonly="1"/>
                 </field>
@@ -97,6 +99,11 @@
                     <field name="amount_tax_electronic_invoice"/>
                     <field name="amount_total_electronic_invoice"/>
                 </xpath>
+                <xpath expr="(//field[@name='reference'])" position="after">
+                    <field name="economic_activities_ids" invisible="1" readonly="1"  />
+                    <field name="economic_activity_id" required="1" domain="[('id', 'in', economic_activities_ids),]" options='{"no_open": True, "no_create": True}' />
+                </xpath>
+                
             </field>
         </record>
 
