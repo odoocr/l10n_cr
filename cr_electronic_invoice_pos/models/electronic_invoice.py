@@ -574,7 +574,7 @@ class PosOrder(models.Model):
                 doc.date_issuance = date_cr
                 invoice_comments = ''
 
-                order.economic_activity_id = order.company_id.activity_id
+                doc.economic_activity_id = doc.company_id.activity_id
 
                 xml_string_builder = api_facturae.gen_xml_v43(
                     doc, sale_conditions, round(total_servicio_gravado, 5),
