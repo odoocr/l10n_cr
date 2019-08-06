@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import base64
 import datetime
@@ -7,7 +6,7 @@ import logging
 import re
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
-
+import pytz
 from lxml import etree
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -172,7 +171,8 @@ class AccountInvoiceElectronic(models.Model):
     date_issuance = fields.Char(
         string="Fecha de emisión", required=False, copy=False)
     consecutive_number_receiver = fields.Char(
-        string="Número Consecutivo Receptor", required=False, copy=False,
+        string="Número Consecutivo Receptor",
+        required=False, copy=False,
         readonly=True, index=True)
     state_send_invoice = fields.Selection([('aceptado', 'Aceptado'),
                                            ('rechazado', 'Rechazado'),
@@ -260,13 +260,25 @@ class AccountInvoiceElectronic(models.Model):
     ignore_total_difference = fields.Boolean(
         string="Ingorar Diferencia en Totales", required=False, default=False)
 
-    error_count = fields.Integer(
-        string="Cantidad de errores", required=False, default="0")
+    error_count = fields.Integer(string="Cantidad de errores", required=False, default="0")
+
+    economic_activity_id = fields.Many2one("economic_activity", string="Actividad Económica", required=False, )
+
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas', compute='_get_economic_activities')
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
     ]
+
+    @api.multi
+    @api.onchange('partner_id', 'company_id')
+    def _get_economic_activities(self):
+        if self.type in ('in_invoice', 'in_refund'):
+            if self.partner_id:
+                self.economic_activities_ids = self.partner_id.economic_activities_ids
+        else:
+            self.economic_activities_ids = self.company_id.economic_activities_ids
 
     @api.multi
     def action_invoice_sent(self):
@@ -628,12 +640,19 @@ class AccountInvoiceElectronic(models.Model):
         if self.type == 'out_refund':
             self.tipo_documento = 'NC'
         elif self.partner_id and self.partner_id.vat:
-            if self.partner_id.country_id.code == 'CR':
-                self.tipo_documento = 'FE'
+            if self.partner_id.country_id and self.partner_id.country_id.code != 'CR':
+                self.tipo_documento = 'TE'
+            elif self.partner_id.identification_id and self.partner_id.identification_id.code == '05':
+                self.tipo_documento = 'TE'
             else:
-                self.tipo_documento = 'FEE'
+                self.tipo_documento = 'FE'
         else:
             self.tipo_documento = 'TE'
+
+        if self.type in ('in_invoice', 'in_refund'):
+            self.economic_activity_id = self.partner_id.activity_id
+        else:
+            self.economic_activity_id = self.company_id.activity_id
 
     @api.model
     # cron Job that verifies if the invoices are Validated at Tributación
@@ -641,13 +660,15 @@ class AccountInvoiceElectronic(models.Model):
         out_invoices = self.env['account.invoice'].search(
             [('type', 'in', ('out_invoice', 'out_refund')),
              ('state', 'in', ('open', 'paid')),
-             ('state_tributacion', 'in', ('recibido', 'procesando', 'ne', 'error'))])
+             ('state_tributacion', 'in', ('recibido', 'procesando', 'ne', 'error'))],
+            limit=max_invoices)
 
         in_invoices = self.env['account.invoice'].search(
             [('type', '=', 'in_invoice'),
              ('tipo_documento', '=', 'FEC'),
              ('state', 'in', ('open', 'paid')),
-             ('state_send_invoice', 'in', ('procesando', 'ne', 'error'))])
+             ('state_send_invoice', 'in', ('procesando', 'ne', 'error'))],
+            limit=max_invoices)
 
         invoices = out_invoices | in_invoices
 
@@ -696,7 +717,6 @@ class AccountInvoiceElectronic(models.Model):
                     i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
                     i.xml_respuesta_tributacion = response_json.get(
                         'respuesta-xml')
-
                     if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
                         email_template = self.env.ref(
                             'account.email_template_edi_invoice', False)
@@ -742,10 +762,18 @@ class AccountInvoiceElectronic(models.Model):
                     i.state_email = 'fe_error'
                     i.state_tributacion = estado_m_h
                     i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
-                    i.xml_respuesta_tributacion = response_json.get(
-                        'respuesta-xml')
-                elif estado_m_h == 'error':
-                    i.state_tributacion = estado_m_h
+                    i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+                else:
+                    if i.error_count > 10:
+                        i.state_tributacion = 'error'
+                    elif i.error_count < 4:
+                        i.error_count += 1
+                        i.state_tributacion = 'procesando'
+                    else:
+                        i.error_count += 1
+                        i.state_tributacion = ''
+                    #doc.state_tributacion = 'no_encontrado'
+                    _logger.error('MAB - Consulta Hacienda - Invoice not found: %s  -  Estado Hacienda: %s', i.number_electronic, estado_m_h)
 
     @api.multi
     def action_check_hacienda(self):
@@ -804,8 +832,9 @@ class AccountInvoiceElectronic(models.Model):
         for inv in invoices:
             current_invoice += 1
 
-            if not inv.sequence.isdigit():  # or (len(inv.number) == 10):
+            if not inv.sequence or not inv.sequence.isdigit():  # or (len(inv.number) == 10):
                 inv.state_tributacion = 'na'
+                _logger.info('E-INV CR - Ignored invoice:%s', inv.number)
                 continue
 
             _logger.debug(
@@ -813,7 +842,14 @@ class AccountInvoiceElectronic(models.Model):
                 current_invoice, total_invoices, inv.number_electronic)
 
             if not inv.xml_comprobante:
-                date_cr = api_facturae.get_time_hacienda()
+                now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+                now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+                dia = inv.number_electronic[3:5]#'%02d' % now_cr.day,
+                mes = inv.number_electronic[5:7]#'%02d' % now_cr.month,
+                anno = inv.number_electronic[7:9]#str(now_cr.year)[2:4],
+                #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+                #date_cr = api_facturae.get_time_hacienda()
+                date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
 
                 numero_documento_referencia = False
                 fecha_emision_referencia = False
@@ -831,7 +867,6 @@ class AccountInvoiceElectronic(models.Model):
                         fecha_emision_referencia = inv.invoice_id.date_issuance
                         codigo_referencia = inv.reference_code_id.code
                         razon_referencia = inv.reference_code_id.name
-                       
 
                 # Si es Nota de Crédito
                 elif inv.tipo_documento == 'NC':
@@ -893,7 +928,6 @@ class AccountInvoiceElectronic(models.Model):
                         total_otros_cargos += inv_line.total_amount
 
                     else:
-
                         line_number += 1
                         price = inv_line.price_unit
                         quantity = inv_line.quantity
@@ -927,10 +961,10 @@ class AccountInvoiceElectronic(models.Model):
                             "montoTotal": base_line,
                             "subtotal": subtotal_line,
                             "BaseImponible": subtotal_line,
+                            "unidadMedida": inv_line.uom_id and inv_line.uom_id.code or 'Sp'
                         }
 
                         if inv_line.product_id:
-                            line["unidadMedida"] = inv_line.product_id.uom_id.code or 'Sp'
                             line["codigo"] = inv_line.product_id.default_code or ''
                             line["codigoProducto"] = inv_line.product_id.code or ''
 
@@ -938,7 +972,6 @@ class AccountInvoiceElectronic(models.Model):
                             line["partidaArancelaria"] = inv_line.tariff_head
 
                         if inv_line.discount:
-                            # descuento = round(base_line - subtotal_line, 5)
                             total_descuento += descuento
                             line["montoDescuento"] = descuento
                             line[
@@ -1016,8 +1049,8 @@ class AccountInvoiceElectronic(models.Model):
                             line["impuesto"] = taxes
                             line["impuestoNeto"] = _line_tax
 
-                        # Si no hay product_id se asume como mercaderia
-                        if inv_line.product_id and inv_line.product_id.uom_id.category_id.name == 'Services':  #inv_line.product_id.type == 'service'
+                        # Si no hay uom_id se asume como Servicio
+                        if not inv_line.uom_id or inv_line.uom_id.category_id.name == 'Services':  #inv_line.product_id.type == 'service'
                             if taxes:
                                 if _tax_exoneration:
                                     if _percentage_exoneration < 1:
@@ -1143,8 +1176,6 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.multi
     def action_invoice_open(self):
-        super(AccountInvoiceElectronic, self).action_invoice_open()
-
         # Revisamos si el ambiente para Hacienda está habilitado
         if self.company_id.frm_ws_ambiente != 'disabled':
 
@@ -1153,7 +1184,10 @@ class AccountInvoiceElectronic(models.Model):
 
                 # Digital Invoice or ticket
                 if inv.type == 'out_invoice':
-
+                    # tipo de identificación
+                    if inv.partner_id and inv.partner_id.vat and not inv.partner_id.identification_id:
+                        raise UserError(
+                            'Seleccione el tipo de identificación del cliente en su perfil')
                     # Verificar si es nota DEBITO
                     # if inv.invoice_id and inv.journal_id and (
                     #         inv.journal_id.code == 'NDV'):
@@ -1161,14 +1195,14 @@ class AccountInvoiceElectronic(models.Model):
                     #     sequence = inv.journal_id.ND_sequence_id.next_by_id()
                     #
                     # else:
-                    if inv.tipo_documento in ('FE', 'TE'):
-                        if inv.partner_id.vat:
-                            inv.tipo_documento = 'FE'
-                            sequence = inv.journal_id.FE_sequence_id.next_by_id()
-                        else:
-                            inv.tipo_documento = 'TE'
-                            sequence = inv.journal_id.TE_sequence_id.next_by_id()
 
+                    if inv.tipo_documento == 'FE' and (not inv.partner_id.vat or inv.partner_id.identification_id.code == '05'):
+                        inv.tipo_documento = 'TE'
+
+                    if inv.tipo_documento == 'FE':
+                        sequence = inv.journal_id.FE_sequence_id.next_by_id()
+                    elif inv.tipo_documento == 'TE':
+                        sequence = inv.journal_id.TE_sequence_id.next_by_id()
                     elif inv.tipo_documento == 'FEE':
                         sequence = inv.journal_id.FEE_sequence_id.next_by_id()
 
@@ -1239,4 +1273,8 @@ class AccountInvoiceElectronic(models.Model):
 
                 inv.number_electronic = response_json.get('clave')
                 inv.sequence = response_json.get('consecutivo')
+                inv.number = inv.sequence
                 inv.state_send_invoice = False
+        super(AccountInvoiceElectronic, self).action_invoice_open()
+
+

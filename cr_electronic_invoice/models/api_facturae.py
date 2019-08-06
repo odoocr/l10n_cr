@@ -4,6 +4,7 @@ import json
 from . import fe_enums
 import io
 import re
+import os
 import base64
 import hashlib
 import urllib
@@ -15,6 +16,7 @@ import logging
 import xmlsig
 import random
 
+from odoo import _
 from odoo.exceptions import UserError
 from xml.sax.saxutils import escape
 from ..xades.context2 import XAdESContext2, PolicyId2, create_xades_epes_signature
@@ -163,8 +165,9 @@ def get_clave_hacienda(self, tipo_documento, consecutivo, sucursal_id, terminal_
 
     cur_date = now_cr.strftime("%d%m%y")
 
-    phone = phonenumbers.parse(self.company_id.phone, self.company_id.country_id.code)
-    codigo_pais = str(phone.country_code)
+    phone = phonenumbers.parse(self.company_id.phone, 
+        self.company_id.country_id and self.company_id.country_id.code or 'CR')
+    codigo_pais = str(phone and phone.country_code or 506)
 
     '''Creamos un código de seguridad random'''
     codigo_seguridad = str(random.randint(1, 99999999)).zfill(8)
@@ -193,7 +196,7 @@ def get_token_hacienda(inv, tipo_ambiente):
     token_expire = last_tokens_expire.get(inv.company_id.id, 0)
     current_time = time.time()
 
-    if token and (current_time - token_time < token_expire-10):
+    if token and (current_time - token_time < token_expire - 10):
         token_hacienda = token
     else:
         headers = {}
@@ -256,6 +259,7 @@ def refresh_token_hacienda(tipo_ambiente, token):
         return token_hacienda
     except ImportError:
         raise Warning('Error Refrescando el Token desde MH')
+
 
 def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
                   detalle_mensaje, cedula_receptor,
@@ -352,8 +356,8 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     sb.Append('<NumeroConsecutivoReceptor>' + mr_consecutivo_receptor + '</NumeroConsecutivoReceptor>')
     sb.Append('</MensajeReceptor>')
 
-
     return str(sb)
+
 
 def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 total_servicio_exento, totalServExonerado,
@@ -389,7 +393,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('xsi:schemaLocation="' + fe_enums.schemaLocation[inv.tipo_documento] + '">')
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<CodigoActividad>' + issuing_company.activity_id.code + '</CodigoActividad>')
+    sb.Append('<CodigoActividad>' + inv.economic_activity_id.code + '</CodigoActividad>')
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
@@ -769,7 +773,6 @@ def consulta_clave(clave, token, tipo_ambiente):
         'Authorization': 'Bearer {}'.format(token),
         'Cache-Control': 'no-cache',
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Postman-Token': 'bf8dc171-5bb7-fa54-7416-56c5cda9bf5c'
     }
 
     _logger.debug('MAB - consulta_clave - url: %s' % endpoint)
@@ -795,6 +798,35 @@ def consulta_clave(clave, token, tipo_ambiente):
                       response.status_code)
         response_json = {'status': response.status_code,
                          'text': 'token_hacienda failed: %s' % response.reason}
+    return response_json
+
+
+def get_economic_activities(company):
+    endpoint = "https://api.hacienda.go.cr/fe/ae?identificacion=" + company.vat
+
+    headers = {
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/x-www-form-urlencoded',
+    }
+
+    try:
+        response = requests.get(endpoint, headers=headers)
+    except requests.exceptions.RequestException as e:
+        _logger.error('Exception %s' % e)
+        return {'status': -1, 'text': 'Excepcion %s' % e}
+
+    if 200 <= response.status_code <= 299:
+        response_json = {
+            'status': 200,
+            'activities': response.json().get('actividades')
+        }
+    elif 400 <= response.status_code <= 499:
+        response_json = {'status': 400, 'ind-estado': 'error'}
+    else:
+        _logger.error('MAB - get_economic_activities failed.  error: %s',
+                      response.status_code)
+        response_json = {'status': response.status_code,
+                         'text': 'get_economic_activities failed: %s' % response.reason}
     return response_json
 
 
@@ -951,18 +983,18 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
 
         partner = invoice.env['res.partner'].search([('vat', '=', emisor),
-                                                  ('supplier', '=', True),
-                                                  '|',
-                                                  ('company_id', '=', invoice.company_id.id),
-                                                  ('company_id', '=', False)],
-                                                 limit=1)
+                                                    ('supplier', '=', True),
+                                                    '|',
+                                                     ('company_id', '=', invoice.company_id.id),
+                                                     ('company_id', '=', False)],
+                                                    limit=1)
 
         if partner:
             invoice.partner_id = partner
         else:
             raise UserError(_('The provider in the invoice does not exists. Please review it.'))
 
-        invoice.account_id = partner.property_account_receivable_id
+        invoice.account_id = partner.property_account_payable_id
         invoice.payment_term_id = partner.property_supplier_payment_term_id
 
         if load_lines:
@@ -996,8 +1028,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 for tax_node in tax_nodes:
                     tax = invoice.env['account.tax'].search(
                         [('tax_code', '=', re.sub(r"[^0-9]+", "", tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text)),
-                        ('amount', '=', tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text),
-                        ('type_tax_use', '=', 'purchase')],
+                         ('amount', '=', tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text),
+                         ('type_tax_use', '=', 'purchase')],
                         limit=1)
                     if tax:
                         total_tax += float(tax_node.xpath("inv:Monto", namespaces=namespaces)[0].text)

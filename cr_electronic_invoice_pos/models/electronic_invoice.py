@@ -32,8 +32,8 @@ class PosConfig(models.Model):
     FE_sequence_id = fields.Many2one("ir.sequence",
                                      string="Secuencia de Facturas Electrónicas",
                                      required=False)
-    NC_sequence_id = fields.Many2one(oldname='return_sequence_id',
-                                     "ir.sequence",
+    NC_sequence_id = fields.Many2one("ir.sequence",
+                                     oldname='return_sequence_id',
                                      string="Secuencia de Notas de Crédito Electrónicas",
                                      required=False)
     TE_sequence_id = fields.Many2one("ir.sequence",
@@ -67,13 +67,13 @@ class PosOrder(models.Model):
     @api.model
     def create(self, vals):
         number_electronic = vals.get('number_electronic', False)
-        if number_electronic:
+        if vals.get('pos_order_id', False):
+            vals['number_electronic'] = '/'
+        elif number_electronic:
             self.sequence_number_sync(vals)
             if self.env['pos.order'].search([('number_electronic', 'like', number_electronic[21:41])]):
                 vals['number_electronic'] = self.env['ir.sequence'].next_by_code(
                     'pos.order.recovery')
-        elif vals.get('pos_order_id', False):
-            vals['number_electronic'] = '/'
         order = super(PosOrder, self).create(vals)
         return order
 
@@ -129,6 +129,8 @@ class PosOrder(models.Model):
     @api.multi
     def action_pos_order_paid(self):
         for order in self:
+            if not order.pos_order_id:
+                continue
             if order.tipo_documento == 'NC':
                 order.number_electronic = order.session_id.config_id.NC_sequence_id._next()
             elif order.tipo_documento == 'TE':
