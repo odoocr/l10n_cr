@@ -841,15 +841,35 @@ class AccountInvoiceElectronic(models.Model):
                 'generate_and_send_invoices - Invoice %s / %s  -  number:%s',
                 current_invoice, total_invoices, inv.number_electronic)
 
-            if not inv.xml_comprobante:
+            if not inv.xml_comprobante or (inv.tipo_documento == 'FEC' and inv.state_send_invoice == 'rechazado'):
+
+                if inv.tipo_documento == 'FEC' and inv.state_send_invoice == 'rechazado':
+                    inv.message_post(body='Se está enviando otra FEC porque la anterior fue rechazada por Hacienda. Clave anterior: ' + inv.number_electronic, 
+                                     subject='Envío de una segunda FEC',
+                                     message_type='notification',
+                                     subtype=None,
+                                     parent_id=False,
+                                     attachments=[[inv.fname_xml_respuesta_tributacion, inv.fname_xml_respuesta_tributacion],
+                                                  [inv.fname_xml_comprobante, inv.fname_xml_comprobante]],)
+
+                    sequence = inv.company_id.FEC_sequence_id.next_by_id()
+                    response_json = api_facturae.get_clave_hacienda(self,
+                                                                    inv.tipo_documento,
+                                                                    sequence,
+                                                                    inv.journal_id.sucursal,
+                                                                    inv.journal_id.terminal)
+
+                    inv.number_electronic = response_json.get('clave')
+                    inv.sequence = response_json.get('consecutivo')
+
                 now_utc = datetime.datetime.now(pytz.timezone('UTC'))
                 now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                dia = inv.number_electronic[3:5]#'%02d' % now_cr.day,
-                mes = inv.number_electronic[5:7]#'%02d' % now_cr.month,
-                anno = inv.number_electronic[7:9]#str(now_cr.year)[2:4],
-                #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                #date_cr = api_facturae.get_time_hacienda()
-                date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
+                dia = inv.number_electronic[3:5]  # '%02d' % now_cr.day,
+                mes = inv.number_electronic[5:7]  # '%02d' % now_cr.month,
+                anno = inv.number_electronic[7:9]  # str(now_cr.year)[2:4],
+                # date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+                # date_cr = api_facturae.get_time_hacienda()
+                date_cr = now_cr.strftime("20" + anno + "-" + mes + "-" + dia + "T%H:%M:%S-06:00")
 
                 numero_documento_referencia = False
                 fecha_emision_referencia = False

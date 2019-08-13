@@ -34,6 +34,7 @@ class PartnerElectronic(models.Model):
     date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
     activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
     economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
+    export = fields.Boolean(string="It's export", default=False )
 
 
     @api.onchange('phone')
