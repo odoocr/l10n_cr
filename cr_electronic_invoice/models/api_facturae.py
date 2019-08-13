@@ -407,7 +407,10 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<Provincia>' + issuing_company.state_id.code + '</Provincia>')
     sb.Append('<Canton>' + issuing_company.county_id.code + '</Canton>')
     sb.Append('<Distrito>' + issuing_company.district_id.code + '</Distrito>')
-    sb.Append('<Barrio>' + str(issuing_company.neighborhood_id.code or '00') + '</Barrio>')
+
+    if issuing_company.neighborhood_id and issuing_company.neighborhood_id.code:
+        sb.Append('<Barrio>' + str(issuing_company.neighborhood_id.code or '00') + '</Barrio>')
+
     sb.Append('<OtrasSenas>' + escape(str(issuing_company.street or 'NA')) + '</OtrasSenas>')
     sb.Append('</Ubicacion>')
 
@@ -454,7 +457,10 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                     sb.Append('<Provincia>' + str(receiver_company.state_id.code or '') + '</Provincia>')
                     sb.Append('<Canton>' + str(receiver_company.county_id.code or '') + '</Canton>')
                     sb.Append('<Distrito>' + str(receiver_company.district_id.code or '') + '</Distrito>')
-                    sb.Append('<Barrio>' + str(receiver_company.neighborhood_id.code or '00') + '</Barrio>')
+
+                    if receiver_company.neighborhood_id and receiver_company.neighborhood_id.code:
+                        sb.Append('<Barrio>' + str(receiver_company.neighborhood_id.code or '00') + '</Barrio>')
+
                     sb.Append('<OtrasSenas>' + escape(str(receiver_company.street or 'NA')) + '</OtrasSenas>')
                     sb.Append('</Ubicacion>')
 
