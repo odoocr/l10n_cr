@@ -844,7 +844,7 @@ class AccountInvoiceElectronic(models.Model):
             if not inv.xml_comprobante or (inv.tipo_documento == 'FEC' and inv.state_send_invoice == 'rechazado'):
 
                 if inv.tipo_documento == 'FEC' and inv.state_send_invoice == 'rechazado':
-                    inv.message_post(body='Se está enviando otra FEC porque la anterior fue rechazada por Hacienda. Clave anterior: ' + inv.number_electronic, 
+                    inv.message_post(body='Se está enviando otra FEC porque la anterior fue rechazada por Hacienda. Adjuntos los XMLs. Clave anterior: ' + inv.number_electronic,
                                      subject='Envío de una segunda FEC',
                                      message_type='notification',
                                      subtype=None,
