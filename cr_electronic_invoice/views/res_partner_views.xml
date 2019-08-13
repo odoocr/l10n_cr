@@ -61,6 +61,7 @@
 
                     <field name="category_id" position="after">
                         <field name="has_exoneration"/>
+                        <field name="export" />
                         <field name="activity_id" 
                             domain="[('id', 'in', economic_activities_ids)]" 
                             options='{"no_open": True, "no_create": True}' 

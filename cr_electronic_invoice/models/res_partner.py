@@ -8,6 +8,7 @@ from . import api_facturae
 
 _logger = logging.getLogger(__name__)
 
+
 class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
@@ -18,14 +19,15 @@ class PartnerElectronic(models.Model):
     neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios", required=False, )
     identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion", required=False, )
     payment_methods_id = fields.Many2one(comodel_name="payment.methods", string="Métodos de Pago", required=False, )
-    has_exoneration = fields.Boolean(string="Posee exoneración", required=False )
+    has_exoneration = fields.Boolean(string="Posee exoneración", default=False )
     type_exoneration = fields.Many2one(comodel_name="aut.ex", string="Tipo Autorizacion", required=False, )
     exoneration_number = fields.Char(string="Número de exoneración", required=False, )
     institution_name = fields.Char(string="Institucion Emisora", required=False, )
     date_issue = fields.Date(string="Fecha de Emisión", required=False, )
     date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
     activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
-    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas', )
+    export = fields.Boolean(string="It's export", default=False )
 
     @api.onchange('phone')
     def _onchange_phone(self):

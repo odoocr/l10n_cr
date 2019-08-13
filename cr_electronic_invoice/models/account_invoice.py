@@ -823,7 +823,17 @@ class AccountInvoiceElectronic(models.Model):
                 inv.state_tributacion = 'na'
                 continue
 
-            if not inv.xml_comprobante:
+            if not inv.xml_comprobante or inv.state_send_invoice == 'rechazado':
+
+                if inv.state_send_invoice == 'rechazado':
+                    inv.message_post(body='Se está enviando otra FEC porque la anterior fue rechazada por Hacienda', 
+                                     subject='Envío de una segunda FEC',
+                                     message_type='notification',
+                                     subtype=None,
+                                     parent_id=False,
+                                     attachments=[[inv.fname_xml_comprobante, inv.fname_xml_comprobante],
+                                                  [inv.fname_xml_respuesta_tributacion, inv.fname_xml_respuesta_tributacion]],)
+
                 date_cr = api_facturae.get_time_hacienda()
 
                 numero_documento_referencia = False
