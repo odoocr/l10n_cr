@@ -68,6 +68,11 @@
             <field name="sequence">0</field>
         </record>
 
+        <record id="tax_group_Exento" model="account.tax.group">
+            <field name="name">Exento</field>
+            <field name="sequence">0</field>
+        </record>
+
         <!-- account tax -->
         <record id="iva_tax_0" 
             model="account.tax">
@@ -78,7 +83,6 @@
             <field name="tax_group_id" ref="tax_group_IVA0"/>
             <field name="description">IVA 0% </field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa 0%</field>
             <field name="iva_tax_code">01</field>
         </record>
@@ -92,7 +96,6 @@
             <field name="tax_group_id" ref="tax_group_IVA0"/>
             <field name="description">IVA 0%</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa 0%</field>
             <field name="iva_tax_code">01</field>
         </record>
@@ -106,7 +109,6 @@
             <field name="tax_group_id" ref="tax_group_IVA13"/>
             <field name="description">IVA General 13%</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa General 13%</field>
             <field name="iva_tax_code">08</field>
         </record>
@@ -120,7 +122,6 @@
             <field name="tax_group_id" ref="tax_group_IVA13"/>
             <field name="description">IVA General 13%</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa General 13%</field>
             <field name="iva_tax_code">08</field>
         </record>
@@ -134,7 +135,6 @@
             <field name="tax_group_id" ref="tax_group_IVA1"/>
             <field name="description">IVA 1% (Tarifa Reducida)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa reducida 1%</field>
             <field name="iva_tax_code">02</field>
         </record>
@@ -148,7 +148,6 @@
             <field name="tax_group_id" ref="tax_group_IVA1"/>
             <field name="description">IVA 1% (Tarifa Reducida)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa reducida 1%</field>
             <field name="iva_tax_code">02</field>
         </record>
@@ -162,7 +161,6 @@
             <field name="tax_group_id" ref="tax_group_IVA2"/>
             <field name="description">IVA 2% (Tarifa Reducida)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa reducida 2%</field>
             <field name="iva_tax_code">03</field>
         </record>
@@ -176,7 +174,6 @@
             <field name="tax_group_id" ref="tax_group_IVA2"/>
             <field name="description">IVA 2% (Tarifa Reducida)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa reducida 2%</field>
             <field name="iva_tax_code">03</field>
         </record>
@@ -190,7 +187,6 @@
             <field name="tax_group_id" ref="tax_group_IVA4"/>
             <field name="description">IVA 4% (Tarifa Reducida)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa reducida 4%</field>
             <field name="iva_tax_code">04</field>
         </record>
@@ -204,7 +200,6 @@
             <field name="tax_group_id" ref="tax_group_IVA4"/>
             <field name="description">IVA 4% (Tarifa Reducida)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Tarifa reducida 4%</field>
             <field name="iva_tax_code">04</field>
         </record>
@@ -218,7 +213,6 @@
             <field name="tax_group_id" ref="tax_group_IVA0"/>
             <field name="description">IVA 0% (Transitorio)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Transitorio 0%</field>
             <field name="iva_tax_code">05</field>
         </record>
@@ -232,7 +226,6 @@
             <field name="tax_group_id" ref="tax_group_IVA0"/>
             <field name="description">IVA 0% (Transitorio)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Transitorio 0%</field>
             <field name="iva_tax_code">05</field>
         </record>
@@ -246,7 +239,6 @@
             <field name="tax_group_id" ref="tax_group_IVA4"/>
             <field name="description">IVA 4% (Transitorio)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Transitorio 4%</field>
             <field name="iva_tax_code">06</field>
         </record>
@@ -260,7 +252,6 @@
             <field name="tax_group_id" ref="tax_group_IVA4"/>
             <field name="description">IVA 4% (Transitorio)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Transitorio 4%</field>
             <field name="iva_tax_code">06</field>
         </record>
@@ -274,7 +265,6 @@
             <field name="tax_group_id" ref="tax_group_IVA8"/>
             <field name="description">IVA 8% (Transitorio)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Transitorio 8%</field>
             <field name="iva_tax_code">07</field>
         </record>
@@ -288,7 +278,6 @@
             <field name="tax_group_id" ref="tax_group_IVA8"/>
             <field name="description">IVA 8% (Transitorio)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">Transitorio 8%</field>
             <field name="iva_tax_code">07</field>
         </record>
@@ -302,7 +291,6 @@
             <field name="tax_group_id" ref="tax_group_SC"/>
             <field name="description">Impuesto Selectivo de Consumo</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -316,7 +304,6 @@
             <field name="tax_group_id" ref="tax_group_SC"/>
             <field name="description">Impuesto Selectivo de Consumo</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -330,7 +317,6 @@
             <field name="tax_group_id" ref="tax_group_IUC"/>
             <field name="description">Impuesto Único a los Combustibles</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -344,7 +330,6 @@
             <field name="tax_group_id" ref="tax_group_IUC"/>
             <field name="description">Impuesto Único a los Combustibles</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -358,7 +343,6 @@
             <field name="tax_group_id" ref="tax_group_IEBA"/>
             <field name="description">Impuesto específico de Bebidas Alcohólicas</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -372,7 +356,6 @@
             <field name="tax_group_id" ref="tax_group_IEBA"/>
             <field name="description">Impuesto específico de Bebidas Alcohólicas</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -388,7 +371,6 @@
             <field name="description">Impuesto Específico sobre las bebidas envasadas sin
     contenido alcohólico y jabones de tocador</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -404,7 +386,6 @@
             <field name="description">Impuesto Específico sobre las bebidas envasadas sin
     contenido alcohólico y jabones de tocador</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -418,7 +399,6 @@
             <field name="tax_group_id" ref="tax_group_IPT"/>
             <field name="description">Impuesto a los Productos de Tabaco</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -432,7 +412,6 @@
             <field name="tax_group_id" ref="tax_group_IPT"/>
             <field name="description">Impuesto a los Productos de Tabaco</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -446,7 +425,6 @@
             <field name="tax_group_id" ref="tax_group_IVA13"/>
             <field name="description">IVA (cálculo especial)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -460,7 +438,6 @@
             <field name="tax_group_id" ref="tax_group_IVA13"/>
             <field name="description">IVA (cálculo especial)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -474,7 +451,6 @@
             <field name="tax_group_id" ref="tax_group_IRBU"/>
             <field name="description">IVA Régimen de Bienes Usados (Factor)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -488,7 +464,6 @@
             <field name="tax_group_id" ref="tax_group_IRBU"/>
             <field name="description">IVA Régimen de Bienes Usados (Factor)</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -501,7 +476,6 @@
             <field name="type_tax_use">sale</field>
             <field name="description">Impuesto Específico al Cemento</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -514,7 +488,6 @@
             <field name="type_tax_use">purchase</field>
             <field name="description">Impuesto Específico al Cemento</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -527,7 +500,6 @@
             <field name="type_tax_use">sale</field>
             <field name="description">Otros</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -540,7 +512,6 @@
             <field name="type_tax_use">purchase</field>
             <field name="description">Otros</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -552,7 +523,7 @@
             <field name="amount">10</field>
             <field name="type_tax_use">sale</field>
             <field name="tax_group_id" ref="tax_group_Servicio"/>
-            <field name="description">Impuesto de servicio utilizado por los restraurantes</field>
+            <field name="description">Impuesto de servicio utilizado por los restaurantes</field>
             <field name="sequence">10</field>
             <field name="iva_tax_desc">Impuesto Servicio 10%</field>
             <field name="iva_tax_code">06</field>
@@ -564,9 +535,9 @@
             <field name="name">Exento</field>
             <field name="amount">0</field>
             <field name="type_tax_use">sale</field>
+            <field name="tax_group_id" ref="tax_group_Exento"/>
             <field name="description">Exento</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -577,9 +548,9 @@
             <field name="name">Exento</field>
             <field name="amount">0</field>
             <field name="type_tax_use">purchase</field>
+            <field name="tax_group_id" ref="tax_group_Exento"/>
             <field name="description">Exento</field>
             <field name="sequence">10</field>
-            <field name="price_include">False</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>

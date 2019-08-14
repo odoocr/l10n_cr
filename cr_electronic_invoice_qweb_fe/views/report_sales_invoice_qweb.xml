@@ -63,9 +63,9 @@
                         <td class="text-center">HORA</td>
                     </tr>
                     <tr>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[8:10]) or o.date_invoice and (o.date_invoice.strftime('%Y/%m/%d')[8:10]) or ''"/></td>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[5:7]) or o.date_invoice and (o.date_invoice.strftime('%Y/%m/%d')[5:7]) or ''"/></td>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[0:4]) or o.date_invoice and (o.date_invoice.strftime('%Y/%m/%d')[0:4]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[8:10]) or o.date_invoice and (o.date_invoice[8:10]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[5:7]) or o.date_invoice and (o.date_invoice[5:7]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[0:4]) or o.date_invoice and (o.date_invoice[0:4]) or ''"/></td>
                         <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[11:16]) or ''"/></td>
                     </tr>
                     </table>
