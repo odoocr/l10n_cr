@@ -281,6 +281,12 @@ class AccountInvoiceElectronic(models.Model):
             self.economic_activities_ids = self.company_id.economic_activities_ids
 
     @api.multi
+    @api.onchange('partner_id')
+    def _partner_changed(self):
+        if self.partner_id.export:
+            self.tipo_documento = 'FEE'
+
+    @api.multi
     def action_invoice_sent(self):
         self.ensure_one()
 
