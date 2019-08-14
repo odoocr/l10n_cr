@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
+
 import phonenumbers
 from odoo import models, fields, api
+
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -26,9 +28,12 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
-    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
+    activity_id = fields.Many2one("economic_activity",
+                                  string="Actividad Económica por defecto",
+                                  required=False, )
 
-    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
+    economic_activities_ids = fields.Many2many('economic_activity',
+                                               string=u'Actividades Económicas', )
 
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(
@@ -37,7 +42,8 @@ class CompanyElectronic(models.Model):
                                   required=False)
     county_id = fields.Many2one("res.country.county", string="Cantón",
                                 required=False)
-    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Barrios",
+    neighborhood_id = fields.Many2one("res.country.neighborhood",
+                                      string="Barrios",
                                       required=False)
     frm_ws_identificador = fields.Char(
         string="Usuario de Factura Electrónica", required=False)
@@ -55,30 +61,32 @@ class CompanyElectronic(models.Model):
     frm_pin = fields.Char(string="Pin", required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
 
-    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False,
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs",
+                                 required=False,
                                  default="1")
-    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False,
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs",
+                                 required=False,
                                  default="1")
 
     CCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Aceptación',
         help='Secuencia de confirmacion de aceptación de comprobante electrónico. Dejar en blanco '
-        'y el sistema automaticamente se lo creará.',
+             'y el sistema automaticamente se lo creará.',
         readonly=False, copy=False,
     )
     CPCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Parcial',
         help='Secuencia de confirmación de aceptación parcial de comprobante electrónico. Dejar '
-        'en blanco y el sistema automáticamente se lo creará.',
+             'en blanco y el sistema automáticamente se lo creará.',
         readonly=False, copy=False,
     )
     RCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Rechazo',
         help='Secuencia de confirmación de rechazo de comprobante electrónico. Dejar '
-        'en blanco y el sistema automáticamente se lo creará.',
+             'en blanco y el sistema automáticamente se lo creará.',
         readonly=False, copy=False,
     )
     FEC_sequence_id = fields.Many2one(
@@ -142,14 +150,16 @@ class CompanyElectronic(models.Model):
         for field, seq_code, seq_name in _TIPOS_CONFIRMACION:
             if not getattr(self, field, None):
                 seq_code += company_subname
-                seq = self.env.ref(seq_code, raise_if_not_found=False) or ir_sequence.create({
-                    'name': seq_name,
-                    'code': seq_code,
-                    'implementation': 'standard',
-                    'padding': 10,
-                    'use_date_range': False,
-                    'company_id': getattr(self, 'id'),
-                })
+                seq = self.env.ref(seq_code,
+                                   raise_if_not_found=False) or ir_sequence.create(
+                    {
+                        'name': seq_name,
+                        'code': seq_code,
+                        'implementation': 'standard',
+                        'padding': 10,
+                        'use_date_range': False,
+                        'company_id': getattr(self, 'id'),
+                    })
                 to_write[field] = seq.id
 
         if to_write:
@@ -165,7 +175,8 @@ class CompanyElectronic(models.Model):
             for activity in activities:
                 if activity["estado"] == "A":
                     activities_codes.append(activity["codigo"])
-            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
+            economic_activities = self.env['economic_activity'].search(
+                [('code', 'in', activities_codes)])
 
             self.economic_activities_ids = economic_activities
             print(economic_activities)

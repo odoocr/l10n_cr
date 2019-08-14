@@ -2,17 +2,18 @@
 # © 2017 Creu Blanca
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from base64 import b64decode, b64encode
 import hashlib
+from base64 import b64decode, b64encode
 
-from .ns import EtsiNS
-from .constants import NS_MAP, MAP_HASHLIB
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_der_x509_certificate
-from .utils import rdns_to_map, dict_compare
 from xmlsig.constants import TransformUsageDigestMethod
 from xmlsig.ns import DSigNs
 from xmlsig.utils import create_node, USING_PYTHON2, get_rdns_name
+
+from .constants import NS_MAP, MAP_HASHLIB
+from .ns import EtsiNS
+from .utils import rdns_to_map, dict_compare
 
 if USING_PYTHON2:
     import urllib
@@ -131,7 +132,7 @@ class PolicyId(Policy):
             remote = self.id
         else:
             policy_id = node.find('etsi:SignaturePolicyId', namespaces=NS_MAP)
-            identifier = policy_id.find('etsi:SigPolicyId',  namespaces=NS_MAP)
+            identifier = policy_id.find('etsi:SigPolicyId', namespaces=NS_MAP)
             remote = identifier.find('etsi:Identifier', namespaces=NS_MAP).text
         value = urllib.urlopen(remote).read()
         value = self.set_transforms(policy_id, value, sign)
