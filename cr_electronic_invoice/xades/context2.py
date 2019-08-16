@@ -2,30 +2,32 @@
 # 2019 por Ricardo Vong <rvong@indelsacr.com>
 # Based on Tobella's original Xades implementation
 
-import re
-from .tobella_xades.constants import NS_MAP, EtsiNS, MAP_HASHLIB
-from .tobella_xades import XAdESContext, PolicyId, template, constants
-import hashlib
-import xmlsig
-from base64 import b64decode, b64encode
-from urllib import parse, request
-import logging
 import datetime
-import pytz
+import hashlib
+import logging
 import random
+import re
+from base64 import b64encode
+from urllib import parse, request
+
+import pytz
+import xmlsig
+
 from . import get_reversed_rdns_name
+from .tobella_xades import XAdESContext, PolicyId, template, constants
+from .tobella_xades.constants import NS_MAP, EtsiNS, MAP_HASHLIB
 
 __all__ = ['XAdESContext2', 'PolicyId2',
            'PolicyId2Exception', 'create_xades_epes_signature']
 
 logger = logging.getLogger(__name__)
 
-
 URL_ESCAPE_PATTERN = re.compile('[\r\n]')
 URL_HACIENDA_PATTERN = re.compile('.+\.hacienda\.go\.cr$')
 
 
-def create_xades_epes_signature(sign_date=datetime.datetime.now(pytz.timezone('UTC'))):
+def create_xades_epes_signature(
+        sign_date=datetime.datetime.now(pytz.timezone('UTC'))):
     min = 1
     max = 9999
 
@@ -47,12 +49,16 @@ def create_xades_epes_signature(sign_date=datetime.datetime.now(pytz.timezone('U
     xmlsig.template.add_transform(ref, xmlsig.constants.TransformEnveloped)
     xmlsig.template.add_transform(ref, xmlsig.constants.TransformInclC14N)
     # Reference to KeyInfo Digest
-    ref = xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256, 'ReferenceKeyInfo',
+    ref = xmlsig.template.add_reference(signature,
+                                        xmlsig.constants.TransformSha256,
+                                        'ReferenceKeyInfo',
                                         uri='#' + key_info_id)
     xmlsig.template.add_transform(ref, xmlsig.constants.TransformInclC14N)
     # Reference to the SignedProperties Digest
-    ref = xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256,
-                                        uri='#' + signed_properties_id, uri_type='http://uri.etsi.org/01903#SignedProperties')
+    ref = xmlsig.template.add_reference(signature,
+                                        xmlsig.constants.TransformSha256,
+                                        uri='#' + signed_properties_id,
+                                        uri_type='http://uri.etsi.org/01903#SignedProperties')
     xmlsig.template.add_transform(ref, xmlsig.constants.TransformInclC14N)
 
     ki = xmlsig.template.ensure_key_info(signature, name=key_info_id)
@@ -169,7 +175,8 @@ class PolicyId2(PolicyId):
             identifier = policy_id.find('etsi:SigPolicyId', namespaces=NS_MAP)
             remote = identifier.find('etsi:Identifier', namespaces=NS_MAP).text
             hash_method = policy_id.find(
-                'etsi:SigPolicyHash/ds:DigestMethod', namespaces=NS_MAP).get('Algorithm')
+                'etsi:SigPolicyHash/ds:DigestMethod', namespaces=NS_MAP).get(
+                'Algorithm')
             doc_digest_data = policy_id.find(
                 'etsi:SigPolicyHash/ds:DigestValue', namespaces=NS_MAP).text
             logger.debug('Doc hash[{}] Digest[{}]'.format(
@@ -212,7 +219,9 @@ class PolicyId2(PolicyId):
             key_x509.fingerprint(MAP_HASHLIB[self.hash_method]()))
         issuer_serial = xmlsig.utils.create_node('IssuerSerial', cert, EtsiNS)
         xmlsig.utils.create_node('X509IssuerName', issuer_serial,
-                                 xmlsig.constants.DSigNs).text = get_reversed_rdns_name(key_x509.issuer.rdns)
+                                 xmlsig.constants.DSigNs).text = get_reversed_rdns_name(
+            key_x509.issuer.rdns)
         xmlsig.utils.create_node('X509SerialNumber', issuer_serial,
-                                 xmlsig.constants.DSigNs).text = str(key_x509.serial_number)
+                                 xmlsig.constants.DSigNs).text = str(
+            key_x509.serial_number)
         return
