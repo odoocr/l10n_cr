@@ -121,6 +121,8 @@ class PosOrder(models.Model):
 
     sequence = fields.Char(string='Consecutivo', readonly=True, )
 
+    economic_activity_id = fields.Many2one("economic_activity", string="Actividad Económica", required=False, )
+
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)',
          "La clave de comprobante debe ser única"),
@@ -175,12 +177,23 @@ class PosOrder(models.Model):
                 'pos_order_id': referenced_order,
                 'reference_code_id': reference_code_id.id,
                 'tipo_documento': tipo_documento,
+                'pos_reference': order.pos_reference,
+                'lines': False,
+                'amount_tax': -order.amount_tax,
+                'amount_total': -order.amount_total,
+                'amount_paid': 0,
             })
+            for line in order.lines:
+                clone_line = line.copy({
+                    # required=True, copy=False
+                    'name': line.name + _(' REFUND'),
+                    'order_id': clone.id,
+                    'qty': -line.qty,
+                    'price_subtotal': -line.price_subtotal,
+                    'price_subtotal_incl': -line.price_subtotal_incl,
+                })
             PosOrder += clone
 
-        for clone in PosOrder:
-            for order_line in clone.lines:
-                order_line.write({'qty': -order_line.qty})
         return {
             'name': _('Return Products'),
             'view_type': 'form',
@@ -560,6 +573,8 @@ class PosOrder(models.Model):
 
                 doc.date_issuance = date_cr
                 invoice_comments = ''
+
+                doc.economic_activity_id = doc.company_id.activity_id
 
                 xml_string_builder = api_facturae.gen_xml_v43(
                     doc, sale_conditions, round(total_servicio_gravado, 5),
