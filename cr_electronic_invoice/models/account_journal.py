@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from odoo import models, fields, api, _
 import logging
 
-from odoo import models, fields
-
 _logger = logging.getLogger(__name__)
-
 
 class AccountJournalInherit(models.Model):
     _name = 'account.journal'
@@ -29,3 +27,4 @@ class AccountJournalInherit(models.Model):
     ND_sequence_id = fields.Many2one("ir.sequence",
                                      string="Secuencia de Notas de Débito Electrónicas",
                                      required=False)
+

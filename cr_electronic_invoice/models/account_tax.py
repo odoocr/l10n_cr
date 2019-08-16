@@ -1,8 +1,6 @@
-import logging
-
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
+import logging
 _logger = logging.getLogger(__name__)
 
 
@@ -14,10 +12,8 @@ class IvaCodeType(models.Model):
         string="Tarifa IVA", default='N/A', required=False, )
     iva_tax_code = fields.Char(
         string="Código Tarifa IVA", default='N/A', required=False, )
-    has_exoneration = fields.Boolean(string="Impuesto Exonerado",
-                                     required=False)
-    percentage_exoneration = fields.Integer(string="Porcentaje de Exoneracion",
-                                            required=False)
+    has_exoneration = fields.Boolean(string="Impuesto Exonerado", required=False)
+    percentage_exoneration = fields.Integer(string="Porcentaje de Exoneracion", required=False)
     tax_root = fields.Many2one(
         "account.tax", string="Impuesto Padre", required=False, )
 
@@ -38,3 +34,6 @@ class IvaCodeType(models.Model):
         else:
             raise UserError(
                 'El porcentaje no puede ser mayor a 100')
+
+
+

@@ -14,5 +14,4 @@ def dict_compare(d1, d2):
 
 
 def rdns_to_map(data):
-    return {x.split('=')[0].strip(): x.split('=')[1].strip() for x in
-            data.split(',') if x}
+    return {x.split('=')[0].strip(): x.split('=')[1].strip() for x in data.split(',') if x}

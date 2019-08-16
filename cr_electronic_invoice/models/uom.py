@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields
+from odoo import models, fields, api, _
 
 
 class UoM(models.Model):
@@ -10,5 +10,4 @@ class UoM(models.Model):
 class UoMCategory(models.Model):
     _inherit = "uom.category"
     measure_type = fields.Selection(
-        selection_add=[('area', 'Area'), ('services', 'Services'),
-                       ('rent', 'Rent'), ])
+        selection_add=[('area', 'Area'), ('services', 'Services'), ('rent', 'Rent'), ])

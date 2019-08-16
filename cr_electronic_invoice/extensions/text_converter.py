@@ -72,8 +72,7 @@ HUNDREDS = (
 )
 
 
-def number_to_text_es(number_in, join_dec=' Y ', separator=',',
-                      decimal_point='.'):
+def number_to_text_es(number_in, join_dec=' Y ', separator=',', decimal_point='.'):
     converted = ''
 
     # Check type and convert to str
@@ -127,7 +126,7 @@ def number_to_text_es(number_in, join_dec=' Y ', separator=',',
 
     # TODO: Check currency inclusion
     has_decimal = float(number_dec) != 0 and join_dec + \
-                  number_dec + "/100" or ' EXACTOS'
+        number_dec + "/100" or ' EXACTOS'
     converted += has_decimal
 
     return converted
@@ -139,15 +138,15 @@ def _convert_number(n):
     if n == '100':
         output = "CIEN "
     elif n[0] != '0':
-        output = HUNDREDS[int(n[0]) - 1]
+        output = HUNDREDS[int(n[0])-1]
 
     k = int(n[1:])
     if k <= 20:
         output += UNITS[k]
     else:
         if (k > 30) & (n[2] != '0'):
-            output += '%sY %s' % (TENS[int(n[1]) - 2], UNITS[int(n[2])])
+            output += '%sY %s' % (TENS[int(n[1])-2], UNITS[int(n[2])])
         else:
-            output += '%s%s' % (TENS[int(n[1]) - 2], UNITS[int(n[2])])
+            output += '%s%s' % (TENS[int(n[1])-2], UNITS[int(n[2])])
 
     return output

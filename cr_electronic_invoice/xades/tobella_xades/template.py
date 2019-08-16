@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from lxml import etree
+
 from xmlsig.constants import DSigNs
 from xmlsig.utils import create_node
-
 from .constants import NS_MAP, EtsiNS
 
 

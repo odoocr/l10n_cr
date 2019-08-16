@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-import logging
 import re
-
-import phonenumbers
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
+import phonenumbers
+import logging
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -23,34 +21,26 @@ class PartnerElectronic(models.Model):
         "res.country.county", string="Cantón", required=False, )
     neighborhood_id = fields.Many2one(
         "res.country.neighborhood", string="Barrios", required=False, )
-    identification_id = fields.Many2one("identification.type",
-                                        string="Tipo de identificacion",
+    identification_id = fields.Many2one("identification.type", string="Tipo de identificacion",
                                         required=False, )
     payment_methods_id = fields.Many2one(
         "payment.methods", string="Métodos de Pago", required=False, )
 
-    has_exoneration = fields.Boolean(string="Posee exoneración",
-                                     required=False)
-    type_exoneration = fields.Many2one("aut.ex", string="Tipo Autorizacion",
-                                       required=False, )
-    exoneration_number = fields.Char(string="Número de exoneración",
-                                     required=False, )
-    institution_name = fields.Char(string="Institucion Emisora",
-                                   required=False, )
+    has_exoneration = fields.Boolean(string="Posee exoneración", required=False)
+    type_exoneration = fields.Many2one("aut.ex", string="Tipo Autorizacion", required=False, )
+    exoneration_number = fields.Char(string="Número de exoneración", required=False, )
+    institution_name = fields.Char(string="Institucion Emisora", required=False, )
     date_issue = fields.Date(string="Fecha de Emisión", required=False, )
-    date_expiration = fields.Date(string="Fecha de Vencimiento",
-                                  required=False, )
-    activity_id = fields.Many2one("economic_activity",
-                                  string="Actividad Económica por defecto",
-                                  required=False, )
-    economic_activities_ids = fields.Many2many('economic_activity',
-                                               string=u'Actividades Económicas', )
+    date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
+    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
+    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
+
 
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:
             phone = phonenumbers.parse(self.phone,
-                                       self.country_id and self.country_id.code or 'CR')
+            self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(phone)
             if not valid:
                 alert = {
@@ -62,8 +52,8 @@ class PartnerElectronic(models.Model):
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:
-            mobile = phonenumbers.parse(self.mobile,
-                                        self.country_id and self.country_id.code or 'CR')
+            mobile = phonenumbers.parse(self.mobile, 
+                self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(mobile)
             if not valid:
                 alert = {
@@ -75,14 +65,11 @@ class PartnerElectronic(models.Model):
     @api.onchange('email')
     def _onchange_email(self):
         if self.email:
-            if not re.match(
-                    r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$',
-                    self.email.lower()):
+            if not re.match(r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', self.email.lower()):
                 vals = {'email': False}
                 alerta = {
                     'title': 'Atención',
-                    'message': 'El correo electrónico no cumple con una estructura válida. ' + str(
-                        self.email)
+                    'message': 'El correo electrónico no cumple con una estructura válida. ' + str(self.email)
                 }
                 return {'value': vals, 'warning': alerta}
 
@@ -105,8 +92,7 @@ class PartnerElectronic(models.Model):
                         raise UserError(
                             'La identificación tipo Cédula jurídica debe contener 10 dígitos, sin cero al inicio y sin guiones.')
                 elif self.identification_id.code == '03' and self.vat.isdigit():
-                    if self.vat.isdigit() and len(self.vat) < 11 or len(
-                            self.vat) > 12:
+                    if self.vat.isdigit() and len(self.vat) < 11 or len(self.vat) > 12:
                         raise UserError(
                             'La identificación tipo DIMEX debe contener 11 o 12 dígitos, sin ceros al inicio y sin guiones.')
                 elif self.identification_id.code == '04' and self.vat.isdigit():
@@ -124,8 +110,7 @@ class PartnerElectronic(models.Model):
             for activity in activities:
                 if activity["estado"] == "A":
                     activities_codes.append(activity["codigo"])
-            economic_activities = self.env['economic_activity'].search(
-                [('code', 'in', activities_codes)])
+            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
 
             self.economic_activities_ids = economic_activities
             print(economic_activities)

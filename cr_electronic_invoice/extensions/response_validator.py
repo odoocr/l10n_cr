@@ -1,6 +1,5 @@
 import json
 from os.path import join, dirname
-
 from jsonschema import validate
 
 

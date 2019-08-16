@@ -3,8 +3,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from cryptography.hazmat.primitives import hashes
-from xmlsig import constants
 
+from xmlsig import constants
 from .ns import EtsiNS
 
 NS_MAP = constants.NS_MAP

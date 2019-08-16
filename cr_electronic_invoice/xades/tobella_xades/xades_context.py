@@ -2,14 +2,14 @@
 # © 2017 Creu Blanca
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from datetime import datetime
 from os import path
 
-import pytz
 from lxml import etree
-from xmlsig import SignatureContext
 
-from .constants import NS_MAP
+from xmlsig import SignatureContext
+from .constants import NS_MAP, EtsiNS
+from datetime import datetime
+import pytz
 
 
 class XAdESContext(SignatureContext):
@@ -114,10 +114,8 @@ class XAdESContext(SignatureContext):
         assert policy is not None
         self.policy.calculate_policy_node(policy, sign)
 
-    def calculate_data_object_properties(self, data_object_properties, node,
-                                         sign=False):
+    def calculate_data_object_properties(self, data_object_properties, node, sign=False):
         return
 
-    def calculate_unsigned_properties(self, unsigned_properties, node,
-                                      sign=False):
+    def calculate_unsigned_properties(self, unsigned_properties, node, sign=False):
         return

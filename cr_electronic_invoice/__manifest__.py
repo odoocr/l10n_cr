@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'Facturación Electrónica Costa Rica',
+    'name': 'Facturación electrónica Costa Rica',
     'version': '12.0.2.0.1',
     'author': 'CRLibre.org',
     'license': 'AGPL-3',
@@ -21,7 +21,7 @@
         'l10n_cr_country_codes',
         'account_cancel',
         'res_currency_cr_adapter',
-    ],
+        ],
     'data': [
         'data/account_tax_data.xml',
         'data/aut_ex_data.xml',

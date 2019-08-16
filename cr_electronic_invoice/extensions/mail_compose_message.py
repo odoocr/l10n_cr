@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, api
+from odoo import fields, models, api
 
 
 class MailComposeMessage(models.TransientModel):
@@ -15,5 +15,4 @@ class MailComposeMessage(models.TransientModel):
                 context.get('default_model') == 'account.invoice':
             for invoice in account_invoice.browse(invoice_ids):
                 invoice.sent = True
-        return super(MailComposeMessage, self).send_mail(
-            auto_commit=auto_commit)
+        return super(MailComposeMessage, self).send_mail(auto_commit=auto_commit)
