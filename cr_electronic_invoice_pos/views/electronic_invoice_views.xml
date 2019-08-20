@@ -123,6 +123,7 @@
                         <div class="text-center">
                             <t t-if="o.tipo_documento=='FE'">FACTURA ELECTRONICA</t>
                             <t t-if="o.tipo_documento=='TE'">TIQUETE ELECTRONICO</t>
+                            <t t-if="o.tipo_documento=='NC'">TIQUETE ELECTRONICO</t>
                             <br/>
                             Version Documento: 4.3<br/>
                             <h2 t-esc="o.user_id.company_id.commercial_name"/>
