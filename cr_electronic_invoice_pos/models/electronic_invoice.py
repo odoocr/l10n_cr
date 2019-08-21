@@ -387,7 +387,7 @@ class PosOrder(models.Model):
                                                          True), ('partner_id', '!=', False),
                                                    #('date_order', '>=', '2019-01-01'),
                                                    #('id', '=', 22145),
-                                                   ('tipo_documento', 'in', ('TE','FE')),
+                                                   ('tipo_documento', 'in', ('TE','FE','NC')),
                                                    ('state_tributacion', '=', False)],
                                                   order="date_order",
                                                   limit=max_orders)
