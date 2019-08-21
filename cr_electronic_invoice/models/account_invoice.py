@@ -1105,6 +1105,13 @@ class AccountInvoiceElectronic(models.Model):
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
 
+                if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.1:
+                    inv.state_tributacion = 'error'
+                    inv.message_post(
+                        subject='Error',
+                        body='Monto factura no concuerda con monto para XML. Factura: %s XML:%s' % (
+                            inv.amount_total, (base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto)))
+                    continue
                 # ESTE METODO GENERA EL XML DIRECTAMENTE DESDE PYTHON
                 xml_string_builder = api_facturae.gen_xml_v43(
                     inv, sale_conditions, round(total_servicio_gravado, 5),
