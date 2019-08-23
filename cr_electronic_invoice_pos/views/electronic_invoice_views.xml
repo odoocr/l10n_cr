@@ -123,6 +123,7 @@
                         <div class="text-center">
                             <t t-if="o.tipo_documento=='FE'">FACTURA ELECTRONICA</t>
                             <t t-if="o.tipo_documento=='TE'">TIQUETE ELECTRONICO</t>
+                            <t t-if="o.tipo_documento=='NC'">NOTA DE CREDITO ELECTRONICA</t>
                             <br/>
                             Version Documento: 4.3<br/>
                             <h2 t-esc="o.user_id.company_id.commercial_name"/>
@@ -233,7 +234,7 @@
                             </tbody>
                         </table>
                         <div style="text-align:center">
-                            Res DGT-R-48-2016 del 07/10/2016
+                            Res DGT-R-033-2019 del 20 / 06 / 2019
                         </div>
 
                     </div>

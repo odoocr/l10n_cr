@@ -133,12 +133,13 @@ class PosOrder(models.Model):
         for order in self:
             if not order.pos_order_id:
                 continue
-            if order.tipo_documento == 'NC':
-                order.number_electronic = order.session_id.config_id.NC_sequence_id._next()
+            if order.tipo_documento == 'FE':
+                order.number_electronic = order.session_id.config_id.FE_sequence_id._next()
             elif order.tipo_documento == 'TE':
                 order.number_electronic = order.session_id.config_id.TE_sequence_id._next()
-            elif order.tipo_documento == 'FE':
-                order.number_electronic = order.session_id.config_id.FE_sequence_id._next()
+            else:
+                order.tipo_documento = 'NC'
+                order.number_electronic = order.session_id.config_id.NC_sequence_id._next()
             order.sequence = order.number_electronic[21:41]
         return super(PosOrder, self).action_pos_order_paid()
 
@@ -386,7 +387,7 @@ class PosOrder(models.Model):
                                                          True), ('partner_id', '!=', False),
                                                    #('date_order', '>=', '2019-01-01'),
                                                    #('id', '=', 22145),
-                                                   ('tipo_documento', 'in', ('TE','FE')),
+                                                   ('tipo_documento', 'in', ('TE','FE','NC')),
                                                    ('state_tributacion', '=', False)],
                                                   order="date_order",
                                                   limit=max_orders)
@@ -403,12 +404,22 @@ class PosOrder(models.Model):
 
             # if doc.company_id.frm_ws_ambiente != 'disabled' and docName.isdigit():
 
-            if not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
+            if not docName or not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
                 _logger.error(
                     'MAB - Valida Hacienda - skipped Invoice %s', docName)
                 doc.state_tributacion = 'no_aplica'
                 continue
 
+            now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+            now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+            dia = docName[3:5]#'%02d' % now_cr.day,
+            mes = docName[5:7]#'%02d' % now_cr.month,
+            anno = docName[7:9]#str(now_cr.year)[2:4],
+            #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+            date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
+            #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
+            #date_cr = api_facturae.get_time_hacienda()
+            doc.number = doc.number_electronic[21:41]
             if not doc.xml_comprobante:
                 #url = doc.company_id.frm_callback_url
                 numero_documento_referencia = False
@@ -440,15 +451,6 @@ class PosOrder(models.Model):
                     codigo_referencia = doc.reference_code_id.code
                     # FacturaReferencia = ''   *****************
 
-                now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                dia = docName[3:5]#'%02d' % now_cr.day,
-                mes = docName[5:7]#'%02d' % now_cr.month,
-                anno = docName[7:9]#str(now_cr.year)[2:4],
-                #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
-                #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
-                #date_cr = api_facturae.get_time_hacienda()
                 #codigo_seguridad = docName[-8:]  # ,doc.company_id.security_code,
                 #if not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
                 #if not doc.statement_ids or not doc.statement_ids[0].statement_id or not doc.statement_ids[0].statement_id.journal_id or not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
@@ -475,6 +477,7 @@ class PosOrder(models.Model):
                 total_impuestos = 0.0
                 base_subtotal = 0.0
                 total_otros_cargos = 0.0
+                total_iva_devuelto = 0.0
 
                 for line in doc.lines:
                     line_number += 1
@@ -580,7 +583,7 @@ class PosOrder(models.Model):
                     doc, sale_conditions, round(total_servicio_gravado, 5),
                     round(total_servicio_exento, 5), total_servicio_exonerado,
                     round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5),
-                    total_mercaderia_exonerado, total_otros_cargos, base_subtotal,
+                    total_mercaderia_exonerado, total_otros_cargos, total_iva_devuelto, base_subtotal,
                     total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
                     otros_cargos, currency_rate, invoice_comments,
                     tipo_documento_referencia, numero_documento_referencia,
