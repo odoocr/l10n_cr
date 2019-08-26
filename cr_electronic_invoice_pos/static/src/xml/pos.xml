@@ -3,13 +3,19 @@
 
     <t t-extend="PosTicket">
         <t t-jquery="div.pos-center-align:first" t-operation="after">
-            <div class="pos-center-align" t-if="!order.is_to_invoice()">
-                  Simplified invoice: <t t-esc="order.simplified_invoice"/>
+            <div class="pos-center-align">
+                  Clave: <br/>
+                  <t t-esc="order.attributes.number_electronic.substring(0,25)"/><br/>
+                  <t t-esc="order.attributes.number_electronic.substring(25,50)"/>
+            </div>
+            <div class="pos-center-align">
+                  Consecutivo: <br/>
+                  <t t-esc="order.attributes.number_electronic.substring(21,41)"/>
             </div>
         </t>
         <t t-jquery="t[t-esc='widget.pos.company.name']" t-operation="after">
             <t t-if="widget.pos.company.vat">
-                <br />
+                <br/>
                 Cédula: <t t-esc="widget.pos.company.vat"/>
             </t>
         </t>

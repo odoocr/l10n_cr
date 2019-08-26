@@ -118,6 +118,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
+
         <menuitem id="menu_res_country_county"
                   name="Cantones"
                   parent="account.account_management_menu"

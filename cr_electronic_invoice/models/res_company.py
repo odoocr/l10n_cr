@@ -3,6 +3,8 @@
 import logging
 import phonenumbers
 from odoo import models, fields, api
+from . import api_facturae
+
 _logger = logging.getLogger(__name__)
 
 _TIPOS_CONFIRMACION = (
@@ -24,18 +26,19 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
-    activity_id = fields.Many2one(comodel_name="economic_activity", string="Actividad Económica",
-                                  required=False, )
+    activity_id = fields.Many2one("economic.activity", string=u"Actividad Económica por defecto", required=False, )
+
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
 
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(
-        comodel_name="identification.type", string="Tipo de identificacion", required=False)
-    district_id = fields.Many2one(comodel_name="res.country.district", string="Distrito",
+        "identification.type", string="Tipo de identificacion", required=False)
+    district_id = fields.Many2one("res.country.district", string="Distrito",
                                   required=False)
-    county_id = fields.Many2one(comodel_name="res.country.county", string="Cantón",
+    county_id = fields.Many2one("res.country.county", string="Cantón",
                                 required=False)
-    neighborhood_id = fields.Many2one(comodel_name="res.country.neighborhood", string="Barrios",
-                                      required=False, )
+    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Barrios",
+                                      required=False)
     frm_ws_identificador = fields.Char(
         string="Usuario de Factura Electrónica", required=False)
     frm_ws_password = fields.Char(
@@ -48,13 +51,6 @@ class CompanyElectronic(models.Model):
         required=True, default='disabled',
         help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
              'de calidad (stag), para el ambiente de producción (prod). Requerido.')
-
-    version_hacienda = fields.Selection(
-        selection=[('4.2', 'Utilizar XMLs version 4.2'),
-                   ('4.3', 'Utilizar XMLs version 4.3')],
-        string="Versión de Hacienda a utilizar",
-        required=True, default='4.2',
-        help='Indica si se quiere utilizar la versión 4.2 o 4.3 de Hacienda')
 
     frm_pin = fields.Char(string="Pin", required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
@@ -129,6 +125,7 @@ class CompanyElectronic(models.Model):
         new_comp.try_create_configuration_sequences()
         return new_comp.id
 
+    @api.model
     def try_create_confirmation_sequeces(self):
         """ Try to automatically add the Comprobante Confirmation sequence to the company.
             It will first check if sequence already exists before attempt to create. The s
@@ -158,3 +155,24 @@ class CompanyElectronic(models.Model):
 
         if to_write:
             self.write(to_write)
+
+    @api.multi
+    def action_get_economic_activities(self):
+        if self.vat:
+            json_response = api_facturae.get_economic_activities(self)
+
+            activities = json_response["activities"]
+            activities_codes = list()
+            for activity in activities:
+                if activity["estado"] == "A":
+                    activities_codes.append(activity["codigo"])
+            economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
+
+            self.economic_activities_ids = economic_activities
+            #print(economic_activities)
+        else:
+            alert = {
+                'title': 'Atención',
+                'message': _('Company VAT is invalid')
+            }
+            return {'value': {'vat': ''}, 'warning': alert}

@@ -57,5 +57,13 @@
             <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
             <field name="taxes_id" eval="[(5)]" />
         </record>
+        <record id="product_iva_devuelto" model="product.template">
+            <field name="name">IVA Devuelto</field>
+            <field name="type">consu</field>
+            <field name="default_code">999</field>
+            <field name="categ_id" ref="product_category_otros_cargos" />
+            <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+            <field name="taxes_id" eval="[(5)]" />
+        </record>
     </data>
 </odoo>

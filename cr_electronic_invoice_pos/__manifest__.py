@@ -2,7 +2,7 @@
 
 {
 	'name': 'Facturación electrónica Costa Rica POS',
-	'version': '10.0.0.0.0',
+	'version': '10.0.2.0.0',
 	'author': 'TechMicro Inc S.A.',
     'license': 'OPL-1',
 	'website': 'http://www.techmicrocr.com',

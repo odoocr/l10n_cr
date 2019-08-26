@@ -26,7 +26,7 @@
                 </span><br/>
                 <span>Tel.</span> <t t-esc="o.company_id.phone"/><br/>
                 <t t-esc="o.company_id.email"/><br/>
-                <t t-esc="o.company_id.website"/><br/><br/>
+                <t t-if="o.company_id.website" t-esc="o.company_id.website"/>
             </td>
             <td width="30%">
               <div class="text-center">
@@ -301,7 +301,7 @@
                         <br/><br/>_____________________<br/>Firma
                     </td>
                     <td style="width:20%;border:1px solid black;">
-                        <strong>Subtotal<br/>Impuesto<br/>Total</strong>
+                        <strong>Subtotal<br/>IVA<br/>Total</strong>
                     </td>
                     <td style="border:1px solid black;" class="text-right">
                         <span t-field="o.amount_untaxed" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/><br/>
@@ -339,7 +339,7 @@
                         trámites de juicio ejecutivo. Esta factura devengará 3% mensual después de su vencimiento.
                     </p>
                     <t t-if="o.company_id.html_bank_account1 or o.company_id.html_bank_account2">
-                        <p>Puede realizar transferencias o depósitos mediante las siguientes Cuentas Bancarias de <t t-esc="o.company_id.commercial_name"/>:</p>
+                        Puede realizar transferencias o depósitos mediante las siguientes Cuentas Bancarias de <t t-esc="o.company_id.commercial_name"/>:
                         <table width="100%;" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td width="50%"> <t t-raw="o.company_id.html_bank_account1"/>
@@ -360,11 +360,12 @@
                                 </td>
                             </tr>
                         </table>
-                        <p><strong>CONFIRMACIONES:</strong> Para enviar confirmaciones de depósito    Correo:   <span t-field="o.company_id.email"/></p>
+                        <strong>CONFIRMACIONES:</strong> Para enviar confirmaciones de depósito    Correo:   <span t-field="o.company_id.email"/>
                     </t>
                 </div>
-                <p class="text-center" style="padding:2px 2px 2px 2px">Clave:<span t-field="o.number_electronic"/> // Usuario:<span t-field="o.create_uid.name"/></p>
-                <p class="text-center" style="padding:2px 2px 2px 2px">Autorizada mediante resolución No DGT-R-48-2016 del 7 de octubre de 2016</p>
+                <p class="text-center" style="padding:2px 2px 2px 2px">
+                  Clave:<span t-field="o.number_electronic"/> // Usuario:<span t-field="o.create_uid.name"/><br/>
+                  Autorizada mediante resolución No DGT-R-033-2019 del 20 de junio de 2019</p>
             </t>
             <link href="http://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css"/>
             <style type="text/css">
