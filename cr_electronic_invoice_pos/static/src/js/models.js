@@ -78,17 +78,11 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
                 // revisar si es normal o devolucion . Pendiente !!!
                 if (order.get('client') && order.get('client').vat) {
                     order.set({'sequence': this.FE_sequence.number_next_actual});
-                    this.consecutive = _sequence_next(this.FE_sequence);
-                    this.consecutive = this.consecutive.substring(21,40);
-                    order.set({'consecutive': this.consecutive});
                     order.set({'number_electronic': _sequence_next(this.FE_sequence)});
                     order.set({'tipo_documento': 'FE'});
                 }
                 else{
                     order.set({'sequence': this.TE_sequence.number_next_actual});
-                    this.consecutive = _sequence_next(this.TE_sequence);
-                    this.consecutive = this.consecutive.substring(21,40);
-                    order.set({'consecutive': this.consecutive});
                     order.set({'number_electronic': _sequence_next(this.TE_sequence)});
                     order.set({'tipo_documento': 'TE'});
                 }

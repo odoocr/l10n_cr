@@ -809,7 +809,7 @@ class AccountInvoiceElectronic(models.Model):
             # if not i.amount_total_electronic_invoice:
             #     i.charge_xml_data()
             current_invoice += 1
-            _logger.debug(
+            _logger.info(
                 '_check_hacienda_for_mrs - Invoice %s / %s  -  number:%s',
                 current_invoice, total_invoices, inv.number_electronic)
             inv.send_mrs_to_hacienda()
@@ -926,6 +926,7 @@ class AccountInvoiceElectronic(models.Model):
                 otros_cargos_id = 0
                 line_number = 0
                 total_otros_cargos = 0.0
+                total_iva_devuelto = 0.0
                 total_servicio_salon = 0.0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
@@ -938,7 +939,10 @@ class AccountInvoiceElectronic(models.Model):
                 base_subtotal = 0.0
                 for inv_line in inv.invoice_line_ids:
                     # Revisamos si está línea es de Otros Cargos
-                    if inv_line.product_id.categ_id.name == 'Otros Cargos':
+                    if inv_line.product_id and inv_line.product_id.id == self.env.ref('cr_electronic_invoice.product_iva_devuelto').id:
+                        total_iva_devuelto = inv_line.total_amount
+
+                    elif inv_line.product_id and inv_line.product_id.categ_id.name == 'Otros Cargos':
                         otros_cargos_id += 1
                         otros_cargos[otros_cargos_id]= {
                             'TipoDocumento': inv_line.product_id.default_code,
@@ -1029,7 +1033,6 @@ class AccountInvoiceElectronic(models.Model):
 
                             for i in line_taxes['taxes']:
                                 if taxes_lookup[i['id']]['tax_code'] == 'service':
-                                    #total_otros_cargos += round(abs(i['amount'] * qty), 5)
                                     total_servicio_salon += round(
                                         subtotal_line * taxes_lookup[i['id']][
                                             'tarifa'] / 100, 5)
@@ -1133,7 +1136,7 @@ class AccountInvoiceElectronic(models.Model):
                     inv, sale_conditions, round(total_servicio_gravado, 5),
                     round(total_servicio_exento, 5), total_servicio_exonerado,
                     round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5),
-                    total_mercaderia_exonerado, total_otros_cargos, base_subtotal,
+                    total_mercaderia_exonerado, total_otros_cargos, total_iva_devuelto, base_subtotal,
                     total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
                     otros_cargos, currency_rate, invoice_comments,
                     tipo_documento_referencia, numero_documento_referencia,
@@ -1290,6 +1293,22 @@ class AccountInvoiceElectronic(models.Model):
                             len(currency.rate_ids) > 0)):
                         raise UserError(
                             'No hay tipo de cambio registrado para la moneda ' + currency.name)
+
+                            
+                if self.env.ref('cr_electronic_invoice.activity_851101').id == inv.economic_activity_id.id and inv.payment_methods_id.sequence == '02':
+                    iva_devuelto = 0
+                    for i in inv.invoice_line_ids:
+                        for t in i.invoice_line_tax_ids:
+                            if t.tax_code=='01' and t.iva_tax_code=='04':
+                                iva_devuelto += i.price_total - i.price_subtotal
+                    if iva_devuelto:
+                        inv_line_iva_devuelto = self.env['account.invoice.line'].create({
+                            'name' : 'IVA Devuelto',
+                            'invoice_id' : inv.id,
+                            'product_id' : self.env.ref('cr_electronic_invoice.product_iva_devuelto').id,
+                            'price_unit' : -iva_devuelto,
+                            'quantity' : 1,
+                        })
 
                 response_json = api_facturae.get_clave_hacienda(self,
                                                                 inv.tipo_documento,

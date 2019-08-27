@@ -6,4 +6,4 @@ Por Odoo CR, Factura Sempai y FSS Solutions
 <br>
 Instalacion
 <br>
-Instalar el modulo cr_customer_query de forma Habitual.
+Instalar el modulo l10n_cr_hacienda_info_query de forma Habitual.

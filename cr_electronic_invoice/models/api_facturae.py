@@ -260,7 +260,6 @@ def refresh_token_hacienda(tipo_ambiente, token):
     except ImportError:
         raise Warning('Error Refrescando el Token desde MH')
 
-
 def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
                   detalle_mensaje, cedula_receptor,
                   consecutivo_receptor,
@@ -358,11 +357,10 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
 
     return str(sb)
 
-
 def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 total_servicio_exento, totalServExonerado,
                 total_mercaderia_gravado, total_mercaderia_exento,
-                totalMercExonerada, totalOtrosCargos, base_total,
+                totalMercExonerada, totalOtrosCargos, total_iva_devuelto, base_total,
                 total_impuestos, total_descuento, lines,
                 otrosCargos, currency_rate, invoice_comments,
                 tipo_documento_referencia, numero_documento_referencia,
@@ -599,24 +597,24 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     if inv.tipo_documento != 'FEE':
         sb.Append('<TotalMercExonerada>' + str(totalMercExonerada) + '</TotalMercExonerada>')
 
-    sb.Append('<TotalGravado>' + str(total_servicio_gravado + total_mercaderia_gravado) + '</TotalGravado>')
-    sb.Append('<TotalExento>' + str(total_servicio_exento + total_mercaderia_exento) + '</TotalExento>')
+    sb.Append('<TotalGravado>' + str(round(total_servicio_gravado + total_mercaderia_gravado, 5)) + '</TotalGravado>')
+    sb.Append('<TotalExento>' + str(round(total_servicio_exento + total_mercaderia_exento, 5)) + '</TotalExento>')
 
     if inv.tipo_documento != 'FEE':
-        sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
+        sb.Append('<TotalExonerado>' + str(round(totalServExonerado + totalMercExonerada, 5)) + '</TotalExonerado>')
 
     sb.Append('<TotalVenta>' +
-              str(total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento + totalServExonerado + totalMercExonerada) +
+              str(round(total_servicio_gravado + total_mercaderia_gravado + total_servicio_exento + total_mercaderia_exento + totalServExonerado + totalMercExonerada, 5)) +
               '</TotalVenta>')
     sb.Append('<TotalDescuentos>' + str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' + str(round(base_total, 5)) + '</TotalVentaNeta>')
     sb.Append('<TotalImpuesto>' + str(round(total_impuestos, 5)) + '</TotalImpuesto>')
 
-    # TODO: Hay que calcular el TotalIVADevuelto
-    # sb.Append('<TotalIVADevuelto>' + str(¿de dónde sacamos esto?) + '</TotalIVADevuelto>')
+    if total_iva_devuelto:
+        sb.Append('<TotalIVADevuelto>' + str(round(total_iva_devuelto, 5)) + '</TotalIVADevuelto>')
 
     sb.Append('<TotalOtrosCargos>' + str(totalOtrosCargos) + '</TotalOtrosCargos>')
-    sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos + totalOtrosCargos, 5)) + '</TotalComprobante>')
+    sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos + totalOtrosCargos - total_iva_devuelto, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
 
     if inv.tipo_documento in ('NC', 'ND'):
@@ -627,10 +625,10 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         sb.Append('<Codigo>' + str(codigo_referencia) + '</Codigo>')
         sb.Append('<Razon>' + str(razon_referencia) + '</Razon>')
         sb.Append('</InformacionReferencia>')
-
-    sb.Append('<Otros>')
-    sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
-    sb.Append('</Otros>')
+    if invoice_comments:
+        sb.Append('<Otros>')
+        sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        sb.Append('</Otros>')
 
     sb.Append('</' + fe_enums.tagName[inv.tipo_documento] + '>')
 
@@ -903,9 +901,17 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         if len(attachments) == 2:
             email_template.attachment_ids = [(6, 0, attachments)]
 
-            email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
-                                                                                        raise_exception=False,
-                                                                                        force_send=True)  # default_type='binary'
+            try:
+                email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
+                                                                                            raise_exception=False,
+                                                                                            force_send=True)  # default_type='binary'
+            except:
+                _logger.error('MAB - consulta documento error al enviar correo: %s',
+                             inv.number_electronic)
+
+            #email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
+            #                                                                            raise_exception=False,
+            #                                                                            force_send=True)  # default_type='binary'
 
             # limpia el template de los attachments
             email_template.attachment_ids = [(5)]
