@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
-   <t t-extend="ClientDetailsEdit">
+   <!--t t-extend="ClientDetailsEdit">
        <t t-jquery="div.client-details-left" t-operation="before">
           <span class="label">Tipo de identificación</span>
           <select class="detail" name="identification_id">
@@ -21,7 +21,7 @@
              </option>
           </select>
        </t>
-   </t>
+   </t-->
 
     <t t-extend="PosTicket">
         <t t-jquery="div.pos-center-align:first" t-operation="after">

@@ -262,23 +262,24 @@ class AccountInvoiceElectronic(models.Model):
 
     error_count = fields.Integer(string="Cantidad de errores", required=False, default="0")
 
-    economic_activity_id = fields.Many2one("economic_activity", string="Actividad Económica", required=False, )
+    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )
 
-    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas', compute='_get_economic_activities')
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities')
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
     ]
 
-    @api.multi
+    #@api.multi
     @api.onchange('partner_id', 'company_id')
     def _get_economic_activities(self):
-        if self.type in ('in_invoice', 'in_refund'):
-            if self.partner_id:
-                self.economic_activities_ids = self.partner_id.economic_activities_ids
-        else:
-            self.economic_activities_ids = self.company_id.economic_activities_ids
+        for inv in self:
+            if inv.type in ('in_invoice', 'in_refund'):
+                if inv.partner_id:
+                    inv.economic_activities_ids = inv.partner_id.economic_activities_ids
+            else:
+                inv.economic_activities_ids = inv.company_id.economic_activities_ids
 
     @api.multi
     def action_invoice_sent(self):
@@ -415,7 +416,7 @@ class AccountInvoiceElectronic(models.Model):
                     token_m_h = api_facturae.get_token_hacienda(
                         inv, inv.company_id.frm_ws_ambiente)
 
-                    api_facturae.consulta_documentos(self, inv,
+                    api_facturae.consulta_documentos(inv, inv,
                                                      inv.company_id.frm_ws_ambiente,
                                                      token_m_h,
                                                      api_facturae.get_time_hacienda(),
@@ -428,14 +429,12 @@ class AccountInvoiceElectronic(models.Model):
                             'Aviso!.\n La factura de proveedor ya fue confirmada')
 
                     if abs(
-                            self.amount_total_electronic_invoice - self.amount_total) > 1:
+                            inv.amount_total_electronic_invoice - inv.amount_total) > 1:
                         inv.state_send_invoice = 'error'
                         inv.message_post(
                             subject='Error',
                             body='Aviso!.\n Monto total no concuerda con monto del XML')
                         continue
-                        raise UserError(
-                            'Aviso!.\n Monto total no concuerda con monto del XML')
 
                     elif not inv.xml_supplier_approval:
                         inv.state_send_invoice = 'error'
@@ -443,23 +442,18 @@ class AccountInvoiceElectronic(models.Model):
                             subject='Error',
                             body='Aviso!.\n No se ha cargado archivo XML')
                         continue
-                        raise UserError(
-                            'Aviso!.\n No se ha cargado archivo XML')
 
                     elif not inv.company_id.sucursal_MR or not inv.company_id.terminal_MR:
                         inv.state_send_invoice = 'error'
                         inv.message_post(subject='Error',
                                          body='Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
                         continue
-                        # raise UserError('Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
 
                     if not inv.state_invoice_partner:
                         inv.state_send_invoice = 'error'
                         inv.message_post(subject='Error',
                                          body='Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.')
                         continue
-                        # raise UserError('Aviso!.\nDebe primero seleccionar el tipo de respuesta para .'
-                        #                'el archivo cargado.')
 
                     if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
 
@@ -495,7 +489,7 @@ class AccountInvoiceElectronic(models.Model):
 
                             '''Solicitamos la clave para el Mensaje Receptor'''
                             response_json = api_facturae.get_clave_hacienda(
-                                self, tipo_documento, sequence,
+                                inv, tipo_documento, sequence,
                                 inv.company_id.sucursal_MR,
                                 inv.company_id.terminal_MR)
 
@@ -660,7 +654,7 @@ class AccountInvoiceElectronic(models.Model):
         out_invoices = self.env['account.invoice'].search(
             [('type', 'in', ('out_invoice', 'out_refund')),
              ('state', 'in', ('open', 'paid')),
-             ('state_tributacion', 'in', ('recibido', 'procesando', 'ne', 'error'))],
+             ('state_tributacion', 'in', ('recibido', 'procesando', 'ne'))], #, 'error'
             limit=max_invoices)
 
         in_invoices = self.env['account.invoice'].search(
@@ -688,92 +682,105 @@ class AccountInvoiceElectronic(models.Model):
                     'E-INV CR - Consulta Hacienda - HALTED - Failed to get token')
                 return
 
-            if i.number_electronic and len(i.number_electronic) == 50:
-                response_json = api_facturae.consulta_clave(
-                    i.number_electronic, token_m_h,
-                    i.company_id.frm_ws_ambiente)
-                status = response_json['status']
+            if not i.xml_comprobante:
+                i.state_tributacion = 'error'
+                _logger.warning(
+                    u'E-INV CR - Documento:%s no tiene documento XML.  Estado: %s',
+                    i.number_electronic, 'error')
+                continue
 
-                if status == 200:
-                    estado_m_h = response_json.get('ind-estado')
-                    _logger.info('E-INV CR - Estado Documento:%s', estado_m_h)
-                elif status == 400:
-                    estado_m_h = response_json.get('ind-estado')
-                    i.state_tributacion = 'ne'
-                    _logger.warning(
-                        'E-INV CR - Documento:%s no encontrado en Hacienda.  Estado: %s',
-                        i.number_electronic, estado_m_h)
-                    continue
-                else:
-                    _logger.error(
-                        'E-INV CR - Error inesperado en Consulta Hacienda - Abortando')
-                    return
-                if i.type == 'in_invoice':
-                    i.state_send_invoice = estado_m_h
-                else:
-                    i.state_tributacion = estado_m_h
+            if not i.number_electronic or len(i.number_electronic) != 50:
+                i.state_tributacion = 'error'
+                _logger.warning(
+                    u'E-INV CR - Documento:%s no cumple con formato de número electrónico.  Estado: %s',
+                    i.number, 'error')
+                continue
 
-                if estado_m_h == 'aceptado':
-                    i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
-                    i.xml_respuesta_tributacion = response_json.get(
-                        'respuesta-xml')
-                    if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
-                        email_template = self.env.ref(
-                            'account.email_template_edi_invoice', False)
-                        attachment = self.env['ir.attachment'].search(
-                            [('res_model', '=', 'account.invoice'),
-                             ('res_id', '=', i.id),
-                             ('res_field', '=', 'xml_comprobante')], limit=1)
-                        attachment.name = i.fname_xml_comprobante
-                        attachment.datas_fname = i.fname_xml_comprobante
-                        attachment.mimetype = 'text/xml'
+            response_json = api_facturae.consulta_clave(
+                i.number_electronic, token_m_h,
+                i.company_id.frm_ws_ambiente)
+            status = response_json['status']
 
-                        attachment_resp = self.env['ir.attachment'].search(
-                            [('res_model', '=', 'account.invoice'),
-                             ('res_id', '=', i.id),
-                             ('res_field', '=', 'xml_respuesta_tributacion')],
-                            limit=1)
-                        attachment_resp.name = i.fname_xml_respuesta_tributacion
-                        attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
-                        attachment_resp.mimetype = 'text/xml'
+            if status == 200:
+                estado_m_h = response_json.get('ind-estado')
+                _logger.info('E-INV CR - Estado Documento:%s', estado_m_h)
+            elif status == 400:
+                estado_m_h = response_json.get('ind-estado')
+                i.state_tributacion = 'ne'
+                _logger.warning(
+                    'E-INV CR - Documento:%s no encontrado en Hacienda.  Estado: %s',
+                    i.number_electronic, estado_m_h)
+                continue
+            else:
+                _logger.error(
+                    'E-INV CR - Error inesperado en Consulta Hacienda - Abortando')
+                return
+            if i.type == 'in_invoice':
+                i.state_send_invoice = estado_m_h
+            else:
+                i.state_tributacion = estado_m_h
 
-                        email_template.attachment_ids = [
-                            (6, 0, [attachment.id, attachment_resp.id])]
+            if estado_m_h == 'aceptado':
+                i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
+                i.xml_respuesta_tributacion = response_json.get(
+                    'respuesta-xml')
+                if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
+                    email_template = self.env.ref(
+                        'account.email_template_edi_invoice', False)
+                    attachment = self.env['ir.attachment'].search(
+                        [('res_model', '=', 'account.invoice'),
+                         ('res_id', '=', i.id),
+                         ('res_field', '=', 'xml_comprobante')], limit=1)
+                    attachment.name = i.fname_xml_comprobante
+                    attachment.datas_fname = i.fname_xml_comprobante
+                    attachment.mimetype = 'text/xml'
 
-                        email_template.with_context(type='binary',
-                                                    default_type='binary').send_mail(
-                            i.id,
-                            raise_exception=False,
-                            force_send=True)  # default_type='binary'
+                    attachment_resp = self.env['ir.attachment'].search(
+                        [('res_model', '=', 'account.invoice'),
+                         ('res_id', '=', i.id),
+                         ('res_field', '=', 'xml_respuesta_tributacion')],
+                        limit=1)
+                    attachment_resp.name = i.fname_xml_respuesta_tributacion
+                    attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
+                    attachment_resp.mimetype = 'text/xml'
 
-                        email_template.attachment_ids = [(5)]
+                    email_template.attachment_ids = [
+                        (6, 0, [attachment.id, attachment_resp.id])]
 
-                elif estado_m_h in ('firma_invalida'):
-                    if i.error_count > 10:
-                        i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
-                        i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
-                        i.state_email = 'fe_error'
-                        _logger.info('email no enviado - factura rechazada')
-                    else:
-                        i.error_count += 1
-                        i.state_tributacion = 'procesando'
+                    email_template.with_context(type='binary',
+                                                default_type='binary').send_mail(
+                        i.id,
+                        raise_exception=False,
+                        force_send=True)  # default_type='binary'
 
-                elif estado_m_h == 'rechazado':
-                    i.state_email = 'fe_error'
-                    i.state_tributacion = estado_m_h
+                    email_template.attachment_ids = [(5)]
+
+            elif estado_m_h in ('firma_invalida'):
+                if i.error_count > 10:
                     i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
                     i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+                    i.state_email = 'fe_error'
+                    _logger.info('email no enviado - factura rechazada')
                 else:
-                    if i.error_count > 10:
-                        i.state_tributacion = 'error'
-                    elif i.error_count < 4:
-                        i.error_count += 1
-                        i.state_tributacion = 'procesando'
-                    else:
-                        i.error_count += 1
-                        i.state_tributacion = ''
-                    #doc.state_tributacion = 'no_encontrado'
-                    _logger.error('MAB - Consulta Hacienda - Invoice not found: %s  -  Estado Hacienda: %s', i.number_electronic, estado_m_h)
+                    i.error_count += 1
+                    i.state_tributacion = 'procesando'
+
+            elif estado_m_h == 'rechazado':
+                i.state_email = 'fe_error'
+                i.state_tributacion = estado_m_h
+                i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
+                i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+            else:
+                if i.error_count > 10:
+                    i.state_tributacion = 'error'
+                elif i.error_count < 4:
+                    i.error_count += 1
+                    i.state_tributacion = 'procesando'
+                else:
+                    i.error_count += 1
+                    i.state_tributacion = ''
+                #doc.state_tributacion = 'no_encontrado'
+                _logger.error('MAB - Consulta Hacienda - Invoice not found: %s  -  Estado Hacienda: %s', i.number_electronic, estado_m_h)
 
     @api.multi
     def action_check_hacienda(self):
@@ -818,7 +825,7 @@ class AccountInvoiceElectronic(models.Model):
         invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
                                                       ('state', 'in', ('open', 'paid')),
                                                       ('number_electronic', '!=', False),
-                                                      ('date_invoice', '>=', '2018-10-01'),
+                                                      ('date_invoice', '>=', '2019-07-01'),
                                                       '|', ('state_tributacion', '=', False),('state_tributacion', '=', 'ne')],
                                                       order='number', limit=max_invoices)
         self.generate_and_send_invoices(invoices)
@@ -1105,7 +1112,7 @@ class AccountInvoiceElectronic(models.Model):
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
 
-                if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.1:
+                if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.5:
                     inv.state_tributacion = 'error'
                     inv.message_post(
                         subject='Error',
@@ -1186,6 +1193,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.multi
     def action_invoice_open(self):
+        super(AccountInvoiceElectronic, self).action_invoice_open()
         # Revisamos si el ambiente para Hacienda está habilitado
         if self.company_id.frm_ws_ambiente != 'disabled':
 
@@ -1231,7 +1239,7 @@ class AccountInvoiceElectronic(models.Model):
                     continue
 
                 # tipo de identificación
-                if not self.company_id.identification_id:
+                if not inv.company_id.identification_id:
                     raise UserError(
                         'Seleccione el tipo de identificación del emisor en el perfil de la compañía')
 
@@ -1291,7 +1299,7 @@ class AccountInvoiceElectronic(models.Model):
                             'quantity' : 1,
                         })
 
-                response_json = api_facturae.get_clave_hacienda(self,
+                response_json = api_facturae.get_clave_hacienda(inv,
                                                                 inv.tipo_documento,
                                                                 sequence,
                                                                 inv.journal_id.sucursal,
@@ -1301,6 +1309,7 @@ class AccountInvoiceElectronic(models.Model):
                 inv.sequence = response_json.get('consecutivo')
                 inv.number = inv.sequence
                 inv.state_send_invoice = False
-        super(AccountInvoiceElectronic, self).action_invoice_open()
+                inv.move_name = inv.sequence
+                inv.move_id.name = inv.sequence
 
 
