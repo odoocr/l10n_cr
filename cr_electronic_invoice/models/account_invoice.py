@@ -1001,11 +1001,10 @@ class AccountInvoiceElectronic(models.Model):
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
 
-                        if inv_line.discount:
+                        if inv_line.discount and price_unit > 0:
                             total_descuento += descuento
                             line["montoDescuento"] = descuento
-                            line[
-                                "naturalezaDescuento"] = inv_line.discount_note or 'Descuento Comercial'
+                            line["naturalezaDescuento"] = inv_line.discount_note or 'Descuento Comercial'
 
                         # Se generan los impuestos
                         taxes = dict()
@@ -1294,7 +1293,6 @@ class AccountInvoiceElectronic(models.Model):
                         raise UserError(
                             'No hay tipo de cambio registrado para la moneda ' + currency.name)
 
-                            
                 if self.env.ref('cr_electronic_invoice.activity_851101').id == inv.economic_activity_id.id and inv.payment_methods_id.sequence == '02':
                     iva_devuelto = 0
                     for i in inv.invoice_line_ids:
@@ -1320,6 +1318,8 @@ class AccountInvoiceElectronic(models.Model):
                 inv.sequence = response_json.get('consecutivo')
                 inv.number = inv.sequence
                 inv.state_send_invoice = False
+
         super(AccountInvoiceElectronic, self).action_invoice_open()
 
-
+        # convertir el monto de la factura a texto
+        self.invoice_amount_text = extensions.text_converter.number_to_text_es(self.amount_total)
