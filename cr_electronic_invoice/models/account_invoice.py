@@ -686,6 +686,13 @@ class AccountInvoiceElectronic(models.Model):
                     i.number_electronic, 'error')
                 continue
 
+            if not i.number_electronic or len(i.number_electronic) != 50:
+                i.state_tributacion = 'error'
+                _logger.warning(
+                    u'E-INV CR - Documento:%s no cumple con formato de número electrónico.  Estado: %s',
+                    i.number, 'error')
+                continue
+
             response_json = api_facturae.consulta_clave(
                 i.number_electronic, token_m_h,
                 i.company_id.frm_ws_ambiente)
@@ -815,7 +822,7 @@ class AccountInvoiceElectronic(models.Model):
         invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
                                                       ('state', 'in', ('open', 'paid')),
                                                       ('number_electronic', '!=', False),
-                                                      ('date_invoice', '>=', '2019-06-01'),
+                                                      ('date_invoice', '>=', '2019-07-01'),
                                                       '|', ('state_tributacion', '=', False),('state_tributacion', '=', 'ne')],
                                                       order='number', limit=max_invoices)
         self.generate_and_send_invoices(invoices)
@@ -834,19 +841,7 @@ class AccountInvoiceElectronic(models.Model):
                 _logger.info('E-INV CR - Ignored invoice:%s', inv.number)
                 continue
 
-            if not inv.number_electronic or len(inv.number_electronic) != 50:
-                i.state_tributacion = 'error'
-                _logger.warning(
-                    u'E-INV CR - Documento:%s no cumple con formato de número electrónico.  Estado: %s',
-                    i.number, 'error')
-                continue
-
-            #if not inv.partner_id or not inv.partner_id.vat or not inv.partner_id.identification_id:  # or (len(inv.number) == 10):
-            #    inv.state_tributacion = 'na'
-            #    _logger.info('E-INV CR - Ignored NO invoice:%s', inv.number)
-            #    continue
-
-            _logger.info(
+            _logger.debug(
                 'generate_and_send_invoices - Invoice %s / %s  -  number:%s',
                 current_invoice, total_invoices, inv.number_electronic)
 
@@ -1117,7 +1112,7 @@ class AccountInvoiceElectronic(models.Model):
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
 
-                if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.1:
+                if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.5:
                     inv.state_tributacion = 'error'
                     inv.message_post(
                         subject='Error',

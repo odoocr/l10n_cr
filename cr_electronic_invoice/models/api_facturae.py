@@ -974,7 +974,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         inv_xmlns = namespaces.pop(None)
         namespaces['inv'] = inv_xmlns
 
-        invoice.consecutive_number_receiver = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
+        #invoice.consecutive_number_receiver = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
         invoice.reference = invoice.consecutive_number_receiver
 
         invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
@@ -1041,7 +1041,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                         discount_note = line.xpath("inv:NaturalezaDescuento", namespaces=namespaces)[0].text
 
                 total_tax = 0.0
-                taxes = invoice.env['account.tax']
+                taxes = []
                 tax_nodes = line.xpath("inv:Impuesto", namespaces=namespaces)
                 for tax_node in tax_nodes:
                     tax = invoice.env['account.tax'].search(
@@ -1054,7 +1054,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
                         # TODO: Add exonerations and exemptions
 
-                        taxes += tax
+                        taxes.append((4,tax.id))
                     else:
                         raise UserError(_('Tax code %s and percentage %s is not registered in the system',
                                         tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text,
@@ -1069,16 +1069,12 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'sequence': line.xpath("inv:NumeroLinea", namespaces=namespaces)[0].text,
                     'discount': discount_percentage,
                     'discount_note': discount_note,
-                    'total_amount': total_amount,
+                    #'total_amount': total_amount,
                     'product_id': product_id,
                     'account_id': account_id,
                     'account_analytic_id': analytic_account_id,
+                    'invoice_line_tax_id': taxes
                 })
-
-                # This must be assigned after line is created
-                invoice_line.invoice_line_tax_ids = taxes
-                invoice_line.total_tax = total_tax
-                invoice_line.amount_untaxed = float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text)
 
                 new_lines += invoice_line
 
