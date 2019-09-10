@@ -121,7 +121,7 @@ class PosOrder(models.Model):
 
     sequence = fields.Char(string='Consecutivo', readonly=True, )
 
-    economic_activity_id = fields.Many2one("economic_activity", string="Actividad Económica", required=False, )
+    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)',
@@ -383,8 +383,8 @@ class PosOrder(models.Model):
                                                    #('name', 'like', '506030918%'),
                                                    #('name', 'not like', '**%'),
                                                    #('number_electronic', '=', False),
-                                                   '|', (no_partner, '=',
-                                                         True), ('partner_id', '!=', False),
+                                                   '|', (no_partner, '=', True), 
+                                                        '&', ('partner_id', '!=', False), ('partner_id.vat', '!=', False),
                                                    #('date_order', '>=', '2019-01-01'),
                                                    #('id', '=', 22145),
                                                    ('tipo_documento', 'in', ('TE','FE','NC')),
@@ -419,7 +419,7 @@ class PosOrder(models.Model):
             date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
             #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
             #date_cr = api_facturae.get_time_hacienda()
-            doc.number = doc.number_electronic[21:41]
+            doc.name = doc.number_electronic[21:41]
             if not doc.xml_comprobante:
                 #url = doc.company_id.frm_callback_url
                 numero_documento_referencia = False
@@ -612,6 +612,10 @@ class PosOrder(models.Model):
                 doc.xml_comprobante = base64.encodestring(xml_firmado)
 
                 _logger.error('MAB - SIGNED XML:%s', doc.fname_xml_comprobante)
+
+            else:
+                xml_firmado = doc.xml_comprobante
+
 
             # get token
             #response_json = fxunctions.token_hacienda(doc.company_id)

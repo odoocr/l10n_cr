@@ -26,9 +26,9 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
-    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
+    activity_id = fields.Many2one("economic.activity", string="Actividad Económica por defecto", required=False, )
 
-    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
 
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(
@@ -165,7 +165,7 @@ class CompanyElectronic(models.Model):
             for activity in activities:
                 if activity["estado"] == "A":
                     activities_codes.append(activity["codigo"])
-            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
+            economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
 
             self.economic_activities_ids = economic_activities
             print(economic_activities)
