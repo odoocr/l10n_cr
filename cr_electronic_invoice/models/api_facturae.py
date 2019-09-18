@@ -160,9 +160,9 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
             'La situación indicada para el comprobante electŕonico es inválida: ' + situacion)
 
     '''Creamos la fecha para la clave'''
-    dia = doc.date_invoice[8:10]#'%02d' % now_cr.day,
-    mes = doc.date_invoice[5:7]#'%02d' % now_cr.month,
-    anno = doc.date_invoice[2:4]#str(now_cr.year)[2:4],
+    dia = str(doc.date_invoice.day).zfill(2) #[8:10]#'%02d' % now_cr.day,
+    mes = str(doc.date_invoice.month).zfill(2) #[5:7]#'%02d' % now_cr.month,
+    anno = str(doc.date_invoice.year)[2:]#str(now_cr.year)[2:4],
     cur_date = dia+mes+anno
 
     phone = phonenumbers.parse(doc.company_id.phone, 
@@ -459,11 +459,14 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                     sb.Append('</Ubicacion>')
 
                 if receiver_company.phone:
-                    phone = phonenumbers.parse(receiver_company.phone, (receiver_company.country_id.code or 'CR'))
-                    sb.Append('<Telefono>')
-                    sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-                    sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
-                    sb.Append('</Telefono>')
+                    try:
+                        phone = phonenumbers.parse(receiver_company.phone, (receiver_company.country_id.code or 'CR'))
+                        sb.Append('<Telefono>')
+                        sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+                        sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+                        sb.Append('</Telefono>')
+                    except:
+                        pass
 
                 match = receiver_company.email and re.match(
                     r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', receiver_company.email.lower())
@@ -613,7 +616,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos + totalOtrosCargos - total_iva_devuelto, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
 
-    if inv.tipo_documento in ('NC', 'ND'):
+    if inv.invoice_id and inv.reference_code_id and inv.reference_document_id:
         sb.Append('<InformacionReferencia>')
         sb.Append('<TipoDoc>' + str(tipo_documento_referencia) + '</TipoDoc>')
         sb.Append('<Numero>' + str(numero_documento_referencia) + '</Numero>')
@@ -816,12 +819,15 @@ def get_economic_activities(company):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
+        _logger.error('MAB - get_economic_activities response: %s',
+                      response.json())
         response_json = {
             'status': 200,
-            'activities': response.json().get('actividades')
+            'activities': response.json().get('actividades'),
+            'name': response.json().get('nombre')
         }
-    elif 400 <= response.status_code <= 499:
-        response_json = {'status': 400, 'ind-estado': 'error'}
+    #elif 400 <= response.status_code <= 499:
+    #    response_json = {'status': 400, 'ind-estado': 'error'}
     else:
         _logger.error('MAB - get_economic_activities failed.  error: %s',
                       response.status_code)
@@ -1005,7 +1011,11 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.account_id = partner.property_account_payable_id
         invoice.payment_term_id = partner.property_supplier_payment_term_id
 
-        if load_lines:
+        _logger.error('MAB - load_lines: %s - account: %s' %
+                      (load_lines, account_id))
+
+        if load_lines and not invoice.invoice_line_ids:
+        #if True:  #load_lines:
             lines = invoice_xml.xpath("inv:DetalleServicio/inv:LineaDetalle", namespaces=namespaces)
             new_lines = invoice.env['account.invoice.line']
             for line in lines:
@@ -1034,9 +1044,13 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 taxes = []
                 tax_nodes = line.xpath("inv:Impuesto", namespaces=namespaces)
                 for tax_node in tax_nodes:
+                    tax_code = re.sub(r"[^0-9]+", "", tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text)
+                    tax_amount = float(tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text)/100
+                    _logger.debug('MAB - tax_code: %s', tax_code)
+                    _logger.debug('MAB - tax_amount: %s', tax_amount)
                     tax = invoice.env['account.tax'].search(
-                        [('tax_code', '=', re.sub(r"[^0-9]+", "", tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text)),
-                         ('amount', '=', tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text),
+                        [('tax_code', '=', tax_code),
+                         ('amount', '=', tax_amount),
                          ('type_tax_use', '=', 'purchase')],
                         limit=1)
                     if tax:
@@ -1047,9 +1061,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                         taxes.append((4,tax.id))
                     else:
                         raise UserError(_('Tax code %s and percentage %s is not registered in the system',
-                                        tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text,
-                                        tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text))
-
+                                        tax_code,  tax_amount))
+                _logger.debug('MAB - impuestos de linea: %s', taxes)
                 invoice_line = invoice.env['account.invoice.line'].create({
                     'name': line.xpath("inv:Detalle", namespaces=namespaces)[0].text,
                     'invoice_id': invoice.id,

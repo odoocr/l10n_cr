@@ -81,6 +81,18 @@
             <field name="active">true</field>
         </record>
 
+        <record id="cr_electronic_invoice.ReferenceDocument_14" model="reference.document">
+            <field name="code">14</field>
+            <field name="name">Comprobante aportado por contribuyente del Regimen Simplificado</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_15" model="reference.document">
+            <field name="code">15</field>
+            <field name="name">Sustituye una Factura Electronica de Compra</field>
+            <field name="active">true</field>
+        </record>
+
         <record id="cr_electronic_invoice.ReferenceDocument_99" model="reference.document">
             <field name="code">99</field>
             <field name="name">Otros</field>

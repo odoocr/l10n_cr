@@ -3,7 +3,7 @@
     <data>
         <!-- TODO-->
         <!-- Secuencias de MR para asignar a la primera compañía.  Si hay más compañías, debemos generar las secuencias-->
-        <function model="res.company" name="try_create_confirmation_sequeces">
+        <function model="res.company" name="try_create_configuration_sequences">
           <value model="res.company" search="[]"/>
         </function>
         <record id="seq_electronic_invoice" model="ir.sequence">
