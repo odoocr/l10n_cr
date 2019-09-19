@@ -66,11 +66,11 @@
                     <field name="vat"/>
                 </field>
 
-                <field name="incoterm_id" position="attributes">
+                <!-- <field name="incoterm_id" position="attributes">
                     <attribute name="attrs">{'invisible':
                         [('country_id','=',%(base.cr)d)]}
                     </attribute>
-                </field>
+                </field> -->
 
                 <xpath expr="//page[1]" position="after">
                     <page string="Facturación Electrónica">
