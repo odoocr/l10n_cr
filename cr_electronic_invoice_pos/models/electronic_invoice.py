@@ -1,4 +1,22 @@
-# -*- coding: utf-8 -*-
+from __future__ import print_function
+import functools
+import traceback
+import sys
+
+INDENT = 4*' '
+
+def stacktrace(func):
+    @functools.wraps(func)
+    def wrapped(*args, **kwds):
+        # Get all but last line returned by traceback.format_stack()
+        # which is the line below.
+        callstack = '\n'.join([INDENT+line.strip() for line in traceback.format_stack()][:-1])
+        _logger.error('MAB - {}() called:'.format(func.__name__))
+        _logger.error(callstack)
+        return func(*args, **kwds)
+
+    return wrapped
+##
 
 import base64
 import json
@@ -14,6 +32,15 @@ from threading import Lock
 lock = Lock()
 
 _logger = logging.getLogger(__name__)
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+
+    @stacktrace
+    @api.model
+    def create(self, vals):
+        return super(StockPicking, self).create(vals)
 
 
 class AccountJournal(models.Model):
@@ -397,8 +424,8 @@ class PosOrder(models.Model):
             'MAB - Valida Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.error('MAB - Valida Hacienda - POS Order %s / %s',
-                          current_order, total_orders)
+            _logger.error('MAB - Valida Hacienda - POS Order: "%s"  -  %s / %s',
+                          doc.number_electronic, current_order, total_orders)
 
             docName = doc.number_electronic
 
@@ -437,8 +464,12 @@ class PosOrder(models.Model):
                         continue
                 else:
                     if doc.amount_total >= 0:
+                        _logger.error(
+                            'MAB - Valida Hacienda - skipped Invoice %s', docName)
+                        doc.state_tributacion = 'no_aplica'
+                        continue
                         doc.tipo_documento = 'ND'
-                        razon_referencia = 'nota debito'
+                        razon_referencia = 'Reemplaza Factura'
                     else:
                         doc.tipo_documento = 'NC'
                         #tipo_documento_referencia = 'FE'
