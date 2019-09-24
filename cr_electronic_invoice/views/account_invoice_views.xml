@@ -31,6 +31,7 @@
                 </field>
                 <field name="fiscal_position_id" position="after">
                     <field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="reference_document_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="state_tributacion" readonly="1"/>
                     <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
@@ -77,11 +78,11 @@
                 <xpath expr="//group[1]" position="after">
                     <group string="Facturación Electrónica" col="2">
                         <group>
-                            <field name='tipo_documento' invisible="1" />
+                            <field name='tipo_documento'/>
                             <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], 'invisible':[('tipo_documento','!=', 'FEC')]}"/>
                             <field name="fname_xml_supplier_approval" invisible="1" />
                             <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}" />
-                            <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('state','!=', 'draft')]}" />
+                            <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC')]}" />
                         </group>
                         <group>
                             <field name="state_invoice_partner" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}"/>
@@ -141,7 +142,7 @@
             </field>
         </record>
 
-        <record id="view_invoice_line_form_inherit" model="ir.ui.view">
+        <!--record id="view_invoice_line_form_inherit" model="ir.ui.view">
             <field name="name">account.invoice.line.form.inherit</field>
             <field name="model">account.invoice.line</field>
             <field name="inherit_id" ref="account.view_invoice_line_form"/>
@@ -153,7 +154,7 @@
                     <field name="total_tax" invisible="1"/>
                 </field>
             </field>
-        </record>
+        </record-->
 
         <record id="view_account_invoice_refund_inherit" model="ir.ui.view">
             <field name="name">account.invoice.refund.form.inherit</field>
@@ -162,6 +163,7 @@
             <field name="arch" type="xml">
                 <field name="description" position="after">
                     <field name="reference_code_id"/>
+                    <field name="reference_document_id"/>
                     <field name="invoice_id" readonly="1"/>
                 </field>
             </field>

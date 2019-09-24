@@ -11,19 +11,25 @@
 
          <record id="cr_electronic_invoice.ReferenceCode_2" model="reference.code">
             <field name="code">02</field>
-            <field name="name">Corrige Monto</field>
+            <field name="name">Corrige texto de ocumento de referencia</field>
             <field name="active">true</field>
         </record>
 
         <record id="cr_electronic_invoice.ReferenceCode_3" model="reference.code">
             <field name="code">03</field>
-            <field name="name">Referencia a Otro Documento</field>
+            <field name="name">Corrige monto</field>
             <field name="active">true</field>
         </record>
 
         <record id="cr_electronic_invoice.ReferenceCode_4" model="reference.code">
             <field name="code">04</field>
-            <field name="name">Sustituye Comprobante Provisional por Contingencia</field>
+            <field name="name">Referencia a otro documento</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceCode_5" model="reference.code">
+            <field name="code">05</field>
+            <field name="name">Sustituye comprobante provisional por contigencia</field>
             <field name="active">true</field>
         </record>
 

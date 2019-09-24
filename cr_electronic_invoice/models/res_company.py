@@ -26,9 +26,9 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
-    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
+    activity_id = fields.Many2one("economic.activity", string="Actividad Económica por defecto", required=False, )
 
-    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
 
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(
@@ -121,11 +121,11 @@ class CompanyElectronic(models.Model):
             of the name or commercial name.
         """
         new_comp_id = super(CompanyElectronic, self).create(vals)
-        new_comp = self.browse(new_comp_id)
-        new_comp.try_create_configuration_sequences()
-        return new_comp.id
+        #new_comp = self.browse(new_comp_id)
+        new_comp_id.try_create_configuration_sequences()
+        return new_comp_id #new_comp.id
 
-    def try_create_confirmation_sequeces(self):
+    def try_create_configuration_sequences(self):
         """ Try to automatically add the Comprobante Confirmation sequence to the company.
             It will first check if sequence already exists before attempt to create. The s
             equence is coded with the following syntax:
@@ -159,16 +159,25 @@ class CompanyElectronic(models.Model):
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
+            _logger.error(
+                'E-INV CR  - Economic Activities: %s',
+                json_response)
+            if json_response["status"] == 200:
+                activities = json_response["activities"]
+                activities_codes = list()
+                for activity in activities:
+                    if activity["estado"] == "A":
+                        activities_codes.append(activity["codigo"])
+                economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
 
-            activities = json_response["activities"]
-            activities_codes = list()
-            for activity in activities:
-                if activity["estado"] == "A":
-                    activities_codes.append(activity["codigo"])
-            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
-
-            self.economic_activities_ids = economic_activities
-            print(economic_activities)
+                self.economic_activities_ids = economic_activities
+                self.name = json_response["name"]
+            else:
+                alert = {
+                    'title': json_response["status"],
+                    'message': json_response["text"]
+                }
+                return {'value': {'vat': ''}, 'warning': alert}
         else:
             alert = {
                 'title': 'Atención',

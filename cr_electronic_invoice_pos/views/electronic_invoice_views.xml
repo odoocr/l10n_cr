@@ -112,9 +112,17 @@
             </field>
         </record>
 
-    <!--/data>
+        <record id="view_pos_order_electronic_invoice_filter" model="ir.ui.view">
+            <field name="name">pos.order.electronic.invoice.filter</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_order_filter"/>
+            <field name="arch" type="xml">
+                <filter name="order_month" position="after">
+                    <filter string="Estado Tributacion" name="order_estado_tributacion" domain="[]" context="{'group_by':'state_tributacion'}"/>
+                </filter>
+            </field>
+        </record>
 
-    <data noupdate="0"-->
     <template id="pos_order_report">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">

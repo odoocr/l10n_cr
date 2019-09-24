@@ -3,7 +3,7 @@
     <data>
         <record id="view_economic_activity_form" model="ir.ui.view">
             <field name="name">economic.activity.form</field>
-            <field name="model">economic_activity</field>
+            <field name="model">economic.activity</field>
             <field name="arch" type="xml">
                 <form string="Actividad Económica">
                     <sheet string="Actividad Económica">
@@ -19,7 +19,7 @@
         
         <record id="view_economic_activity_tree" model="ir.ui.view">
             <field name="name">economic.activity.tree</field>
-            <field name="model">economic_activity</field>
+            <field name="model">economic.activity</field>
             <field name="arch" type="xml">
                 <tree string="Actividad Económica">
                     <field name="code"/>
@@ -31,7 +31,7 @@
 
         <record id="action_economic_activity" model="ir.actions.act_window">
             <field name="name">Actividad Económica</field>
-            <field name="res_model">economic_activity</field>
+            <field name="res_model">economic.activity</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
