@@ -969,7 +969,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
         try:
             invoice_xml = etree.fromstring(base64.b64decode(invoice.xml_supplier_approval))
-            document_type = re.search('FacturaElectronica|NotaCreditoElectronica|NotaDebitoElectronica', invoice_xml.tag).group(0)
+            document_type = re.search('FacturaElectronica|NotaCreditoElectronica|NotaDebitoElectronica|TiqueteElectronico', invoice_xml.tag).group(0)
         except Exception as e:
             raise UserError(_("This XML file is not XML-compliant. Error: %s") % e)
 
@@ -981,10 +981,14 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.reference = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
 
         invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
-        invoice.economic_activity_id = invoice.env['economic.activity'].search([('code', '=', invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)[0].text)], limit=1)
+        activity_node = invoice.env['economic.activity'].search([('code', '=', invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces))], limit=1)
+        if activity_node:
+            activity_id = activity_node[0].text
+        else:
+            activity_id = False
+        invoice.economic_activity_id = activity_id
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
         invoice.date_invoice = invoice.date_issuance
-
 
         emisor = invoice_xml.xpath(
             "inv:Emisor/inv:Identificacion/inv:Numero",
