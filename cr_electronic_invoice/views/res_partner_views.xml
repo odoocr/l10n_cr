@@ -63,7 +63,7 @@
                             options='{"no_open": True, "no_create": True}' 
                             attrs="{'invisible': [('supplier', '!=', True)]}" />
                         <field name="economic_activities_ids" invisible="1" readonly="1" />
-                        <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" /> 
+                        <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" colspan="2" /> 
                     </field>
 
                     <field name="category_id" position="after">
@@ -72,7 +72,7 @@
                 </data>
                 <xpath expr="//page[3]" position="after">
                     <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">
-                        <group col="3">
+                        <group col="2">
                             <field name="exoneration_number"/>
                             <field name="type_exoneration"/>
                             <field name="institution_name"/>

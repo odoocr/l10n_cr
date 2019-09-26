@@ -32,8 +32,8 @@ class PartnerElectronic(models.Model):
     institution_name = fields.Char(string="Institucion Emisora", required=False, )
     date_issue = fields.Date(string="Fecha de Emisión", required=False, )
     date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
-    activity_id = fields.Many2one("economic_activity", string="Actividad Económica por defecto", required=False, )
-    economic_activities_ids = fields.Many2many('economic_activity', string=u'Actividades Económicas',)
+    activity_id = fields.Many2one("economic.activity", string="Actividad Económica por defecto", required=False, )
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
 
 
     @api.onchange('phone')
@@ -104,16 +104,25 @@ class PartnerElectronic(models.Model):
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
+            _logger.error(
+                'E-INV CR  - Economic Activities: %s',
+                json_response)
+            if json_response["status"] == 200:
+                activities = json_response["activities"]
+                activities_codes = list()
+                for activity in activities:
+                    if activity["estado"] == "A":
+                        activities_codes.append(activity["codigo"])
+                economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
 
-            activities = json_response["activities"]
-            activities_codes = list()
-            for activity in activities:
-                if activity["estado"] == "A":
-                    activities_codes.append(activity["codigo"])
-            economic_activities = self.env['economic_activity'].search([('code', 'in', activities_codes)])
-
-            self.economic_activities_ids = economic_activities
-            print(economic_activities)
+                self.economic_activities_ids = economic_activities
+                self.name = json_response["name"]
+            else:
+                alert = {
+                    'title': json_response["status"],
+                    'message': json_response["text"]
+                }
+                return {'value': {'vat': ''}, 'warning': alert}
         else:
             alert = {
                 'title': 'Atención',
