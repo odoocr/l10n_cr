@@ -1064,7 +1064,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     tax = invoice.env['account.tax'].search(
                         [('tax_code', '=', tax_code),
                          ('amount', '=', tax_amount),
-                         ('type_tax_use', '=', 'purchase')],
+                         ('type_tax_use', '=', 'purchase'),
+                         ('active', '=', True)],
                         limit=1)
                     if tax:
                         total_tax += float(tax_node.xpath("inv:Monto", namespaces=namespaces)[0].text)
