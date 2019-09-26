@@ -426,7 +426,9 @@ class AccountInvoiceElectronic(models.Model):
     def load_xml_data(self):
         default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
         load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
-        api_facturae.load_xml_data(self, load_lines, default_account_id)
+        analytic_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_analytic_account_id')
+        product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
+        api_facturae.load_xml_data(self, load_lines, default_account_id, product_id, analytic_account_id)
 
     @api.multi
     def action_send_mrs_to_hacienda(self):

@@ -977,11 +977,11 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         inv_xmlns = namespaces.pop(None)
         namespaces['inv'] = inv_xmlns
 
-        #invoice.consecutive_number_receiver = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
-        invoice.reference = invoice.consecutive_number_receiver
+        # invoice.consecutive_number_receiver = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
+        invoice.reference = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
 
         invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
-        invoice.economic_activity_id = invoice.env['economic_activity'].search([('code', '=', invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)[0].text)], limit=1)
+        invoice.economic_activity_id = invoice.env['economic.activity'].search([('code', '=', invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)[0].text)], limit=1)
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
         invoice.date_invoice = invoice.date_issuance
 
@@ -1081,7 +1081,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'sequence': line.xpath("inv:NumeroLinea", namespaces=namespaces)[0].text,
                     'discount': discount_percentage,
                     'discount_note': discount_note,
-                    #'total_amount': total_amount,
+                    # 'total_amount': total_amount,
                     'product_id': product_id,
                     'account_id': account_id,
                     'account_analytic_id': analytic_account_id,
