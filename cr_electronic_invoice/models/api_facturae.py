@@ -141,7 +141,7 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
     elif doc.company_id.identification_id.code == '02' and len(inv_cedula) != 10:
         raise UserError(
             'La Cédula Jurídica del emisor debe de tener 10 dígitos')
-    elif doc.company_id.identification_id.code == '03' and (len(inv_cedula) != 11 or len(inv_cedula) != 12):
+    elif doc.company_id.identification_id.code == '03' and len(inv_cedula) not in (11, 12):
         raise UserError(
             'La identificación DIMEX del emisor debe de tener 11 o 12 dígitos')
     elif doc.company_id.identification_id.code == '04' and len(inv_cedula) != 10:
