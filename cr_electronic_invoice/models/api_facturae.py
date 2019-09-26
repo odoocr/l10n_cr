@@ -1026,8 +1026,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         _logger.error('MAB - load_lines: %s - account: %s' %
                       (load_lines, account_id))
 
-        if load_lines and not invoice.invoice_line_ids:
-        #if True:  #load_lines:
+        # if load_lines and not invoice.invoice_line_ids:
+        if load_lines:
             lines = invoice_xml.xpath("inv:DetalleServicio/inv:LineaDetalle", namespaces=namespaces)
             new_lines = invoice.env['account.invoice.line']
             for line in lines:
@@ -1058,7 +1058,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 tax_nodes = line.xpath("inv:Impuesto", namespaces=namespaces)
                 for tax_node in tax_nodes:
                     tax_code = re.sub(r"[^0-9]+", "", tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text)
-                    tax_amount = float(tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text)/100
+                    tax_amount = float(tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text)
                     _logger.debug('MAB - tax_code: %s', tax_code)
                     _logger.debug('MAB - tax_amount: %s', tax_amount)
                     tax = invoice.env['account.tax'].search(
@@ -1072,10 +1072,10 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
                         # TODO: Add exonerations
 
-                        taxes.append((4,tax.id))
+                        taxes.append((4, tax.id))
                     else:
-                        raise UserError(_('Tax code %s and percentage %s is not registered in the system',
-                                        tax_code,  tax_amount))
+                        raise UserError(_('Tax code %s and percentage %s is not registered in the system', tax_code, tax_amount))
+
                 _logger.debug('MAB - impuestos de linea: %s', taxes)
                 invoice_line = invoice.env['account.invoice.line'].create({
                     'name': line.xpath("inv:Detalle", namespaces=namespaces)[0].text,

@@ -1055,26 +1055,19 @@ class AccountInvoiceElectronic(models.Model):
                             for i in line_taxes['taxes']:
                                 if taxes_lookup[i['id']]['tax_code'] == 'service':
                                     total_servicio_salon += round(
-                                        subtotal_line * taxes_lookup[i['id']][
-                                            'tarifa'] / 100, 5)
+                                        subtotal_line * taxes_lookup[i['id']]['tarifa'] / 100, 5)
 
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     # tax_amount = round(i['amount'], 5) * quantity
-                                    tax_amount = round(
-                                        subtotal_line * taxes_lookup[i['id']][
-                                            'tarifa'] / 100, 5)
+                                    tax_amount = round(subtotal_line * taxes_lookup[i['id']]['tarifa'] / 100, 5)
                                     _line_tax += tax_amount
                                     tax = {
-                                        'codigo': taxes_lookup[i['id']][
-                                            'tax_code'],
-                                        'tarifa': taxes_lookup[i['id']][
-                                            'tarifa'],
+                                        'codigo': taxes_lookup[i['id']]['tax_code'],
+                                        'tarifa': taxes_lookup[i['id']]['tarifa'],
                                         'monto': tax_amount,
-                                        'iva_tax_desc': taxes_lookup[i['id']][
-                                            'iva_tax_desc'],
-                                        'iva_tax_code': taxes_lookup[i['id']][
-                                            'iva_tax_code'],
+                                        'iva_tax_desc': taxes_lookup[i['id']]['iva_tax_desc'],
+                                        'iva_tax_code': taxes_lookup[i['id']]['iva_tax_code'],
                                     }
                                     # Se genera la exoneración si existe para este impuesto
                                     if _tax_exoneration:
