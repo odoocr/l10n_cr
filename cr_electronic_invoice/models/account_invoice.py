@@ -1199,17 +1199,12 @@ class AccountInvoiceElectronic(models.Model):
                         inv.state_send_invoice = 'procesando'
                     else:
                         inv.state_tributacion = 'procesando'
-                    inv.message_post(
-                        subject='Error',
-                        body='Ya recibido anteriormente, se pasa a consultar')
+                    inv.message_post(subject='Error', body='Ya recibido anteriormente, se pasa a consultar')
                 elif inv.error_count > 10:
                     inv.message_post(subject='Error', body=response_text)
                     inv.electronic_invoice_return_message = response_text
                     inv.state_tributacion = 'error'
-                    _logger.error(
-                        'E-INV CR  - Invoice: %s  Status: %s Error sending XML: %s',
-                        inv.number_electronic,
-                        response_status, response_text)
+                    _logger.error('E-INV CR  - Invoice: %s  Status: %s Error sending XML: %s' % (inv.number_electronic, response_status, response_text))
                 else:
                     inv.error_count += 1
                     if inv.tipo_documento == 'FEC':
@@ -1217,10 +1212,7 @@ class AccountInvoiceElectronic(models.Model):
                     else:
                         inv.state_tributacion = 'procesando'
                     inv.message_post(subject='Error', body=response_text)
-                    _logger.error(
-                        'E-INV CR  - Invoice: %s  Status: %s Error sending XML: %s',
-                        inv.number_electronic,
-                        response_status, response_text)
+                    _logger.error('E-INV CR  - Invoice: %s  Status: %s Error sending XML: %s' % (inv.number_electronic, response_status, response_text))
 
     @api.multi
     def action_invoice_open(self):
@@ -1262,8 +1254,7 @@ class AccountInvoiceElectronic(models.Model):
 
             # Digital Supplier Invoice
             elif inv.type == 'in_invoice' and inv.partner_id.country_id and \
-                inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and \
-                    inv.partner_id.vat and inv.xml_supplier_approval is False:
+                inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and inv.partner_id.vat and inv.xml_supplier_approval is False:
                 inv.tipo_documento = 'FEC'
                 sequence = inv.company_id.FEC_sequence_id.next_by_id()
             else:
@@ -1272,12 +1263,10 @@ class AccountInvoiceElectronic(models.Model):
 
             # tipo de identificación
             if not inv.company_id.identification_id:
-                raise UserError(
-                    'Seleccione el tipo de identificación del emisor en el perfil de la compañía')
+                raise UserError('Seleccione el tipo de identificación del emisor en el perfil de la compañía')
 
             if inv.partner_id and inv.partner_id.vat:
-                identificacion = re.sub(
-                    '[^0-9]', '', inv.partner_id.vat)
+                identificacion = re.sub('[^0-9]', '', inv.partner_id.vat)
                 id_code = inv.partner_id.identification_id and inv.partner_id.identification_id.code
                 if not id_code:
                     if len(identificacion) == 9:
@@ -1290,29 +1279,20 @@ class AccountInvoiceElectronic(models.Model):
                         id_code = '05'
 
                 if id_code == '01' and len(identificacion) != 9:
-                    raise UserError(
-                        'La Cédula Física del receptor debe de tener 9 dígitos')
+                    raise UserError('La Cédula Física del receptor debe de tener 9 dígitos')
                 elif id_code == '02' and len(identificacion) != 10:
-                    raise UserError(
-                        'La Cédula Jurídica del receptor debe de tener 10 dígitos')
-                elif id_code == '03' and len(
-                        identificacion) not in (11, 12):
-                    raise UserError(
-                        'La identificación DIMEX del receptor debe de tener 11 o 12 dígitos')
+                    raise UserError('La Cédula Jurídica del receptor debe de tener 10 dígitos')
+                elif id_code == '03' and len(identificacion) not in (11, 12):
+                    raise UserError('La identificación DIMEX del receptor debe de tener 11 o 12 dígitos')
                 elif id_code == '04' and len(identificacion) != 10:
-                    raise UserError(
-                        'La identificación NITE del receptor debe de tener 10 dígitos')
+                    raise UserError('La identificación NITE del receptor debe de tener 10 dígitos')
 
                 if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
-                    raise UserError(
-                        'No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para' +
-                        inv.payment_term_id.name)
+                    raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para %s' % (inv.payment_term_id.name))
 
                 # Validate if invoice currency is the same as the company currency
-                if currency.name != self.company_id.currency_id.name and (
-                        not currency.rate_ids or not (
-                        len(currency.rate_ids) > 0)):
-                    raise UserError(_('No hay tipo de cambio registrado para la moneda ' + currency.name))
+                if currency.name != self.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
+                    raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
 
             # actividad_clinica = self.env.ref('cr_electronic_invoice.activity_851101')
             # if actividad_clinica.id == inv.economic_activity_id.id and inv.payment_methods_id.sequence == '02':
@@ -1347,7 +1327,7 @@ class AccountInvoiceElectronic(models.Model):
             inv.move_name = inv.sequence
             inv.move_id.name = inv.sequence
 
-        super(AccountInvoiceElectronic, self).action_invoice_open()
+            super(AccountInvoiceElectronic, self).action_invoice_open()
 
-        # convertir el monto de la factura a texto
-        self.invoice_amount_text = extensions.text_converter.number_to_text_es(self.amount_total)
+            # convertir el monto de la factura a texto
+            self.invoice_amount_text = ''

@@ -200,7 +200,8 @@ def get_token_hacienda(inv, tipo_ambiente):
         token_hacienda = token
     else:
         headers = {}
-        data = {'client_id': tipo_ambiente,
+        data = {
+                'client_id': tipo_ambiente,
                 'client_secret': '',
                 'grant_type': 'password',
                 'username': inv.company_id.frm_ws_identificador,
@@ -228,12 +229,10 @@ def get_token_hacienda(inv, tipo_ambiente):
                 last_tokens_refresh[inv.company_id.id] = response_json.get(
                     'refresh_expires_in')
             else:
-                _logger.error(
-                    'MAB - token_hacienda failed.  error: %s', response.status_code)
+                _logger.error('MAB - token_hacienda failed.  error: %s' % (response.status_code))
 
         except requests.exceptions.RequestException as e:
-            raise Warning(
-                'Error Obteniendo el Token desde MH. Excepcion %s' % e)
+            raise Warning(_('Error Obteniendo el Token desde MH. Excepcion %s' % (e)))
 
     return token_hacienda
 
@@ -825,8 +824,7 @@ def get_economic_activities(company):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
-        _logger.error('MAB - get_economic_activities response: %s',
-                      response.json())
+        _logger.error('MAB - get_economic_activities response: %s' % (response.json()))
         response_json = {
             'status': 200,
             'activities': response.json().get('actividades'),
@@ -1074,9 +1072,9 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
                         taxes.append((4, tax.id))
                     else:
-                        raise UserError(_('Tax code %s and percentage %s is not registered in the system', tax_code, tax_amount))
+                        raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))
 
-                _logger.debug('MAB - impuestos de linea: %s', taxes)
+                _logger.debug('MAB - impuestos de linea: %s' % (taxes))
                 invoice_line = invoice.env['account.invoice.line'].create({
                     'name': line.xpath("inv:Detalle", namespaces=namespaces)[0].text,
                     'invoice_id': invoice.id,
