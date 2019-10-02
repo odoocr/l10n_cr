@@ -861,7 +861,7 @@ class AccountInvoiceElectronic(models.Model):
                                                       ('number_electronic', '!=', False),
                                                       ('date_invoice', '>=', '2019-07-01'),
                                                       '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
-                                                      order='id', limit=max_invoices)
+                                                      order='id asc', limit=max_invoices)
         self.generate_and_send_invoices(invoices)
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
@@ -911,6 +911,8 @@ class AccountInvoiceElectronic(models.Model):
                 # date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
                 # date_cr = api_facturae.get_time_hacienda()
                 date_cr = now_cr.strftime("20" + anno + "-" + mes + "-" + dia + "T%H:%M:%S-06:00")
+
+                inv.date_issuance = date_cr
 
                 numero_documento_referencia = False
                 fecha_emision_referencia = False
@@ -1139,7 +1141,7 @@ class AccountInvoiceElectronic(models.Model):
                 # convertir el monto de la factura a texto
                 inv.invoice_amount_text = extensions.text_converter.number_to_text_es(
                     base_subtotal + total_impuestos - total_iva_devuelto)
-                inv.date_issuance = date_cr
+                
 
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
                 if not inv.origin:
