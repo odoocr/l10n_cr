@@ -646,6 +646,7 @@ class AccountInvoiceElectronic(models.Model):
                                'tipo_documento': doc_type,
                                'reference_code_id': reference_code_id,
                                'reference_document_id': reference_document_id,
+                               'economic_activity_id': invoice.economic_activity_id.id,
                                'payment_methods_id': invoice.payment_methods_id.id})
                 refund_invoice = self.create(values)
                 doc_type = {
