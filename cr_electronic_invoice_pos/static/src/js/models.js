@@ -54,7 +54,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
         var prefix = format(seq.prefix, idict);
         var suffix = format(seq.suffix, idict);
         seq.number_next_actual += seq.number_increment;
-        //debugger;
+        debugger;
         return prefix + pad(num, seq.padding) + suffix;
     };
 
@@ -73,7 +73,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             return PosModelParent.load_server_data.apply(this, arguments);
         },
         push_order: function(order, opts) {
-            debugger;
+            //debugger;
             if (order !== undefined) {
                 // revisar si es normal o devolucion . Pendiente !!!
                 if (order.get('client') && order.get('client').vat) {
@@ -87,7 +87,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
                     order.set({'tipo_documento': 'TE'});
                 }
             };
-            debugger;
+            //debugger;
             //return PosModelParent.push_order.call(order,opts);
             return PosModelParent.push_order.apply(this, arguments);
         }
@@ -100,7 +100,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             order['number_electronic'] = this.get('number_electronic');
             order['sequence'] = this.get('sequence');
             order['tipo_documento'] = this.get('tipo_documento');
-            debugger;
+            //debugger;
             return order;
         },
         export_as_JSON: function() {
@@ -108,7 +108,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             order['number_electronic'] = this.get('number_electronic');
             order['sequence'] = this.get('sequence');
             order['tipo_documento'] = this.get('tipo_documento');
-            debugger;
+            //debugger;
             return order;
         }
     });

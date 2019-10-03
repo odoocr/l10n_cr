@@ -1,4 +1,22 @@
-# -*- coding: utf-8 -*-
+from __future__ import print_function
+import functools
+import traceback
+import sys
+
+INDENT = 4*' '
+
+def stacktrace(func):
+    @functools.wraps(func)
+    def wrapped(*args, **kwds):
+        # Get all but last line returned by traceback.format_stack()
+        # which is the line below.
+        callstack = '\n'.join([INDENT+line.strip() for line in traceback.format_stack()][:-1])
+        _logger.error('MAB - {}() called:'.format(func.__name__))
+        _logger.error(callstack)
+        return func(*args, **kwds)
+
+    return wrapped
+##
 
 import base64
 import json
@@ -14,6 +32,15 @@ from threading import Lock
 lock = Lock()
 
 _logger = logging.getLogger(__name__)
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+
+    @stacktrace
+    @api.model
+    def create(self, vals):
+        return super(StockPicking, self).create(vals)
 
 
 class AccountJournal(models.Model):
@@ -67,13 +94,13 @@ class PosOrder(models.Model):
     @api.model
     def create(self, vals):
         number_electronic = vals.get('number_electronic', False)
-        if number_electronic:
+        if vals.get('pos_order_id', False):
+            vals['number_electronic'] = '/'
+        elif number_electronic:
             self.sequence_number_sync(vals)
             if self.env['pos.order'].search([('number_electronic', 'like', number_electronic[21:41])]):
                 vals['number_electronic'] = self.env['ir.sequence'].next_by_code(
                     'pos.order.recovery')
-        elif vals.get('pos_order_id', False):
-            vals['number_electronic'] = '/'
         order = super(PosOrder, self).create(vals)
         return order
 
@@ -121,6 +148,8 @@ class PosOrder(models.Model):
 
     sequence = fields.Char(string='Consecutivo', readonly=True, )
 
+    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )
+
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)',
          "La clave de comprobante debe ser única"),
@@ -129,12 +158,15 @@ class PosOrder(models.Model):
     @api.multi
     def action_pos_order_paid(self):
         for order in self:
-            if order.tipo_documento == 'NC':
-                order.number_electronic = order.session_id.config_id.NC_sequence_id._next()
+            if not order.pos_order_id:
+                continue
+            if order.tipo_documento == 'FE':
+                order.number_electronic = order.session_id.config_id.FE_sequence_id._next()
             elif order.tipo_documento == 'TE':
                 order.number_electronic = order.session_id.config_id.TE_sequence_id._next()
-            elif order.tipo_documento == 'FE':
-                order.number_electronic = order.session_id.config_id.FE_sequence_id._next()
+            else:
+                order.tipo_documento = 'NC'
+                order.number_electronic = order.session_id.config_id.NC_sequence_id._next()
             order.sequence = order.number_electronic[21:41]
         return super(PosOrder, self).action_pos_order_paid()
 
@@ -173,12 +205,23 @@ class PosOrder(models.Model):
                 'pos_order_id': referenced_order,
                 'reference_code_id': reference_code_id.id,
                 'tipo_documento': tipo_documento,
+                'pos_reference': order.pos_reference,
+                'lines': False,
+                'amount_tax': -order.amount_tax,
+                'amount_total': -order.amount_total,
+                'amount_paid': 0,
             })
+            for line in order.lines:
+                clone_line = line.copy({
+                    # required=True, copy=False
+                    'name': line.name + _(' REFUND'),
+                    'order_id': clone.id,
+                    'qty': -line.qty,
+                    'price_subtotal': -line.price_subtotal,
+                    'price_subtotal_incl': -line.price_subtotal_incl,
+                })
             PosOrder += clone
 
-        for clone in PosOrder:
-            for order_line in clone.lines:
-                order_line.write({'qty': -order_line.qty})
         return {
             'name': _('Return Products'),
             'view_type': 'form',
@@ -367,11 +410,11 @@ class PosOrder(models.Model):
                                                    #('name', 'like', '506030918%'),
                                                    #('name', 'not like', '**%'),
                                                    #('number_electronic', '=', False),
-                                                   '|', (no_partner, '=',
-                                                         True), ('partner_id', '!=', False),
+                                                   '|', (no_partner, '=', True), 
+                                                        '&', ('partner_id', '!=', False), ('partner_id.vat', '!=', False),
                                                    #('date_order', '>=', '2019-01-01'),
                                                    #('id', '=', 22145),
-                                                   ('tipo_documento', 'in', ('TE','FE')),
+                                                   ('tipo_documento', 'in', ('TE','FE','NC')),
                                                    ('state_tributacion', '=', False)],
                                                   order="date_order",
                                                   limit=max_orders)
@@ -381,19 +424,29 @@ class PosOrder(models.Model):
             'MAB - Valida Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.error('MAB - Valida Hacienda - POS Order %s / %s',
-                          current_order, total_orders)
+            _logger.error('MAB - Valida Hacienda - POS Order: "%s"  -  %s / %s',
+                          doc.number_electronic, current_order, total_orders)
 
             docName = doc.number_electronic
 
             # if doc.company_id.frm_ws_ambiente != 'disabled' and docName.isdigit():
 
-            if not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
+            if not docName or not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
                 _logger.error(
                     'MAB - Valida Hacienda - skipped Invoice %s', docName)
                 doc.state_tributacion = 'no_aplica'
                 continue
 
+            now_utc = datetime.datetime.now(pytz.timezone('UTC'))
+            now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
+            dia = docName[3:5]#'%02d' % now_cr.day,
+            mes = docName[5:7]#'%02d' % now_cr.month,
+            anno = docName[7:9]#str(now_cr.year)[2:4],
+            #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
+            date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
+            #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
+            #date_cr = api_facturae.get_time_hacienda()
+            doc.name = doc.number_electronic[21:41]
             if not doc.xml_comprobante:
                 #url = doc.company_id.frm_callback_url
                 numero_documento_referencia = False
@@ -411,8 +464,12 @@ class PosOrder(models.Model):
                         continue
                 else:
                     if doc.amount_total >= 0:
+                        _logger.error(
+                            'MAB - Valida Hacienda - skipped Invoice %s', docName)
+                        doc.state_tributacion = 'no_aplica'
+                        continue
                         doc.tipo_documento = 'ND'
-                        razon_referencia = 'nota debito'
+                        razon_referencia = 'Reemplaza Factura'
                     else:
                         doc.tipo_documento = 'NC'
                         #tipo_documento_referencia = 'FE'
@@ -425,15 +482,6 @@ class PosOrder(models.Model):
                     codigo_referencia = doc.reference_code_id.code
                     # FacturaReferencia = ''   *****************
 
-                now_utc = datetime.datetime.now(pytz.timezone('UTC'))
-                now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-                dia = docName[3:5]#'%02d' % now_cr.day,
-                mes = docName[5:7]#'%02d' % now_cr.month,
-                anno = docName[7:9]#str(now_cr.year)[2:4],
-                #date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
-                #date_cr = now_cr.strftime("2018-09-01T07:25:32-06:00")
-                #date_cr = api_facturae.get_time_hacienda()
                 #codigo_seguridad = docName[-8:]  # ,doc.company_id.security_code,
                 #if not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
                 #if not doc.statement_ids or not doc.statement_ids[0].statement_id or not doc.statement_ids[0].statement_id.journal_id or not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
@@ -460,6 +508,7 @@ class PosOrder(models.Model):
                 total_impuestos = 0.0
                 base_subtotal = 0.0
                 total_otros_cargos = 0.0
+                total_iva_devuelto = 0.0
 
                 for line in doc.lines:
                     line_number += 1
@@ -559,11 +608,13 @@ class PosOrder(models.Model):
                 doc.date_issuance = date_cr
                 invoice_comments = ''
 
+                doc.economic_activity_id = doc.company_id.activity_id
+
                 xml_string_builder = api_facturae.gen_xml_v43(
                     doc, sale_conditions, round(total_servicio_gravado, 5),
                     round(total_servicio_exento, 5), total_servicio_exonerado,
                     round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5),
-                    total_mercaderia_exonerado, total_otros_cargos, base_subtotal,
+                    total_mercaderia_exonerado, total_otros_cargos, total_iva_devuelto, base_subtotal,
                     total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
                     otros_cargos, currency_rate, invoice_comments,
                     tipo_documento_referencia, numero_documento_referencia,
@@ -592,6 +643,10 @@ class PosOrder(models.Model):
                 doc.xml_comprobante = base64.encodestring(xml_firmado)
 
                 _logger.error('MAB - SIGNED XML:%s', doc.fname_xml_comprobante)
+
+            else:
+                xml_firmado = doc.xml_comprobante
+
 
             # get token
             #response_json = fxunctions.token_hacienda(doc.company_id)

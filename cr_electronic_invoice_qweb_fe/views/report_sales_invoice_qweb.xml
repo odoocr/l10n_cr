@@ -7,9 +7,6 @@
 <template id="sale_stock.report_invoice_document_inherit_sale_stock" inherit_id="account.report_invoice_document">
 </template>
 
-<template id="account_payment_partner.report_invoice_payment_mode" inherit_id="account.report_invoice_document">
-</template>
-
 <template id="account.report_invoice_document_with_payments" inherit_id="account.report_invoice_document">
 </template>
 
@@ -33,7 +30,7 @@
                     </span><br/>
                     <span>Tel.</span> <t t-esc="o.company_id.phone"/><br/>
                     <t t-esc="o.company_id.email"/><br/>
-                    <t t-esc="o.company_id.website"/><br/><br/>
+                    <t t-if="o.company_id.website" t-esc="o.company_id.website"/>
                 </td>
                 <td width="30%">
                 <div class="text-center">
@@ -241,7 +238,7 @@
                 <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
             <br/>
             <div class="content">
-                <table cellspacing="0" style="height:120mm;width:100%;" class="mt30 mb30">
+                <table cellspacing="0" style="height:100mm;width:100%;" class="mt30 mb30">
                 <!--thead class="bb bt tble-header"-->
                 <thead class="tble-header">
                         <tr>
@@ -373,7 +370,7 @@
                         trámites de juicio ejecutivo. Esta factura devengará 3% mensual después de su vencimiento.
                     </p>
                     <t t-if="o.company_id.html_bank_account1 or o.company_id.html_bank_account2">
-                        <p>Puede realizar transferencias o depósitos mediante las siguientes Cuentas Bancarias de <t t-esc="o.company_id.commercial_name"/>:</p>
+                        Puede realizar transferencias o depósitos mediante las siguientes Cuentas Bancarias de <t t-esc="o.company_id.commercial_name"/>:
                         <table width="100%;" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td width="50%"> <t t-raw="o.company_id.html_bank_account1"/>
@@ -394,11 +391,12 @@
                                 </td>
                             </tr>
                         </table>
-                        <p><strong>CONFIRMACIONES:</strong> Para enviar confirmaciones de depósito    Correo:   <span t-field="o.company_id.email"/></p>
+                        <strong>CONFIRMACIONES:</strong> Para enviar confirmaciones de depósito    Correo:   <span t-field="o.company_id.email"/>
                     </t>
                 </div>
-                <p class="text-center" style="padding:2px 2px 2px 2px">Clave:<span t-field="o.number_electronic"/> // Usuario:<span t-field="o.create_uid.name"/></p>
-                <p class="text-center" style="padding:2px 2px 2px 2px">Autorizada mediante resolución No DGT-R-48-2016 del 7 de octubre de 2016</p>
+                <p class="text-center" style="padding:2px 2px 2px 2px">
+                  Clave:<span t-field="o.number_electronic"/> // Usuario:<span t-field="o.create_uid.name"/><br/>
+                  Autorizada mediante resolución No DGT-R-033-2019 del 20 de junio de 2019</p>
             </t>
             <link href="http://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css"/>
             <style type="text/css">
