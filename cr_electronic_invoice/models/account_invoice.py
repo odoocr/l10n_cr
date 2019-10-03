@@ -433,6 +433,7 @@ class AccountInvoiceElectronic(models.Model):
     @api.multi
     def action_send_mrs_to_hacienda(self):
         if self.state_invoice_partner:
+            self.state_send_invoice = False
             self.send_mrs_to_hacienda()
         else:
             raise UserError(_('You must select the aceptance state: Accepted, Parcial Accepted or Rejected'))
@@ -455,8 +456,7 @@ class AccountInvoiceElectronic(models.Model):
                                                      False)
                 else:
 
-                    if inv.state_send_invoice and inv.state_send_invoice in (
-                            'aceptado', 'rechazado', 'na'):
+                    if inv.state_send_invoice and inv.state_send_invoice in ('aceptado', 'rechazado', 'na'):
                         raise UserError(
                             'Aviso!.\n La factura de proveedor ya fue confirmada')
 
@@ -878,9 +878,8 @@ class AccountInvoiceElectronic(models.Model):
                 _logger.info('E-INV CR - Ignored invoice:%s', inv.number)
                 continue
 
-            _logger.debug(
-                'generate_and_send_invoices - Invoice %s / %s  -  number:%s',
-                current_invoice, total_invoices, inv.number_electronic)
+            _logger.debug('generate_and_send_invoices - Invoice %s / %s  -  number:%s',
+                          current_invoice, total_invoices, inv.number_electronic)
 
             if not inv.xml_comprobante or (inv.tipo_documento == 'FEC' and inv.state_send_invoice == 'rechazado'):
 
@@ -1141,7 +1140,6 @@ class AccountInvoiceElectronic(models.Model):
                 # convertir el monto de la factura a texto
                 inv.invoice_amount_text = extensions.text_converter.number_to_text_es(
                     base_subtotal + total_impuestos - total_iva_devuelto)
-                
 
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
                 if not inv.origin:
