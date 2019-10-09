@@ -25,10 +25,12 @@ Facturación electrónica Costa Rica
 |badge1| |badge2| |badge3| |badge4| |badge5| 
 
 
-Módulo para Odoo que implementa la Facturacion Electronica para Costa Rica actualmente en versión 4.2
+Módulo para Odoo que implementa la Facturacion Electronica para Costa Rica actualmente en versión 4.3
 
 - Agrega la generación de los archivos requeridos por el Ministerio de Hacienda al momento de generar una factura
+- Comunicación con el API de Tributación para la presentación de las facturas y su validación
 - Importación de facturas de proveedores y el envío del "Mensage Respuesta" (aceptación, aceptación parcial o rechazo).
+- Envío de Facturas Electrónica de Compra
 
 Más información en: https://www.hacienda.go.cr/ATV/ComprobanteElectronico/frmAnexosyEstructuras.aspx#
 
@@ -40,7 +42,7 @@ Más información en: https://www.hacienda.go.cr/ATV/ComprobanteElectronico/frmA
 Changelog
 =========
 
-11.0.1.0.0 (2018-11-01)
+12.0.1.0.0 (2019-06-25)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 * Creation and first draft of the module
@@ -75,12 +77,10 @@ Delfix S.A.
     * Joaquin Mena <jmena@akurey.com>
     * Julio Barboza <jbarboza@akurey.com>
 
-
 Contributors
 ~~~~~~~~~~~~
 * Nehemias Herrera
 * Esteban Monge <estebanmonge@riseup.net>
-
 
 Maintainers
 ~~~~~~~~~~~
