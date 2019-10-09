@@ -13,19 +13,12 @@ class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
-    state_id = fields.Many2one(
-        "res.country.state", string="Provincia", required=False, )
-    district_id = fields.Many2one(
-        "res.country.district", string="Distrito", required=False, )
-    county_id = fields.Many2one(
-        "res.country.county", string="Cantón", required=False, )
-    neighborhood_id = fields.Many2one(
-        "res.country.neighborhood", string="Barrios", required=False, )
-    identification_id = fields.Many2one("identification.type", string="Tipo de identificacion",
-                                        required=False, )
-    payment_methods_id = fields.Many2one(
-        "payment.methods", string="Métodos de Pago", required=False, )
-
+    state_id = fields.Many2one("res.country.state", string="Provincia", required=False, )
+    district_id = fields.Many2one("res.country.district", string="Distrito", required=False, )
+    county_id = fields.Many2one("res.country.county", string="Cantón", required=False, )
+    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Barrios", required=False, )
+    identification_id = fields.Many2one("identification.type", string="Tipo de identificacion",required=False, )
+    payment_methods_id = fields.Many2one("payment.methods", string="Métodos de Pago", required=False, )
     has_exoneration = fields.Boolean(string="Posee exoneración", required=False)
     type_exoneration = fields.Many2one("aut.ex", string="Tipo Autorizacion", required=False, )
     exoneration_number = fields.Char(string="Número de exoneración", required=False, )
@@ -34,13 +27,12 @@ class PartnerElectronic(models.Model):
     date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Actividad Económica por defecto", required=False, )
     economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
-
+    export = fields.Boolean(string="It's export", default=False)
 
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:
-            phone = phonenumbers.parse(self.phone,
-            self.country_id and self.country_id.code or 'CR')
+            phone = phonenumbers.parse(self.phone, self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(phone)
             if not valid:
                 alert = {
@@ -52,8 +44,7 @@ class PartnerElectronic(models.Model):
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:
-            mobile = phonenumbers.parse(self.mobile, 
-                self.country_id and self.country_id.code or 'CR')
+            mobile = phonenumbers.parse(self.mobile, self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(mobile)
             if not valid:
                 alert = {
