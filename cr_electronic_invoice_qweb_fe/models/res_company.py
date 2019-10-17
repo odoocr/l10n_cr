@@ -21,3 +21,9 @@ class ResCompany(models.Model):
 
     html_bank_account1 = fields.Html(string="HTML Cuenta CRC")
     html_bank_account2 = fields.Html(string="HTML Cuenta USD")
+
+class res_company(models.Model):
+        _name = 'res.company'
+        _inherit = ['res.company']
+
+        cr_invoice_color = fields.Selection([('green','Green'),('sempai','Sempai'),('moresempai','More Sempai'),('blue', 'Blue'),('black', 'Black')],required=True,default='black')
