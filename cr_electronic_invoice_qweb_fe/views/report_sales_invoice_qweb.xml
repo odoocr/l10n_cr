@@ -55,7 +55,7 @@
                     <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.number"/>
                 </div>
                 <div class="text-center">
-                    <table style="width:100%;" class="dtheader rounded2">
+                    <table t-if="o.date_issuance" style="width:100%;" class="dtheader rounded2">
                     <tr>
                         <td class="text-center">DÍA</td>
                         <td class="text-center">MES</td>
@@ -67,6 +67,14 @@
                         <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[5:7]) or o.date_invoice and (o.date_invoice[5:7]) or ''"/></td>
                         <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[0:4]) or o.date_invoice and (o.date_invoice[0:4]) or ''"/></td>
                         <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[11:16]) or ''"/></td>
+                    </tr>
+                    </table>
+                    <table t-if="not o.date_issuance" style="width:100%;" class="dtheader rounded2">
+                    <tr>
+                        <td class="text-center">FECHA</td>
+                    </tr>
+                    <tr>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_invoice or ''"/></td>
                     </tr>
                     </table>
                 </div>
