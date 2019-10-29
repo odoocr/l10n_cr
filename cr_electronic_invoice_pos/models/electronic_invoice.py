@@ -1,3 +1,4 @@
+"""
 from __future__ import print_function
 import functools
 import traceback
@@ -16,6 +17,7 @@ def stacktrace(func):
         return func(*args, **kwds)
 
     return wrapped
+"""
 ##
 
 import base64
@@ -37,7 +39,7 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
 
-    @stacktrace
+    #@stacktrace
     @api.model
     def create(self, vals):
         return super(StockPicking, self).create(vals)

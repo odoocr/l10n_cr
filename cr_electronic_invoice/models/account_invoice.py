@@ -63,7 +63,7 @@ class AccountInvoiceRefund(models.TransientModel):
                     description = form.description or inv.name
 
                     if inv.tipo_documento in ('FE', 'TE') and inv.state_tributacion == 'rechazado':
-                        tipo_refund == 'out_invoice'
+                        tipo_refund = 'out_invoice'
                         tipo_doc = inv.tipo_documento
                     elif inv.type == 'out_invoice':
                         tipo_refund = 'out_refund'
@@ -269,7 +269,7 @@ class AccountInvoiceElectronic(models.Model):
                    ('CCE', 'MR Aceptación'),
                    ('CPCE', 'MR Aceptación Parcial'),
                    ('RCE', 'MR Rechazo'),
-                   ('FEC', 'Factura Electrónica de Exportación')],
+                   ('FEC', 'Factura Electrónica de Compra')],
         string="Tipo Comprobante",
         required=False, default='FE',
         help='Indica el tipo de documento de acuerdo a la '
