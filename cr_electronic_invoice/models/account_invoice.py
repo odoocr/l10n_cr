@@ -302,14 +302,20 @@ class AccountInvoiceElectronic(models.Model):
             if inv.type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
                     inv.economic_activities_ids = inv.partner_id.economic_activities_ids
+                    inv.economic_activities_id = inv.partner_id.activity_id
             else:
                 inv.economic_activities_ids = inv.company_id.economic_activities_ids
+                inv.economic_activities_id = inv.company_id.activity_id
 
     @api.multi
     @api.onchange('partner_id')
     def _partner_changed(self):
         if self.partner_id.export:
             self.tipo_documento = 'FEE'
+
+        if self.type in ('in_invoice', 'in_refund'):
+            if self.partner_id:
+                self.payment_methods_id = self.partner_id.payment_methods_id
 
     @api.multi
     def action_invoice_sent(self):

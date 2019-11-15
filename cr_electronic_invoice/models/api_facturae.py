@@ -968,6 +968,10 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         try:
             invoice_xml = etree.fromstring(base64.b64decode(invoice.xml_supplier_approval))
             document_type = re.search('FacturaElectronica|NotaCreditoElectronica|NotaDebitoElectronica|TiqueteElectronico', invoice_xml.tag).group(0)
+
+            if document_type == 'TiqueteElectronico':
+                raise UserError(_("This is a TICKET only invoices are valid for taxes"))
+
         except Exception as e:
             raise UserError(_("This XML file is not XML-compliant. Error: %s") % e)
 
