@@ -82,6 +82,7 @@
                                 <field name="frm_pin" password="True"/>
                             </group>
                             <group cols="2">
+                                <button name="test_get_token" type="object" string="Test get token" colspan="2" />
                                 <field name="frm_ws_ambiente" widget="radio"/>
                             </group>
                             <group cols="2">

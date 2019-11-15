@@ -156,6 +156,14 @@ class CompanyElectronic(models.Model):
             self.write(to_write)
 
     @api.multi
+    def test_get_token(self):
+        token_m_h = api_facturae.get_token_hacienda(
+            self.env.user, self.frm_ws_ambiente)
+        if token_m_h:
+           _logger.info('E-INV CR - I got the token')
+        return 
+
+    @api.multi
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
