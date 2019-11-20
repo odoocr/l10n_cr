@@ -315,7 +315,10 @@ class AccountInvoiceElectronic(models.Model):
 
         if self.type in ('in_invoice', 'in_refund'):
             if self.partner_id:
-                self.payment_methods_id = self.partner_id.payment_methods_id
+                if self.payment_methods_id:
+                    self.payment_methods_id = self.partner_id.payment_methods_id
+                else:
+                    raise UserError(_('Partner does not have a default payment method'))
 
     @api.multi
     def action_invoice_sent(self):
