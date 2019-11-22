@@ -818,7 +818,7 @@ def get_economic_activities(company):
     }
 
     try:
-        response = requests.get(endpoint, headers=headers)
+        response = requests.get(endpoint, headers=headers, verify=False)
     except requests.exceptions.RequestException as e:
         _logger.error('Exception %s' % e)
         return {'status': -1, 'text': 'Excepcion %s' % e}
