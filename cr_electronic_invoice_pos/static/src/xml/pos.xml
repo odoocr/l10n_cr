@@ -25,6 +25,7 @@
 
     <t t-extend="PosTicket">
         <t t-jquery="div.pos-center-align:first" t-operation="after">
+          <t t-if="order.attributes.number_electronic">
             <div class="pos-center-align">
                   Clave: <br/>
                   <t t-esc="order.attributes.number_electronic.substring(0,25)"/><br/>
@@ -34,6 +35,7 @@
                   Consecutivo: <br/>
                   <t t-esc="order.attributes.number_electronic.substring(21,41)"/>
             </div>
+          </t>
         </t>
         <t t-jquery="t[t-esc='widget.pos.company.name']" t-operation="after">
             <t t-if="widget.pos.company.vat">
