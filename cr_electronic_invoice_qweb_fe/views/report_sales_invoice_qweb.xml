@@ -55,7 +55,7 @@
                     <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.number"/>
                 </div>
                 <div class="text-center">
-                    <table style="width:100%;" class="dtheader rounded2">
+                    <table t-if="o.date_issuance" style="width:100%;" class="dtheader rounded2">
                     <tr>
                         <td class="text-center">DÍA</td>
                         <td class="text-center">MES</td>
@@ -69,22 +69,30 @@
                         <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[11:16]) or ''"/></td>
                     </tr>
                     </table>
+                    <table t-if="not o.date_issuance" style="width:100%;" class="dtheader rounded2">
+                    <tr>
+                        <td class="text-center">FECHA</td>
+                    </tr>
+                    <tr>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_invoice or ''"/></td>
+                    </tr>
+                    </table>
                 </div>
                 </td>
             </tr>
             </table>
 
             <link href="http://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css"/>
-            <style type="text/css">
-                
+            <style  t-if="o.company_id.cr_invoice_color == 'black'" type="text/css">
+
                     body {
                         font-family: 'Droid Sans', Arial, sans-serif;
                         font-size:16px;
 
                     }
-                
+
                 .title{
-                color:#222222;
+                color:#222;
                 font-size:24px;
                 font-weight:bolder;
                 }
@@ -100,6 +108,142 @@
                 }
                 .dtcls{
                 color:#222;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+        </style>
+        <style  t-if="o.company_id.cr_invoice_color == 'sempai'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#ce0b9d;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#ce0b9d;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#ce0b9d;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+            </style>
+        <style  t-if="o.company_id.cr_invoice_color == 'moresempai'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#661ab2;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#661ab2;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#661ab2;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+            </style>
+            <style  t-if="o.company_id.cr_invoice_color == 'blue'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#2874A6;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#2874A6;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#2874A6;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+            </style>
+            <style  t-if="o.company_id.cr_invoice_color == 'green'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#196F3D;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#196F3D;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#196F3D;
                 width:25%;
                 padding:5px 5px;
                 border: 1px solid;
