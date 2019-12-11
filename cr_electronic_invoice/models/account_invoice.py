@@ -290,15 +290,15 @@ class AccountInvoiceElectronic(models.Model):
 
     economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities')
 
-    total_serv_gravados = fields.Monetary(string='Total de servicios gravados', readonly=True,)
-    total_serv_exentos = fields.Monetary(string='Total de servicios excentos', readonly=True,)
-    total_serv_exonerado = fields.Monetary(string='Total de servicios exonerados', readonly=True,)
-    total_mercancias_gravadas = fields.Monetary(string='Total de mercancías gravadas', readonly=True,)
-    total_mercancias_exentas = fields.Monetary(string='Total de mercancías excentas', readonly=True,)
-    total_merc_exonerada = fields.Monetary(string='Total de servicios exoneradas', readonly=True,)
-    total_gravado = fields.Monetary(string='Total gravados', readonly=True,)
-    total_exento = fields.Monetary(string='Total excento', readonly=True,)
-    total_exonerado = fields.Monetary(string='Total exonerado', readonly=True,)
+    # total_serv_gravados = fields.Monetary(string='Total de servicios gravados', readonly=True,)
+    # total_serv_exentos = fields.Monetary(string='Total de servicios excentos', readonly=True,)
+    # total_serv_exonerado = fields.Monetary(string='Total de servicios exonerados', readonly=True,)
+    # total_mercancias_gravadas = fields.Monetary(string='Total de mercancías gravadas', readonly=True,)
+    # total_mercancias_exentas = fields.Monetary(string='Total de mercancías excentas', readonly=True,)
+    # total_merc_exonerada = fields.Monetary(string='Total de servicios exoneradas', readonly=True,)
+    # total_gravado = fields.Monetary(string='Total gravados', readonly=True,)
+    # total_exento = fields.Monetary(string='Total excento', readonly=True,)
+    # total_exonerado = fields.Monetary(string='Total exonerado', readonly=True,)
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
@@ -335,20 +335,14 @@ class AccountInvoiceElectronic(models.Model):
         self.ensure_one()
 
         if self.invoice_id.type == 'in_invoice' or self.invoice_id.type == 'in_refund':
-            email_template = self.env.ref(
-                'cr_electronic_invoice.email_template_invoice_vendor', False)
+            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
         else:
-            email_template = self.env.ref(
-                'account.email_template_edi_invoice', False)
+            email_template = self.env.ref('account.email_template_edi_invoice', False)
 
         email_template.attachment_ids = [(5)]
 
         if self.env.user.company_id.frm_ws_ambiente == 'disabled':
-            email_template.with_context(type='binary', default_type='binary').send_mail(
-                        self.id,
-                        raise_exception=False,
-                        force_send=True)  # default_type='binary'
-
+            email_template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
         elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
 
             attachment = self.env['ir.attachment'].search(
