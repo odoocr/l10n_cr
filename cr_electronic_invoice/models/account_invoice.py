@@ -1333,7 +1333,6 @@ class AccountInvoiceElectronic(models.Model):
                         'quantity': 1,
                     })
 
-            #super(AccountInvoiceElectronic, inv).action_invoice_open()
             response_json = api_facturae.get_clave_hacienda(inv,
                                                             inv.tipo_documento,
                                                             sequence,
