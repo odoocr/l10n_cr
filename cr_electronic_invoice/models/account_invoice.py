@@ -343,7 +343,13 @@ class AccountInvoiceElectronic(models.Model):
 
         email_template.attachment_ids = [(5)]
 
-        if self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
+        if self.env.user.company_id.frm_ws_ambiente == 'disabled':
+            email_template.with_context(type='binary', default_type='binary').send_mail(
+                        self.id,
+                        raise_exception=False,
+                        force_send=True)  # default_type='binary'
+
+        elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
 
             attachment = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'),
