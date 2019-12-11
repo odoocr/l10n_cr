@@ -1240,6 +1240,7 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             if inv.company_id.frm_ws_ambiente == 'disabled':
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
+                inv.tipo_doc = None
                 continue
 
             currency = inv.currency_id
