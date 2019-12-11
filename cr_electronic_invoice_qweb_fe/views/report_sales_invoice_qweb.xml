@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-<data>
+<data noupdate="1">
 <template id="sale.report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
 </template>
 
