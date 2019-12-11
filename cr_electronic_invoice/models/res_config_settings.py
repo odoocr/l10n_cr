@@ -11,13 +11,14 @@ class AccountConfigSettings(models.TransientModel):
 
     expense_account_id = fields.Many2one(
         'account.account',
-        company_dependent=True,
+        related='company_id.expense_account_id',
         string=_("Default Expense Account for loading data from XML"),
         domain=[('deprecated', '=', False)],
         help=_("The expense account used when loading Costa Rican digital invoice"))
 
     load_lines = fields.Boolean(
         string=_('Indicates if invoice lines should be load when loading a Costa Rican Digital Invoice'),
+        related='company_id.load_lines',
     )
 """
     @api.model

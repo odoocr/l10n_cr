@@ -22,3 +22,8 @@ class ProductElectronic(models.Model):
     tariff_head = fields.Char(string="Partida arancelaria para factura"
                                      " de exportación",
                               required=False, )
+
+class ProductCategory(models.Model):
+    _inherit = "product.category"
+
+    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )

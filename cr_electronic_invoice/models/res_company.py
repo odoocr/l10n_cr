@@ -2,7 +2,7 @@
 
 import logging
 import phonenumbers
-from odoo import models, fields, api
+from odoo import _, api, fields, models
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -59,6 +59,16 @@ class CompanyElectronic(models.Model):
                                  default="1")
     terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False,
                                  default="1")
+
+    expense_account_id = fields.Many2one(
+        'account.account',
+        string=_("Default Expense Account for loading data from XML"),
+        domain=[('deprecated', '=', False)],
+        help=_("The expense account used when loading Costa Rican digital invoice"))
+
+    load_lines = fields.Boolean(
+        string=_('Indicates if invoice lines should be load when loading a Costa Rican Digital Invoice'),
+    )
 
     CCE_sequence_id = fields.Many2one(
         'ir.sequence',
