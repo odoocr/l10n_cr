@@ -290,6 +290,16 @@ class AccountInvoiceElectronic(models.Model):
 
     economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities')
 
+    total_serv_gravados = fields.Monetary(string='Total de servicios gravados', readonly=True,)
+    total_serv_exentos = fields.Monetary(string='Total de servicios excentos', readonly=True,)
+    total_serv_exonerado = fields.Monetary(string='Total de servicios exonerados', readonly=True,)
+    total_mercancias_gravadas = fields.Monetary(string='Total de mercancías gravadas', readonly=True,)
+    total_mercancias_exentas = fields.Monetary(string='Total de mercancías excentas', readonly=True,)
+    total_merc_exonerada = fields.Monetary(string='Total de servicios exoneradas', readonly=True,)
+    total_gravado = fields.Monetary(string='Total gravados', readonly=True,)
+    total_exento = fields.Monetary(string='Total excento', readonly=True,)
+    total_exonerado = fields.Monetary(string='Total exonerado', readonly=True,)
+
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
@@ -1323,7 +1333,7 @@ class AccountInvoiceElectronic(models.Model):
                         'quantity': 1,
                     })
 
-            super(AccountInvoiceElectronic, inv).action_invoice_open()
+            #super(AccountInvoiceElectronic, inv).action_invoice_open()
             response_json = api_facturae.get_clave_hacienda(inv,
                                                             inv.tipo_documento,
                                                             sequence,
