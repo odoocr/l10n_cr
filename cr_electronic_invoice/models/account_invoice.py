@@ -1312,7 +1312,7 @@ class AccountInvoiceElectronic(models.Model):
                     raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para %s' % (inv.payment_term_id.name))
 
                 # Validate if invoice currency is the same as the company currency
-                if currency.name != self.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
+                if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
                     raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
 
             # actividad_clinica = self.env.ref('cr_electronic_invoice.activity_851101')
@@ -1334,20 +1334,20 @@ class AccountInvoiceElectronic(models.Model):
                         'quantity': 1,
                     })
 
+            super(AccountInvoiceElectronic, inv).action_invoice_open()
+
             response_json = api_facturae.get_clave_hacienda(inv,
                                                             inv.tipo_documento,
                                                             sequence,
                                                             inv.journal_id.sucursal,
                                                             inv.journal_id.terminal)
-
             inv.number_electronic = response_json.get('clave')
             inv.sequence = response_json.get('consecutivo')
             inv.number = inv.sequence
-            inv.state_send_invoice = False
             inv.move_name = inv.sequence
             inv.move_id.name = inv.sequence
+            inv.state_send_invoice = False
+            inv.invoice_amount_text = ''
 
-            super(AccountInvoiceElectronic, self).action_invoice_open()
-
-            # convertir el monto de la factura a texto
-            self.invoice_amount_text = ''
+            
+            
