@@ -181,11 +181,20 @@ class InvoiceLineElectronic(models.Model):
     product_code = fields.Char(
         related='product_id.default_code',
     )
-    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", 
+    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica",
                                            required=False, store=True,
                                            # default=_get_default_activity_id)
                                            default=False)
+    non_tax_deductible = fields.Boolean(string='Indicates if this invoice is non-tax deductible',)
 
+    @api.onchange('product_id')
+    def product_changed(self):
+        if self.product_id.non_tax_deductible:
+            self.non_tax_deductible = True
+        else:
+            self.non_tax_deductible = False
+
+        
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -290,16 +299,6 @@ class AccountInvoiceElectronic(models.Model):
 
     economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities')
 
-    # total_serv_gravados = fields.Monetary(string='Total de servicios gravados', readonly=True,)
-    # total_serv_exentos = fields.Monetary(string='Total de servicios excentos', readonly=True,)
-    # total_serv_exonerado = fields.Monetary(string='Total de servicios exonerados', readonly=True,)
-    # total_mercancias_gravadas = fields.Monetary(string='Total de mercancías gravadas', readonly=True,)
-    # total_mercancias_exentas = fields.Monetary(string='Total de mercancías excentas', readonly=True,)
-    # total_merc_exonerada = fields.Monetary(string='Total de servicios exoneradas', readonly=True,)
-    # total_gravado = fields.Monetary(string='Total gravados', readonly=True,)
-    # total_exento = fields.Monetary(string='Total excento', readonly=True,)
-    # total_exonerado = fields.Monetary(string='Total exonerado', readonly=True,)
-
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
@@ -378,8 +377,7 @@ class AccountInvoiceElectronic(models.Model):
                         'sent': True,
                     })
                 else:
-                    raise UserError(
-                        _('Response XML from Hacienda has not been received'))
+                    raise UserError(_('Response XML from Hacienda has not been received'))
             else:
                 raise UserError(_('Invoice XML has not been generated'))
         else:
@@ -476,8 +474,7 @@ class AccountInvoiceElectronic(models.Model):
                 else:
 
                     if inv.state_send_invoice and inv.state_send_invoice in ('aceptado', 'rechazado', 'na'):
-                        raise UserError(
-                            'Aviso!.\n La factura de proveedor ya fue confirmada')
+                        raise UserError('Aviso!.\n La factura de proveedor ya fue confirmada')
 
                     if abs(
                             inv.amount_total_electronic_invoice - inv.amount_total) > 1:
@@ -870,19 +867,23 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.multi
     def action_create_fec(self):
-        self.generate_and_send_invoices(self)
+        if inv.company_id.frm_ws_ambiente == 'disabled':
+            raise UserError(_('Hacienda API is disabled in company'))
+        else:
+            self.generate_and_send_invoices(self)
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
-        _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
-        invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
-                                                      ('state', 'in', ('open', 'paid')),
-                                                      ('number_electronic', '!=', False),
-                                                      ('date_invoice', '>=', '2019-07-01'),
-                                                      '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
-                                                      order='id asc', limit=max_invoices)
-        self.generate_and_send_invoices(invoices)
-        _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
+        if inv.company_id.frm_ws_ambiente != 'disabled':
+            _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
+            invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
+                                                        ('state', 'in', ('open', 'paid')),
+                                                        ('number_electronic', '!=', False),
+                                                        ('date_invoice', '>=', '2019-07-01'),
+                                                        '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
+                                                        order='id asc', limit=max_invoices)
+            self.generate_and_send_invoices(invoices)
+            _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
     @api.multi
     def generate_and_send_invoices(self, invoices):

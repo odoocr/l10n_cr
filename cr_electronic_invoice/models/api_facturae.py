@@ -915,10 +915,6 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
                 _logger.error('MAB - consulta documento error al enviar correo: %s',
                              inv.number_electronic)
 
-            #email_template.with_context(type='binary', default_type='binary').send_mail(inv.id,
-            #                                                                            raise_exception=False,
-            #                                                                            force_send=True)  # default_type='binary'
-
             # limpia el template de los attachments
             email_template.attachment_ids = [(5)]
 
@@ -1063,20 +1059,33 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     tax_amount = float(tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text)
                     _logger.debug('MAB - tax_code: %s', tax_code)
                     _logger.debug('MAB - tax_amount: %s', tax_amount)
-                    tax = invoice.env['account.tax'].search(
-                        [('tax_code', '=', tax_code),
-                         ('amount', '=', tax_amount),
-                         ('type_tax_use', '=', 'purchase'),
-                         ('active', '=', True)],
-                        limit=1)
+
+                    if product_id.non_tax_deductible:
+                        tax = invoice.env['account.tax'].search(
+                                        [('tax_code', '=', tax_code),
+                                        ('amount', '=', tax_amount),
+                                        ('type_tax_use', '=', 'purchase'),
+                                        ('non_tax_deductible', '=', True),
+                                        ('active', '=', True)],
+                                        limit=1)
+                    else:
+                        tax = invoice.env['account.tax'].search(
+                            [('tax_code', '=', tax_code),
+                            ('amount', '=', tax_amount),
+                            ('type_tax_use', '=', 'purchase'),
+                            ('active', '=', True)],
+                            limit=1)
+
                     if tax:
                         total_tax += float(tax_node.xpath("inv:Monto", namespaces=namespaces)[0].text)
 
                         # TODO: Add exonerations
-
                         taxes.append((4, tax.id))
                     else:
-                        raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))
+                        if product_id.non_tax_deductible:
+                            raise UserError(_('Tax code %s and percentage %s as non-tax deductible is not registered in the system' % (tax_code, tax_amount)))
+                        else:
+                            raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))
 
                 _logger.debug('MAB - impuestos de linea: %s' % (taxes))
                 invoice_line = invoice.env['account.invoice.line'].create({

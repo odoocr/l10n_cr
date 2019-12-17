@@ -43,7 +43,7 @@ class ImportInvoiceImportWizardCR(models.TransientModel):
 
         invoice.fname_xml_supplier_approval = attachment.datas_fname
         invoice.xml_supplier_approval = base64.encodestring(attachment.index_content.encode('UTF-8'))
-        api_facturae.load_xml_data(invoice, True, self.account_id.id, self.static_product_id.id, self.account_analytic_id.id)
+        api_facturae.load_xml_data(invoice, True, self.account_id, self.static_product_id, self.account_analytic_id)
         attachment.write({'res_model': 'account.invoice', 'res_id': invoice.id})
         invoice.message_post(attachment_ids=[attachment.id])
         return invoice
