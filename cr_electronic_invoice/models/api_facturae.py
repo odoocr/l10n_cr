@@ -1098,9 +1098,9 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'discount': discount_percentage,
                     'discount_note': discount_note,
                     # 'total_amount': total_amount,
-                    'product_id': product_id,
-                    'account_id': account_id,
-                    'account_analytic_id': analytic_account_id,
+                    'product_id': product_id.id or False,
+                    'account_id': account_id.id or False,
+                    'account_analytic_id': analytic_account_id.id or False,
                     'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                     'total_tax': total_tax,
                 })
