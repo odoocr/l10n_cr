@@ -874,7 +874,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
-        if inv.company_id.frm_ws_ambiente != 'disabled':
+        if self.company_id.frm_ws_ambiente != 'disabled':
             _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
             invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
                                                         ('state', 'in', ('open', 'paid')),

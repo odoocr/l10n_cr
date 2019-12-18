@@ -11,7 +11,7 @@
                     <field name="commercial_measurement" required="0"/>
                 </field>
                 <field name="type" position="after">
-                    <field name="non_tax_deductible" required="0"/>
+                    <field name="non_tax_deductible" default="0" groups="" />
                 </field>
             </field>
         </record>
