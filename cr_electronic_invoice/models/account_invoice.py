@@ -880,7 +880,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.multi
     def action_create_fec(self):
-        if inv.company_id.frm_ws_ambiente == 'disabled':
+        if self.company_id.frm_ws_ambiente == 'disabled':
             raise UserError(_('Hacienda API is disabled in company'))
         else:
             self.generate_and_send_invoices(self)
