@@ -79,10 +79,10 @@
                     <group string="Facturación Electrónica" col="2">
                         <group>
                             <field name='tipo_documento'/>
-                            <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], 'invisible':[('tipo_documento','!=', 'FEC')]}"/>
+                            <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], 'invisible':[('tipo_documento','!=', 'FEC')], 'required':[('date_invoice','>=', '2019/06/01')]}"/>
                             <field name="fname_xml_supplier_approval" invisible="1" />
                             <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}" />
-                            <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC')]}" />
+                            <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('state','!=','draft')]}" />
                         </group>
                         <group>
                             <field name="state_invoice_partner" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}"/>
@@ -102,7 +102,7 @@
                 </xpath>
                 <xpath expr="(//field[@name='reference'])" position="after">
                     <field name="economic_activities_ids" invisible="1" readonly="1"  />
-                    <field name="economic_activity_id" required="1" domain="[('id', 'in', economic_activities_ids),]" options='{"no_open": True, "no_create": True}' />
+                    <field name="economic_activity_id" attrs="{'required':[('tipo_documento','=', 'FEC')]}" domain="[('id', 'in', economic_activities_ids),]" options='{"no_open": True, "no_create": True}' />
                 </xpath>
                 
             </field>

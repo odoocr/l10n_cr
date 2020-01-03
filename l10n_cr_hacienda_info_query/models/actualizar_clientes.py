@@ -93,7 +93,7 @@ class res_partner(models.Model):
                             self.name = name
                             for act in actividades:
                                 if act.get('estado') == 'A':
-                                    self.activity_id = self.env['economic_activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
+                                    self.activity_id = self.env['economic.activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
 
                 #Si la petición arroja error se almacena en el campo ultima_respuesta de res_company. Nota: se usa execute ya que el metodo por objeto no funciono
                 else:
