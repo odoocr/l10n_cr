@@ -47,7 +47,9 @@ class ResCurrencyRate(models.Model):
             "=========================================================")
         _logger.debug("Executing exchange rate update from 1 CRC = X USD")
 
-        company_name = self.env.user.company_id.name
+        bccr_username = self.env['ir.config_parameter'].sudo().get_param('bccr_username')
+        bccr_email = self.env['ir.config_parameter'].sudo().get_param('bccr_email')
+        bccr_token = self.env['ir.config_parameter'].sudo().get_param('bccr_token')
 
         # Get current date to get exchange rate for today
         currentDate = datetime.datetime.now().date()
@@ -59,18 +61,17 @@ class ResCurrencyRate(models.Model):
         imp.filter.add('http://ws.sdde.bccr.fi.cr')
 
         # Web Service Connection using the XML schema from BCCRR
-        client = Client('http://indicadoreseconomicos.bccr.fi.cr/indicadoreseconomicos/WebServices/wsIndicadoresEconomicos.asmx?WSDL',
-                        doctor=ImportDoctor(imp))
+        client = Client('https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx?WSDL', doctor=ImportDoctor(imp))
 
-        # Get Selling exchange Rate from BCCR
-        # Indicators IDs at https://www.bccr.fi.cr/seccion-indicadores-economicos/servicio-web
         # The response is a string we need to convert it to XML to extract value
 
-        response = client.service.ObtenerIndicadoresEconomicosXML(tcIndicador='318',
-                                                                  tcFechaInicio=today,
-                                                                  tcFechaFinal=today,
-                                                                  tcNombre=company_name,
-                                                                  tnSubNiveles='N')
+        response = client.service.ObtenerIndicadoresEconomicosXML(Indicador='318',
+                                                                  FechaInicio=today,
+                                                                  FechaFinal=today,
+                                                                  Nombre=bccr_username,
+                                                                  SubNiveles='N',
+                                                                  CorreoElectronico=bccr_email,
+                                                                  Token=bccr_token)
         xmlResponse = xml.etree.ElementTree.fromstring(response)
         rateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC/NUM_VALOR")
         sellingRate = 0
@@ -80,11 +81,13 @@ class ResCurrencyRate(models.Model):
             sellingRate = 1 / sellingOriginalRate
 
         # Get Buying exchange Rate from BCCR
-        response = client.service.ObtenerIndicadoresEconomicosXML(tcIndicador='317',
-                                                                  tcFechaInicio=today,
-                                                                  tcFechaFinal=today,
-                                                                  tcNombre=company_name,
-                                                                  tnSubNiveles='N')
+        response = client.service.ObtenerIndicadoresEconomicosXML(Indicador='317',
+                                                                  FechaInicio=today,
+                                                                  FechaFinal=today,
+                                                                  Nombre=bccr_username,
+                                                                  SubNiveles='N',
+                                                                  CorreoElectronico=bccr_email,
+                                                                  Token=bccr_token)
 
         xmlResponse = xml.etree.ElementTree.fromstring(response)
         rateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC/NUM_VALOR")
