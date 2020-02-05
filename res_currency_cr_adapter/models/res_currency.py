@@ -133,6 +133,7 @@ class ResCurrencyRate(models.Model):
                                 'currency_id': currency_id.id})
                 else:
                    _logger.debug("Error loading currency rates, dates for a buying and selling rate don't match") 
+                nodeIndex += 1
         else:
             _logger.debug("Error loading currency rates, dates for buying and selling rates don't match")
 
