@@ -41,7 +41,7 @@ class ResCurrencyRate(models.Model):
                                    help='The buying exchange rate from CRC to USD as it is send from BCCR')
 
     @api.model
-    def _cron_update(self, first_date, last_date):
+    def _cron_update(self, first_date=False, last_date=False):
 
         _logger.debug("=========================================================")
         _logger.debug("Executing exchange rate update from 1 CRC = X USD")
