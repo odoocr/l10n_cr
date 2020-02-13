@@ -7,7 +7,7 @@ from odoo import _, api, fields, models
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    exchange_source = fields.Selection([('bccr','BCCR (recomendado)'),('hacienda','Hacienda')],required=True,default='bccr')
+    exchange_source = fields.Selection([('disabled','Deshabilitado'),('bccr','BCCR (recomendado)'),('hacienda','Hacienda')],required=True,default='disabled')
     bccr_username = fields.Char(string="Nombre de usuario del BCCR", required=False, )
     bccr_email = fields.Char(string="e-mail registrado en el BCCR", required=False, )
     bccr_token = fields.Char(string="Token para utilizar en el BCCR", required=False, )
