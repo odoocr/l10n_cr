@@ -3,9 +3,7 @@
 
 from odoo import api, fields, models
 from odoo.addons import decimal_precision as dp
-from suds.client import Client
-from suds.xsd.doctor import Import, ImportDoctor
-from xmlrpc.client import ServerProxy
+from zeep import Client
 import datetime
 import xml.etree.ElementTree
 import logging
@@ -41,7 +39,7 @@ class ResCurrencyRate(models.Model):
                                    help='The buying exchange rate from CRC to USD as it is send from BCCR')
 
     @api.model
-    def _cron_update(self, first_date, last_date):
+    def _cron_update(self, first_date=False, last_date=False):
 
         _logger.debug("=========================================================")
         _logger.debug("Executing exchange rate update from 1 CRC = X USD")
@@ -58,15 +56,8 @@ class ResCurrencyRate(models.Model):
             initial_date = first_date.strftime('%d/%m/%Y')
             end_date = last_date.strftime('%d/%m/%Y')
 
-        # Get XML Schema for BCCR webservice SOAP
-        imp = Import('http://www.w3.org/2001/XMLSchema', location='http://www.w3.org/2001/XMLSchema.xsd')
-        imp.filter.add('http://ws.sdde.bccr.fi.cr')
-
         # Web Service Connection using the XML schema from BCCRR
-        client = Client('https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx?WSDL', doctor=ImportDoctor(imp))
-
-
-        # The response is a string we need to convert it to XML to extract value
+        client = Client('https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx?WSDL')
 
         response = client.service.ObtenerIndicadoresEconomicosXML(Indicador='318',
                                                                   FechaInicio=initial_date,
