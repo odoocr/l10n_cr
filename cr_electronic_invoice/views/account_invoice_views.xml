@@ -87,7 +87,7 @@
                         <group>
                             <field name="state_invoice_partner" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}"/>
                             <field name="date_issuance" readonly="1"/>
-                            <field name="number_electronic" readonly="1"/>
+                            <field name="number_electronic" attrs="{'readonly':[('state','!=','draft')]}" />
                             <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
                             <field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
                             <field name="state_send_invoice" readonly="1"/>

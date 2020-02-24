@@ -8,9 +8,10 @@
                 <form string="Actividad Económica">
                     <sheet string="Actividad Económica">
                         <group col="4">
-                            <field name="code"/>
-                            <field name="name"/>
-                            <field name="description"/>
+                            <field name="code" />
+                            <field name="name" />
+                            <field name="description" />
+                            <field name="active" widget="boolean_button" />
                         </group>
                     </sheet>
                 </form>
@@ -22,9 +23,10 @@
             <field name="model">economic.activity</field>
             <field name="arch" type="xml">
                 <tree string="Actividad Económica">
-                    <field name="code"/>
-                    <field name="name"/>
-                    <field name="description"/>
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="description" />
+                    <field name="active" />
                 </tree>
             </field>
         </record>

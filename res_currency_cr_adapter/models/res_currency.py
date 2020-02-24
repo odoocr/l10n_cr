@@ -49,12 +49,12 @@ class ResCurrencyRate(models.Model):
         bccr_token = self.env['ir.config_parameter'].sudo().get_param('bccr_token')
 
         # Get current date to get exchange rate for today
-        if not first_date:
-            initial_date = datetime.datetime.now().date().strftime('%d/%m/%Y')
-            end_date = initial_date
-        else:
+        if first_date:
             initial_date = first_date.strftime('%d/%m/%Y')
             end_date = last_date.strftime('%d/%m/%Y')
+        else:
+            initial_date = datetime.datetime.now().date().strftime('%d/%m/%Y')
+            end_date = initial_date
 
         # Web Service Connection using the XML schema from BCCRR
         client = Client('https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx?WSDL')
