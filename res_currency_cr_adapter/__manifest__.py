@@ -14,7 +14,7 @@
         'views/res_currency_rate_view.xml',
         'views/res_config_settings_views.xml',
     ],
-    # 'external_dependencies': {'python': ['suds']},
+    'external_dependencies': {'python': ['zeep']},
     'installable': True,
     'auto_install': False,
 }
