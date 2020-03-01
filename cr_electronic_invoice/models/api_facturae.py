@@ -659,24 +659,23 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             'comprobanteXml': xml_base64
             }
 
-    if inv.partner_id:
+    if inv.partner_id.vat:
         if not inv.partner_id.identification_id:
-            if len(vat) == 9:  # cedula fisica
+            if len(inv.partner_id.vat) == 9:  # cedula fisica
                 id_code = '01'
-            elif len(vat) == 10:  # cedula juridica
+            elif len(inv.partner_id.vat) == 10:  # cedula juridica
                 id_code = '02'
-            elif len(vat) == 11 or len(vat) == 12:  # dimex
+            elif len(inv.partner_id.vat) == 11 or len(inv.partner_id.vat) == 12:  # dimex
                 id_code = '03'
             else:
                 id_code = '05'
         else:
             id_code = inv.partner_id.identification_id.code
 
-        if inv.partner_id.vat:
-            data['receptor']={
-                             'tipoIdentificacion': id_code,
-                             'numeroIdentificacion': inv.partner_id.vat
-                             }
+        data['receptor']={
+                         'tipoIdentificacion': id_code,
+                         'numeroIdentificacion': inv.partner_id.vat
+                         }
 
     json_hacienda = json.dumps(data)
 
