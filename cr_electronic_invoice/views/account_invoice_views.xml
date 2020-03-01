@@ -33,8 +33,6 @@
                     <field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="reference_document_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
-                    <field name="not_loaded_invoice" attrs="{'readonly':[('state','!=','draft')]}"/>
-                    <field name="not_loaded_invoice_date" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="state_tributacion" readonly="1"/>
                     <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
                     <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion"/>

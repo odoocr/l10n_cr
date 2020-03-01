@@ -268,10 +268,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
                   monto_total_impuesto_acreditar=False,
                   monto_total_gasto_aplicable=False):
     '''Verificamos si la clave indicada corresponde a un numeros'''
-    if clave:
-        mr_clave = re.sub('[^0-9]', '', clave)
-    else:
-        mr_clave = False
+    mr_clave = re.sub('[^0-9]', '', clave)
     if len(mr_clave) != 50:
         raise UserError(
             'La clave a utilizar es inválida. Debe contener al menos 50 digitos')
@@ -503,11 +500,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
             sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
 
-        if v.get('codigo'):
-            sb.Append('<CodigoComercial>')
-            sb.Append('<Tipo>04</Tipo>')
-            sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
-            sb.Append('</CodigoComercial>')
+        # sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
 
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
@@ -629,7 +622,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos + totalOtrosCargos - total_iva_devuelto, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
 
-    if tipo_documento_referencia and numero_documento_referencia and fecha_emision_referencia:
+    if inv.invoice_id and inv.reference_code_id and inv.reference_document_id:
         sb.Append('<InformacionReferencia>')
         sb.Append('<TipoDoc>' + str(tipo_documento_referencia) + '</TipoDoc>')
         sb.Append('<Numero>' + str(numero_documento_referencia) + '</Numero>')
@@ -1000,13 +993,9 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             "inv:Emisor/inv:Identificacion/inv:Numero",
             namespaces=namespaces)[0].text
 
-        receptor_node = invoice_xml.xpath(
+        receptor = invoice_xml.xpath(
             "inv:Receptor/inv:Identificacion/inv:Numero",
-            namespaces=namespaces)
-        if receptor_node:
-            receptor = receptor_node[0].text
-        else:
-            raise UserError('El receptor no está definido en el xml')  # noqa
+            namespaces=namespaces)[0].text
 
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
@@ -1036,8 +1025,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         _logger.error('MAB - load_lines: %s - account: %s' %
                       (load_lines, account_id))
 
-        if load_lines and not invoice.invoice_line_ids:
-        #if True:  #load_lines:
+        # if load_lines and not invoice.invoice_line_ids:
+        if load_lines:
             lines = invoice_xml.xpath("inv:DetalleServicio/inv:LineaDetalle", namespaces=namespaces)
             new_lines = invoice.env['account.invoice.line']
             for line in lines:
