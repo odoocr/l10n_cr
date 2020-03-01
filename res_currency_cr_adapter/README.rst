@@ -53,6 +53,7 @@ Do not contact contributors directly about support or help with technical issues
 
 Credits
 =======
+Carlos Wong (WhiteTiger008) <cewongq@gmail.com>
 
 Authors
 ~~~~~~~
