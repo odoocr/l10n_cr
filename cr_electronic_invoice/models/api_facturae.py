@@ -658,6 +658,12 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             },
             'comprobanteXml': xml_base64
             }
+    if inv.partner_id and inv.partner_id.identification_id and inv.partner_id.identification_id.code:
+        data['receptor']= {
+            'tipoIdentificacion': inv.partner_id.identification_id.code,
+            'numeroIdentificacion': inv.partner_id.vat
+        }
+
 
     if inv.partner_id.vat:
         if not inv.partner_id.identification_id:
@@ -1088,6 +1094,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                             [('tax_code', '=', tax_code),
                             ('amount', '=', tax_amount),
                             ('type_tax_use', '=', 'purchase'),
+                            ('non_tax_deductible', '=', False),
                             ('active', '=', True)],
                             limit=1)
 
