@@ -663,12 +663,14 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
                 'tipoIdentificacion': inv.company_id.identification_id.code,
                 'numeroIdentificacion': inv.company_id.vat
             },
-            'receptor': {
-                'tipoIdentificacion': inv.partner_id.identification_id.code,
-                'numeroIdentificacion': inv.partner_id.vat
-            },
             'comprobanteXml': xml_base64
             }
+    if inv.partner_id and inv.partner_id.identification_id and inv.partner_id.identification_id.code:
+        data['receptor']= {
+            'tipoIdentificacion': inv.partner_id.identification_id.code,
+            'numeroIdentificacion': inv.partner_id.vat
+        }
+
 
     json_hacienda = json.dumps(data)
 
