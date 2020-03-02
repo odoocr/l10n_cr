@@ -334,7 +334,7 @@ class AccountInvoiceElectronic(models.Model):
 
         if self.type in ('in_invoice', 'in_refund'):
             if self.partner_id:
-                if self.payment_methods_id:
+                if self.partner_id.payment_methods_id:
                     self.payment_methods_id = self.partner_id.payment_methods_id
                 else:
                     raise UserError(_('Partner does not have a default payment method'))
@@ -935,16 +935,16 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
-        if self.company_id.frm_ws_ambiente != 'disabled':
-            _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
-            invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
-                                                        ('state', 'in', ('open', 'paid')),
-                                                        ('number_electronic', '!=', False),
-                                                        ('date_invoice', '>=', '2019-07-01'),
-                                                        '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
-                                                        order='id asc', limit=max_invoices)
-            self.generate_and_send_invoices(invoices)
-            _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
+        #if self.company_id.frm_ws_ambiente != 'disabled':
+        _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
+        invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
+                                                      ('state', 'in', ('open', 'paid')),
+                                                      ('number_electronic', '!=', False),
+                                                      ('date_invoice', '>=', '2019-07-01'),
+                                                      '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
+                                                      order='id asc', limit=max_invoices)
+        self.generate_and_send_invoices(invoices)
+        _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
     @api.multi
     def generate_and_send_invoices(self, invoices):
@@ -1425,24 +1425,14 @@ class AccountInvoiceElectronic(models.Model):
                     })
 
             super(AccountInvoiceElectronic, inv).action_invoice_open()
-<<<<<<< HEAD
-
-            response_json = api_facturae.get_clave_hacienda(inv,
-=======
             if not inv.number_electronic:
                 response_json = api_facturae.get_clave_hacienda(inv,
->>>>>>> arreglos v12
                                                             inv.tipo_documento,
                                                             sequence,
                                                             inv.journal_id.sucursal,
                                                             inv.journal_id.terminal)
-<<<<<<< HEAD
-            inv.number_electronic = response_json.get('clave')
-            inv.sequence = response_json.get('consecutivo')
-=======
                 inv.number_electronic = response_json.get('clave')
                 inv.sequence = response_json.get('consecutivo')
->>>>>>> arreglos v12
             inv.number = inv.sequence
             inv.move_name = inv.sequence
             inv.move_id.name = inv.sequence

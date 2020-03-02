@@ -1087,6 +1087,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                             [('tax_code', '=', tax_code),
                             ('amount', '=', tax_amount),
                             ('type_tax_use', '=', 'purchase'),
+                            ('non_tax_deductible', '=', False),
                             ('active', '=', True)],
                             limit=1)
 
