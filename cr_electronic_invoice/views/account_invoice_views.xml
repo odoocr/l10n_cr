@@ -79,7 +79,7 @@
                     <group string="Facturación Electrónica" col="2">
                         <group>
                             <field name='tipo_documento'/>
-                            <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], 'invisible':[('tipo_documento','!=', 'FEC')], 'required':[('date_invoice','>=', '2019/06/01')]}"/>
+                            <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], }" />
                             <field name="fname_xml_supplier_approval" invisible="1" />
                             <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}" />
                             <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('state','!=','draft')]}" />
@@ -177,6 +177,15 @@
                 <field name="name" position="after">
                     <field name="tax_code"/>
                 </field>
+            </field>
+        </record>
+
+        <record id="view_account_invoice_filter_inherited" model="ir.ui.view">
+            <field name="name">account.invoice.select.inherited</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                <field name="number" string="Invoice" filter_domain="['|','|','|', ('number','ilike',self), ('origin','ilike',self), ('reference', 'ilike', self), ('partner_id', 'child_of', self)]"/>
             </field>
         </record>
     </data>

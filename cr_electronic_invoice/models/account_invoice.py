@@ -181,11 +181,20 @@ class InvoiceLineElectronic(models.Model):
     product_code = fields.Char(
         related='product_id.default_code',
     )
-    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", 
+    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica",
                                            required=False, store=True,
                                            # default=_get_default_activity_id)
                                            default=False)
+    non_tax_deductible = fields.Boolean(string='Indicates if this invoice is non-tax deductible',)
 
+    @api.onchange('product_id')
+    def product_changed(self):
+        if self.product_id.non_tax_deductible:
+            self.non_tax_deductible = True
+        else:
+            self.non_tax_deductible = False
+
+        
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -302,8 +311,10 @@ class AccountInvoiceElectronic(models.Model):
             if inv.type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
                     inv.economic_activities_ids = inv.partner_id.economic_activities_ids
+                    inv.economic_activities_id = inv.partner_id.activity_id
             else:
                 inv.economic_activities_ids = inv.company_id.economic_activities_ids
+                inv.economic_activities_id = inv.company_id.activity_id
 
     @api.multi
     @api.onchange('partner_id')
@@ -311,20 +322,27 @@ class AccountInvoiceElectronic(models.Model):
         if self.partner_id.export:
             self.tipo_documento = 'FEE'
 
+        if self.type in ('in_invoice', 'in_refund'):
+            if self.partner_id:
+                if self.payment_methods_id:
+                    self.payment_methods_id = self.partner_id.payment_methods_id
+                else:
+                    raise UserError(_('Partner does not have a default payment method'))
+
     @api.multi
     def action_invoice_sent(self):
         self.ensure_one()
 
         if self.invoice_id.type == 'in_invoice' or self.invoice_id.type == 'in_refund':
-            email_template = self.env.ref(
-                'cr_electronic_invoice.email_template_invoice_vendor', False)
+            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
         else:
-            email_template = self.env.ref(
-                'account.email_template_edi_invoice', False)
+            email_template = self.env.ref('account.email_template_edi_invoice', False)
 
         email_template.attachment_ids = [(5)]
 
-        if self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
+        if self.env.user.company_id.frm_ws_ambiente == 'disabled':
+            email_template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
+        elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
 
             attachment = self.env['ir.attachment'].search(
                 [('res_model', '=', 'account.invoice'),
@@ -359,8 +377,7 @@ class AccountInvoiceElectronic(models.Model):
                         'sent': True,
                     })
                 else:
-                    raise UserError(
-                        _('Response XML from Hacienda has not been received'))
+                    raise UserError(_('Response XML from Hacienda has not been received'))
             else:
                 raise UserError(_('Invoice XML has not been generated'))
         else:
@@ -424,11 +441,24 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.multi
     def load_xml_data(self):
-        default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
+        account = False
+        analytic_account = False
+        product = False
         load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
+
+        default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
+        if default_account_id:
+            account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
+
         analytic_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_analytic_account_id')
+        if analytic_account_id:
+            analytic_account = self.env['account.analytic.account'].search([('id', '=', analytic_account_id)], limit=1)
+            
         product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
-        api_facturae.load_xml_data(self, load_lines, default_account_id, product_id, analytic_account_id)
+        if product_id:
+            product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
+            
+        api_facturae.load_xml_data(self, load_lines, account, product, analytic_account)
 
     @api.multi
     def action_send_mrs_to_hacienda(self):
@@ -457,8 +487,7 @@ class AccountInvoiceElectronic(models.Model):
                 else:
 
                     if inv.state_send_invoice and inv.state_send_invoice in ('aceptado', 'rechazado', 'na'):
-                        raise UserError(
-                            'Aviso!.\n La factura de proveedor ya fue confirmada')
+                        raise UserError('Aviso!.\n La factura de proveedor ya fue confirmada')
 
                     if abs(
                             inv.amount_total_electronic_invoice - inv.amount_total) > 1:
@@ -851,19 +880,23 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.multi
     def action_create_fec(self):
-        self.generate_and_send_invoices(self)
+        if self.company_id.frm_ws_ambiente == 'disabled':
+            raise UserError(_('Hacienda API is disabled in company'))
+        else:
+            self.generate_and_send_invoices(self)
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
-        _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
-        invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
-                                                      ('state', 'in', ('open', 'paid')),
-                                                      ('number_electronic', '!=', False),
-                                                      ('date_invoice', '>=', '2019-07-01'),
-                                                      '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
-                                                      order='id asc', limit=max_invoices)
-        self.generate_and_send_invoices(invoices)
-        _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
+        if self.company_id.frm_ws_ambiente != 'disabled':
+            _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
+            invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
+                                                        ('state', 'in', ('open', 'paid')),
+                                                        ('number_electronic', '!=', False),
+                                                        ('date_invoice', '>=', '2019-07-01'),
+                                                        '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
+                                                        order='id asc', limit=max_invoices)
+            self.generate_and_send_invoices(invoices)
+            _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
     @api.multi
     def generate_and_send_invoices(self, invoices):
@@ -1221,6 +1254,7 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             if inv.company_id.frm_ws_ambiente == 'disabled':
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
+                inv.tipo_documento = None
                 continue
 
             currency = inv.currency_id
@@ -1292,7 +1326,7 @@ class AccountInvoiceElectronic(models.Model):
                     raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para %s' % (inv.payment_term_id.name))
 
                 # Validate if invoice currency is the same as the company currency
-                if currency.name != self.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
+                if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
                     raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
 
             # actividad_clinica = self.env.ref('cr_electronic_invoice.activity_851101')
@@ -1315,20 +1349,19 @@ class AccountInvoiceElectronic(models.Model):
                     })
 
             super(AccountInvoiceElectronic, inv).action_invoice_open()
+
             response_json = api_facturae.get_clave_hacienda(inv,
                                                             inv.tipo_documento,
                                                             sequence,
                                                             inv.journal_id.sucursal,
                                                             inv.journal_id.terminal)
-
             inv.number_electronic = response_json.get('clave')
             inv.sequence = response_json.get('consecutivo')
             inv.number = inv.sequence
-            inv.state_send_invoice = False
             inv.move_name = inv.sequence
             inv.move_id.name = inv.sequence
+            inv.state_send_invoice = False
+            inv.invoice_amount_text = ''
 
-            super(AccountInvoiceElectronic, self).action_invoice_open()
-
-            # convertir el monto de la factura a texto
-            self.invoice_amount_text = ''
+            
+            

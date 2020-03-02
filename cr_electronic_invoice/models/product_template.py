@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
 import logging
@@ -22,6 +22,9 @@ class ProductElectronic(models.Model):
     tariff_head = fields.Char(string="Partida arancelaria para factura"
                                      " de exportación",
                               required=False, )
+
+    non_tax_deductible = fields.Boolean(string='Indicates if this product is non-tax deductible', default=False, )
+
 
 class ProductCategory(models.Model):
     _inherit = "product.category"
