@@ -2,7 +2,11 @@
 
 import logging
 import phonenumbers
+
 from odoo import models, fields, api
+from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
+
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -27,8 +31,6 @@ class CompanyElectronic(models.Model):
     commercial_name = fields.Char(string="Nombre comercial", required=False, )
 
     activity_id = fields.Many2one("economic.activity", string="Actividad Económica por defecto", required=False, )
-
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
 
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one(
@@ -167,18 +169,24 @@ class CompanyElectronic(models.Model):
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
-            _logger.error(
-                'E-INV CR  - Economic Activities: %s',
-                json_response)
+
+            self.env.cr.execute('update economic_activity set active=False')
+
+            self.message_post(subject='Actividades Económicas',
+                            body='Aviso!.\n Cargando actividades económicas desde Hacienda')
+
             if json_response["status"] == 200:
                 activities = json_response["activities"]
                 activities_codes = list()
                 for activity in activities:
                     if activity["estado"] == "A":
                         activities_codes.append(activity["codigo"])
-                economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
 
-                self.economic_activities_ids = economic_activities
+                economic_activities = self.env['economic.activity'].search([('active', '=', False), ('code', 'in', activities_codes)])
+
+                for activity in economic_activities:
+                    activity.active = True
+
                 self.name = json_response["name"]
             else:
                 alert = {

@@ -193,24 +193,27 @@ class InvoiceLineElectronic(models.Model):
 
     @api.onchange('product_id')
     def product_changed(self):
+        # Check if the product is non deductible to use a non_deductible tax
         if self.product_id.non_tax_deductible:
             self.non_tax_deductible = True
         else:
             self.non_tax_deductible = False
 
+        # Check for the economic activity in the product or product category or company respectively (already set in the invoice when partner selected)
+        if self.product_id and self.product_id.economic_activity_id:
+            self.economic_activity_id = self.product_id.economic_activity_id
+        elif self.product_id and self.product_id.categ_id and self.product_id.categ_id.economic_activity_id:
+            self.economic_activity_id = self.product_id.categ_id.economic_activity_id
+        else:
+            self.economic_activity_id = self.invoice_id.economic_activity_id
         
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
 
-    number_electronic = fields.Char(
-        string="Número electrónico", required=False, copy=False, index=True)
-    date_issuance = fields.Char(
-        string="Fecha de emisión", required=False, copy=False)
-    consecutive_number_receiver = fields.Char(
-        string="Número Consecutivo Receptor",
-        required=False, copy=False,
-        readonly=True, index=True)
+    number_electronic = fields.Char(string="Número electrónico", required=False, copy=False, index=True)
+    date_issuance = fields.Char(string="Fecha de emisión", required=False, copy=False)
+    consecutive_number_receiver = fields.Char(string="Número Consecutivo Receptor", required=False, copy=False, readonly=True, index=True)
     state_send_invoice = fields.Selection([('aceptado', 'Aceptado'),
                                            ('rechazado', 'Rechazado'),
                                            ('error', 'Error'),
@@ -232,26 +235,20 @@ class AccountInvoiceElectronic(models.Model):
                                          copy=False)
 
     state_invoice_partner = fields.Selection(
-        [('1', 'Aceptado'), ('3', 'Rechazado'), ('2', 'Aceptacion parcial')],
-        'Respuesta del Cliente')
-    reference_code_id = fields.Many2one(
-        "reference.code", string="Código de referencia",
-        required=False, )
-    reference_document_id = fields.Many2one(
-        "reference.document", string="Tipo Documento de referencia",
-        required=False, )
+        [('1', 'Aceptado'), 
+         ('2', 'Aceptacion parcial'),
+         ('3', 'Rechazado')], 
+         'Respuesta del Cliente')
 
-    payment_methods_id = fields.Many2one(
-        "payment.methods", string="Métodos de Pago",
-        required=False, )
+    reference_code_id = fields.Many2one("reference.code", string="Código de referencia", required=False, )
 
-    invoice_id = fields.Many2one("account.invoice",
-                                 string="Documento de referencia",
-                                 required=False,
-                                 copy=False)
-    xml_respuesta_tributacion = fields.Binary(
-        string="Respuesta Tributación XML", required=False, copy=False,
-        attachment=True)
+    reference_document_id = fields.Many2one("reference.document", string="Tipo Documento de referencia", required=False, )
+
+    payment_methods_id = fields.Many2one("payment.methods", string="Métodos de Pago", required=False, )
+
+    invoice_id = fields.Many2one("account.invoice", string="Documento de referencia", required=False, copy=False)
+
+    xml_respuesta_tributacion = fields.Binary( string="Respuesta Tributación XML", required=False, copy=False, attachment=True)
 
     electronic_invoice_return_message = fields.Char(
         string='Respuesta Hacienda', readonly=True, )
@@ -317,7 +314,7 @@ class AccountInvoiceElectronic(models.Model):
                     inv.economic_activities_ids = inv.partner_id.economic_activities_ids
                     inv.economic_activities_id = inv.partner_id.activity_id
             else:
-                inv.economic_activities_ids = inv.company_id.economic_activities_ids
+                inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
                 inv.economic_activities_id = inv.company_id.activity_id
 
     @api.multi
@@ -327,11 +324,10 @@ class AccountInvoiceElectronic(models.Model):
             self.tipo_documento = 'FEE'
 
         if self.type in ('in_invoice', 'in_refund'):
-            if self.partner_id:
-                if self.partner_id.payment_methods_id:
-                    self.payment_methods_id = self.partner_id.payment_methods_id
-                else:
-                    raise UserError(_('Partner does not have a default payment method'))
+            if self.partner_id and self.partner_id.payment_methods_id:
+                self.payment_methods_id = self.partner_id.payment_methods_id
+            else:
+                raise UserError(_('Partner does not have a default payment method'))
 
     @api.multi
     def action_invoice_sent(self):
@@ -352,6 +348,7 @@ class AccountInvoiceElectronic(models.Model):
                 [('res_model', '=', 'account.invoice'),
                  ('res_id', '=', self.id),
                  ('res_field', '=', 'xml_comprobante')], limit=1)
+
             if attachment:
                 attachment.name = self.fname_xml_comprobante
                 attachment.datas_fname = self.fname_xml_comprobante
