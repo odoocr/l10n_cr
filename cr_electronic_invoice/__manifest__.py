@@ -2,7 +2,7 @@
 
 {
     'name': 'Facturación electrónica Costa Rica',
-    'version': '12.0.2.0.2',
+    'version': '12.0.2.0.3',
     'author': 'Odoo CR Community',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
@@ -22,7 +22,6 @@
         'account_cancel',
         'res_currency_cr_adapter',
         ],
-    'post_init_hook': 'post_init_hook',
     'data': [
         'data/account_tax_data.xml',
         'data/aut_ex_data.xml',
@@ -66,5 +65,6 @@
             'OpenSSL',
         ],
     },
+    'post_init_hook': 'post_init_hook',
     'installable': True,
 }
