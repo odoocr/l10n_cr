@@ -14,3 +14,5 @@ Para ayuda y soporte la comunidad de Odoo CR cuenta con un grupo en Telegram: ht
 BRANCH='12.0'
 
 git clone --branch ${BRANCH} --depth 1 --single-branch https://github.com/odoocr/l10n_cr
+
+Esto es una versión BETA, usar bajo su propio riesgo y responsabilidad

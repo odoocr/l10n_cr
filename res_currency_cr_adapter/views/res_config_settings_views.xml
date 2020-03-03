@@ -6,14 +6,15 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="account.res_config_settings_view_form"/>
             <field name="arch" type="xml">
-            
                 <xpath expr="//field[@name='currency_exchange_journal_id']" position="after">
-                        <div class="o_form_label .col-lg-3">User name registered in the BCCR</div>
-                        <field name="bccr_username" string="User name registered in the BCCR" />
-                        <div class="o_form_label">email registered in the BCCR</div>
-                        <field name="bccr_email" string="email registered in the BCCR" />
-                        <div class="o_form_label">BCCR Token</div>
-                        <field name="bccr_token" string="BCCR Token" />
+                        <div class="o_form_label col-lg-3 o_light_label">Origen del tipo de cambio</div>
+                        <field name="exchange_source" string="Origen del tipo de cambio"/>
+                        <div attrs="{'invisible':[('exchange_source', '!=', 'bccr'')]}" class="o_form_label col-lg-3 o_light_label">Username registered in the BCCR</div>
+                        <field attrs="{'invisible':[('exchange_source', '!=', 'bccr'')]}" name="bccr_username" string="User name registered in the BCCR" />
+                        <div attrs="{'invisible':[('exchange_source', '!=', 'bccr'')]}" class="o_form_label col-lg-3 o_light_label">Email registered in the BCCR</div>
+                        <field attrs="{'invisible':[('exchange_source', '!=', 'bccr'')]}" name="bccr_email" string="email registered in the BCCR" />
+                        <div attrs="{'invisible':[('exchange_source', '!=', 'bccr'')]}" class="o_form_label col-lg-3 o_light_label">BCCR Token</div>
+                        <field attrs="{'invisible':[('exchange_source', '!=', 'bccr'')]}" name="bccr_token" string="BCCR Token" password="True" />
                 </xpath>
            </field>
         </record>
