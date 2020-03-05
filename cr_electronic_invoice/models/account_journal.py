@@ -9,7 +9,7 @@ class AccountJournalInherit(models.Model):
     _name = 'account.journal'
     _inherit = 'account.journal'
 
-    sucursal = fields.Integer(string="Sucursal", required=False, default="1")
+    sucursal = fields.Integer(string="Branch", required=False, default="1")
     terminal = fields.Integer(string="Terminal", required=False, default="1")
 
     FE_sequence_id = fields.Many2one("ir.sequence",

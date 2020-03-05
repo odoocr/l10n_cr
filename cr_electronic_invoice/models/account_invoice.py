@@ -30,13 +30,13 @@ class AccountInvoiceRefund(models.TransientModel):
         return ''
 
     reference_code_id = fields.Many2one(
-        "reference.code", string="Código de referencia",
+        "reference.code", string="Code reference",
         required=True, )
     reference_document_id = fields.Many2one(
-        "reference.document", string="Codigo Documento de referencia",
+        "reference.document", string="Reference Document Id",
         required=True, )
     invoice_id = fields.Many2one("account.invoice",
-                                 string="Documento de referencia",
+                                 string="Invoice Id",
                                  default=_get_invoice_id, required=False, )
 
     @api.multi

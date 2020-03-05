@@ -28,38 +28,35 @@ class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
 
-    commercial_name = fields.Char(string="Nombre comercial", required=False, )
-
-    activity_id = fields.Many2one("economic.activity", string="Actividad Económica por defecto", required=False, )
-
+    commercial_name = fields.Char(string="Commercial Name", required=False, )
+    activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, )
     signature = fields.Binary(string="Llave Criptográfica", )
-    identification_id = fields.Many2one(
-        "identification.type", string="Tipo de identificacion", required=False)
-    district_id = fields.Many2one("res.country.district", string="Distrito",
-                                  required=False)
-    county_id = fields.Many2one("res.country.county", string="Cantón",
-                                required=False)
-    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Barrios",
-                                      required=False)
-    frm_ws_identificador = fields.Char(
-        string="Usuario de Factura Electrónica", required=False)
-    frm_ws_password = fields.Char(
-        string="Password de Factura Electrónica", required=False)
+    identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
+    district_id = fields.Many2one("res.country.district", string="District", required=False)
+    county_id = fields.Many2one("res.country.county", string="Canton", required=False)
+    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Neighborhood", required=False)
+    frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
+    frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
 
-    frm_ws_ambiente = fields.Selection(
-        selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'),
-                   ('api-prod', 'Producción')],
-        string="Ambiente",
-        required=True, default='disabled',
-        help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
-             'de calidad (stag), para el ambiente de producción (prod). Requerido.')
+    frm_ws_ambiente = fields.Selection(selection=[('disabled', 'Deshabilitado'), 
+                                                  ('api-stag', 'Pruebas'),
+                                                  ('api-prod', 'Producción')],
+                                    string="Environment",
+                                    required=True, 
+                                    default='disabled',
+                                    help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
+                                    'de calidad (stag), para el ambiente de producción (prod). Requerido.')
 
-    frm_pin = fields.Char(string="Pin", required=False,
+    frm_pin = fields.Char(string="Pin", 
+                          required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
 
-    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False,
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", 
+                                 required=False,
                                  default="1")
-    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False,
+
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", 
+                                 required=False,
                                  default="1")
 
     CCE_sequence_id = fields.Many2one(
@@ -69,6 +66,7 @@ class CompanyElectronic(models.Model):
         'y el sistema automaticamente se lo creará.',
         readonly=False, copy=False,
     )
+
     CPCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Parcial',

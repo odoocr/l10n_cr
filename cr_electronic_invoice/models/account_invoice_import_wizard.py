@@ -15,7 +15,7 @@ from . import api_facturae
 class ImportInvoiceImportWizardCR(models.TransientModel):
     _inherit = "account.invoice.import.wizard"
 
-    static_product_id = fields.Many2one('product.product', string='Producto a asignar en las líneas', domain=[('purchase_ok', '=', True)])
+    static_product_id = fields.Many2one('product.product', string='Product to asign to every line', domain=[('purchase_ok', '=', True)])
     account_id = fields.Many2one('account.account', string='Expense Account', domain=[('deprecated', '=', False)])
     account_analytic_id = fields.Many2one('account.analytic.account', string='Analytic Account')
 
