@@ -12,6 +12,7 @@
                             <field name="name" />
                             <field name="description" />
                             <field name="active" widget="boolean_button" />
+                            <field name="sale_type" />
                         </group>
                     </sheet>
                 </form>
@@ -22,11 +23,12 @@
             <field name="name">economic.activity.tree</field>
             <field name="model">economic.activity</field>
             <field name="arch" type="xml">
-                <tree string="Actividad Económica">
+                <tree string="Actividad Económica" editable="bottom">
                     <field name="code" />
                     <field name="name" />
                     <field name="description" />
                     <field name="active" />
+                    <field name="sale_type" />
                 </tree>
             </field>
         </record>

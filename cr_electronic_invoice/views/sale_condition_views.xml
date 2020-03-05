@@ -24,7 +24,7 @@
             <field name="name">sale.conditions.tree</field>
             <field name="model">sale.conditions</field>
             <field name="arch" type="xml">
-                <tree string="Condiciones de venta">
+                <tree string="Condiciones de venta" editable="bottom">
                     <field name="sequence"/>
                     <field name="name"/>
                     <field name="active"/>
