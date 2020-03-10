@@ -33,11 +33,25 @@
             </field>
         </record>
 
+        <record id="view_economic_activity_filter" model="ir.ui.view">
+            <field name="name">economic.activity.select</field>
+            <field name="model">economic.activity</field>
+            <field name="arch" type="xml">
+                <search string="Search Activity">
+                    <field name="code" string="Activity" filter_domain="['|', '|', ('id','=',self), ('code','=',self), ('name','ilike',self)]"/>
+                    <separator/>
+                    <filter name="Active" string="Active" domain="[('active','=',True)]"/>
+                    <filter name="Inactive" string="Inactive" domain="[('active', '=', False)]"/>
+               </search>
+            </field>
+        </record>
+
         <record id="action_economic_activity" model="ir.actions.act_window">
             <field name="name">Actividad Económica</field>
             <field name="res_model">economic.activity</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_economic_activity_filter"/>
         </record>
     </data>
 </odoo>
