@@ -38,7 +38,8 @@
             <field name="model">economic.activity</field>
             <field name="arch" type="xml">
                 <search string="Search Activity">
-                    <field name="code" string="Activity" filter_domain="['|', '|', ('id','=',self), ('code','=',self), ('name','ilike',self)]"/>
+                    <field name="name" string="Activity" filter_domain="['|', ('name','ilike',self), ('code','=',self)]" />
+                    <field name="id" string="ID" filter_domain="[('id','=',self)]" />
                     <separator/>
                     <filter name="Active" string="Active" domain="[('active','=',True)]"/>
                     <filter name="Inactive" string="Inactive" domain="[('active', '=', False)]"/>
