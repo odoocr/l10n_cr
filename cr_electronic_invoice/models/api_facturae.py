@@ -1125,6 +1125,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'account_analytic_id': analytic_account_id.id or False,
                     'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                     'total_tax': total_tax,
+                    'economic_activity_id': invoice.economic_activity_id,
                 })
 
                 # This must be assigned after line is created
