@@ -1000,12 +1000,14 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.reference = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
 
         invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
-        activity_node = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces))], limit=1)
+        activity_node = invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)
+        activity = False
         if activity_node:
             activity_id = activity_node[0].text
+            activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_id)], limit=1)
         else:
             activity_id = False
-        invoice.economic_activity_id = activity_id
+        invoice.economic_activity_id = activity
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
         invoice.date_invoice = invoice.date_issuance
 
@@ -1042,7 +1044,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.account_id = partner.property_account_payable_id
         invoice.payment_term_id = partner.property_supplier_payment_term_id
 
-        _logger.error('MAB - load_lines: %s - account: %s' %
+        _logger.debug('MAB - load_lines: %s - account: %s' %
                       (load_lines, account_id))
 
         # if load_lines and not invoice.invoice_line_ids:
@@ -1125,12 +1127,11 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'account_analytic_id': analytic_account_id.id or False,
                     'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                     'total_tax': total_tax,
-                    'economic_activity_id': invoice.economic_activity_id,
                 })
 
                 # This must be assigned after line is created
                 invoice_line.invoice_line_tax_ids = taxes
-
+                invoice_line.economic_activity_id = activity
                 new_lines += invoice_line
 
             invoice.invoice_line_ids = new_lines
