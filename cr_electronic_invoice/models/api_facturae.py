@@ -1000,7 +1000,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.reference = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
 
         invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
-        activity_node = invoice.env['economic.activity'].search([('code', '=', invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces))], limit=1)
+        activity_node = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces))], limit=1)
         if activity_node:
             activity_id = activity_node[0].text
         else:

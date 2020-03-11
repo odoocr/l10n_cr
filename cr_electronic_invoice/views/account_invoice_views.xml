@@ -101,8 +101,8 @@
                     <field name="amount_total_electronic_invoice"/>
                 </xpath>
                 <xpath expr="(//field[@name='reference'])" position="after">
-                    <field name="economic_activities_ids" invisible="1" readonly="1"  />
-                    <field name="economic_activity_id" attrs="{'required':[('tipo_documento','=', 'FEC')]}" domain="[('id', 'in', economic_activities_ids),]" options='{"no_open": True, "no_create": True}' />
+                    <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": False}' />
+                    <field name="economic_activity_id" attrs="{'required':[('tipo_documento','=', 'FEC')]}" domain="[('id', 'in', economic_activities_ids),]" options='{"no_open": True, "no_create": True", active_test": False}' />
                 </xpath>
                 
             </field>
