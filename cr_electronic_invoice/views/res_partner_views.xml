@@ -60,9 +60,9 @@
                         <field name="identification_id"/>
                         <field name="activity_id" 
                             domain="[('id', 'in', economic_activities_ids)]" 
-                            options='{"no_open": True, "no_create": True}' 
+                            options='{"no_open": True, "no_create": True, "active_test": False}' 
                             attrs="{'invisible': [('supplier', '!=', True)]}" />
-                        <field name="economic_activities_ids" invisible="1" readonly="1" />
+                        <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": False}' />
                         <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" attrs="{'invisible': [('supplier', '!=', True)]}" /> 
                     </field>
 

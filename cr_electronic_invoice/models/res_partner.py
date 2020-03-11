@@ -25,8 +25,8 @@ class PartnerElectronic(models.Model):
     institution_name = fields.Char(string="Exoneration Issuer", required=False, )
     date_issue = fields.Date(string="Issue Date", required=False, )
     date_expiration = fields.Date(string="Expiration Date", required=False, )
-    activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", required=False, )
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities',)
+    activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", required=False, context={'active_test': False} )
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False})
     export = fields.Boolean(string="It's export", default=False)
 
     @api.onchange('phone')
@@ -102,7 +102,7 @@ class PartnerElectronic(models.Model):
                 for activity in activities:
                     if activity["estado"] == "A":
                         activities_codes.append(activity["codigo"])
-                economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
 
                 self.economic_activities_ids = economic_activities
                 self.name = json_response["name"]

@@ -29,7 +29,7 @@ class CompanyElectronic(models.Model):
     _inherit = ['res.company', 'mail.thread', ]
 
     commercial_name = fields.Char(string="Commercial Name", required=False, )
-    activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, )
+    activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     district_id = fields.Many2one("res.country.district", string="District", required=False)
@@ -180,7 +180,7 @@ class CompanyElectronic(models.Model):
                     if activity["estado"] == "A":
                         activities_codes.append(activity["codigo"])
 
-                economic_activities = self.env['economic.activity'].search([('active', '=', False), ('code', 'in', activities_codes)])
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
 
                 for activity in economic_activities:
                     activity.active = True

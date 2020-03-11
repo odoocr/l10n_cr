@@ -187,6 +187,7 @@ class InvoiceLineElectronic(models.Model):
     )
     economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica",
                                            required=False, store=True,
+                                           context={'active_test': False},
                                            # default=_get_default_activity_id)
                                            default=False)
     non_tax_deductible = fields.Boolean(string='Indicates if this invoice is non-tax deductible',)
@@ -296,9 +297,9 @@ class AccountInvoiceElectronic(models.Model):
 
     error_count = fields.Integer(string="Cantidad de errores", required=False, default="0")
 
-    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )
+    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, context={'active_test': False}, )
 
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities')
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities', context={'active_test': False})
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
