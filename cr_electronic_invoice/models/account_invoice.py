@@ -1272,7 +1272,8 @@ class AccountInvoiceElectronic(models.Model):
                 continue
 
             currency = inv.currency_id
-
+            sequence = False
+            
             # Digital Invoice or ticket
             if inv.type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
                 pass   
