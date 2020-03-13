@@ -1306,8 +1306,8 @@ class AccountInvoiceElectronic(models.Model):
             # Digital Supplier Invoice
             elif inv.type == 'in_invoice' and inv.partner_id.country_id and \
                 inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and inv.partner_id.vat and inv.xml_supplier_approval is False:
-                inv.tipo_documento = 'FEC'
-                sequence = inv.company_id.FEC_sequence_id.next_by_id()
+                if inv.tipo_documento == 'FEC':
+                    sequence = inv.company_id.FEC_sequence_id.next_by_id()
             else:
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 continue
