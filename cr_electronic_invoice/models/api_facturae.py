@@ -1083,7 +1083,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     _logger.debug('MAB - tax_code: %s', tax_code)
                     _logger.debug('MAB - tax_amount: %s', tax_amount)
 
-                    if product_id.non_tax_deductible:
+                    if product_id and product_id.non_tax_deductible:
                         tax = invoice.env['account.tax'].search(
                                         [('tax_code', '=', tax_code),
                                         ('amount', '=', tax_amount),
@@ -1106,7 +1106,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                         # TODO: Add exonerations
                         taxes.append((4, tax.id))
                     else:
-                        if product_id.non_tax_deductible:
+                        if product_id and product_id.non_tax_deductible:
                             raise UserError(_('Tax code %s and percentage %s as non-tax deductible is not registered in the system' % (tax_code, tax_amount)))
                         else:
                             raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))

@@ -1,7 +1,7 @@
 # copyright  2018 Carlos Wong, Akurey S.A.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 from zeep import Client
 import datetime
@@ -127,11 +127,11 @@ class ResCurrencyRate(models.Model):
                                     'original_rate_2': buyingOriginalRate,
                                     'currency_id': currency_id.id})
                     else:
-                        _logger.debug("Error loading currency rates, dates for a buying and selling rate don't match")
+                        _logger.error("Error loading currency rates, dates for a buying (%s) and selling (%s) rates don't match" % (buyingRateNodes[nodeIndex].find("DES_FECHA").text, sellingRateNodes[nodeIndex].find("DES_FECHA").text))
 
                     nodeIndex += 1
             else:
-                _logger.debug("Error loading currency rates, dates for buying and selling rates don't match")
+                _logger.error("Error loading currency rates, dates range data for buying and selling rates don't match")
 
         if exchange_source == 'hacienda':
             _logger.debug("Getting exchange rates from HACIENDA")
@@ -141,7 +141,7 @@ class ResCurrencyRate(models.Model):
                 response = requests.get(url, timeout=5, verify=False)
 
             except requests.exceptions.RequestException as e:
-                _logger.info('RequestException %s' % e)
+                _logger.error('RequestException %s' % e)
                 return False
 
             if response.status_code in (200,):
@@ -165,6 +165,6 @@ class ResCurrencyRate(models.Model):
                     vals['name'] = today
                     self.create(vals)
 
-            _logger.info(vals)
+            _logger.debug(vals)
 
-        _logger.info("=========================================================")
+        _logger.debug("=========================================================")
