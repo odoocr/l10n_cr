@@ -1310,7 +1310,7 @@ class AccountInvoiceElectronic(models.Model):
                 if inv.tipo_documento == 'FEC':
                     sequence = inv.company_id.FEC_sequence_id.next_by_id()
             
-            if not inv.tipo_documento:
+            if not inv.tipo_documento or (inv.type == 'in_invoice' and inv.tipo_documento == "FE"):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 continue
 
