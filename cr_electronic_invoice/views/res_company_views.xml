@@ -18,10 +18,7 @@
 
                 <field name="website" position="before">
                     <field name="commercial_name"/>
-                    <field name="activity_id" 
-                            domain="[('id', 'in', economic_activities_ids)]" 
-                            options='{"no_open": True, "no_create": True}' />
-                    <field name="economic_activities_ids" invisible="1" readonly="1" />
+                    <field name="activity_id"  domain="[('active', '=', True)]" options='{"no_open": True, "no_create": True}' />
                     <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" colspan="2" /> 
                 </field>
 

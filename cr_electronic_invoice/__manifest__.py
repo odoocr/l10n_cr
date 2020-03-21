@@ -2,7 +2,7 @@
 
 {
     'name': 'Facturación electrónica Costa Rica',
-    'version': '12.0.2.0.1',
+    'version': '12.0.2.0.3',
     'author': 'Odoo CR Community',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
@@ -65,5 +65,6 @@
             'OpenSSL',
         ],
     },
+    'post_init_hook': 'post_init_hook',
     'installable': True,
 }

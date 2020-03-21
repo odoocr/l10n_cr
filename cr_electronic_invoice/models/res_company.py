@@ -2,7 +2,11 @@
 
 import logging
 import phonenumbers
+
 from odoo import models, fields, api
+from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
+
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -24,40 +28,35 @@ class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
 
-    commercial_name = fields.Char(string="Nombre comercial", required=False, )
-
-    activity_id = fields.Many2one("economic.activity", string="Actividad Económica por defecto", required=False, )
-
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
-
+    commercial_name = fields.Char(string="Commercial Name", required=False, )
+    activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
-    identification_id = fields.Many2one(
-        "identification.type", string="Tipo de identificacion", required=False)
-    district_id = fields.Many2one("res.country.district", string="Distrito",
-                                  required=False)
-    county_id = fields.Many2one("res.country.county", string="Cantón",
-                                required=False)
-    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Barrios",
-                                      required=False)
-    frm_ws_identificador = fields.Char(
-        string="Usuario de Factura Electrónica", required=False)
-    frm_ws_password = fields.Char(
-        string="Password de Factura Electrónica", required=False)
+    identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
+    district_id = fields.Many2one("res.country.district", string="District", required=False)
+    county_id = fields.Many2one("res.country.county", string="Canton", required=False)
+    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Neighborhood", required=False)
+    frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
+    frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
 
-    frm_ws_ambiente = fields.Selection(
-        selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'),
-                   ('api-prod', 'Producción')],
-        string="Ambiente",
-        required=True, default='disabled',
-        help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
-             'de calidad (stag), para el ambiente de producción (prod). Requerido.')
+    frm_ws_ambiente = fields.Selection(selection=[('disabled', 'Deshabilitado'), 
+                                                  ('api-stag', 'Pruebas'),
+                                                  ('api-prod', 'Producción')],
+                                    string="Environment",
+                                    required=True, 
+                                    default='disabled',
+                                    help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
+                                    'de calidad (stag), para el ambiente de producción (prod). Requerido.')
 
-    frm_pin = fields.Char(string="Pin", required=False,
+    frm_pin = fields.Char(string="Pin", 
+                          required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
 
-    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False,
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", 
+                                 required=False,
                                  default="1")
-    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False,
+
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", 
+                                 required=False,
                                  default="1")
 
     CCE_sequence_id = fields.Many2one(
@@ -67,6 +66,7 @@ class CompanyElectronic(models.Model):
         'y el sistema automaticamente se lo creará.',
         readonly=False, copy=False,
     )
+
     CPCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Parcial',
@@ -167,18 +167,24 @@ class CompanyElectronic(models.Model):
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
-            _logger.error(
-                'E-INV CR  - Economic Activities: %s',
-                json_response)
+
+            self.env.cr.execute('update economic_activity set active=False')
+
+            self.message_post(subject='Actividades Económicas',
+                            body='Aviso!.\n Cargando actividades económicas desde Hacienda')
+
             if json_response["status"] == 200:
                 activities = json_response["activities"]
                 activities_codes = list()
                 for activity in activities:
                     if activity["estado"] == "A":
                         activities_codes.append(activity["codigo"])
-                economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
 
-                self.economic_activities_ids = economic_activities
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
+
+                for activity in economic_activities:
+                    activity.active = True
+
                 self.name = json_response["name"]
             else:
                 alert = {

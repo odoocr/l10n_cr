@@ -845,7 +845,7 @@ def get_economic_activities(company):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
-        _logger.error('MAB - get_economic_activities response: %s' % (response.json()))
+        _logger.debug('MAB - get_economic_activities response: %s' % (response.json()))
         response_json = {
             'status': 200,
             'activities': response.json().get('actividades'),
@@ -1000,12 +1000,14 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.reference = invoice_xml.xpath("inv:NumeroConsecutivo", namespaces=namespaces)[0].text
 
         invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
-        activity_node = invoice.env['economic.activity'].search([('code', '=', invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces))], limit=1)
+        activity_node = invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)
+        activity = False
         if activity_node:
             activity_id = activity_node[0].text
+            activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_id)], limit=1)
         else:
             activity_id = False
-        invoice.economic_activity_id = activity_id
+        invoice.economic_activity_id = activity
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
         invoice.date_invoice = invoice.date_issuance
 
@@ -1042,7 +1044,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.account_id = partner.property_account_payable_id
         invoice.payment_term_id = partner.property_supplier_payment_term_id
 
-        _logger.error('MAB - load_lines: %s - account: %s' %
+        _logger.debug('MAB - load_lines: %s - account: %s' %
                       (load_lines, account_id))
 
         # if load_lines and not invoice.invoice_line_ids:
@@ -1081,7 +1083,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     _logger.debug('MAB - tax_code: %s', tax_code)
                     _logger.debug('MAB - tax_amount: %s', tax_amount)
 
-                    if product_id.non_tax_deductible:
+                    if product_id and product_id.non_tax_deductible:
                         tax = invoice.env['account.tax'].search(
                                         [('tax_code', '=', tax_code),
                                         ('amount', '=', tax_amount),
@@ -1104,7 +1106,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                         # TODO: Add exonerations
                         taxes.append((4, tax.id))
                     else:
-                        if product_id.non_tax_deductible:
+                        if product_id and product_id.non_tax_deductible:
                             raise UserError(_('Tax code %s and percentage %s as non-tax deductible is not registered in the system' % (tax_code, tax_amount)))
                         else:
                             raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))
@@ -1129,7 +1131,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
                 # This must be assigned after line is created
                 invoice_line.invoice_line_tax_ids = taxes
-
+                invoice_line.economic_activity_id = activity
                 new_lines += invoice_line
 
             invoice.invoice_line_ids = new_lines
