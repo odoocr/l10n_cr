@@ -1,17 +1,61 @@
-# sphinx build directories
-_build/
-
-# dotfiles
-.*
-!.gitignore
-!.mailmap
-# compiled python files
-*.py[co]
+# Byte-compiled / optimized / DLL files
 __pycache__/
-# setup.py egg_info
-*.egg-info
-# emacs backup files
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Pycharm
+.idea
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Rope
+.ropeproject
+
+# Sphinx documentation
+docs/_build/
+
+# Backup files
 *~
-# hg stuff
-*.orig
-status
+*.swp
+
+# macOS filestore
+.DS_Store
+
+# VS Code
+.vscode/

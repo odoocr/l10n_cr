@@ -2,7 +2,7 @@
 
 {
     'name': 'Facturación electrónica Costa Rica',
-    'version': '10.0.2.0.0',
+    'version': '10.0.2.0.1',
     'author': 'CRLibre.org',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
@@ -21,8 +21,9 @@
         'l10n_cr_country_codes',
         'account_cancel',
         #'res_currency_cr_adapter',
-        'account_invoice_import',
-        'base_business_document_import', ],
+        #'account_invoice_import',
+        #'base_business_document_import', 
+    ],
     'data': [
         'data/account_tax_data.xml',
         'data/aut_ex_data.xml',
@@ -39,6 +40,8 @@
         'data/uom_data.xml',
         'data/economic_activity_data.xml',
         'data/sequence.xml',
+        'data/res.currency.xml',
+        'data/decimal_precision.xml',
         'views/uom_views.xml',
         'views/account_invoice_views.xml',
         'views/account_journal_views.xml',
@@ -53,13 +56,14 @@
         'views/resolution_views.xml',
         'views/sale_condition_views.xml',
         'views/account_tax_views.xml',
+        'views/economic_activity_views.xml',
         'views/menu_views.xml',
         'security/ir.model.access.csv',
-        'wizard/account_invoice_import_view.xml',
     ],
     'external_dependencies': {
         "python": [
             'xmlsig',
+            'OpenSSL',
         ],
     },
     'installable': True,

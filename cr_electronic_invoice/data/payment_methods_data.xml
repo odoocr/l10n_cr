@@ -23,7 +23,7 @@
 
         <record id="cr_electronic_invoice.PaymentMethods_4" model="payment.methods">
             <field name="sequence">04</field>
-            <field name="name">Transferencia – depósito bancario</field>
+            <field name="name">Transferencia – depósito</field>
             <field name="active">true</field>
         </record>
 

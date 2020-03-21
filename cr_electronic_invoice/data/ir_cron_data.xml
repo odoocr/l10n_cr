@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        <record id="ir_cron_consultahacienda" model="ir.cron">
+        <record id="ir_cron_consultahacienda2" model="ir.cron">
             <field name="name">Consulta Hacienda FE Clientes</field>
             <field eval="True" name="active"/>
             <field name="user_id" ref="base.user_root"/>
@@ -14,7 +14,7 @@
             <field name="args">(1,)</field>
         </record>
 
-        <record id="ir_cron_confirmahacienda" model="ir.cron">
+        <record id="ir_cron_confirmahacienda2" model="ir.cron">
             <field name="name">Consulta Hacienda FE Proveedores</field>
             <field eval="True" name="active"/>
             <field name="user_id" ref="base.user_root"/>
@@ -27,7 +27,7 @@
             <field name="args">(1,)</field>
         </record>
 
-        <record id="ir_cron_valida_hacienda_invoice" model="ir.cron">
+        <record id="ir_cron_valida_hacienda_invoice2" model="ir.cron">
             <field name="name">Valida Facturas Hacienda</field>
             <field eval="True" name="active"/>
             <field name="user_id" ref="base.user_root"/>
@@ -40,7 +40,7 @@
             <field name="args">(1,)</field>
         </record>
 
-        <record id="ir_cron_mr_hacienda_invoice" model="ir.cron">
+        <record id="ir_cron_mr_hacienda_invoice2" model="ir.cron">
             <field name="name">Envio Mensaje Receptor</field>
             <field eval="False" name="active"/>
             <field name="user_id" ref="base.user_root"/>

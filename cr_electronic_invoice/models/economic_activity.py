@@ -3,7 +3,7 @@ from odoo import models, fields, api, _
 
 
 class EconomicActivity(models.Model):
-    _name = "economic_activity"
+    _name = "economic.activity"
 
     active = fields.Boolean(string="Activo", required=False, default=True)
     code = fields.Char(string="Código", required=False, )

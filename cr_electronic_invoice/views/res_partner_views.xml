@@ -60,6 +60,11 @@
                         position="before">
                         <field name="identification_id"/>
                         <field name="vat"/>
+                        <field name="activity_id" 
+                            options='{"no_open": True, "no_create": True}' 
+                            attrs="{'invisible': [('supplier', '!=', True)]}" />
+                        <field name="economic_activities_ids" invisible="1" readonly="1" />
+                        <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" /> 
                     </field>
 
                     <field name="category_id" position="after">
