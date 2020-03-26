@@ -937,7 +937,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
                              inv.number_electronic)
 
             # limpia el template de los attachments
-            email_template.attachment_ids = [(5)]
+            email_template.attachment_ids = [(5, 0, 0)]
 
 
 def send_message(inv, date_cr, xml, token, env):
