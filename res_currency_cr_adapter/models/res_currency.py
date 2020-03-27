@@ -1,7 +1,7 @@
 # copyright  2018 Carlos Wong, Akurey S.A.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 from zeep import Client
 import datetime
@@ -47,104 +47,101 @@ class ResCurrencyRate(models.Model):
 
         exchange_source = self.env['ir.config_parameter'].sudo().get_param('exchange_source')
         if exchange_source == 'bccr':
+            _logger.debug("Getting exchange rates from BCCR")
             bccr_username = self.env['ir.config_parameter'].sudo().get_param('bccr_username')
             bccr_email = self.env['ir.config_parameter'].sudo().get_param('bccr_email')
             bccr_token = self.env['ir.config_parameter'].sudo().get_param('bccr_token')
 
             # Get current date to get exchange rate for today
-            currentDate = datetime.datetime.now().date()
-            # formato requerido por el BCCR dd/mm/yy
-            today = currentDate.strftime('%d/%m/%Y')
-
-            # Get XML Schema for BCCR webservice SOAP
-            imp = Import('http://www.w3.org/2001/XMLSchema', location='http://www.w3.org/2001/XMLSchema.xsd')
-            imp.filter.add('http://ws.sdde.bccr.fi.cr')
+            if first_date:
+                initial_date = first_date.strftime('%d/%m/%Y')
+                end_date = last_date.strftime('%d/%m/%Y')
+            else:
+                initial_date = datetime.datetime.now().date().strftime('%d/%m/%Y')
+                end_date = initial_date
 
             # Web Service Connection using the XML schema from BCCRR
-            client = Client('https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx?WSDL', doctor=ImportDoctor(imp))
-
-            # The response is a string we need to convert it to XML to extract value
+            client = Client('https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx?WSDL')
 
             response = client.service.ObtenerIndicadoresEconomicosXML(Indicador='318',
-                                                                      FechaInicio=today,
-                                                                      FechaFinal=today,
-                                                                      Nombre=bccr_username,
-                                                                      SubNiveles='N',
-                                                                      CorreoElectronico=bccr_email,
-                                                                      Token=bccr_token)
+                                                                    FechaInicio=initial_date,
+                                                                    FechaFinal=end_date,
+                                                                    Nombre=bccr_username,
+                                                                    SubNiveles='N',
+                                                                    CorreoElectronico=bccr_email,
+                                                                    Token=bccr_token)
             xmlResponse = xml.etree.ElementTree.fromstring(response)
-            rateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC/NUM_VALOR")
-            sellingRate = 0
-            if len(rateNodes) > 0:
-                sellingOriginalRate = float(rateNodes[0].text)
-                # Odoo uses the value of 1 unit of the base currency divided between the exchage rate
-                sellingRate = 1 / sellingOriginalRate
+            sellingRateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC")
 
             # Get Buying exchange Rate from BCCR
             response = client.service.ObtenerIndicadoresEconomicosXML(Indicador='317',
-                                                                      FechaInicio=today,
-                                                                      FechaFinal=today,
-                                                                      Nombre=bccr_username,
-                                                                      SubNiveles='N',
-                                                                      CorreoElectronico=bccr_email,
-                                                                      Token=bccr_token)
+                                                                    FechaInicio=initial_date,
+                                                                    FechaFinal=end_date,
+                                                                    Nombre=bccr_username,
+                                                                    SubNiveles='N',
+                                                                    CorreoElectronico=bccr_email,
+                                                                    Token=bccr_token)
 
             xmlResponse = xml.etree.ElementTree.fromstring(response)
-            rateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC/NUM_VALOR")
+            buyingRateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC")
+
+            sellingRate = 0
             buyingRate = 0
-            if len(rateNodes) > 0:
-                buyingOriginalRate = float(rateNodes[0].text)
-                # Odoo uses the value of 1 unit of the base currency divided between the exchage rate
-                buyingRate = 1 / buyingOriginalRate
+            nodeIndex = 0
+            if len(sellingRateNodes) > 0 and len(sellingRateNodes) == len(buyingRateNodes):
+                while nodeIndex < len(sellingRateNodes):
+                    if sellingRateNodes[nodeIndex].find("DES_FECHA").text == buyingRateNodes[nodeIndex].find("DES_FECHA").text:
+                        currentDateStr = datetime.datetime.strptime(sellingRateNodes[nodeIndex].find("DES_FECHA").text, "%Y-%m-%dT%H:%M:%S-06:00").strftime('%Y-%m-%d')
 
-            # Save the exchange rate in database
-            today = currentDate.strftime('%Y-%m-%d')
+                        sellingOriginalRate = float(sellingRateNodes[nodeIndex].find("NUM_VALOR").text)
+                        buyingOriginalRate = float(buyingRateNodes[nodeIndex].find("NUM_VALOR").text)
 
-            # GET THE CURRENCY ID
-            currency_id = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
+                        # Odoo uses the value of 1 unit of the base currency divided between the exchage rate
+                        sellingRate = 1 / sellingOriginalRate
+                        buyingRate = 1 / buyingOriginalRate
 
-            # Get the rate for this date to know it is already registered
-            ratesIds = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
+                        # GET THE CURRENCY ID
+                        currency_id = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
 
-            if len(ratesIds) > 0:
-                newRate = ratesIds.write({'rate': sellingRate,
-                                          'original_rate': sellingOriginalRate,
-                                          'rate_2': buyingRate,
-                                          'original_rate_2': buyingOriginalRate,
-                                          'currency_id': currency_id.id})
-                _logger.debug({'name': today,
-                               'rate': sellingRate,
-                               'original_rate': sellingOriginalRate,
-                               'rate_2': buyingRate,
-                               'original_rate_2': buyingOriginalRate,
-                               'currency_id': currency_id.id})
+                        # Get the rate for this date to know it is already registered
+                        ratesIds = self.env['res.currency.rate'].search([('name', '=', currentDateStr)], limit=1)
+
+                        if len(ratesIds) > 0:
+                            newRate = ratesIds.write({'rate': sellingRate,
+                                                    'original_rate': sellingOriginalRate,
+                                                    'rate_2': buyingRate,
+                                                    'original_rate_2': buyingOriginalRate,
+                                                    'currency_id': currency_id.id})
+                        else:
+                            newRate = self.create({'name': currentDateStr,
+                                                'rate': sellingRate,
+                                                'original_rate': sellingOriginalRate,
+                                                'rate_2': buyingRate,
+                                                'original_rate_2': buyingOriginalRate,
+                                                'currency_id': currency_id.id})
+
+                        _logger.debug({'name': currentDateStr,
+                                    'rate': sellingRate,
+                                    'original_rate': sellingOriginalRate,
+                                    'rate_2': buyingRate,
+                                    'original_rate_2': buyingOriginalRate,
+                                    'currency_id': currency_id.id})
+                    else:
+                        _logger.error("Error loading currency rates, dates for a buying (%s) and selling (%s) rates don't match" % (buyingRateNodes[nodeIndex].find("DES_FECHA").text, sellingRateNodes[nodeIndex].find("DES_FECHA").text))
+
+                    nodeIndex += 1
             else:
-                newRate = self.create({'name': today,
-                                       'rate': sellingRate,
-                                       'original_rate': sellingOriginalRate,
-                                       'rate_2': buyingRate,
-                                       'original_rate_2': buyingOriginalRate,
-                                       'currency_id': currency_id.id})
-                _logger.debug({'name': today,
-                               'rate': sellingRate,
-                               'original_rate': sellingOriginalRate,
-                               'rate_2': buyingRate,
-                               'original_rate_2': buyingOriginalRate,
-                               'currency_id': currency_id.id})
-
-            _logger.debug(
-                "=========================================================")
+                _logger.error("Error loading currency rates, dates range data for buying and selling rates don't match")
 
         if exchange_source == 'hacienda':
-            _logger.info("=========================================================")
-            _logger.info("Executing exchange rate update")
+            _logger.debug("Getting exchange rates from HACIENDA")
 
             try:
                 url = 'https://api.hacienda.go.cr/indicadores/tc'
                 response = requests.get(url, timeout=5, verify=False)
 
             except requests.exceptions.RequestException as e:
-                _logger.info('RequestException %s' % e)
+                _logger.error('RequestException %s' % e)
                 return False
 
             if response.status_code in (200,):
@@ -168,5 +165,6 @@ class ResCurrencyRate(models.Model):
                     vals['name'] = today
                     self.create(vals)
 
-            _logger.info(vals)
-            _logger.info("=========================================================")
+            _logger.debug(vals)
+
+        _logger.debug("=========================================================")
