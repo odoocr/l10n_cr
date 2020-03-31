@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_res_partner_inherit" 
+            model="ir.ui.view">
+            <field name="name">res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <data>
+                     <field name="property_payment_term_id" 
+                        position="after">
+                        <field name="payment_methods_id" 
+                            groups="account.group_account_invoice"/>
+                    </field>
+
+                    <field name="vat" position="after">
+                        <field name="identification_id"/>
+                        <field name="supplier_rank" invisible="1" readonly="1"/>
+                        <field name="activity_id" 
+                            domain="[('id', 'in', economic_activities_ids)]" 
+                            options='{"no_open": True, "no_create": True, "active_test": False}' 
+                            attrs="{'invisible': [('supplier_rank', '>', 0)]}" />
+                        <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": False}' />
+                        <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" attrs="{'invisible': [('supplier_rank', '>', 0)]}" /> 
+                    </field>
+
+                    <field name="category_id" position="after">
+                        
+                        <field name="has_exoneration" attrs="{'invisible': [('supplier_rank', '>', 0)]}" />
+                        <field name="export" attrs="{'invisible': [('supplier_rank', '>', 0)]}" />
+                    </field>
+                </data>
+                <xpath expr="//page[3]" position="after">
+                    <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">
+                        <group col="2">
+                            <field name="exoneration_number"/>
+                            <field name="type_exoneration"/>
+                            <field name="institution_name"/>
+                            <field name="date_issue"/>
+                            <field name="date_expiration"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

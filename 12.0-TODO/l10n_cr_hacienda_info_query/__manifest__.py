@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
         "name" : "Consultar Información de Clientes en Hacienda Costa Rica",
-        "version" : "12.0.1.1",
+        "version" : "13.0.1.1",
         "author" : "Odoo CR, Factura Sempai, FSS Solutions",
         'license': 'LGPL-3',
         "website" : "https://github.com/odoocr/l10n_cr",
