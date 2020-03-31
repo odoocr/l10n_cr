@@ -31,7 +31,7 @@ class AccountInvoiceRefund(models.TransientModel):
 
     reference_code_id = fields.Many2one("reference.code", string="Code reference", required=True, )
     reference_document_id = fields.Many2one("reference.document", string="Reference Document Id", required=True, )
-    invoice_id = fields.Many2one("account.invoice", string="Invoice Id", default=_get_invoice_id, required=False, )
+    invoice_id = fields.Many2one("account.move", string="Invoice Id", default=_get_invoice_id, required=False, )
 
     def reverse_moves(self, mode='refund'):
         if self.env.user.company_id.frm_ws_ambiente == 'disabled':
@@ -230,7 +230,7 @@ class AccountInvoiceElectronic(models.Model):
 
     payment_methods_id = fields.Many2one("payment.methods", string="Métodos de Pago", required=False, )
 
-    invoice_id = fields.Many2one("account.invoice", string="Documento de referencia", required=False, copy=False)
+    invoice_id = fields.Many2one("account.move", string="Documento de referencia", required=False, copy=False)
 
     xml_respuesta_tributacion = fields.Binary( string="Respuesta Tributación XML", required=False, copy=False, attachment=True)
 
@@ -328,7 +328,7 @@ class AccountInvoiceElectronic(models.Model):
         elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
 
             attachment = self.env['ir.attachment'].search(
-                [('res_model', '=', 'account.invoice'),
+                [('res_model', '=', 'account.move'),
                  ('res_id', '=', self.id),
                  ('res_field', '=', 'xml_comprobante')], limit=1)
 
@@ -337,7 +337,7 @@ class AccountInvoiceElectronic(models.Model):
                 attachment.datas_fname = self.fname_xml_comprobante
 
                 attachment_resp = self.env['ir.attachment'].search(
-                    [('res_model', '=', 'account.invoice'),
+                    [('res_model', '=', 'account.move'),
                      ('res_id', '=', self.id),
                      ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
 
@@ -665,7 +665,7 @@ class AccountInvoiceElectronic(models.Model):
                     'out_refund': ('customer refund refund'),
                     'in_refund': ('vendor refund refund')
                 }
-                message = _("This %s has been created from: <a href=# data-oe-model=account.invoice data-oe-id=%d>%s</a>") % (doc_type[invoice.type], invoice.id, invoice.number)
+                message = _("This %s has been created from: <a href=# data-oe-model=account.move data-oe-id=%d>%s</a>") % (doc_type[invoice.type], invoice.id, invoice.number)
                 refund_invoice.message_post(body=message)
                 new_invoices += refund_invoice
             return new_invoices
@@ -695,13 +695,13 @@ class AccountInvoiceElectronic(models.Model):
     @api.model
     # cron Job that verifies if the invoices are Validated at Tributación
     def _check_hacienda_for_invoices(self, max_invoices=10):
-        out_invoices = self.env['account.invoice'].search(
+        out_invoices = self.env['account.move'].search(
             [('type', 'in', ('out_invoice', 'out_refund')),
              ('state', 'in', ('open', 'paid')),
              ('state_tributacion', 'in', ('recibido', 'procesando', 'ne'))],  # , 'error'
             limit=max_invoices)
 
-        in_invoices = self.env['account.invoice'].search(
+        in_invoices = self.env['account.move'].search(
             [('type', '=', 'in_invoice'),
              ('tipo_documento', '=', 'FEC'),
              ('state', 'in', ('open', 'paid')),
@@ -760,7 +760,7 @@ class AccountInvoiceElectronic(models.Model):
                 if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
                     email_template = self.env.ref('account.email_template_edi_invoice', False)
                     attachment = self.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.invoice'),
+                        [('res_model', '=', 'account.move'),
                          ('res_id', '=', i.id),
                          ('res_field', '=', 'xml_comprobante')], limit=1)
                     attachment.name = i.fname_xml_comprobante
@@ -768,7 +768,7 @@ class AccountInvoiceElectronic(models.Model):
                     attachment.mimetype = 'text/xml'
 
                     attachment_resp = self.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.invoice'),
+                        [('res_model', '=', 'account.move'),
                          ('res_id', '=', i.id),
                          ('res_field', '=', 'xml_respuesta_tributacion')],
                         limit=1)
@@ -822,7 +822,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     def _check_hacienda_for_mrs(self, max_invoices=10):  # cron
-        invoices = self.env['account.invoice'].search(
+        invoices = self.env['account.move'].search(
             [('type', 'in', ('in_invoice', 'in_refund')),
              ('tipo_documento', '!=', 'FEC'),
              ('state', 'in', ('open', 'paid')),
@@ -851,7 +851,7 @@ class AccountInvoiceElectronic(models.Model):
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
         #if self.company_id.frm_ws_ambiente != 'disabled':
         _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
-        invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
+        invoices = self.env['account.move'].search([('type', 'in', ('out_invoice', 'out_refund')),
                                                       ('state', 'in', ('open', 'paid')),
                                                       ('number_electronic', '!=', False),
                                                       ('invoice_date', '>=', '2019-07-01'),
@@ -1308,7 +1308,7 @@ class AccountInvoiceElectronic(models.Model):
                             iva_devuelto += i.price_total - i.price_subtotal
                 if iva_devuelto:
                     prod_iva_devuelto = self.env.ref('cr_electronic_invoice.product_iva_devuelto')
-                    inv_line_iva_devuelto = self.env['account.invoice.line'].create({
+                    inv_line_iva_devuelto = self.env['account.move.line'].create({
                         'name': 'IVA Devuelto',
                         'invoice_id': inv.id,
                         'product_id': prod_iva_devuelto.id,

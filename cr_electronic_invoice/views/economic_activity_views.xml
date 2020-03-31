@@ -50,7 +50,6 @@
         <record id="action_economic_activity" model="ir.actions.act_window">
             <field name="name">Actividad Económica</field>
             <field name="res_model">economic.activity</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="view_economic_activity_filter"/>
         </record>

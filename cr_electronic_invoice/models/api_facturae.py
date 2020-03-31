@@ -707,7 +707,7 @@ def get_invoice_attachments(invoice, record_id):
     attachments = []
 
     attachment = invoice.env['ir.attachment'].search(
-        [('res_model', '=', 'account.invoice'), ('res_id', '=', record_id),
+        [('res_model', '=', 'account.move'), ('res_id', '=', record_id),
          ('res_field', '=', 'xml_comprobante')], limit=1)
 
     if attachment.id:
@@ -716,7 +716,7 @@ def get_invoice_attachments(invoice, record_id):
         attachments.append(attachment.id)
 
     attachment_resp = invoice.env['ir.attachment'].search(
-        [('res_model', '=', 'account.invoice'), ('res_id', '=', record_id),
+        [('res_model', '=', 'account.move'), ('res_id', '=', record_id),
          ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
 
     if attachment_resp.id:
@@ -882,7 +882,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         attachments = []
 
         attachment = self.env['ir.attachment'].search(
-            [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+            [('res_model', '=', 'account.move'), ('res_id', '=', inv.id),
              ('res_field', '=', 'xml_comprobante')], limit=1)
 
         if attachment.id:
@@ -891,7 +891,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
             attachments.append(attachment.id)
 
         attachment_resp = self.env['ir.attachment'].search(
-            [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+            [('res_model', '=', 'account.move'), ('res_id', '=', inv.id),
              ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
 
         if attachment_resp.id:
