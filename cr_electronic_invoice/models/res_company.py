@@ -8,6 +8,7 @@ from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
 from . import api_facturae
+<<<<<<< refs/remotes/upstream/13.0
 
 _logger = logging.getLogger(__name__)
 
@@ -23,13 +24,21 @@ _TIPOS_CONFIRMACION = (
      'Supplier electronic purchase invoice sequence'),
 )
 
+=======
+
+_logger = logging.getLogger(__name__)
+>>>>>>> Updated
 
 _TIPOS_CONFIRMACION = (
     # Provides listing of types of comprobante confirmations
-    ('CCE_sequence_id', 'account.invoice.supplier.accept.', 'Supplier invoice acceptance sequence'),
+    ('CCE_sequence_id', 'account.invoice.supplier.accept.',
+     'Supplier invoice acceptance sequence'),
     ('CPCE_sequence_id', 'account.invoice.supplier.partial.',
      'Supplier invoice partial acceptance sequence'),
-    ('RCE_sequence_id', 'account.invoice.supplier.reject.', 'Supplier invoice rejection sequence'),
+    ('RCE_sequence_id', 'account.invoice.supplier.reject.',
+     'Supplier invoice rejection sequence'),
+    ('FEC_sequence_id', 'account.invoice.supplier.reject.',
+     'Supplier electronic purchase invoice sequence'),
 )
 
 
@@ -41,6 +50,9 @@ class CompanyElectronic(models.Model):
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
 <<<<<<< refs/remotes/upstream/13.0
+<<<<<<< refs/remotes/upstream/13.0
+=======
+>>>>>>> Updated
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
     frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
@@ -65,6 +77,7 @@ class CompanyElectronic(models.Model):
     terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", 
                                  required=False,
                                  default="1")
+<<<<<<< refs/remotes/upstream/13.0
 =======
     identification_id = fields.Many2one(comodel_name="identification.type", string="Tipo de identificacion",
                                         required=False, )
@@ -103,12 +116,15 @@ class CompanyElectronic(models.Model):
     #RCE_sequence_id = fields.Many2one('ir.sequence', string='Secuencia de Rechazo Comprobante Electrónico',
     #                                  readonly=False, copy=False)
 >>>>>>> Many Fixes
+=======
+>>>>>>> Updated
 
     CCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Aceptación',
         help='Secuencia de confirmacion de aceptación de comprobante electrónico. Dejar en blanco '
         'y el sistema automaticamente se lo creará.',
+<<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
         readonly=False, copy=False,
     )
@@ -117,6 +133,10 @@ class CompanyElectronic(models.Model):
         copy=False,
         )
 >>>>>>> Many Fixes
+=======
+        readonly=False, copy=False,
+    )
+>>>>>>> Updated
 
     CPCE_sequence_id = fields.Many2one(
         'ir.sequence',
@@ -124,18 +144,26 @@ class CompanyElectronic(models.Model):
         help='Secuencia de confirmación de aceptación parcial de comprobante electrónico. Dejar '
         'en blanco y el sistema automáticamente se lo creará.',
 <<<<<<< refs/remotes/upstream/13.0
+<<<<<<< refs/remotes/upstream/13.0
         readonly=False, copy=False,
     )
 =======
         readonly=False, copy=False)
 
 >>>>>>> Many Fixes
+=======
+        readonly=False, copy=False,
+    )
+>>>>>>> Updated
     RCE_sequence_id = fields.Many2one(
         'ir.sequence',
         string='Secuencia Rechazo',
         help='Secuencia de confirmación de rechazo de comprobante electrónico. Dejar '
         'en blanco y el sistema automáticamente se lo creará.',
 <<<<<<< refs/remotes/upstream/13.0
+<<<<<<< refs/remotes/upstream/13.0
+=======
+>>>>>>> Updated
         readonly=False, copy=False,
     )
     FEC_sequence_id = fields.Many2one(
@@ -167,9 +195,12 @@ class CompanyElectronic(models.Model):
                     'message': _('Número de teléfono inválido')
                 }
                 return {'value': {'phone': ''}, 'warning': alert}
+<<<<<<< refs/remotes/upstream/13.0
 =======
         readonly=False, copy=False)
 >>>>>>> Many Fixes
+=======
+>>>>>>> Updated
 
     @api.model
     def create(self, vals):
@@ -181,6 +212,9 @@ class CompanyElectronic(models.Model):
             of the name or commercial name.
         """
 <<<<<<< refs/remotes/upstream/13.0
+<<<<<<< refs/remotes/upstream/13.0
+=======
+>>>>>>> Updated
         new_comp_id = super(CompanyElectronic, self).create(vals)
         #new_comp = self.browse(new_comp_id)
         new_comp_id.try_create_configuration_sequences()
@@ -195,6 +229,7 @@ class CompanyElectronic(models.Model):
             of the name or commercial name.
         """
         company_subname = self.commercial_name
+<<<<<<< refs/remotes/upstream/13.0
         if not company_subname:
             company_subname = getattr(self, 'name')
 =======
@@ -203,10 +238,15 @@ class CompanyElectronic(models.Model):
         if not company_subname:
             company_subname = vals.get('name')
 >>>>>>> Many Fixes
+=======
+        if not company_subname:
+            company_subname = getattr(self, 'name')
+>>>>>>> Updated
         company_subname = company_subname.split(' ')[0].lower()
         ir_sequence = self.env['ir.sequence']
         to_write = {}
         for field, seq_code, seq_name in _TIPOS_CONFIRMACION:
+<<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             if not getattr(self, field, None):
                 seq_code += company_subname
@@ -216,11 +256,17 @@ class CompanyElectronic(models.Model):
                 seq_code += company_subname
                 seq = ir_sequence.create({
 >>>>>>> Many Fixes
+=======
+            if not getattr(self, field, None):
+                seq_code += company_subname
+                seq = self.env.ref(seq_code, raise_if_not_found=False) or ir_sequence.create({
+>>>>>>> Updated
                     'name': seq_name,
                     'code': seq_code,
                     'implementation': 'standard',
                     'padding': 10,
                     'use_date_range': False,
+<<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
                     'company_id': getattr(self, 'id'),
                 })
@@ -272,10 +318,59 @@ class CompanyElectronic(models.Model):
             return {'value': {'vat': ''}, 'warning': alert}
 =======
                     'company_id': new_comp.id,
+=======
+                    'company_id': getattr(self, 'id'),
+>>>>>>> Updated
                 })
                 to_write[field] = seq.id
 
         if to_write:
+<<<<<<< refs/remotes/upstream/13.0
             new_comp.write(to_write)
         return new_comp
 >>>>>>> Many Fixes
+=======
+            self.write(to_write)
+
+    def test_get_token(self):
+        token_m_h = api_facturae.get_token_hacienda(
+            self.env.user, self.frm_ws_ambiente)
+        if token_m_h:
+           _logger.info('E-INV CR - I got the token')
+        return 
+
+    def action_get_economic_activities(self):
+        if self.vat:
+            json_response = api_facturae.get_economic_activities(self)
+
+            self.env.cr.execute('update economic_activity set active=False')
+
+            self.message_post(subject='Actividades Económicas',
+                            body='Aviso!.\n Cargando actividades económicas desde Hacienda')
+
+            if json_response["status"] == 200:
+                activities = json_response["activities"]
+                activities_codes = list()
+                for activity in activities:
+                    if activity["estado"] == "A":
+                        activities_codes.append(activity["codigo"])
+
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
+
+                for activity in economic_activities:
+                    activity.active = True
+
+                self.name = json_response["name"]
+            else:
+                alert = {
+                    'title': json_response["status"],
+                    'message': json_response["text"]
+                }
+                return {'value': {'vat': ''}, 'warning': alert}
+        else:
+            alert = {
+                'title': 'Atención',
+                'message': _('Company VAT is invalid')
+            }
+            return {'value': {'vat': ''}, 'warning': alert}
+>>>>>>> Updated

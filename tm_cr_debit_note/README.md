@@ -1,4 +1,0 @@
-Credit and Debit Notes
-=======================
-
-

@@ -28,3 +28,31 @@ class AccountJournalInherit(models.Model):
                                      string="Secuencia de Notas de Débito Electrónicas",
                                      required=False)
 
+<<<<<<< refs/remotes/upstream/13.0
+=======
+    sequence_electronic_doc_reject = fields.Many2one(comodel_name="ir.sequence",
+                                                     string="Secuencia de Rechazo Comprobante Electrónico",
+                                                     required=False)
+
+
+    #FE_sequence_id = fields.Many2one("ir.sequence",
+    #                                 string="Secuencia de Facturas Electrónicas",
+    #                                 required=False)
+
+    #TE_sequence_id = fields.Many2one("ir.sequence",
+    #                                 string="Secuencia de Tiquetes Electrónicos",
+    #                                 required=False)
+
+    #FEE_sequence_id = fields.Many2one("ir.sequence",
+    #                                  string="Secuencia de Facturas Electrónicas de Exportación",
+    #                                  required=False)
+
+    #NC_sequence_id = fields.Many2one("ir.sequence",
+    #                                 string="Secuencia de Notas de Crédito Electrónicas",
+    #                                 required=False)
+
+    #ND_sequence_id = fields.Many2one("ir.sequence",
+    #                                 string="Secuencia de Notas de Débito Electrónicas",
+    #                                 required=False)
+
+>>>>>>> Updated
