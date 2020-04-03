@@ -6,7 +6,6 @@ from odoo import fields, models, api
 class MailComposeMessage(models.TransientModel):
     _inherit = 'mail.compose.message'
 
-    @api.multi
     def send_mail(self, auto_commit=False):
         context = self._context
         account_invoice = self.env['account.invoice']

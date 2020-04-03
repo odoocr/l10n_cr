@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product.decimal_price" model="decimal.precision">
+            <field name="digits">5</field>
+        </record>
+        <record id="product.decimal_discount" model="decimal.precision">
+            <field name="digits">5</field>
+        </record>
+        <record id="account" model="decimal.precision" forcecreate="1">
+            <field name="name">account</field>
+            <field name="digits">5</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="base.CRC" model="res.currency">
+            <field name="rounding" eval="0.000010" />
+            <field name="symbol">₡</field>
+            <field name="position">before</field>
+        </record>
+    </data>
+</odoo>
