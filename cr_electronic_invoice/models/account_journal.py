@@ -55,4 +55,7 @@ class AccountJournalInherit(models.Model):
     #                                 string="Secuencia de Notas de Débito Electrónicas",
     #                                 required=False)
 
+<<<<<<< HEAD
 >>>>>>> Updated
+=======
+>>>>>>> 13.0

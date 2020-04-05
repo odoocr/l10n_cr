@@ -6,6 +6,7 @@
             model="aut.ex">
             <field name="code">01</field>
             <field name="name">Compras autorizadas</field>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             <field name="active" 
@@ -17,12 +18,17 @@
             <field name="active" 
                 eval="True"/>
 >>>>>>> Updated
+=======
+            <field name="active" 
+                eval="True"/>
+>>>>>>> 13.0
         </record>
 
         <record id="cr_electronic_invoice.AutEx_2" 
             model="aut.ex">
             <field name="code">02</field>
             <field name="name">Ventas exentas a diplomáticos</field>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             <field name="active" 
@@ -34,11 +40,16 @@
             <field name="active" 
                 eval="True"/>
 >>>>>>> Updated
+=======
+            <field name="active" 
+                eval="True"/>
+>>>>>>> 13.0
         </record>
 
         <record id="cr_electronic_invoice.AutEx_3" 
             model="aut.ex">
             <field name="code">03</field>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             <field name="name">Autorizado por Ley Especial</field>
@@ -53,12 +64,18 @@
             <field name="active" 
                 eval="True"/>
 >>>>>>> Updated
+=======
+            <field name="name">Autorizado por Ley Especial</field>
+            <field name="active" 
+                eval="True"/>
+>>>>>>> 13.0
         </record>
 
         <record id="cr_electronic_invoice.AutEx_4" 
             model="aut.ex">
             <field name="code">04</field>
             <field name="name">Exenciones Dirección General de Hacienda</field>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             <field name="active" 
@@ -70,12 +87,17 @@
             <field name="active" 
                 eval="True"/>
 >>>>>>> Updated
+=======
+            <field name="active" 
+                eval="True"/>
+>>>>>>> 13.0
         </record>
 
         <record id="cr_electronic_invoice.AutEx_5" 
             model="aut.ex">
             <field name="code">05</field>
             <field name="name">Transitorio V</field>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             <field name="active" 
@@ -87,12 +109,17 @@
             <field name="active" 
                 eval="True"/>
 >>>>>>> Updated
+=======
+            <field name="active" 
+                eval="True"/>
+>>>>>>> 13.0
         </record>
 
         <record id="cr_electronic_invoice.AutEx_6" 
             model="aut.ex">
             <field name="code">06</field>
             <field name="name">Transitorio IX</field>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             <field name="active" 
@@ -104,12 +131,17 @@
             <field name="active" 
                 eval="True"/>
 >>>>>>> Updated
+=======
+            <field name="active" 
+                eval="True"/>
+>>>>>>> 13.0
         </record>
 
         <record id="cr_electronic_invoice.AutEx_7" 
             model="aut.ex">
             <field name="code">07</field>
             <field name="name">Transitorio XVII</field>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             <field name="active" 
@@ -121,12 +153,17 @@
             <field name="active" 
                 eval="True"/>
 >>>>>>> Updated
+=======
+            <field name="active" 
+                eval="True"/>
+>>>>>>> 13.0
         </record>
 
         <record id="cr_electronic_invoice.AutEx_99" 
             model="aut.ex">
             <field name="code">99</field>
             <field name="name">Otros</field>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
             <field name="active" 
@@ -138,6 +175,10 @@
             <field name="active" 
                 eval="True"/>
 >>>>>>> Updated
+=======
+            <field name="active" 
+                eval="True"/>
+>>>>>>> 13.0
         </record>
 
     </data>

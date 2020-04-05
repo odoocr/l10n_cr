@@ -20,6 +20,7 @@
         <menuitem id="menu_economic_activity" name="Actividad Económica" parent="menu_electronic_invoice"
                   sequence="8" action="action_economic_activity"/>
 
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
     </data>
@@ -43,4 +44,7 @@
 =======
     </data>
 >>>>>>> Updated
+=======
+    </data>
+>>>>>>> 13.0
 </odoo>

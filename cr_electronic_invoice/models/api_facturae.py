@@ -112,6 +112,7 @@ def get_consecutivo_hacienda(tipo_documento, consecutivo, sucursal_id, terminal_
     return consecutivo_mh
 
 
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
 def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_id, situacion='normal'):
@@ -142,6 +143,11 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
 
     tipo_doc = fe_enums.TipoDocumento[tipo_documento]
 >>>>>>> Updated
+=======
+def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_id, situacion='normal'):
+
+    tipo_doc = fe_enums.TipoDocumento[tipo_documento]
+>>>>>>> 13.0
 
     '''Verificamos si el consecutivo indicado corresponde a un numero'''
     inv_consecutivo = re.sub('[^0-9]', '', consecutivo)
@@ -155,6 +161,7 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
     '''Armamos el consecutivo pues ya tenemos los datos necesarios'''
     consecutivo_mh = inv_sucursal + inv_terminal + tipo_doc + inv_consecutivo
 
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
     if not doc.company_id.identification_id:
@@ -182,6 +189,11 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
 
     elif not self.company_id.identification_id:
         raise UserError('Seleccione el tipo de identificación del emisor en el pérfil de la compañía')
+=======
+    if not doc.company_id.identification_id:
+        raise UserError(
+            'Seleccione el tipo de identificación del emisor en el pérfil de la compañía')
+>>>>>>> 13.0
 
     else:
         '''Obtenemos el número de identificación del Emisor y lo validamos númericamente'''
@@ -219,7 +231,10 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
     elif doc.company_id.identification_id.code == '04' and len(inv_cedula) != 10:
         raise UserError(
             'La identificación NITE del emisor debe de tener 10 dígitos')
+<<<<<<< HEAD
 >>>>>>> Updated
+=======
+>>>>>>> 13.0
 
     inv_cedula = str(inv_cedula).zfill(12)
 
@@ -356,6 +371,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     mr_fecha_emision = fecha_emision
     if mr_fecha_emision is None:
         raise UserError('La fecha de emisión en el MR es inválida.')
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
 =======
@@ -1070,10 +1086,54 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_s
     
     sb.Append('<TotalMercanciasGravadas>' + str(total_mercaderia_gravado) + '</TotalMercanciasGravadas>')
     sb.Append('<TotalMercanciasExentas>' + str(total_mercaderia_exento) + '</TotalMercanciasExentas>') 
+=======
 
-    sb.Append('<TotalGravado>' + str(total_servicio_gravado + total_mercaderia_gravado) + '</TotalGravado>')
-    sb.Append('<TotalExento>' + str(total_servicio_exento + total_mercaderia_exento) + '</TotalExento>')
+    '''Verificamos si el ID del mensaje receptor es válido'''
+    mr_mensaje_id = int(id_mensaje)
+    if mr_mensaje_id < 1 and mr_mensaje_id > 3:
+        raise UserError('El ID del mensaje receptor es inválido.')
+    elif mr_mensaje_id is None:
+        raise UserError('No se ha proporcionado un ID válido para el MR.')
 
+    mr_cedula_receptor = re.sub('[^0-9]', '', cedula_receptor)
+    if len(mr_cedula_receptor) != 12:
+        mr_cedula_receptor = str(mr_cedula_receptor).zfill(12)
+    elif mr_cedula_receptor is None:
+        raise UserError(
+            'No se ha proporcionado una cédula de receptor válida para el MR.')
+
+    '''Verificamos si el consecutivo indicado para el mensaje receptor corresponde a numeros'''
+    mr_consecutivo_receptor = re.sub('[^0-9]', '', consecutivo_receptor)
+    if len(mr_consecutivo_receptor) != 20:
+        raise UserError('La clave del consecutivo para el mensaje receptor es inválida. '
+                        'Debe contener al menos 50 digitos')
+
+    mr_monto_impuesto = monto_impuesto
+    mr_detalle_mensaje = detalle_mensaje
+    mr_total_factura = total_factura
+
+    '''Iniciamos con la creación del mensaje Receptor'''
+    sb = StringBuilder()
+    sb.Append('<MensajeReceptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
+    sb.Append('xmlns="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/mensajeReceptor" ')
+    sb.Append('xsi:schemaLocation="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/mensajeReceptor ')
+    sb.Append('https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.3/MensajeReceptor_V4.3.xsd">')
+    sb.Append('<Clave>' + mr_clave + '</Clave>')
+    sb.Append('<NumeroCedulaEmisor>' + mr_cedula_emisor + '</NumeroCedulaEmisor>')
+    sb.Append('<FechaEmisionDoc>' + mr_fecha_emision + '</FechaEmisionDoc>')
+    sb.Append('<Mensaje>' + str(mr_mensaje_id) + '</Mensaje>')
+
+    if mr_detalle_mensaje is not None:
+        sb.Append('<DetalleMensaje>' + escape(mr_detalle_mensaje) + '</DetalleMensaje>')
+
+    if mr_monto_impuesto is not None and mr_monto_impuesto > 0:
+        sb.Append('<MontoTotalImpuesto>' + str(mr_monto_impuesto) + '</MontoTotalImpuesto>')
+>>>>>>> 13.0
+
+    if codigo_actividad:
+        sb.Append('<CodigoActividad>' + str(codigo_actividad) + '</CodigoActividad>')
+
+<<<<<<< HEAD
     # TODO: Hay que calcular TotalExonerado 
     #sb.Append('<TotalExonerado>' + str(totalServExonerado + totalMercExonerada) + '</TotalExonerado>')
     
@@ -1089,10 +1149,28 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_s
 
     # TODO: Hay que calcular el TotalOtrosCargos 
     #sb.Append('<TotalOtrosCargos>' + str(¿de dónde sacamos esto?) + '</TotalOtrosCargos>')
+=======
+    sb.Append('<CondicionImpuesto>' + str(condicion_impuesto) + '</CondicionImpuesto>')
 
-    sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos, 2)) + '</TotalComprobante>')
-    sb.Append('</ResumenFactura>')
+    # TODO: Estar atento a la publicación de Hacienda de cómo utilizar esto
+    if monto_total_impuesto_acreditar:
+        sb.Append('<MontoTotalImpuestoAcreditar>' + str(monto_total_impuesto_acreditar) + '</MontoTotalImpuestoAcreditar>')
 
+    # TODO: Estar atento a la publicación de Hacienda de cómo utilizar esto
+    if monto_total_gasto_aplicable:
+        sb.Append('<MontoTotalDeGastoAplicable>' + str(monto_total_gasto_aplicable) + '</MontoTotalDeGastoAplicable>')
+
+    if mr_total_factura is not None and mr_total_factura > 0:
+        sb.Append('<TotalFactura>' + str(mr_total_factura) + '</TotalFactura>')
+    else:
+        raise UserError('El monto Total de la Factura para el Mensaje Receptro es inválido')
+>>>>>>> 13.0
+
+    sb.Append('<NumeroCedulaReceptor>' + mr_cedula_receptor + '</NumeroCedulaReceptor>')
+    sb.Append('<NumeroConsecutivoReceptor>' + mr_consecutivo_receptor + '</NumeroConsecutivoReceptor>')
+    sb.Append('</MensajeReceptor>')
+
+<<<<<<< HEAD
     sb.Append('<Otros>')
     sb.Append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
     sb.Append('</Otros>')
@@ -1107,27 +1185,64 @@ def gen_xml_fee_v43(inv, consecutivo, date, sale_conditions, medio_pago, total_s
 def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado, total_servicio_exento,
                total_mercaderia_gravado, total_mercaderia_exento, base_total, total_impuestos, total_descuento,
                lines, currency_rate, invoice_comments):
+=======
+    return str(sb)
+
+def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
+                total_servicio_exento, totalServExonerado,
+                total_mercaderia_gravado, total_mercaderia_exento,
+                totalMercExonerada, totalOtrosCargos, total_iva_devuelto, base_total,
+                total_impuestos, total_descuento, lines,
+                otrosCargos, currency_rate, invoice_comments,
+                tipo_documento_referencia, numero_documento_referencia,
+                fecha_emision_referencia, codigo_referencia, razon_referencia):
 
     numero_linea = 0
 
+    if inv._name == 'pos.order':
+        plazo_credito = '0'
+        payment_methods_id = '01'
+        cod_moneda = str(inv.company_id.currency_id.name)
+    else:
+        payment_methods_id = str(inv.payment_methods_id.sequence)
+        plazo_credito = str(inv.invoice_payment_term_id and inv.invoice_payment_term_id.line_ids[0].days or 0)
+        cod_moneda = str(inv.currency_id.name)
+>>>>>>> 13.0
+
+    if inv.tipo_documento == 'FEC':
+        issuing_company = inv.partner_id
+        receiver_company = inv.company_id
+    else:
+        issuing_company = inv.company_id
+        receiver_company = inv.partner_id
+
     sb = StringBuilder()
+<<<<<<< HEAD
     sb.Append('<?xml version="1.0" encoding="utf-8"?>')
     sb.Append('<TiqueteElectronico xmlns="https://tribunet.hacienda.go.cr/docs/esquemas/2017/v4.2/tiqueteElectronico" ')
     sb.Append('xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ')
     sb.Append('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
     sb.Append('xsi:schemaLocation="https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.2/TiqueteElectronico_V4.2.xsd">')
+=======
+    sb.Append('<' + fe_enums.tagName[inv.tipo_documento] + ' xmlns="' + fe_enums.XmlnsHacienda[inv.tipo_documento] + '" ')
+    sb.Append('xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ')
+    sb.Append('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
+    sb.Append('xsi:schemaLocation="' + fe_enums.schemaLocation[inv.tipo_documento] + '">')
+>>>>>>> 13.0
 
     sb.Append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.Append('<NumeroConsecutivo>' + consecutivo + '</NumeroConsecutivo>')
-    sb.Append('<FechaEmision>' + date + '</FechaEmision>')
+    sb.Append('<CodigoActividad>' + inv.economic_activity_id.code + '</CodigoActividad>')
+    sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
+    sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
-    sb.Append('<Nombre>' + escape(inv.company_id.name) + '</Nombre>')
+    sb.Append('<Nombre>' + escape(issuing_company.name) + '</Nombre>')
     sb.Append('<Identificacion>')
-    sb.Append('<Tipo>' + inv.company_id.identification_id.code + '</Tipo>')
-    sb.Append('<Numero>' + inv.company_id.vat + '</Numero>')
+    sb.Append('<Tipo>' + issuing_company.identification_id.code + '</Tipo>')
+    sb.Append('<Numero>' + issuing_company.vat + '</Numero>')
     sb.Append('</Identificacion>')
-    sb.Append('<NombreComercial>' + escape(str(inv.company_id.commercial_name or 'NA')) + '</NombreComercial>')
+    sb.Append('<NombreComercial>' + escape(str(issuing_company.commercial_name or 'NA')) + '</NombreComercial>')
     sb.Append('<Ubicacion>')
+<<<<<<< HEAD
     sb.Append('<Provincia>' + inv.company_id.state_id.code + '</Provincia>')
     sb.Append('<Canton>' + inv.company_id.county_id.code + '</Canton>')
     sb.Append('<Distrito>' + inv.company_id.district_id.code + '</Distrito>')
@@ -1214,8 +1329,45 @@ def gen_xml_te(inv, consecutivo, date, sale_conditions, medio_pago, total_servic
     telectronico_bytes = str(sb)
 
     return stringToBase64(telectronico_bytes)
+=======
+    sb.Append('<Provincia>' + issuing_company.state_id.code + '</Provincia>')
+    sb.Append('<Canton>' + issuing_company.county_id.code + '</Canton>')
+    sb.Append('<Distrito>' + issuing_company.district_id.code + '</Distrito>')
 
+    if issuing_company.neighborhood_id and issuing_company.neighborhood_id.code:
+        sb.Append('<Barrio>' + str(issuing_company.neighborhood_id.code or '00') + '</Barrio>')
 
+    sb.Append('<OtrasSenas>' + escape(str(issuing_company.street or 'NA')) + '</OtrasSenas>')
+    sb.Append('</Ubicacion>')
+
+    if issuing_company.phone:
+        phone = phonenumbers.parse(issuing_company.phone, (issuing_company.country_id.code or 'CR'))
+        sb.Append('<Telefono>')
+        sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+        sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+        sb.Append('</Telefono>')
+
+    sb.Append('<CorreoElectronico>' + str(issuing_company.email) + '</CorreoElectronico>')
+    sb.Append('</Emisor>')
+>>>>>>> 13.0
+
+    if inv.tipo_documento == 'TE' or (inv.tipo_documento == 'NC' and not receiver_company.vat):
+        pass
+    else:
+        vat = re.sub('[^0-9]', '', receiver_company.vat)
+        if not receiver_company.identification_id:
+            if len(vat) == 9:  # cedula fisica
+                id_code = '01'
+            elif len(vat) == 10:  # cedula juridica
+                id_code = '02'
+            elif len(vat) == 11 or len(vat) == 12:  # dimex
+                id_code = '03'
+            else:
+                id_code = '05'
+        else:
+            id_code = receiver_company.identification_id.code
+
+<<<<<<< HEAD
 def gen_xml_nc_v43(
     inv, consecutivo, date, sale_conditions, medio_pago, total_servicio_gravado,
     total_servicio_exento, total_mercaderia_gravado, total_mercaderia_exento, base_total,
@@ -1259,31 +1411,57 @@ def gen_xml_nc_v43(
     sb.Append('</Emisor>')
     sb.Append('<Receptor>')
     sb.Append('<Nombre>' + escape(str(inv.partner_id.name[:80])) + '</Nombre>')
+=======
+        if receiver_company.name:
+            sb.Append('<Receptor>')
+            sb.Append('<Nombre>' + escape(str(receiver_company.name[:99])) + '</Nombre>')
 
-    if inv.partner_id.identification_id.code == '05':
-        sb.Append('<IdentificacionExtranjero>' + inv.partner_id.vat + '</IdentificacionExtranjero>')
-    else:
-        sb.Append('<Identificacion>')
-        sb.Append('<Tipo>' + inv.partner_id.identification_id.code + '</Tipo>')
-        sb.Append('<Numero>' + inv.partner_id.vat + '</Numero>')
-        sb.Append('</Identificacion>')
+            if inv.tipo_documento == 'FEE':
+                if receiver_company.vat:
+                    sb.Append('<IdentificacionExtranjero>' + receiver_company.vat + '</IdentificacionExtranjero>')
+            else:
+                sb.Append('<Identificacion>')
+                sb.Append('<Tipo>' + id_code + '</Tipo>')
+                sb.Append('<Numero>' + vat + '</Numero>')
+                sb.Append('</Identificacion>')
 
-    sb.Append('<Ubicacion>')
-    sb.Append('<Provincia>' + str(inv.partner_id.state_id.code or '') + '</Provincia>')
-    sb.Append('<Canton>' + str(inv.partner_id.county_id.code or '') + '</Canton>')
-    sb.Append('<Distrito>' + str(inv.partner_id.district_id.code or '') + '</Distrito>')
-    sb.Append('<Barrio>' + str(inv.partner_id.neighborhood_id.code or '00') + '</Barrio>')
-    sb.Append('<OtrasSenas>' + str(inv.partner_id.street or 'NA') + '</OtrasSenas>')
-    sb.Append('</Ubicacion>')
-    sb.Append('<Telefono>')
-    sb.Append('<CodigoPais>' + inv.partner_id.phone_code + '</CodigoPais>')
-    sb.Append('<NumTelefono>' + re.sub('[^0-9]+', '', inv.partner_id.phone) + '</NumTelefono>')
-    sb.Append('</Telefono>')
-    sb.Append('<CorreoElectronico>' + str(inv.partner_id.email) + '</CorreoElectronico>')
-    sb.Append('</Receptor>')
+            if inv.tipo_documento != 'FEE':
+                if receiver_company.state_id and receiver_company.county_id and receiver_company.district_id and receiver_company.neighborhood_id:
+                    sb.Append('<Ubicacion>')
+                    sb.Append('<Provincia>' + str(receiver_company.state_id.code or '') + '</Provincia>')
+                    sb.Append('<Canton>' + str(receiver_company.county_id.code or '') + '</Canton>')
+                    sb.Append('<Distrito>' + str(receiver_company.district_id.code or '') + '</Distrito>')
+
+                    if receiver_company.neighborhood_id and receiver_company.neighborhood_id.code:
+                        sb.Append('<Barrio>' + str(receiver_company.neighborhood_id.code or '00') + '</Barrio>')
+
+                    sb.Append('<OtrasSenas>' + escape(str(receiver_company.street or 'NA')) + '</OtrasSenas>')
+                    sb.Append('</Ubicacion>')
+
+                if receiver_company.phone:
+                    try:
+                        phone = phonenumbers.parse(receiver_company.phone, (receiver_company.country_id.code or 'CR'))
+                        sb.Append('<Telefono>')
+                        sb.Append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+                        sb.Append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+                        sb.Append('</Telefono>')
+                    except:
+                        pass
+
+                match = receiver_company.email and re.match(
+                    r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$', receiver_company.email.lower())
+                if match:
+                    email_receptor = receiver_company.email
+                else:
+                    email_receptor = 'indefinido@indefinido.com'
+                sb.Append('<CorreoElectronico>' + email_receptor + '</CorreoElectronico>')
+>>>>>>> 13.0
+
+            sb.Append('</Receptor>')
+
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
-    sb.Append('<PlazoCredito>' + str(inv.partner_id.property_payment_term_id.line_ids[0].days or 0) + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + medio_pago + '</MedioPago>')
+    sb.Append('<PlazoCredito>' + plazo_credito + '</PlazoCredito>')
+    sb.Append('<MedioPago>' + payment_methods_id + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -1294,6 +1472,12 @@ def gen_xml_nc_v43(
 
         sb.Append('<LineaDetalle>')
         sb.Append('<NumeroLinea>' + str(numero_linea) + '</NumeroLinea>')
+
+        if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
+            sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
+
+        # sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
+
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' + str(v['unidadMedida']) + '</UnidadMedida>')
         sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
@@ -1301,15 +1485,26 @@ def gen_xml_nc_v43(
 
         sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
         if v.get('montoDescuento'):
+<<<<<<< HEAD
             sb.Append('<MontoDescuento>' + str(v['montoDescuento']) + '</MontoDescuento>')
         if v.get('naturalezaDescuento'):
             sb.Append('<NaturalezaDescuento>' + str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
+=======
+            sb.Append('<Descuento>')
+            sb.Append('<MontoDescuento>' +
+                      str(v['montoDescuento']) + '</MontoDescuento>')
+            if v.get('naturalezaDescuento'):
+                sb.Append('<NaturalezaDescuento>' + str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
+            sb.Append('</Descuento>')
+
+>>>>>>> 13.0
         sb.Append('<SubTotal>' + str(v['subtotal']) + '</SubTotal>')
         sb.Append('<BaseImponible>' + str(v['subtotal']) + '</BaseImponible>')
 >>>>>>> Many Fixes
 =======
 >>>>>>> Updated
 
+<<<<<<< HEAD
     '''Verificamos si el ID del mensaje receptor es válido'''
     mr_mensaje_id = int(id_mensaje)
     if mr_mensaje_id < 1 and mr_mensaje_id > 3:
@@ -1588,10 +1783,46 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<PlazoCredito>' + plazo_credito + '</PlazoCredito>')
     sb.Append('<MedioPago>' + payment_methods_id + '</MedioPago>')
     sb.Append('<DetalleServicio>')
+=======
+        # TODO: ¿qué es base imponible? ¿porqué podría ser diferente del subtotal?
+        # if inv.tipo_documento != 'FEE':
+        #   sb.Append('<BaseImponible>' + str(v['subtotal']) + '</BaseImponible>')
 
-    detalle_factura = lines
-    response_json = json.loads(detalle_factura)
+        if v.get('impuesto'):
+            for (a, b) in v['impuesto'].items():
+                tax_code = str(b['iva_tax_code'])
+                if tax_code.isdigit():
+                    sb.Append('<Impuesto>')
+                    sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
+                    sb.Append('<CodigoTarifa>' + tax_code + '</CodigoTarifa>')
+                    sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
+                    sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
 
+                    if inv.tipo_documento != 'FEE':
+                        if b.get('exoneracion'):
+                            sb.Append('<Exoneracion>')
+                            sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
+                            sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
+                            sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
+                            sb.Append('<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                            sb.Append('<PorcentajeExoneracion>' + str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                            sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
+                            sb.Append('</Exoneracion>')
+                    sb.Append('</Impuesto>')
+
+            sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
+
+        sb.Append('<MontoTotalLinea>' + str(v['montoTotalLinea']) + '</MontoTotalLinea>')
+        sb.Append('</LineaDetalle>')
+    sb.Append('</DetalleServicio>')
+>>>>>>> 13.0
+
+    if otrosCargos:
+        sb.Append('<OtrosCargos>')
+        for otro_cargo in otrosCargos:
+            sb.Append('<TipoDocumento>' + str(otrosCargos[otro_cargo]['TipoDocumento']) + '</TipoDocumento>')
+
+<<<<<<< HEAD
     for (k, v) in response_json.items():
         numero_linea = numero_linea + 1
 <<<<<<< refs/remotes/upstream/13.0
@@ -1706,6 +1937,22 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
             sb.Append('<MontoCargo>' + str(otrosCargos[otro_cargo]['MontoCargo']) + '</MontoCargo>')
         sb.Append('</OtrosCargos>')
 
+=======
+            if otrosCargos[otro_cargo].get('NumeroIdentidadTercero'):
+                sb.Append('<NumeroIdentidadTercero>' + str(otrosCargos[otro_cargo]['NumeroIdentidadTercero']) + '</NumeroIdentidadTercero>')
+
+            if otrosCargos[otro_cargo].get('NombreTercero'):
+                sb.Append('<NombreTercero>' + str(otrosCargos[otro_cargo]['NombreTercero']) + '</NombreTercero>')
+
+            sb.Append('<Detalle>' + str(otrosCargos[otro_cargo]['Detalle']) + '</Detalle>')
+
+            if otrosCargos[otro_cargo].get('Porcentaje'):
+                sb.Append('<Porcentaje>' + str(otrosCargos[otro_cargo]['Porcentaje']) + '</Porcentaje>')
+
+            sb.Append('<MontoCargo>' + str(otrosCargos[otro_cargo]['MontoCargo']) + '</MontoCargo>')
+        sb.Append('</OtrosCargos>')
+
+>>>>>>> 13.0
     sb.Append('<ResumenFactura>')
     sb.Append('<CodigoTipoMoneda>')
     sb.Append('<CodigoMoneda>' + cod_moneda + '</CodigoMoneda>')
@@ -1736,17 +1983,23 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<TotalDescuentos>' + str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.Append('<TotalVentaNeta>' + str(round(base_total, 5)) + '</TotalVentaNeta>')
     sb.Append('<TotalImpuesto>' + str(round(total_impuestos, 5)) + '</TotalImpuesto>')
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
+=======
+>>>>>>> 13.0
 
     if total_iva_devuelto:
         sb.Append('<TotalIVADevuelto>' + str(round(total_iva_devuelto, 5)) + '</TotalIVADevuelto>')
 
+<<<<<<< HEAD
 =======
 
     if total_iva_devuelto:
         sb.Append('<TotalIVADevuelto>' + str(round(total_iva_devuelto, 5)) + '</TotalIVADevuelto>')
 
 >>>>>>> Updated
+=======
+>>>>>>> 13.0
     sb.Append('<TotalOtrosCargos>' + str(totalOtrosCargos) + '</TotalOtrosCargos>')
     sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos + totalOtrosCargos - total_iva_devuelto, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
@@ -1963,7 +2216,10 @@ def get_economic_activities(company):
         'Cache-Control': 'no-cache',
         'Content-Type': 'application/x-www-form-urlencoded',
     }
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
+=======
+>>>>>>> 13.0
 
     try:
         response = requests.get(endpoint, headers=headers, verify=False)
@@ -1986,6 +2242,7 @@ def get_economic_activities(company):
         response_json = {'status': response.status_code,
                          'text': 'get_economic_activities failed: %s' % response.reason}
     return response_json
+<<<<<<< HEAD
 
 =======
 
@@ -2012,6 +2269,9 @@ def get_economic_activities(company):
     return response_json
 
 >>>>>>> Updated
+=======
+
+>>>>>>> 13.0
 
 def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     if (inv.type == 'in_invoice' or inv.type == 'in_refund') and (inv.tipo_documento != 'FEC'):
@@ -2098,6 +2358,7 @@ def send_message(inv, date_cr, xml, token, env):
 
     vat = re.sub('[^0-9]', '', inv.partner_id.vat)
     xml_base64 = stringToBase64(xml)
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 
     comprobante = {
@@ -2116,6 +2377,8 @@ def send_message(inv, date_cr, xml, token, env):
     }
 
 =======
+=======
+>>>>>>> 13.0
 
     comprobante = {
         'clave': inv.number_electronic,
@@ -2132,7 +2395,10 @@ def send_message(inv, date_cr, xml, token, env):
         'comprobanteXml': xml_base64,
     }
 
+<<<<<<< HEAD
 >>>>>>> Updated
+=======
+>>>>>>> 13.0
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
     try:
         response = requests.post(endpoint, data=json.dumps(comprobante), headers=headers)

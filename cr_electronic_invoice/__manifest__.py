@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 {
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
+=======
+>>>>>>> 13.0
     'name': 'Facturación electrónica Costa Rica',
     'version': '13.0.1.0.0',
     'author': 'Odoo CR Community',
@@ -13,6 +16,7 @@
         '''
         Facturación electronica Costa Rica.
         ''',
+<<<<<<< HEAD
 =======
 	'name': 'Facturación Electrónica Costa Rica',
     'version': '12.0.2.0.0',
@@ -39,6 +43,8 @@ Allows to apply invoices accord to Ministerio de Hacienda regulation.
         Facturación electronica Costa Rica.
         ''',
 >>>>>>> Updated
+=======
+>>>>>>> 13.0
     'depends': [
         'base',
         'product',
@@ -48,10 +54,13 @@ Allows to apply invoices accord to Ministerio de Hacienda regulation.
         'account',
         'l10n_cr_country_codes',
         'res_currency_cr_adapter',
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
 =======
 >>>>>>> Updated
+=======
+>>>>>>> 13.0
         ],
     'data': [
         'data/account_tax_data.xml',
@@ -71,10 +80,14 @@ Allows to apply invoices accord to Ministerio de Hacienda regulation.
         'data/sequence.xml',
         'data/res.currency.xml',
         'data/decimal_precision.xml',
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 =======
         'data/account_journal.xml',
 >>>>>>> Updated
+=======
+        'data/account_journal.xml',
+>>>>>>> 13.0
         'views/uom_views.xml',
         'views/account_move_views.xml',
         'views/account_journal_views.xml',
@@ -91,6 +104,7 @@ Allows to apply invoices accord to Ministerio de Hacienda regulation.
         'views/account_tax_views.xml',
         'views/economic_activity_views.xml',
         'views/menu_views.xml',
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
         'security/ir.model.access.csv',
     ],
@@ -109,6 +123,10 @@ Allows to apply invoices accord to Ministerio de Hacienda regulation.
         'views/account_move_reversal_views.xml',
         'security/ir.model.access.csv',
 >>>>>>> Updated
+=======
+        'views/account_move_reversal_views.xml',
+        'security/ir.model.access.csv',
+>>>>>>> 13.0
     ],
     'external_dependencies': {
         "python": [
@@ -116,6 +134,7 @@ Allows to apply invoices accord to Ministerio de Hacienda regulation.
             'OpenSSL',
         ],
     },
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 	'installable': True,
 >>>>>>> Many Fixes
@@ -123,4 +142,8 @@ Allows to apply invoices accord to Ministerio de Hacienda regulation.
     'post_init_hook': 'post_init_hook',
     'installable': True,
 >>>>>>> Updated
+=======
+    'post_init_hook': 'post_init_hook',
+    'installable': True,
+>>>>>>> 13.0
 }

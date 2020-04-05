@@ -6,11 +6,15 @@
             <field name="model">account.journal</field>
             <field name="inherit_id" ref="account.view_account_journal_form"/>
             <field name="arch" type="xml">
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
                 <xpath expr="//page[1]" position="after">
 =======
                <!-- <xpath expr="//page[1]" position="after">
 >>>>>>> Updated
+=======
+               <!-- <xpath expr="//page[1]" position="after">
+>>>>>>> 13.0
                     <page string="Facturación Electrónica" attrs="{'invisible':[('type','!=','sale')]}">
                         <group cols="2">
                             <group cols="2">
@@ -28,16 +32,22 @@
                             </group>
                         </group>
                     </page>
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
                 </xpath>
 =======
+=======
+>>>>>>> 13.0
                 </xpath>-->
                 <xpath expr="//field[@name='type']" position="after">
 					<field name="terminal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
 					<field name="sucursal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
 				</xpath>
 
+<<<<<<< HEAD
 >>>>>>> Updated
+=======
+>>>>>>> 13.0
             </field>
         </record>
     </data>

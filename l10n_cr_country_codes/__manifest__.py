@@ -8,6 +8,7 @@
     'website': 'https://github.com/odoocr',
     'category': 'Account',
     'description': '''Codigos Pais para Facturación electronica Costa Rica.''',
+<<<<<<< HEAD
 <<<<<<< refs/remotes/upstream/13.0
 <<<<<<< refs/remotes/upstream/13.0
     'depends': ['base', 'account', 'product', ],
@@ -17,6 +18,9 @@
 =======
     'depends': ['base', 'account', 'product', ],
 >>>>>>> Updated
+=======
+    'depends': ['base', 'account', 'product', ],
+>>>>>>> 13.0
     'data': [
              'data/res.country.state.csv',
              'data/res.country.county.csv',

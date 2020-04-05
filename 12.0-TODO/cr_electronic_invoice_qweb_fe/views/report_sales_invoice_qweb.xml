@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<template id="sale.report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
+</template>
+
+<template id="sale_stock.report_invoice_document_inherit_sale_stock" inherit_id="account.report_invoice_document">
+</template>
+
+<template id="account.report_invoice_document_with_payments" inherit_id="account.report_invoice_document">
+</template>
+
+<template id="account.report_invoice_document">
+    <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+        <div class="header">
+            <table style="width:100%">
+            <tr>
+                <td width="25%">
+                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="margin:110px 0 0 0; max-height:150px;"/>
+                </td>
+                <td width="45%">
+                    <strong><t t-esc="o.company_id.commercial_name"/></strong><br/>
+                    <t t-esc="o.company_id.identification_id.name"/> <t t-esc="o.company_id.vat"/><br/>
+                    <t t-if="o.company_id.street" t-esc="o.company_id.street"/><br/>
+                    <t t-if="o.company_id.street2" t-esc="o.company_id.street2"/>
+                    <span>
+                        <t t-if="o.company_id.district_id" t-esc="o.company_id.district_id.name"/>,
+                        <t t-if="o.company_id.county_id" t-esc="o.company_id.county_id.name"/>,
+                        <t t-if="o.company_id.country_id" t-esc="o.company_id.country_id.name"/>
+                    </span><br/>
+                    <span>Tel.</span> <t t-esc="o.company_id.phone"/><br/>
+                    <t t-esc="o.company_id.email"/><br/>
+                    <t t-if="o.company_id.website" t-esc="o.company_id.website"/>
+                </td>
+                <td width="30%">
+                <div class="text-center">
+                    <t t-if="o.type == 'in_invoice'">
+                        <span style="font-weight:bolder" t-if="not o.number_electronic">FACTURA</span>
+                        <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='FE'">FACTURA ELECTRONICA</span>
+                        <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='FEC'">FACTURA ELECTRONICA COMPRA</span>
+                        <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='TE'">TIQUETE ELECTRONICO</span>
+                    </t>
+                    <t t-if="o.type == 'out_invoice'">
+                        <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='FE'">FACTURA ELECTRONICA</span>
+                        <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='TE'">TIQUETE ELECTRONICO</span>
+                        <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='FEE'">FACTURA ELECTRONICA DE EXPORTACION</span>
+                        <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='ND'">NOTA DEBITO ELECTRONICA</span>
+                        <span style="font-weight:bolder" t-if="not o.number_electronic">FACTURA</span>
+                    </t>
+                    <t t-if="o.type == 'out_refund' or o.type == 'in_refund'">
+                        <span style="font-weight:bolder" t-if="o.number_electronic">NOTA DE CRÉDITO ELECTRONICA</span><br/>
+                        <span style="font-weight:bolder" t-if="not o.number_electronic">NOTA DE CRÉDITO</span><br/>
+                    </t>
+                    <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'" t-esc="o.reference"/>
+                    <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.number"/>
+                </div>
+                <div class="text-center">
+                    <table t-if="o.date_issuance" style="width:100%;" class="dtheader rounded2">
+                    <tr>
+                        <td class="text-center">DÍA</td>
+                        <td class="text-center">MES</td>
+                        <td class="text-center">AÑO</td>
+                        <td class="text-center">HORA</td>
+                    </tr>
+                    <tr>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[8:10]) or o.date_invoice and (o.date_invoice[8:10]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[5:7]) or o.date_invoice and (o.date_invoice[5:7]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[0:4]) or o.date_invoice and (o.date_invoice[0:4]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[11:16]) or ''"/></td>
+                    </tr>
+                    </table>
+                    <table t-if="not o.date_issuance" style="width:100%;" class="dtheader rounded2">
+                    <tr>
+                        <td class="text-center">FECHA</td>
+                    </tr>
+                    <tr>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_invoice or ''"/></td>
+                    </tr>
+                    </table>
+                </div>
+                </td>
+            </tr>
+            </table>
+
+            <link href="http://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css"/>
+            <style  t-if="o.company_id.cr_invoice_color == 'black'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#222;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#222;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#222;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+        </style>
+        <style  t-if="o.company_id.cr_invoice_color == 'sempai'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#ce0b9d;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#ce0b9d;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#ce0b9d;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+            </style>
+        <style  t-if="o.company_id.cr_invoice_color == 'moresempai'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#661ab2;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#661ab2;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#661ab2;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+            </style>
+            <style  t-if="o.company_id.cr_invoice_color == 'blue'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#2874A6;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#2874A6;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#2874A6;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+            </style>
+            <style  t-if="o.company_id.cr_invoice_color == 'green'" type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:16px;
+
+                    }
+
+                .title{
+                color:#196F3D;
+                font-size:24px;
+                font-weight:bolder;
+                }
+                .rounded2{
+                border: 1px solid;
+                padding:5px 5px;
+                }
+                .dtheader{
+                    background-color:#196F3D;
+                    color:#ffffff;
+                    border:none;
+                    padding:5px 5px;
+                }
+                .dtcls{
+                color:#196F3D;
+                width:25%;
+                padding:5px 5px;
+                border: 1px solid;
+                }
+                .dtbg{
+                    margin:5px 5px;
+                    background-color:#fff;
+                }
+            </style>
+        </div><!---//end header-->
+        <div class="page" style="height:210mm;width:100%">
+                    <div name="invoice_address">
+                    </div>
+
+            <table style="width:100%" class="mt30 mb30">
+                <thead>
+                    <tr>
+                        <th width="20%"/>
+                        <th width="40%"/>
+                        <th width="20%"/>
+                        <th width="20%"/>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border:1px solid black;">
+                        <td>
+                            <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
+                                <strong>PROVEEDOR:</strong>
+                            </span>
+                            <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
+                                <strong>CLIENTE:</strong>
+                            </span>
+                        </td>
+                        <td colspan="3">
+                            <t t-if="o.partner_id.parent_id">
+                                <strong><span style="font-size:18px" t-field="o.partner_id.parent_id.name"/><br/></strong>
+                            </t>
+                            <strong><span style="font-size:20px" t-field="o.partner_id.name"/></strong>
+                        </td>
+                    </tr>
+                    <tr style="border:1px solid black;">
+                        <td>
+                            <strong>CÉDULA JURÍDICA:</strong>
+                        </td>
+                        <td>
+                            <span t-field="o.partner_id.vat"/>
+                        </td>
+                        <td>
+                            <strong>CONDICIÓN VENTA:</strong>
+                        </td>
+                        <td>
+                            <span t-esc="o.payment_term_id and o.payment_term_id.name or 'CONTADO'"/>
+                        </td>
+                    </tr>
+                    <tr style="border:1px solid black;">
+                        <td>
+                            <strong>TELÉFONO:</strong>
+                        </td>
+                        <td>
+                            <span t-field="o.partner_id.phone"/>
+                        </td>
+                        <td>
+                            <strong>FECHA VENCE:</strong><br/>
+                        </td>
+                        <td>
+                            <span t-field="o.date_due"/><br/>
+                        </td>
+                    </tr>
+
+                    <tr style="border:1px solid black;">
+                        <td>
+                            <strong>DIRECCIÓN:</strong>
+                        </td>
+                        <td>
+                            <span t-field="o.partner_id.street"/>
+                        </td>
+                        <td>
+                            <strong>MEDIO DE PAGO:</strong>
+                        </td>
+                        <td>
+                            <span t-esc="o.payment_methods_id and o.payment_methods_id.name or 'Efectivo'"/>
+                        </td>
+                    </tr>
+                    <tr style="border:1px solid black;">
+                        <td>
+                            <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
+                                <strong>FACTURA INTERNA:</strong><br/>
+                            </span>
+                            <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
+                                <strong>ORDEN DE COMPRA:</strong><br/>
+                            </span>
+                        </td>
+                        <td>
+                            <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
+                                <span t-field="o.sequence"/>-<span t-field="o.origin"/><br/>
+                            </span>
+                            <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
+                                <span t-field="o.name"/>-<span t-field="o.origin"/><br/>
+                            </span>
+                        </td>
+                        <td>
+                            <strong>MONEDA:</strong><br/>
+                        </td>
+                        <td>
+                            <span t-field="o.currency_id.name"/><br/>
+                        </td>
+                    </tr>
+                    <tr style="border:1px solid black;">
+                        <td>
+                            <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
+                                <strong>USUARIO:</strong>
+                            </span>
+                            <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
+                                <strong>VENDEDOR:</strong>
+                            </span>
+                        </td>
+                        <td>
+                            <span t-field="o.user_id.name"/>
+                        </td>
+                        <td>
+                            <strong>TIPO CAMBIO:</strong>
+                        </td>
+                        <td>
+                            <span t-esc="o.amount_total_company_signed / o.amount_total_signed"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div name="reference"/>
+                <!-- Is there a discount on at least one line? -->
+                <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
+            <br/>
+            <div class="content">
+                <table cellspacing="0" style="height:100mm;width:100%;" class="mt30 mb30">
+                <!--thead class="bb bt tble-header"-->
+                <thead class="tble-header">
+                        <tr>
+                            <th>Producto</th>
+                            <th class="hidden">Source Document</th>
+                            <th class="text-right">Cant.</th>
+                            <th width="15%" class="text-right">Precio</th>
+                            <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
+                            <th width="15%" class="text-right">Impuesto</th>
+                            <th width="20%" class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="invoice_tbody">
+                        <tr t-foreach="o.invoice_line_ids" t-as="l" style="height:25px;font-size:16px">
+                            <td><span t-field="l.name"/></td>
+                            <td class="hidden"><span t-field="l.origin"/></td>
+                            <td class="text-right">
+                                <span t-field="l.quantity"/>
+                                <span t-field="l.uom_id" groups="product.group_uom"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="l.price_unit"/>
+                            </td>
+                            <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                                <span t-field="l.discount"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-if="l.invoice_line_tax_ids" t-esc="', '.join(map(lambda x: (x.description or x.name), l.invoice_line_tax_ids))"/>
+                                <span t-if="not l.invoice_line_tax_ids">EXE</span>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                            </td>
+                        </tr>
+                        <tr style="height:25px;">
+                            <td colspan="6" class="text-center">
+                                ********** Ultima Línea **********
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <t t-if="o.comment" class="text-center" style="height:25px;">
+                                    <span class="text-center">
+                                        <br/><br/><span t-field="o.comment"/>
+                                    </span>
+                                </t>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+            <table style="width:100%" class="mt30 mb30">
+                <!--tr style="border:1px solid black;" -->
+                <tr style="border:1px solid black;">
+                    <td style="width:20%" class="text-center">
+                        <br/><br/>_____________________<br/>Nombre
+                    </td>
+                    <td style="width:20%" class="text-center">
+                        <br/><br/>_____________________<br/>No.Cédula
+                    </td>
+                    <td style="width:20%" class="text-center">
+                        <br/><br/>_____________________<br/>Firma
+                    </td>
+                    <td style="border:1px solid black;" class="text-right">
+                                    <table class="table table-sm">
+                                        <tr class="border-black o_subtotal" style="">
+                                            <td><strong>Subtotal</strong></td>
+                                            <td class="text-right">
+                                                <span t-field="o.amount_untaxed"/>
+                                            </td>
+                                        </tr>
+                                        <t t-foreach="o.amount_by_group" t-as="amount_by_group">
+                                            <tr style="">
+                                                <t t-if="len(o.tax_line_ids) == 1 and o.amount_untaxed == amount_by_group[2]">
+                                                    <td><span t-esc="amount_by_group[0]"/></td>
+                                                    <td class="text-right o_price_total">
+                                                        <span t-esc="amount_by_group[3]"/>
+                                                    </td>
+                                                </t>
+                                                <t t-else="">
+                                                    <td>
+                                                        <span t-esc="amount_by_group[0]"/>
+                                                        <span>&amp;nbsp;<span>on</span>
+                                                            <t t-esc="amount_by_group[4]"/>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-right o_price_total">
+                                                        <span t-esc="amount_by_group[3]"/>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                        </t>
+                                        <tr class="border-black o_total">
+                                            <td><strong>Total</strong></td>
+                                            <td class="text-right">
+                                                <span t-field="o.amount_total"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                    </td>
+                </tr>
+            </table>
+            <!--t t-if="o.type == 'in_invoice' or o.type == 'in_refund'"-->
+            <t t-if="o.type != 'out_invoice'">
+                <div class="rounded2">
+                    <table width="100%;" cellpadding="0" cellspacing="0">
+                        <tr class="text-center">
+                            <td width="34%"><br/><br/><br/>__________________________</td>
+                            <td width="33%"><br/><br/><br/>__________________________</td>
+                            <td width="33%"><br/><br/><br/>__________________________</td>
+                        </tr>
+                        <tr class="text-center">
+                            <td>Registrado por</td>
+                            <td>Fecha</td>
+                            <td>Revisado por</td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+
+            <!--t t-if="o.type == 'out_invoice' or o.type == 'out_refund'"-->
+            <t t-if="o.type == 'out_invoice'">
+                <div class="rounded2">
+                    <p style="font-size:14px;padding:2px;text-align:justify;">
+                        Este documento constituye factura comercial con titulo ejecutivo de acuerdo al art. 460 del Código de Comercio
+                        que podrá hacerse efectivo el día de su vencimiento y en caso de ejecución, renuncio a mi domicilio y los
+                        trámites de juicio ejecutivo. Esta factura devengará 3% mensual después de su vencimiento.
+                    </p>
+                    <t t-if="o.company_id.html_bank_account1 or o.company_id.html_bank_account2">
+                        Puede realizar transferencias o depósitos mediante las siguientes Cuentas Bancarias de <t t-esc="o.company_id.commercial_name"/>:
+                        <table width="100%;" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td width="50%"> <t t-raw="o.company_id.html_bank_account1"/>
+                                    <!--p style="font-size:16px;">
+                                        <strong>XXXXXX</strong><br/>
+                                        Cuenta: XXXXX<br/>
+                                        CC: XXXXXX<br/>
+                                        IBAN: XXXXX
+                                    </p-->
+                                </td>
+                                <td> <t t-raw="o.company_id.html_bank_account2"/>
+                                    <!--p style="font-size:16px;">
+                                        <strong>XXXXX</strong><br/>
+                                        Cuenta: XXXXX<br/>
+                                        CC: XXXXX<br/>
+                                        IBAN: XXXXX
+                                    </p-->
+                                </td>
+                            </tr>
+                        </table>
+                        <strong>CONFIRMACIONES:</strong> Para enviar confirmaciones de depósito    Correo:   <span t-field="o.company_id.email"/>
+                    </t>
+                </div>
+                <p class="text-center" style="padding:2px 2px 2px 2px">
+                  Clave:<span t-field="o.number_electronic"/> // Usuario:<span t-field="o.user_id.name"/><br/>
+                  Autorizada mediante resolución No DGT-R-033-2019 del 20 de junio de 2019</p>
+            </t>
+            <link href="http://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css"/>
+            <style type="text/css">
+
+                    body {
+                        font-family: 'Droid Sans', Arial, sans-serif;
+                        font-size:14px;
+                    }
+
+                .tble {
+                width: 100%;
+                }
+                .tble-header {
+                height: 35px;
+                font-size: 14px;
+                text-align: center;
+                line-height: 34px;
+                text-decoration: none;
+                font-weight: bold;
+                background:#222;
+                color:#fff;
+                }
+                .box{
+                border:1px solid #222 !important;
+                border-width : 1px 1px 1px 1px;
+                padding:2px 2px !important;
+                text-align:center;
+                }
+
+                .boxsq{
+                border:solid #333 !important;
+                border-width:1px 1px 1px 1px !important;
+                }
+
+                .boxsq2{
+                border:solid #333 !important;
+                border-width:1px 1px 0px 1px !important;
+                }
+                .rcorners2{
+                border-radius: 5px;
+                border: 1px solid #333;
+                padding:5px 5px 5px 5px;
+                font-size: 16px;
+                }
+                .rounded1{
+                color:#fff;
+                border-radius: 8px;
+                border:none;
+                padding:5px 5px;
+                background: #222;
+                }
+                .rounded2{
+                border: 1px solid #ddd;
+                padding:5px 5px;
+                }
+                .title{
+                color:#222222;
+                font-size:14px;
+                font-weight:bolder;
+                }
+            </style>
+        </div>
+    </div>
+</template>
+
+<template id="account.report_invoice">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="account.report_invoice_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+</template>
+</data>
+</openerp>
+
+
+
