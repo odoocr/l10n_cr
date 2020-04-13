@@ -41,7 +41,7 @@
             <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
             <field name="taxes_id" eval="[(5)]" />
         </record>
-        <record id="product_profesionales" model="product.template">
+        <record id="product_servicio" model="product.template">
             <field name="name">Impuesto de Servicio 10%</field>
             <field name="type">consu</field>
             <field name="default_code">06</field>

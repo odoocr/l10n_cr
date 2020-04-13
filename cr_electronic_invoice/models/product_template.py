@@ -14,14 +14,12 @@ class ProductElectronic(models.Model):
             [('code', '=', '04')], limit=1)
         return code_type_id or False
 
-    commercial_measurement = fields.Char(
-        string="Unidad de Medida Comercial", required=False, )
-    code_type_id = fields.Many2one("code.type.product", string="Tipo de código", required=False,
-                                   default=_default_code_type_id)
+    commercial_measurement = fields.Char(string="Commercial Unit", )
+    code_type_id = fields.Many2one("code.type.product", string="Code Type", default=_default_code_type_id)
 
-    tariff_head = fields.Char(string="Partida arancelaria para factura"
-                                     " de exportación",
-                              required=False, )
+    tariff_head = fields.Char(string="Tax rate for exporting invoices", )
+
+    economic_activity_id = fields.Many2one("economic.activity", string="Economic Activity", )
 
     non_tax_deductible = fields.Boolean(string='Indicates if this product is non-tax deductible', default=False, )
 
@@ -29,4 +27,4 @@ class ProductElectronic(models.Model):
 class ProductCategory(models.Model):
     _inherit = "product.category"
 
-    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )
+    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", )
