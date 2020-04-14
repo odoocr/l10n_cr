@@ -1368,11 +1368,7 @@ class AccountInvoiceElectronic(models.Model):
             
             # Number must be set before calling super method
             inv.number = inv.sequence
-            inv.move_name = inv.sequence
-            inv.move_id.name = inv.sequence
-            inv.state_send_invoice = False
-            inv.invoice_amount_text = ''
-
+            
             super(AccountInvoiceElectronic, inv).action_invoice_open()
             if not inv.number_electronic:
                 response_json = api_facturae.get_clave_hacienda(inv,
@@ -1383,7 +1379,7 @@ class AccountInvoiceElectronic(models.Model):
                 inv.number_electronic = response_json.get('clave')
                 inv.sequence = response_json.get('consecutivo')
             
-            
-
-            
-            
+            inv.move_name = inv.sequence
+            inv.move_id.name = inv.sequence
+            inv.state_send_invoice = False
+            inv.invoice_amount_text = ''
