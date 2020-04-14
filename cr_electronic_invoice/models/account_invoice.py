@@ -1365,6 +1365,13 @@ class AccountInvoiceElectronic(models.Model):
                         'price_unit': -iva_devuelto,
                         'quantity': 1,
                     })
+            
+            # Number must be set before calling super method
+            inv.number = inv.sequence
+            inv.move_name = inv.sequence
+            inv.move_id.name = inv.sequence
+            inv.state_send_invoice = False
+            inv.invoice_amount_text = ''
 
             super(AccountInvoiceElectronic, inv).action_invoice_open()
             if not inv.number_electronic:
@@ -1375,11 +1382,8 @@ class AccountInvoiceElectronic(models.Model):
                                                             inv.journal_id.terminal)
                 inv.number_electronic = response_json.get('clave')
                 inv.sequence = response_json.get('consecutivo')
-            inv.number = inv.sequence
-            inv.move_name = inv.sequence
-            inv.move_id.name = inv.sequence
-            inv.state_send_invoice = False
-            inv.invoice_amount_text = ''
+            
+            
 
             
             
