@@ -1309,8 +1309,8 @@ class AccountInvoiceElectronic(models.Model):
                 inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and inv.partner_id.vat and inv.xml_supplier_approval is False:
                 if inv.tipo_documento == 'FEC':
                     sequence = inv.company_id.FEC_sequence_id.next_by_id()
-            
-            if not inv.tipo_documento or (inv.type == 'in_invoice' and inv.tipo_documento == "FE"):
+
+            if not inv.tipo_documento or (inv.type == 'in_invoice' and inv.tipo_documento in ("CCE", "CPCE", "RCE", "FE")):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 continue
 
@@ -1366,9 +1366,8 @@ class AccountInvoiceElectronic(models.Model):
                         'quantity': 1,
                     })
             
-            # Number must be set before calling super method
-            inv.number = inv.sequence
             
+
             super(AccountInvoiceElectronic, inv).action_invoice_open()
             if not inv.number_electronic:
                 response_json = api_facturae.get_clave_hacienda(inv,
@@ -1379,6 +1378,7 @@ class AccountInvoiceElectronic(models.Model):
                 inv.number_electronic = response_json.get('clave')
                 inv.sequence = response_json.get('consecutivo')
             
+            inv.number = inv.sequence
             inv.move_name = inv.sequence
             inv.move_id.name = inv.sequence
             inv.state_send_invoice = False
