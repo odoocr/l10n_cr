@@ -39,6 +39,7 @@
         'data/sequence.xml',
         'data/res.currency.xml',
         'data/decimal_precision.xml',
+        'data/account_journal.xml',
         'views/uom_views.xml',
         'views/account_move_views.xml',
         'views/account_journal_views.xml',
@@ -55,6 +56,7 @@
         'views/account_tax_views.xml',
         'views/economic_activity_views.xml',
         'views/menu_views.xml',
+        'views/account_move_reversal_views.xml',
         'security/ir.model.access.csv',
     ],
     'external_dependencies': {
