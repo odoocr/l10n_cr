@@ -52,11 +52,13 @@ class AccountInvoiceRefund(models.TransientModel):
                     #    return result
                     if inv.state in ['draft', 'proforma2', 'cancel']:
                         raise UserError(_('Cannot refund draft/proforma/cancelled invoice.'))
-                    if inv.reconciled and mode in ('cancel', 'modify'):
-                        raise UserError(_('Cannot refund invoice which is already reconciled, invoice should be unreconciled first. You can only refund this invoice.'))
+                    if inv.has_reconciled_entries:
+                        raise UserError(_(
+                            'Cannot refund invoice which is already reconciled, invoice should be unreconciled first. You can only refund this invoice.'))
+                    #if inv.reconciled and mode in ('cancel', 'modify'):
 
                     date = form.date or False
-                    description = form.description or inv.name
+                    description = inv.tipo_documento + ": " + inv.name + " " + form.reason
 
                     if inv.tipo_documento in ('FE', 'TE') and inv.state_tributacion == 'rechazado':
                         tipo_refund = 'out_invoice'
@@ -71,7 +73,7 @@ class AccountInvoiceRefund(models.TransientModel):
                         tipo_doc = 'ND'
                         tipo_refund = 'in_invoice'
 
-                    refund = inv.refund(form.invoice_date, date, description,
+                    refund = inv.refund(form.invoice_id.date, date, description,
                                         inv.journal_id.id, form.invoice_id.id,
                                         form.reference_code_id.id, form.reference_document_id.id, tipo_refund, tipo_doc)
 
@@ -189,7 +191,8 @@ class InvoiceLineElectronic(models.Model):
         elif self.product_id and self.product_id.categ_id and self.product_id.categ_id.economic_activity_id:
             self.economic_activity_id = self.product_id.categ_id.economic_activity_id
         else:
-            self.economic_activity_id = self.invoice_id.economic_activity_id
+            self.economic_activity_id = self.company_id.activity_id
+            #self.economic_activity_id = self.invoice_id.economic_activity_id
         
 
 class AccountInvoiceElectronic(models.Model):
@@ -254,15 +257,13 @@ class AccountInvoiceElectronic(models.Model):
         string='Total de impuestos FE', readonly=True, )
     amount_total_electronic_invoice = fields.Monetary(
         string='Total FE', readonly=True, )
+
     tipo_documento = fields.Selection(
         selection=[('FE', 'Factura Electrónica'),
                    ('FEE', 'Factura Electrónica de Exportación'),
                    ('TE', 'Tiquete Electrónico'),
                    ('NC', 'Nota de Crédito'),
                    ('ND', 'Nota de Débito'),
-                   ('CCE', 'MR Aceptación'),
-                   ('CPCE', 'MR Aceptación Parcial'),
-                   ('RCE', 'MR Rechazo'),
                    ('FEC', 'Factura Electrónica de Compra')],
         string="Tipo Comprobante",
         required=False, default='FE',
@@ -284,11 +285,41 @@ class AccountInvoiceElectronic(models.Model):
 
     economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities', context={'active_test': False})
 
+    #journal_id = fields.Many2one('account.journal', string='Journal', compute='_get_journal',)
+
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
     ]
 
+    #@api.model
+    @api.onchange('tipo_documento')
+    def _get_journal(self):
+        document_type = self.tipo_documento
+        company_id = self.company_id.id
+        journal = False
+        journal_next_number = 0
+
+        if document_type == "TE":
+            journal = self.env['account.journal'].search([('code', '=', 'TEJ'),
+                                                           ('company_id', '=', company_id)])
+            journal_next_number = 1
+        elif document_type == "FEE":
+            journal = self.env['account.journal'].search([('code', '=', 'FEEJ'),
+                                                           ('company_id', '=', company_id)])
+            journal_next_number = 2
+        elif document_type == "FEC":
+            journal = self.env['account.journal'].search([('code', '=', 'FECJ'),
+                                                           ('company_id', '=', company_id)])
+        elif document_type == "ND":
+            journal = self.env['account.journal'].search([('code', '=', 'NDJ'),
+                                                           ('company_id', '=', company_id)])
+        else:
+            journal = self.env['account.journal'].search([('code', '=', 'INV'),
+                                                          ('company_id', '=', company_id)])
+
+        #self.invoice_sequence_number_next = journal_next_number
+        self.journal_id = journal and journal.id
 
     @api.onchange('partner_id', 'company_id')
     def _get_economic_activities(self):
@@ -305,6 +336,12 @@ class AccountInvoiceElectronic(models.Model):
     def _partner_changed(self):
         if self.partner_id.export:
             self.tipo_documento = 'FEE'
+
+        #Nuevo para auto seleccionar la actividad economica del cliente al momento de seleccionarlo
+        if self.partner_id.activity_id:
+            self.economic_activity_id = self.partner_id.activity_id
+        #else:
+        #    raise UserError(_('Partner does not have an activity ID'))
 
         if self.type in ('in_invoice', 'in_refund'):
             if self.partner_id:
@@ -641,6 +678,7 @@ class AccountInvoiceElectronic(models.Model):
                journal_id=None, invoice_id=None,
                reference_code_id=None, reference_document_id=None, 
                invoice_type=None, doc_type=None):
+
         if self.env.user.company_id.frm_ws_ambiente == 'disabled':
             new_invoices = super(AccountInvoiceElectronic, self)._reverse_moves(cancel=True)
             return new_invoices
@@ -651,6 +689,7 @@ class AccountInvoiceElectronic(models.Model):
                 values = self._prepare_refund(
                     invoice, invoice_date=invoice_date, date=date,
                     description=description, journal_id=journal_id)
+
                 values.update({'invoice_id': invoice_id,
                                'type': invoice_type,
                                'tipo_documento': doc_type,
@@ -697,7 +736,7 @@ class AccountInvoiceElectronic(models.Model):
     def _check_hacienda_for_invoices(self, max_invoices=10):
         out_invoices = self.env['account.move'].search(
             [('type', 'in', ('out_invoice', 'out_refund')),
-             ('state', 'in', ('open', 'paid')),
+             ('state', 'in', ('posted', 'paid')),
              ('state_tributacion', 'in', ('recibido', 'procesando', 'ne'))],  # , 'error'
             limit=max_invoices)
 
@@ -852,7 +891,8 @@ class AccountInvoiceElectronic(models.Model):
         #if self.company_id.frm_ws_ambiente != 'disabled':
         _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
         invoices = self.env['account.move'].search([('type', 'in', ('out_invoice', 'out_refund')),
-                                                      ('state', 'in', ('open', 'paid')),
+                                                      #('state', 'in', ('open', 'paid')),
+                                                      ('state', 'in', ('posted', 'paid')),
                                                       ('number_electronic', '!=', False),
                                                       ('invoice_date', '>=', '2019-07-01'),
                                                       '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
@@ -984,7 +1024,7 @@ class AccountInvoiceElectronic(models.Model):
                         line_taxes = inv_line.tax_ids.compute_all(
                             price, currency, 1,
                             product=inv_line.product_id,
-                            partner=inv_line.invoice_id.partner_id)
+                            partner=inv_line.partner_id)
 
                         price_unit = round(line_taxes['total_excluded'], 5)
 
@@ -1133,8 +1173,9 @@ class AccountInvoiceElectronic(models.Model):
                 inv.invoice_amount_text = extensions.text_converter.number_to_text_es(base_subtotal + total_impuestos - total_iva_devuelto)
 
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
-                if not inv.origin:
-                    inv.origin = inv.invoice_id.display_name
+                #if not inv.origin:
+                #    inv.move_name = inv.invoice_id.display_name
+                #    inv.origin = inv.invoice_id.display_name
 
                 if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.5:
                     inv.state_tributacion = 'error'
@@ -1213,7 +1254,6 @@ class AccountInvoiceElectronic(models.Model):
                     inv.message_post(subject='Error', body=response_text)
                     _logger.error('E-INV CR  - Invoice: %s  Status: %s Error sending XML: %s' % (inv.number_electronic, response_status, response_text))
 
-
     def action_post(self):
         # Revisamos si el ambiente para Hacienda está habilitado
         for inv in self:
@@ -1223,7 +1263,8 @@ class AccountInvoiceElectronic(models.Model):
                 continue
 
             currency = inv.currency_id
-            sequence = False
+            sequence = inv.journal_id.sequence_id.number_next
+            #next_number = inv.journal_id.sequence_id.number_next
             
             # Digital Invoice or ticket
             if inv.type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
@@ -1242,18 +1283,17 @@ class AccountInvoiceElectronic(models.Model):
 
                 if inv.tipo_documento == 'FE' and (not inv.partner_id.vat or inv.partner_id.identification_id.code == '05'):
                     inv.tipo_documento = 'TE'
-
-                if inv.tipo_documento == 'FE':
-                    sequence = inv.journal_id.FE_sequence_id.next_by_id()
-                elif inv.tipo_documento == 'TE':
-                    sequence = inv.journal_id.TE_sequence_id.next_by_id()
-                elif inv.tipo_documento == 'FEE':
-                    sequence = inv.journal_id.FEE_sequence_id.next_by_id()
+                #if inv.tipo_documento == 'FE':
+                #    sequence = inv.journal_id.FE_sequence_id.next_by_id()
+                #elif inv.tipo_documento == 'TE':
+                #    sequence = inv.journal_id.TE_sequence_id.next_by_id()
+                #elif inv.tipo_documento == 'FEE':
+                #    sequence = inv.journal_id.FEE_sequence_id.next_by_id()
 
             # Credit Note
             elif inv.type == 'out_refund':
                 inv.tipo_documento = 'NC'
-                sequence = inv.journal_id.NC_sequence_id.next_by_id()
+                #sequence = inv.journal_id.NC_sequence_id.next_by_id()
 
             # Digital Supplier Invoice
             elif inv.type == 'in_invoice' and inv.partner_id.country_id and \
