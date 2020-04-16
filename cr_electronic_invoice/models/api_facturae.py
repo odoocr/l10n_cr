@@ -985,6 +985,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.invoice_date = invoice.date_issuance
         emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
         receptor = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+        invoice.payment_methods_id = invoice.env['payment.methods'].search([('sequence', '=', invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)[0].text)], limit=1)
 
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +

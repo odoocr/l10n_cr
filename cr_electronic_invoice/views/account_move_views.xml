@@ -183,19 +183,20 @@
             </field>
         </record>
 
-        <!--
-                <record id="view_account_invoice_refund_inherit" model="ir.ui.view">
-                    <field name="name">account.invoice.refund.form.inherit</field>
-                    <field name="model">account.invoice.refund</field>
-                    <field name="inherit_id" ref="account.view_account_invoice_refund"/>
-                    <field name="arch" type="xml">
-                        <field name="description" position="after">
-                            <field name="reference_code_id"/>
-                            <field name="reference_document_id"/>
-                            <field name="invoice_id" readonly="1"/>
-                        </field>
-                    </field>
-                </record> -->
+
+<!-- 
+        <record id="view_account_move_reverse_inherit" model="ir.ui.view">
+            <field name="name">account.move.reverse.form.inherit</field>
+            <field name="model">account.move.reverse</field>
+            <field name="inherit_id" ref="account.view_account_invoice_refund"/>
+            <field name="arch" type="xml">
+                <field name="description" position="after">
+                    <field name="reference_code_id"/>
+                    <field name="reference_document_id"/>
+                    <field name="invoice_id" readonly="1"/>
+                </field>
+            </field>
+        </record> -->
 
         <record id="view_tax_form_inherit" model="ir.ui.view">
             <field name="name">account.tax.form.inherit</field>
@@ -208,13 +209,13 @@
             </field>
         </record>
 
-        <!-- <record id="view_account_invoice_filter_inherited" model="ir.ui.view">
+        <record id="view_account_invoice_filter" model="ir.ui.view">
             <field name="name">account.invoice.select.inherited</field>
-            <field name="model">account.invoice</field>
+            <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_account_invoice_filter"/>
             <field name="arch" type="xml">
-                <field name="number" string="Invoice" filter_domain="['|','|','|', ('number','ilike',self), ('origin','ilike',self), ('reference', 'ilike', self), ('partner_id', 'child_of', self)]"/>
+                <field name="name" string="Invoice" filter_domain="['|', '|', '|' , '|', '|', ('name', 'ilike', self), ('invoice_origin', 'ilike', self), ('ref', 'ilike', self), ('invoice_payment_ref', 'ilike', self), ('partner_id', 'child_of', self), ('reference', 'ilike', self)]"/>
             </field>
-        </record> -->
+        </record>
     </data>
 </odoo>
