@@ -550,6 +550,7 @@
                 <field name="code">181001</field>
                 <field name="name">SERVICIOS DE COSTURA Y SASTRERIA (COSTURERAS Y SASTRES)</field>
                 <field name="description">SE REFIERE A LA CONFECCION DE PRENDAS DE VESTIR, DONDE EL CLIENTE SUMINISTRA LA TELA. NO EXISTE VENTA DE PRODUCTOS, SOLO LA PRESTACION DEL SERVICIO. ADEMAS INCLUYASE LA ACTIVIDAD DE CUALQUIER ARREGLO EN LAS PRENDAS DE VESTIR.</field>
+                <field name="sale_type">services</field>
         </record>
         <record id="activity_181002" model="economic.activity">
                 <field name="code">181002</field>

@@ -1011,6 +1011,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
         invoice.date_invoice = invoice.date_issuance
         invoice.payment_methods_id = invoice.env['payment.methods'].search([('sequence', '=', invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)[0].text)], limit=1)
+        invoice.tipo_documento= False
 
         emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
