@@ -1010,20 +1010,18 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.economic_activity_id = activity
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
         invoice.date_invoice = invoice.date_issuance
+        invoice.payment_methods_id = invoice.env['payment.methods'].search([('sequence', '=', invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)[0].text)], limit=1)
 
-        emisor = invoice_xml.xpath(
-            "inv:Emisor/inv:Identificacion/inv:Numero",
-            namespaces=namespaces)[0].text
+        emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
-        receptor = invoice_xml.xpath(
-            "inv:Receptor/inv:Identificacion/inv:Numero",
-            namespaces=namespaces)[0].text
+        receptor = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
                              receptor + '. Por favor active la compañía correcta.')  # noqa
 
         currency_node = invoice_xml.xpath("inv:ResumenFactura/inv:CodigoTipoMoneda/inv:CodigoMoneda", namespaces=namespaces)
+        
         if currency_node:
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', currency_node[0].text)], limit=1).id
         else:
