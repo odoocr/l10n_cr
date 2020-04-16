@@ -1009,12 +1009,15 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         else:
             raise UserError(_('The provider in the invoice does not exists. Please review it.'))
 
-        invoice.invoice_payment_term_id = partner.property_supplier_payment_term_id
+        invoice.account_id = partner.property_account_payable_id
+        invoice.payment_term_id = partner.property_supplier_payment_term_id
+
         payment_method_node = invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)
         if payment_method_node:
             invoice.payment_methods_id = invoice.env['payment.methods'].search([('sequence', '=', payment_method_node[0].text)], limit=1)
         else:
-            invoice.payment_methods_id = partner.payment_methods_id     
+            invoice.payment_methods_id = partner.payment_methods_id
+
 
         _logger.debug('MAB - load_lines: %s - account: %s' %
                       (load_lines, account_id))
