@@ -960,7 +960,7 @@ class AccountInvoiceElectronic(models.Model):
                 if inv.invoice_id and inv.reference_code_id and inv.reference_document_id:
                     if inv.invoice_id.number_electronic:
                         numero_documento_referencia = inv.invoice_id.number_electronic
-                        fecha_emision_referencia = inv.invoice_id.date_issuance
+                        fecha_emision_referencia = inv.invoice_id.date_invoice.strftime("%Y-%m-%d") + "T12:00:00-06:00" 
                     else:
                         numero_documento_referencia = inv.invoice_id and re.sub('[^0-9]+', '', inv.invoice_id.sequence).rjust(50, '0') or '0000000'
                         date_invoice = datetime.datetime.strptime(inv.invoice_id and inv.invoice_id.date_invoice or '2018-08-30', "%Y-%m-%d")
