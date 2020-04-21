@@ -3,6 +3,7 @@ from odoo import api, SUPERUSER_ID
 
 # change state xml_id to fix errors
 def pre_init_hook(cr):
+    return
     cr.execute("UPDATE public.ir_model_data "
                "SET module = 'l10n_cr_country_codes', name = 'state_sj' "
                "WHERE module = 'l10n_cr' and name = 'state_SJ';")
