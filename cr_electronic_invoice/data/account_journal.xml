@@ -7,7 +7,7 @@
             <field name="terminal">1</field> 
             <field name="type">sale</field>          
         </record>-->
-
+<!--
         <record id="journal_nd_01" model="account.journal">
             <field name="code">NDJ</field>
             <field name="name">Notas de Débito</field>
@@ -39,6 +39,6 @@
             <field name="terminal">1</field> 
             <field name="type">sale</field>          
         </record>
-
+-->
     </data>
 </odoo>

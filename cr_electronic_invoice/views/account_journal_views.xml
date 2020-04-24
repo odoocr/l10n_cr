@@ -6,7 +6,7 @@
             <field name="model">account.journal</field>
             <field name="inherit_id" ref="account.view_account_journal_form"/>
             <field name="arch" type="xml">
-               <!-- <xpath expr="//page[1]" position="after">
+               <xpath expr="//page[1]" position="after">
                     <page string="Facturación Electrónica" attrs="{'invisible':[('type','!=','sale')]}">
                         <group cols="2">
                             <group cols="2">
@@ -24,11 +24,11 @@
                             </group>
                         </group>
                     </page>
-                </xpath>-->
-                <xpath expr="//field[@name='type']" position="after">
+                </xpath>
+                <!--xpath expr="//field[@name='type']" position="after">
 					<field name="terminal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
 					<field name="sucursal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
-				</xpath>
+				</xpath-->
 
             </field>
         </record>
