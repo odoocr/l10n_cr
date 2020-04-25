@@ -1309,8 +1309,8 @@ class AccountInvoiceElectronic(models.Model):
                 inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and inv.partner_id.vat and inv.xml_supplier_approval is False:
                 if inv.tipo_documento == 'FEC':
                     sequence = inv.company_id.FEC_sequence_id.next_by_id()
-            
-            if not inv.tipo_documento or (inv.type == 'in_invoice' and inv.tipo_documento == "FE"):
+
+            if not inv.tipo_documento or (inv.type == 'in_invoice' and inv.tipo_documento in ("CCE", "CPCE", "RCE", "FE")):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 continue
 
@@ -1365,6 +1365,8 @@ class AccountInvoiceElectronic(models.Model):
                         'price_unit': -iva_devuelto,
                         'quantity': 1,
                     })
+            
+            
 
             super(AccountInvoiceElectronic, inv).action_invoice_open()
             if not inv.number_electronic:
@@ -1375,11 +1377,9 @@ class AccountInvoiceElectronic(models.Model):
                                                             inv.journal_id.terminal)
                 inv.number_electronic = response_json.get('clave')
                 inv.sequence = response_json.get('consecutivo')
+            
             inv.number = inv.sequence
             inv.move_name = inv.sequence
             inv.move_id.name = inv.sequence
             inv.state_send_invoice = False
             inv.invoice_amount_text = ''
-
-            
-            

@@ -1010,20 +1010,18 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.economic_activity_id = activity
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
         invoice.date_invoice = invoice.date_issuance
+        invoice.tipo_documento= False
 
-        emisor = invoice_xml.xpath(
-            "inv:Emisor/inv:Identificacion/inv:Numero",
-            namespaces=namespaces)[0].text
+        emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
-        receptor = invoice_xml.xpath(
-            "inv:Receptor/inv:Identificacion/inv:Numero",
-            namespaces=namespaces)[0].text
+        receptor = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
                              receptor + '. Por favor active la compañía correcta.')  # noqa
 
         currency_node = invoice_xml.xpath("inv:ResumenFactura/inv:CodigoTipoMoneda/inv:CodigoMoneda", namespaces=namespaces)
+        
         if currency_node:
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', currency_node[0].text)], limit=1).id
         else:
@@ -1043,6 +1041,12 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
         invoice.account_id = partner.property_account_payable_id
         invoice.payment_term_id = partner.property_supplier_payment_term_id
+
+        payment_method_node = invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)
+        if payment_method_node:
+            invoice.payment_methods_id = invoice.env['payment.methods'].search([('sequence', '=', payment_method_node[0].text)], limit=1)
+        else:
+            invoice.payment_methods_id = partner.payment_methods_id
 
         _logger.debug('MAB - load_lines: %s - account: %s' %
                       (load_lines, account_id))
