@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from . import account_journal
-from . import account_payment
 from . import account_move
+from . import account_payment
 from . import api_facturae
 from . import code_type_product
 from . import fe_enums
