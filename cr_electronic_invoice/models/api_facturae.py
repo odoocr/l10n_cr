@@ -268,7 +268,10 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
                   monto_total_impuesto_acreditar=False,
                   monto_total_gasto_aplicable=False):
     '''Verificamos si la clave indicada corresponde a un numeros'''
-    mr_clave = re.sub('[^0-9]', '', clave)
+    if clave:
+        mr_clave = re.sub('[^0-9]', '', clave)
+    else:
+        mr_clave = False
     if len(mr_clave) != 50:
         raise UserError(
             'La clave a utilizar es inválida. Debe contener al menos 50 digitos')
@@ -493,7 +496,11 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
             sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
 
-        # sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
+        if v.get('codigo'):
+            sb.Append('<CodigoComercial>')
+            sb.Append('<Tipo>04</Tipo>')
+            sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
+            sb.Append('</CodigoComercial>')
 
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' + str(v['unidadMedida']) + '</UnidadMedida>')
@@ -599,7 +606,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos + totalOtrosCargos - total_iva_devuelto, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
 
-    if inv.invoice_id and inv.reference_code_id and inv.reference_document_id:
+    if tipo_documento_referencia and numero_documento_referencia and fecha_emision_referencia:
         sb.Append('<InformacionReferencia>')
         sb.Append('<TipoDoc>' + str(tipo_documento_referencia) + '</TipoDoc>')
         sb.Append('<Numero>' + str(numero_documento_referencia) + '</Numero>')
@@ -635,14 +642,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             },
             'comprobanteXml': xml_base64
             }
-    if inv.partner_id and inv.partner_id.identification_id and inv.partner_id.identification_id.code:
-        data['receptor']= {
-            'tipoIdentificacion': inv.partner_id.identification_id.code,
-            'numeroIdentificacion': inv.partner_id.vat
-        }
-
-
-    if inv.partner_id.vat:
+    if inv.partner_id and inv.partner_id.vat:
         if not inv.partner_id.identification_id:
             if len(inv.partner_id.vat) == 9:  # cedula fisica
                 id_code = '01'
@@ -795,6 +795,8 @@ def consulta_clave(clave, token, tipo_ambiente):
             'respuesta-xml': response.json().get('respuesta-xml')
         }
     elif 400 <= response.status_code <= 499:
+        _logger.error('MAB - 400 - consulta_clave failed.  error: %s reason: %s',
+                      response.status_code, response.reason)
         response_json = {'status': 400, 'ind-estado': 'error'}
     else:
         _logger.error('MAB - consulta_clave failed.  error: %s',
