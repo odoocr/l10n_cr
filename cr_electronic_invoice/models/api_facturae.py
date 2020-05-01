@@ -883,11 +883,11 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        last_state = inv.state_send_invoice
+        last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-        inv.state_send_invoice = estado_m_h
+        inv.state_tributacion = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
