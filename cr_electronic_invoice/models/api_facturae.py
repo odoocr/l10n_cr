@@ -1121,3 +1121,5 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         tax_node = invoice_xml.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
         if tax_node:
             invoice.amount_tax_electronic_invoice = tax_node[0].text
+        
+        invoice._compute_amount()
