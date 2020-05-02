@@ -101,6 +101,9 @@ class PartnerElectronic(models.Model):
 
                 self.economic_activities_ids = economic_activities
                 self.name = json_response["name"]
+
+                if len(activities_codes) >= 1:
+                    self.activity_id = economic_activities[0]
             else:
                 alert = {
                     'title': json_response["status"],

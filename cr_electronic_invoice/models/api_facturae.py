@@ -859,11 +859,11 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        last_state = inv.state_send_invoice
+        last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-        inv.state_send_invoice = estado_m_h
+        inv.state_tributacion = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
@@ -987,6 +987,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         invoice.invoice_date = invoice.date_issuance
         emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
         receptor = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+        invoice.tipo_documento= False
 
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
@@ -1010,7 +1011,15 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         else:
             raise UserError(_('The provider in the invoice does not exists. Please review it.'))
 
-        invoice.invoice_payment_term_id = partner.property_supplier_payment_term_id
+        invoice.account_id = partner.property_account_payable_id
+        invoice.payment_term_id = partner.property_supplier_payment_term_id
+
+        payment_method_node = invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)
+        if payment_method_node:
+            invoice.payment_methods_id = invoice.env['payment.methods'].search([('sequence', '=', payment_method_node[0].text)], limit=1)
+        else:
+            invoice.payment_methods_id = partner.payment_methods_id
+
 
         _logger.debug('MAB - load_lines: %s - account: %s' %
                       (load_lines, account_id))
