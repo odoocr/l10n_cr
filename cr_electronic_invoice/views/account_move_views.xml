@@ -38,8 +38,7 @@
                 </field>
 
                 <field name="date_issuance" position="after">
-                    <field name="tipo_documento" required="1" domain="[('id', 'in', ('FE','FEE','TE')),]"
-                           attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="tipo_documento" attrs="{'readonly':[('state','!=','draft')], 'required':[('type','in', ('out_invoice', 'out_refund'))]}"/>
                     <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
                 </field>
 

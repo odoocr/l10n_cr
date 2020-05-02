@@ -470,7 +470,8 @@ class AccountInvoiceElectronic(models.Model):
         product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
         if product_id:
             product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
-            
+        
+        self.invoice_line_ids = [(5, 0, 0)]
         api_facturae.load_xml_data(self, load_lines, account, product, analytic_account)
 
     def action_send_mrs_to_hacienda(self):
