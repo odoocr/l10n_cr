@@ -8,8 +8,6 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//button[@name='button_draft']" position="after">
-                    <button name="load_xml_data" type="object" string="Cargar datos desde XMLs" 
-                            attrs="{'invisible':['|', ('state_tributacion','!=', False), '|', ('xml_comprobante', '=', False), ('xml_respuesta_tributacion', '=', False)]}"/>
                     <button name="action_check_hacienda" type="object" string="Consultar Hacienda" 
                             attrs="{'invisible':[('state_tributacion','=', False)]}"/>
                     <button name="action_send_mrs_to_hacienda" type="object" string="Enviar Mensaje Receptor" 
@@ -38,8 +36,7 @@
                 </field>
 
                 <field name="date_issuance" position="after">
-                    <field name="tipo_documento" required="1" domain="[('id', 'in', ('FE','FEE','TE')),]"
-                           attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="tipo_documento" attrs="{'readonly':[('state','!=','draft')], 'required':[('type','in', ('out_invoice', 'out_refund'))]}"/>
                     <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
                 </field>
 
@@ -72,13 +69,13 @@
                 <xpath expr="//page[2]" position="after">
                     <page name="fe_invoice_data" string="Información Electrónica" >
                         <group id="fe_tab_group" col="2" >
-                            <group string="Factura Electrónica de compra" name="fe_in_info_group" colspan="2" col="5" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('type','in', ('out_invoice', 'out_refund'))]}">
+                            <group string="Aceptación Electrónica" name="fe_in_info_group" colspan="2" col="5" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('type','in', ('out_invoice', 'out_refund'))]}">
                                 <field name="fname_xml_supplier_approval" invisible="1" colspan="5" />
                                 <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" colspan="4"
                                    attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('type','in', ('out_invoice', 'out_refund'))]}"/>
                                 <button name="load_xml_data" type="object" string="Cargar datos del XML" colspan="1"
                                     attrs="{'invisible':['|', '|', '|', ('xml_supplier_approval', '=', False), ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC'), ('state','!=','draft')]}"/>
-                                <field name="state_invoice_partner" colspan="5" attrs="{'invisible':['|', ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC')]}"/>
+                               <field name="state_invoice_partner" colspan="5" attrs="{'invisible':['|', ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC')]}"/>
                             </group>
                             <group string="Referencia Electrónica" name="eref_info_group" colspan="2">
                                 <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
@@ -89,15 +86,8 @@
                                 <field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                                 <field name="reference_document_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                                 <field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
-                                
-                                <!-- <field name="electronic_invoice_return_message" readonly="1"/> -->
                             </group>
-                            <group string="Aceptación Electrónica" name="eaceptance_info_group" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('type', '!=', 'in_invoice')]}"
-                                   domain="[('company_id', '=', company_id), ('partner_id','child_of', [partner_id]), ('type','=','in_invoice')]"
-                                   colspan="2">
-                                <field name="state_invoice_partner"
-                                       attrs="{'invisible':[('tipo_documento','=', 'FEC')]}"/>
-                            </group>
+                            
                         </group>
                     </page>
                 </xpath>
