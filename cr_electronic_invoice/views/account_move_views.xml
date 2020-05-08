@@ -113,7 +113,6 @@
             </field>
         </record>
 
-
 <!-- 
         <record id="view_account_move_reverse_inherit" model="ir.ui.view">
             <field name="name">account.move.reverse.form.inherit</field>
