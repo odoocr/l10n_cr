@@ -13,6 +13,6 @@ class MailComposeMessage(models.TransientModel):
             account_invoice = self.env['account.move']
             invoice_ids = context.get('active_ids')
             for invoice in account_invoice.browse(invoice_ids):
-                invoice.sent = True
+                invoice.invoice_sent = True
         return super(MailComposeMessage, self).send_mail(auto_commit=auto_commit)
     
