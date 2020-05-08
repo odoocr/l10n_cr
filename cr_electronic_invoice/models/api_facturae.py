@@ -859,11 +859,11 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        last_state = inv.state_send_invoice
+        last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-        inv.state_send_invoice = estado_m_h
+        inv.state_tributacion = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
@@ -976,17 +976,18 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
         invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
         activity_node = invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)
+        activity_id = False
         activity = False
         if activity_node:
-            activity_id = activity_node[0].text
-            activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_id)], limit=1)
-        else:
-            activity_id = False
+            activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_node[0].text)], limit=1)
+            activity_id = activity.id
+            
         invoice.economic_activity_id = activity
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
         invoice.invoice_date = invoice.date_issuance
         emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
         receptor = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+        invoice.tipo_documento= False
 
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
@@ -999,7 +1000,6 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
 
         partner = invoice.env['res.partner'].search([('vat', '=', emisor),
-                                                    ('supplier', '=', True),
                                                     '|',
                                                      ('company_id', '=', invoice.company_id.id),
                                                      ('company_id', '=', False)],
@@ -1010,15 +1010,32 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         else:
             raise UserError(_('The provider in the invoice does not exists. Please review it.'))
 
-        invoice.invoice_payment_term_id = partner.property_supplier_payment_term_id
+        invoice.account_id = partner.property_account_payable_id
+        invoice.payment_term_id = partner.property_supplier_payment_term_id
+
+        payment_method_node = invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)
+        if payment_method_node:
+            invoice.payment_methods_id = invoice.env['payment.methods'].search([('sequence', '=', payment_method_node[0].text)], limit=1)
+        else:
+            invoice.payment_methods_id = partner.payment_methods_id
+
 
         _logger.debug('MAB - load_lines: %s - account: %s' %
                       (load_lines, account_id))
+        
+        product = False
+        if product_id:
+            product = product_id
+
+        analytic_account = False
+        if analytic_account_id:
+            analytic_account = analytic_account_id.id
+
 
         # if load_lines and not invoice.invoice_line_ids:
         if load_lines:
             lines = invoice_xml.xpath("inv:DetalleServicio/inv:LineaDetalle", namespaces=namespaces)
-            new_lines = invoice.env['account.move.line']
+            new_lines = []
             for line in lines:
                 product_uom = invoice.env['uom.uom'].search(
                     [('code', '=', line.xpath("inv:UnidadMedida", namespaces=namespaces)[0].text)],
@@ -1080,28 +1097,23 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                             raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))
 
                 _logger.debug('MAB - impuestos de linea: %s' % (taxes))
-                invoice_line = invoice.env['account.move.line'].create({
+                columns = {
                     'name': line.xpath("inv:Detalle", namespaces=namespaces)[0].text,
-                    'invoice_id': invoice.id,
+                    'move_id': invoice.id,
                     'price_unit': line.xpath("inv:PrecioUnitario", namespaces=namespaces)[0].text,
                     'quantity': line.xpath("inv:Cantidad", namespaces=namespaces)[0].text,
                     'product_uom_id': product_uom,
                     'sequence': line.xpath("inv:NumeroLinea", namespaces=namespaces)[0].text,
                     'discount': discount_percentage,
                     'discount_note': discount_note,
-                    # 'total_amount': total_amount,
-                    'product_id': product_id.id or False,
-                    'account_id': account_id.id or False,
-                    'analytic_account_id': analytic_account_id.id or False,
-                    'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
-                    'total_tax': total_tax,
-                })
-
-                # This must be assigned after line is created
-                invoice_line.tax_ids = taxes
-                invoice_line.economic_activity_id = activity
-                new_lines += invoice_line
-
+                    'product_id': product,
+                    'account_id': account_id.id,
+                    'analytic_account_id': analytic_account,
+                    'economic_activity_id': activity_id,
+                    'tax_ids': taxes,
+                }
+                new_lines.append((0, 0, columns))
+            
             invoice.invoice_line_ids = new_lines
 
         invoice.amount_total_electronic_invoice = invoice_xml.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)[0].text
@@ -1109,5 +1121,5 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         tax_node = invoice_xml.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
         if tax_node:
             invoice.amount_tax_electronic_invoice = tax_node[0].text
-
-        invoice.compute_taxes()
+        
+        invoice._compute_amount()
