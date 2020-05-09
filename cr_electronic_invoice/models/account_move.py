@@ -259,7 +259,8 @@ class AccountInvoiceElectronic(models.Model):
                    ('CCE', 'MR Aceptación'),
                    ('CPCE', 'MR Aceptación Parcial'),
                    ('RCE', 'MR Rechazo'),
-                   ('FEC', 'Factura Electrónica de Compra')],
+                   ('FEC', 'Factura Electrónica de Compra'),
+                   ('disabled', 'Electronic Documents Disabled')],
         string="Tipo Comprobante",
         required=False, default='FE',
         help='Indica el tipo de documento de acuerdo a la '
@@ -1311,7 +1312,7 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             if inv.company_id.frm_ws_ambiente == 'disabled':
                 super(AccountInvoiceElectronic, inv).action_post()
-                inv.tipo_documento = None
+                inv.tipo_documento = 'disabled'
                 continue
 
             currency = inv.currency_id
