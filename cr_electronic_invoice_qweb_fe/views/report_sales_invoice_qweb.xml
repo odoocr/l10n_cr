@@ -52,7 +52,7 @@
                         <span style="font-weight:bolder" t-if="not o.number_electronic">NOTA DE CRÉDITO</span><br/>
                     </t>
                     <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'" t-esc="o.reference"/>
-                    <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.number"/>
+                    <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.name"/>
                 </div>
                 <div class="text-center">
                     <table t-if="o.date_issuance" style="width:100%;" class="dtheader rounded2">
@@ -63,9 +63,9 @@
                         <td class="text-center">HORA</td>
                     </tr>
                     <tr>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[8:10]) or o.date_invoice and (o.date_invoice[8:10]) or ''"/></td>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[5:7]) or o.date_invoice and (o.date_invoice[5:7]) or ''"/></td>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[0:4]) or o.date_invoice and (o.date_invoice[0:4]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[8:10]) or o.invoice_date and (o.invoice_date[8:10]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[5:7]) or o.invoice_date and (o.invoice_date[5:7]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[0:4]) or o.invoice_date and (o.invoice_date[0:4]) or ''"/></td>
                         <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[11:16]) or ''"/></td>
                     </tr>
                     </table>
@@ -74,7 +74,7 @@
                         <td class="text-center">FECHA</td>
                     </tr>
                     <tr>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_invoice or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.invoice_date or ''"/></td>
                     </tr>
                     </table>
                 </div>
@@ -382,7 +382,7 @@
                 <thead class="tble-header">
                         <tr>
                             <th>Producto</th>
-                            <th class="hidden">Source Document</th>
+                            <!--th class="hidden">Source Document</th-->
                             <th class="text-right">Cant.</th>
                             <th width="15%" class="text-right">Precio</th>
                             <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
