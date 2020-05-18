@@ -11,6 +11,7 @@ from lxml import etree
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
+from odoo.tools.misc import get_lang
 
 from . import api_facturae
 from .. import extensions
