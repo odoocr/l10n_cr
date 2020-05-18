@@ -4,8 +4,8 @@
 <template id="sale.report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
 </template>
 
-<!--template id="sale_stock.report_invoice_document_inherit_sale_stock" inherit_id="account.report_invoice_document">
-</template-->
+<template id="sale_stock.sale_stock_report_invoice_document" inherit_id="account.report_invoice_document">
+</template>
 
 <template id="account.report_invoice_document_with_payments" inherit_id="account.report_invoice_document">
 </template>
