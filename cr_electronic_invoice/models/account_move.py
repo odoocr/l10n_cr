@@ -11,6 +11,7 @@ from lxml import etree
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
+from odoo.tools.misc import get_lang
 
 from . import api_facturae
 from .. import extensions
@@ -259,7 +260,8 @@ class AccountInvoiceElectronic(models.Model):
                    ('CCE', 'MR Aceptación'),
                    ('CPCE', 'MR Aceptación Parcial'),
                    ('RCE', 'MR Rechazo'),
-                   ('FEC', 'Factura Electrónica de Compra')],
+                   ('FEC', 'Factura Electrónica de Compra'),
+                   ('disabled', 'Electronic Documents Disabled')],
         string="Tipo Comprobante",
         required=False, default='FE',
         help='Indica el tipo de documento de acuerdo a la '
@@ -325,14 +327,21 @@ class AccountInvoiceElectronic(models.Model):
         self.ensure_one()
 
         if self.invoice_id.type == 'in_invoice' or self.invoice_id.type == 'in_refund':
-            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
+            template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', raise_if_not_found=False)
         else:
-            email_template = self.env.ref('account.email_template_edi_invoice', False)
+            template = self.env.ref('account.email_template_edi_invoice', raise_if_not_found=False)
+        template.attachment_ids = [(5,0,0)]
 
-        email_template.attachment_ids = [(5,0,0)]
+        lang = get_lang(self.env)
+        if template and template.lang:
+            lang = template._render_template(template.lang, 'account.move', self.id)
+        else:
+            lang = lang.code
+
 
         if self.env.user.company_id.frm_ws_ambiente == 'disabled':
-            email_template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
+            pass
+            #template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
         elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
 
             attachment = self.env['ir.attachment'].search(
@@ -353,50 +362,41 @@ class AccountInvoiceElectronic(models.Model):
                     attachment_resp.name = self.fname_xml_respuesta_tributacion
                     attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
 
-                    email_template.attachment_ids = [
+                    template.attachment_ids = [
                         (6, 0, [attachment.id, attachment_resp.id])]
-                    """
-                    email_template.with_context(type='binary',
-                                                default_type='binary').send_mail(
-                        self.id,
-                        raise_exception=False,
-                        force_send=True)  # default_type='binary'
-
-                    email_template.attachment_ids = [(5)]
-
-                    self.write({
-                        'invoice_mailed': True,
-                        'sent': True,
-                    })
-                    """
-                    compose_form = self.env.ref('account.account_invoice_send_wizard_form', False)
-                    ctx = dict(
-                        default_model='account.invoice',
-                        default_res_id=self.id,
-                        default_use_template=bool(email_template),
-                        default_template_id=email_template and email_template.id or False,
-                        default_composition_mode='comment',
-                        mark_invoice_as_sent=True,
-                        custom_layout="mail.mail_notification_paynow",
-                        force_email=True
-                    )
-                    return {
-                        'name': _('Send Invoice'),
-                        'type': 'ir.actions.act_window',
-                        'view_type': 'form',
-                        'view_mode': 'form',
-                        'res_model': 'account.invoice.send',
-                        'views': [(compose_form.id, 'form')],
-                        'view_id': compose_form.id,
-                        'target': 'new',
-                        'context': ctx,
-                    }
                 else:
                     raise UserError(_('Response XML from Hacienda has not been received'))
             else:
                 raise UserError(_('Invoice XML has not been generated'))
+
         else:
             raise UserError(_('Partner is not assigne to this invoice'))
+
+        compose_form = self.env.ref('account.account_invoice_send_wizard_form', raise_if_not_found=False)
+        ctx = dict(
+            default_model='account.move',
+            default_res_id=self.id,
+            default_use_template=bool(template),
+            default_template_id=template and template.id or False,
+            default_composition_mode='comment',
+            mark_invoice_as_sent=True,
+            custom_layout="mail.mail_notification_paynow",
+            model_description=self.with_context(lang=lang).type_name,
+            force_email=True
+        )
+
+        return {
+            'name': _('Send Invoice'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'account.invoice.send',
+            'views': [(compose_form.id, 'form')],
+            'view_id': compose_form.id,
+            'target': 'new',
+            'context': ctx,
+        }
+
 
     @api.onchange('xml_supplier_approval')
     def _onchange_xml_supplier_approval(self):
@@ -1311,7 +1311,7 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             if inv.company_id.frm_ws_ambiente == 'disabled':
                 super(AccountInvoiceElectronic, inv).action_post()
-                inv.tipo_documento = None
+                inv.tipo_documento = 'disabled'
                 continue
 
             currency = inv.currency_id

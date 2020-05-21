@@ -1011,7 +1011,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             raise UserError(_('The provider in the invoice does not exists. Please review it.'))
 
         invoice.account_id = partner.property_account_payable_id
-        invoice.payment_term_id = partner.property_supplier_payment_term_id
+        invoice.invoice_payment_term_id = partner.property_supplier_payment_term_id
 
         payment_method_node = invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)
         if payment_method_node:
