@@ -104,7 +104,7 @@ class CompanyElectronic(models.Model):
             if not valid:
                 alert = {
                     'title': 'Atención',
-                    'message': _('Número de teléfono inválido')
+                    'message': 'Número de teléfono inválido'
                 }
                 return {'value': {'phone': ''}, 'warning': alert}
 

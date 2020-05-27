@@ -299,10 +299,10 @@ class AccountInvoiceElectronic(models.Model):
             if inv.type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
                     inv.economic_activities_ids = inv.partner_id.economic_activities_ids
-                    inv.economic_activities_id = inv.partner_id.activity_id
+                    inv.economic_activity_id = inv.partner_id.activity_id
             else:
                 inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', True)])
-                inv.economic_activities_id = inv.company_id.activity_id
+                inv.economic_activity_id = inv.company_id.activity_id
 
     @api.onchange('partner_id')
     def _partner_changed(self):
