@@ -299,10 +299,10 @@ class AccountInvoiceElectronic(models.Model):
             if inv.type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
                     inv.economic_activities_ids = inv.partner_id.economic_activities_ids
-                    inv.economic_activities_id = inv.partner_id.activity_id
+                    inv.economic_activity_id = inv.partner_id.activity_id
             else:
                 inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', True)])
-                inv.economic_activities_id = inv.company_id.activity_id
+                inv.economic_activity_id = inv.company_id.activity_id
 
     @api.onchange('partner_id')
     def _partner_changed(self):
@@ -314,13 +314,13 @@ class AccountInvoiceElectronic(models.Model):
                 #Nuevo para auto seleccionar la actividad economica del cliente al momento de seleccionarlo
                 if self.partner_id.activity_id:
                     self.economic_activity_id = self.partner_id.activity_id
-                else:
-                    raise UserError(_('Partner does not have a default economic activity'))
+                #else:
+                #    raise UserError(_('Partner does not have a default economic activity'))
 
                 if self.partner_id.payment_methods_id:
                     self.payment_methods_id = self.partner_id.payment_methods_id
-                else:
-                    raise UserError(_('Partner does not have a default payment method'))
+                #else:
+                #    raise UserError(_('Partner does not have a default payment method'))
 
 
     def action_invoice_sent(self):
@@ -1320,6 +1320,10 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError('Datos incompletos de referencia para nota de crédito')
             elif (inv.not_loaded_invoice or inv.not_loaded_invoice_date) and not (inv.not_loaded_invoice and inv.not_loaded_invoice_date and inv.reference_code_id and inv.reference_document_id):
                 raise UserError('Datos incompletos de referencia para nota de crédito no cargada')
+
+            if self.type == 'in_invoice' and self.partner_id.country_id and \
+                self.partner_id.country_id.code == 'CR' and self.partner_id.identification_id and self.partner_id.vat and self.economic_activity_id is False:
+                raise UserError('Las facturas FEC requieren que el proveedor tenga definida la actividad económica')
 
             # Digital Invoice or ticket
             if inv.type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
