@@ -1053,7 +1053,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         
         product = False
         if product_id:
-            product = product_id
+            product = product_id.id
 
         analytic_account = False
         if analytic_account_id:
