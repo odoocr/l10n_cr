@@ -27,6 +27,7 @@ class ResConfigSettings(models.TransientModel):
 
     load_lines = fields.Boolean(
         string=_('Indicates if invoice lines should be load when loading a Costa Rican Digital Invoice'),
+        default=True
     )
 
     @api.model

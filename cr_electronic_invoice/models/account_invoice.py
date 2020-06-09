@@ -317,6 +317,10 @@ class AccountInvoiceElectronic(models.Model):
             else:
                 inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
                 inv.economic_activities_id = inv.company_id.activity_id
+                
+            # Temporal hack while Hacienda force us to use Economic activity per line
+            for line in inv.invoice_line_ids:
+                line.economic_activity_id = inv.economic_activities_id
 
     @api.multi
     @api.onchange('partner_id')
