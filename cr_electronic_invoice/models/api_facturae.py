@@ -369,7 +369,10 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
-        payment_methods_id = '01'
+        if inv.statement_ids[0].statement_id.journal_id.type == 'cash':
+            payment_methods_id = '01'
+        if inv.statement_ids[0].statement_id.journal_id.type == 'bank':
+            payment_methods_id = '02'
         cod_moneda = str(inv.company_id.currency_id.name)
     else:
         payment_methods_id = str(inv.payment_methods_id.sequence)
