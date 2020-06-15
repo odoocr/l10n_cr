@@ -246,11 +246,11 @@ class PosOrder(models.Model):
                                                   limit=max_orders)
         total_orders = len(pos_orders)
         current_order = 0
-        _logger.error(
+        _logger.info(
             'MAB - Consulta Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.error(
+            _logger.info(
                 'MAB - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
 
             #response_json = fxunctions.token_hacienda(doc.company_id)
@@ -309,7 +309,7 @@ class PosOrder(models.Model):
                         doc.state_email = 'sent'
                     else:
                         doc.state_email = 'no_email'
-                        _logger.info('email no enviado - cliente no definido')
+                        _logger.info('MAB - Email no enviado - Cliente no definido')
 
                 elif estado_m_h in ('firma_invalida'):
                     if doc.error_count > 10:
@@ -318,7 +318,7 @@ class PosOrder(models.Model):
                         doc.xml_respuesta_tributacion = response_json.get(
                             'respuesta-xml')
                         doc.state_email = 'fe_error'
-                        _logger.info('email no enviado - factura rechazada')
+                        _logger.error('MAB - Email no enviado - Factura rechazada')
                     else:
                         doc.error_count += 1
                         doc.state_tributacion = 'procesando'
@@ -328,7 +328,7 @@ class PosOrder(models.Model):
                     doc.xml_respuesta_tributacion = response_json.get(
                         'respuesta-xml')
                     doc.state_email = 'fe_error'
-                    _logger.info('email no enviado - factura rechazada')
+                    _logger.error('MAB - Email no enviado - Factura rechazada')
                 elif estado_m_h == 'error':
                     doc.state_tributacion = estado_m_h
                     doc.state_email = 'fe_error'
@@ -343,12 +343,12 @@ class PosOrder(models.Model):
                         doc.state_tributacion = ''
                     #doc.state_tributacion = 'no_encontrado'
                     _logger.error(
-                        'MAB - Consulta Hacienda - POS Order not found: %s', doc.number_electronic)
+                        'MAB - Consulta Hacienda - POS Order no encontrada: %s', doc.number_electronic)
             else:
                 doc.state_tributacion = 'error'
                 _logger.error(
-                    'MAB - POS Order %s  - x Number Electronic: %s formato incorrecto', doc.name, doc.number_electronic)
-        _logger.error('MAB - Consulta Hacienda POS- Finalizad Exitosamente')
+                    'MAB - POS Order %s - x Number Electronic: %s formato incorrecto', doc.name, doc.number_electronic)
+        _logger.info('MAB - Consulta Hacienda POS - Finalizad Exitosamente')
 
     @api.model
     def _reenviacorreos_pos(self, max_orders=1):  # cron
@@ -363,18 +363,18 @@ class PosOrder(models.Model):
                                                   )
         total_orders = len(pos_orders)
         current_order = 0
-        _logger.error(
+        _logger.info(
             'MAB - Reenvia Correos- POS Orders to send: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.error('MAB - Reenvia Correos- POS Order %s - %s / %s',
+            _logger.info('MAB - Reenvia Correos- POS Order %s - %s / %s',
                           doc.name, current_order, total_orders)
             if doc.partner_id.email and not doc.partner_id.opt_out and doc.state_tributacion == 'aceptado':
                 comprobante = self.env['ir.attachment'].search(
                     [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
                      ('res_field', '=', 'xml_comprobante')], limit=1)
                 if not comprobante:
-                    _logger.info('email no enviado - tiquete sin xml')
+                    _logger.error('MAB - Email no enviado - Tiquete sin xml')
                     continue
 
                 try:
@@ -400,11 +400,11 @@ class PosOrder(models.Model):
                 doc.state_email = 'sent'
             elif doc.state_tributacion in ('rechazado', 'rejected'):
                 doc.state_email = 'fe_error'
-                _logger.info('email no enviado - factura rechazada')
+                _logger.error('MAB - Email no enviado - factura rechazada')
             else:
                 doc.state_email = 'no_email'
-                _logger.info('email no enviado - cuenta no definida')
-        _logger.error('MAB - Reenvia Correos - Finalizado')
+                _logger.info('MAB - Email no enviado - Cuenta no definida')
+        _logger.info('MAB - Reenvia Correos - Finalizado')
 
     @api.model
     def _validahacienda_pos(self, max_orders=10, no_partner=True):  # cron
@@ -422,11 +422,11 @@ class PosOrder(models.Model):
                                                   limit=max_orders)
         total_orders = len(pos_orders)
         current_order = 0
-        _logger.error(
+        _logger.info(
             'MAB - Valida Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.error('MAB - Valida Hacienda - POS Order: "%s"  -  %s / %s',
+            _logger.info('MAB - Valida Hacienda - POS Order: "%s"  -  %s / %s',
                           doc.number_electronic, current_order, total_orders)
 
             docName = doc.number_electronic
@@ -644,7 +644,7 @@ class PosOrder(models.Model):
                 #doc.xml_comprobante = response_json.get('xmlFirmado')
                 doc.xml_comprobante = base64.encodestring(xml_firmado)
 
-                _logger.error('MAB - SIGNED XML:%s', doc.fname_xml_comprobante)
+                _logger.info('MAB - SIGNED XML:%s', doc.fname_xml_comprobante)
 
             else:
                 xml_firmado = doc.xml_comprobante
