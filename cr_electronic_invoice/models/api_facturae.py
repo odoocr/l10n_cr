@@ -362,13 +362,19 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 fecha_emision_referencia, codigo_referencia, razon_referencia):
 
     numero_linea = 0
+    payment_methods_id = []
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
-        payment_methods_id = '01'
+        inv_statement_length = len(inv.statement_ids)
+        for statement_counter in range(inv_statement_length):
+            if inv.statement_ids[statement_counter].statement_id.journal_id.type == 'cash':
+                payment_methods_id.append('01')
+            else:
+                payment_methods_id.append('02')
         cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id = str(inv.payment_methods_id.sequence)
+        payment_methods_id.append(str(inv.payment_methods_id.sequence))
         plazo_credito = str(inv.invoice_payment_term_id and inv.invoice_payment_term_id.line_ids[0].days or 0)
         cod_moneda = str(inv.currency_id.name)
 
@@ -481,7 +487,9 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' + plazo_credito + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + payment_methods_id + '</MedioPago>')
+    payment_method_length = len(payment_methods_id)
+    for payment_method_counter in range(payment_method_length):
+        sb.Append('<MedioPago>' + payment_methods_id[payment_method_counter] + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
