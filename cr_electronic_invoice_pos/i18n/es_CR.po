@@ -1,0 +1,490 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* cr_electronic_invoice_pos
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0-20200118\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-28 03:45+0000\n"
+"PO-Revision-Date: 2020-06-28 03:45+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: cr_electronic_invoice_pos
+#: model:mail.template,body_html:cr_electronic_invoice_pos.email_template_pos_invoice
+msgid "\n"
+"<div style=\"font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; \">\n"
+"\n"
+"    <p>Hello ${object.partner_id.name},</p>\n"
+"\n"
+"    <p>A new invoice is available for you: </p>\n"
+"\n"
+"    <p style=\"border-left: 1px solid #8e0000; margin-left: 30px;\">\n"
+"       &nbsp;&nbsp;<strong>REFERENCES</strong><br />\n"
+"       &nbsp;&nbsp;Invoice number: <strong>${object.name}</strong><br />\n"
+"       &nbsp;&nbsp;Invoice date: ${object.date_order}<br />\n"
+"       % if object.user_id:\n"
+"       &nbsp;&nbsp;Your contact: <a href=\"mailto:${object.user_id.email or ''}?subject=Invoice%20${object.number}\">${object.user_id.name}</a>\n"
+"       % endif\n"
+"    </p>\n"
+"\n"
+"    <br/>\n"
+"    <p>If you have any question, do not hesitate to contact us.</p>\n"
+"    <p>Thank you for choosing ${object.company_id.name or 'us'}!</p>\n"
+"    <br/>\n"
+"    <br/>\n"
+"    <div style=\"width: 375px; margin: 0px; padding: 0px; background-color: #8E0000; border-top-left-radius: 5px 5px; border-top-right-radius: 5px 5px; background-repeat: repeat no-repeat;\">\n"
+"        <h3 style=\"margin: 0px; padding: 2px 14px; font-size: 12px; color: #DDD;\">\n"
+"            <strong style=\"text-transform:uppercase;\">${object.company_id.name}</strong></h3>\n"
+"    </div>\n"
+"    <div style=\"width: 347px; margin: 0px; padding: 5px 14px; line-height: 16px; background-color: #F2F2F2;\">\n"
+"        <span style=\"color: #222; margin-bottom: 5px; display: block; \">\n"
+"        % if object.company_id.street:\n"
+"            ${object.company_id.street}<br/>\n"
+"        % endif\n"
+"        % if object.company_id.street2:\n"
+"            ${object.company_id.street2}<br/>\n"
+"        % endif\n"
+"        % if object.company_id.city or object.company_id.zip:\n"
+"            ${object.company_id.zip} ${object.company_id.city}<br/>\n"
+"        % endif\n"
+"        % if object.company_id.country_id:\n"
+"            ${object.company_id.state_id and ('%s, ' % object.company_id.state_id.name) or ''} ${object.company_id.country_id.name or ''}<br/>\n"
+"        % endif\n"
+"        </span>\n"
+"        % if object.company_id.phone:\n"
+"            <div style=\"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; \">\n"
+"                Phone:&nbsp; ${object.company_id.phone}\n"
+"            </div>\n"
+"        % endif\n"
+"        % if object.company_id.website:\n"
+"            <div>\n"
+"                Web :&nbsp;<a href=\"${object.company_id.website}\">${object.company_id.website}</a>\n"
+"            </div>\n"
+"        %endif\n"
+"        <p></p>\n"
+"    </div>\n"
+"</div>\n"
+"            "
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:193
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:207
+#, python-format
+msgid " REFUND"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:mail.template,subject:cr_electronic_invoice_pos.email_template_pos_invoice
+msgid "${object.company_id.name|safe} Invoice (Ref ${object.number or 'n/a'})"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#. openerp-web
+#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:69
+#, python-format
+msgid "% discount"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "<br/>\n"
+"                            Cédula:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "<br/>\n"
+"                            Teléfono:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "<br/>\n"
+"                            Versión Documento: 4.3<br/>"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "<strong>IVA y Servicio incluidos</strong>"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "<strong>Total</strong>"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "Accepted"
+msgstr "Aceptado"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__error_count
+msgid "Amount of errors"
+msgstr "Cantidad de errores"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__sucursal
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Branch"
+msgstr "Sucursal"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Cajero:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Cant"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Clave Numérica:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#. openerp-web
+#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:6
+#, python-format
+msgid "Clave:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#. openerp-web
+#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:34
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+#, python-format
+msgid "Cliente:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__sequence
+msgid "Consecutive"
+msgstr "Consecutivo"
+
+#. module: cr_electronic_invoice_pos
+#. openerp-web
+#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:11
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+#, python-format
+msgid "Consecutivo:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.actions.server,name:cr_electronic_invoice_pos.ir_cron_consultahacienda_pos_ir_actions_server
+#: model:ir.cron,cron_name:cr_electronic_invoice_pos.ir_cron_consultahacienda_pos
+#: model:ir.cron,name:cr_electronic_invoice_pos.ir_cron_consultahacienda_pos
+msgid "Consulta Hacienda POS"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#. openerp-web
+#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:19
+#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:36
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+#, python-format
+msgid "Cédula:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Descripción"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__economic_activity_id
+msgid "Economic Activity"
+msgstr "Actividad Económica"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,tipo_documento:0
+msgid "Electronic Credit Note"
+msgstr "Nota de Crédito Electrónica"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__NC_sequence_id
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Electronic Credit Note Sequence"
+msgstr "Secuencia de Nota de Crédito Electrónica"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+#: selection:pos.order,tipo_documento:0
+msgid "Electronic Invoice"
+msgstr "Factura Electrónica"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__FE_sequence_id
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Electronic Invoice Sequence"
+msgstr "Secuencia de Factura Electrónica"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__number_electronic
+msgid "Electronic Number"
+msgstr "Número Electrónico"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,tipo_documento:0
+msgid "Electronic Ticket"
+msgstr "Tiquete Electrónico"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__TE_sequence_id
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Electronic Ticket Sequence"
+msgstr "Secuencia de Tiquete Electrónico"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__state_email
+msgid "Email state"
+msgstr "Estado del correo electrónico"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "Error"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_email:0
+msgid "Error FE"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_order_electronic_invoice_filter
+msgid "Estado Tributacion"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "FACTURA ELECTRÓNICA"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__state_tributacion
+msgid "FE State"
+msgstr "Estado FE"
+
+#. module: cr_electronic_invoice_pos
+#: model:mail.template,report_name:cr_electronic_invoice_pos.email_template_pos_invoice
+msgid "FE_${(object.number_electronic or '').replace('/','_')}_${object.state == 'draft' and 'draft' or ''}"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Fecha:"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "Invalid Sign"
+msgstr "Firma Inválida"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__date_issuance
+msgid "Issue date"
+msgstr "Fecha de emisión"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model,name:cr_electronic_invoice_pos.model_account_journal
+msgid "Journal"
+msgstr "Diario"
+
+#. module: cr_electronic_invoice_pos
+#: sql_constraint:pos.order:0
+msgid "La clave de comprobante debe ser única"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Monto"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "NOTA DE CRÉDITO ELECTRÓNICA"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "No apply"
+msgstr "No aplica"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "Not found"
+msgstr "No encontrado"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Pago"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_account_journal__payment_method_id
+msgid "Payment Methods"
+msgstr "Métodos de pago"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model,name:cr_electronic_invoice_pos.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr "Configuración del TPV"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model,name:cr_electronic_invoice_pos.model_pos_order
+msgid "Point of Sale Orders"
+msgstr "Pedidos del TPV"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.actions.report,name:cr_electronic_invoice_pos.pos_orders
+msgid "PosOrders"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Precio"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "Procesing"
+msgstr "Procesando"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__tipo_documento
+msgid "Receipt Type"
+msgstr "Tipo de comprobante"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "Received"
+msgstr "Recibido"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.actions.server,name:cr_electronic_invoice_pos.ir_cron_reenvia_correos_pos_ir_actions_server
+#: model:ir.cron,cron_name:cr_electronic_invoice_pos.ir_cron_reenvia_correos_pos
+#: model:ir.cron,name:cr_electronic_invoice_pos.ir_cron_reenvia_correos_pos
+msgid "Reenvia Correos POS"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__reference_code_id
+msgid "Reference code"
+msgstr "Código de referencia"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__pos_order_id
+msgid "Reference document"
+msgstr "Documento de referencia"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "Rejected"
+msgstr "Rechazado"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_tributacion:0
+msgid "Rejected2"
+msgstr "Rechazado2"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "Res DGT-R-033-2019 del 20 / 06 / 2019"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:215
+#, python-format
+msgid "Return Products"
+msgstr "Devolver Productos"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_email:0
+msgid "Sent"
+msgstr "Enviado"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__tipo_documento
+msgid "Show document type in concordance with Ministerio de Hacienda classification"
+msgstr "Indica el tipo de documento de acuerdo a la clasificación del Ministerio de Hacienda"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid "TIQUETE ELECTRÓNICO"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__xml_respuesta_tributacion
+msgid "Taxation XML response"
+msgstr "Respuesta Tributación XML"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__fname_xml_respuesta_tributacion
+msgid "Taxation XML response filename"
+msgstr "Nombre de archivo XML Respuesta Tributación"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__terminal
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Terminal"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:180
+#, python-format
+msgid "To return product(s), you need to open a session that will be used to register the refund."
+msgstr "Para regresar producto(s), necesita abrir una sesión que será usada para registrar el reembolso"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model,name:cr_electronic_invoice_pos.model_stock_picking
+msgid "Transfer"
+msgstr "Transferir"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.actions.server,name:cr_electronic_invoice_pos.ir_cron_valida_hacienda_pos_ir_actions_server
+#: model:ir.cron,cron_name:cr_electronic_invoice_pos.ir_cron_valida_hacienda_pos
+#: model:ir.cron,name:cr_electronic_invoice_pos.ir_cron_valida_hacienda_pos
+msgid "Valida Hacienda POS"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#. openerp-web
+#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:68
+#, python-format
+msgid "With a"
+msgstr "Con un"
+
+#. module: cr_electronic_invoice_pos
+#: selection:pos.order,state_email:0
+msgid "Without email"
+msgstr "Sin cuenta de correo"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__xml_comprobante
+msgid "XML receipt"
+msgstr "Comprobante XML"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__fname_xml_comprobante
+msgid "XML receipt filename"
+msgstr "Nombre del comprobante XML"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "e.g. 1"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "e.g. 2"
+msgstr ""
+
