@@ -49,17 +49,17 @@ class AccountJournal(models.Model):
 
 class PosConfig(models.Model):
     _inherit = 'pos.config'
-    sucursal = fields.Integer(string="Sucursal", required=False, default="1")
+    sucursal = fields.Integer(string="Branch", required=False, default="1")
     terminal = fields.Integer(string="Terminal", required=False, default="1")
     FE_sequence_id = fields.Many2one("ir.sequence",
-                                     string="Secuencia de Facturas Electrónicas",
+                                     string="Electronic Invoice Sequence",
                                      required=False)
     NC_sequence_id = fields.Many2one("ir.sequence",
                                      oldname='return_sequence_id',
-                                     string="Secuencia de Notas de Crédito Electrónicas",
+                                     string="Electronic Credit Note Sequence",
                                      required=False)
     TE_sequence_id = fields.Many2one("ir.sequence",
-                                     string="Secuencia de Tiquetes Electrónicos",
+                                     string="Electronic Ticket Sequence",
                                      required=False)
 class PosOrder(models.Model):
     _name = "pos.order"
@@ -99,48 +99,48 @@ class PosOrder(models.Model):
         return order
 
     number_electronic = fields.Char(
-        string="Número electrónico", required=False, copy=False, index=True)
+        string="Electronic Number", required=False, copy=False, index=True)
     date_issuance = fields.Char(
-        string="Fecha de emisión", required=False, copy=False)
-    state_tributacion = fields.Selection([('aceptado', 'Aceptado'),
-                                          ('rechazado', 'Rechazado'),
-                                          ('rejected', 'Rechazado2'),
-                                          ('no_encontrado', 'No encontrado'),
-                                          ('no_aplica', 'No aplica'),
-                                          ('recibido', 'Recibido'),
-                                          ('firma_invalida', 'Firma Inválida'),
+        string="Issue date", required=False, copy=False)
+    state_tributacion = fields.Selection([('aceptado', 'Accepted'),
+                                          ('rechazado', 'Rejected'),
+                                          ('rejected', 'Rejected2'),
+                                          ('no_encontrado', 'Not found'),
+                                          ('no_aplica', 'No apply'),
+                                          ('recibido', 'Received'),
+                                          ('firma_invalida', 'Invalid Sign'),
                                           ('error', 'Error'),
-                                          ('procesando', 'Procesando')], 'Estado FE', copy=False)
+                                          ('procesando', 'Procesing')], 'FE State', copy=False)
 
     reference_code_id = fields.Many2one(
-        "reference.code", string="Código de referencia", required=False)
+        "reference.code", string="Reference code", required=False)
     pos_order_id = fields.Many2one(
-        "pos.order", string="Documento de referencia", required=False, copy=False)
+        "pos.order", string="Reference document", required=False, copy=False)
     xml_respuesta_tributacion = fields.Binary(
-        string="Respuesta Tributación XML", required=False, copy=False, attachment=True)
+        string="Taxation XML response", required=False, copy=False, attachment=True)
     fname_xml_respuesta_tributacion = fields.Char(
-        string="Nombre de archivo XML Respuesta Tributación", required=False, copy=False)
+        string="Taxation XML response filename", required=False, copy=False)
     xml_comprobante = fields.Binary(
-        string="Comprobante XML", required=False, copy=False, attachment=True)
+        string="XML receipt", required=False, copy=False, attachment=True)
     fname_xml_comprobante = fields.Char(
-        string="Nombre de archivo Comprobante XML", required=False, copy=False)
-    state_email = fields.Selection([('no_email', 'Sin cuenta de correo'), (
-        'sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
+        string="XML receipt filename", required=False, copy=False)
+    state_email = fields.Selection([('no_email', 'Without email'), (
+        'sent', 'Sent'), ('fe_error', 'Error FE')], 'Email state', copy=False)
     error_count = fields.Integer(
-        string="Cantidad de errores", required=False, default="0")
+        string="Amount of errors", required=False, default="0")
     tipo_documento = fields.Selection(
         oldname='doc_type',
-        selection=[('FE', 'Factura Electrónica'),
-                   ('TE', 'Tiquete Electrónico'),
-                   ('NC', 'Nota de Crédito')],
-        string="Tipo Comprobante",
+        selection=[('FE', 'Electronic Invoice'),
+                   ('TE', 'Electronic Ticket'),
+                   ('NC', 'Electronic Credit Note')],
+        string="Receipt Type",
         required=False, default='FE',
-        help='Indica el tipo de documento de acuerdo a la '
-             'clasificación del Ministerio de Hacienda')
+        help='Show document type in concordance with '
+             'Ministerio de Hacienda classification')
 
-    sequence = fields.Char(string='Consecutivo', readonly=True, )
+    sequence = fields.Char(string='Consecutive', readonly=True, )
 
-    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )
+    economic_activity_id = fields.Many2one("economic.activity", string="Economic Activity", required=False, )
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (number_electronic)',
