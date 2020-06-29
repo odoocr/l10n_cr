@@ -1,3 +1,4 @@
+import datetime
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import logging
@@ -24,13 +25,17 @@ class IvaCodeType(models.Model):
         self.tax_compute_exoneration()
 
     def tax_compute_exoneration(self):
-        if self.percentage_exoneration <= 100:
-            if self.tax_root:
-                _tax_amount = self.tax_root.amount / 100
-                _procentage = self.percentage_exoneration / 100
-                self.amount = (_tax_amount * (1 - _procentage)) * 100
+        if datetime.datetime.today() < datetime.datetime.strptime('2020-07-01', '%Y-%m-%d'):
+            if self.percentage_exoneration <= 100:
+                if self.tax_root:
+                    _tax_amount = self.tax_root.amount / 100
+                    _procentage = self.percentage_exoneration / 100
+                    self.amount = (_tax_amount * (1 - _procentage)) * 100
+            else:
+                raise UserError('El porcentaje no puede ser mayor a 100')
         else:
-            raise UserError('El porcentaje no puede ser mayor a 100')
-
-
-
+            if self.percentage_exoneration <= 13:
+                if self.tax_root:
+                    self.amount = self.tax_root.amount - self.percentage_exoneration
+            else:
+                raise UserError('El porcentaje no puede ser mayor a 13')

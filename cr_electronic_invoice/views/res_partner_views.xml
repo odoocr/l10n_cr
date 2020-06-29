@@ -62,10 +62,10 @@
                     <xpath expr="//form/sheet/notebook" position="before">
                         <group col="5">
                             <separator colspan="5"/>
-                            <field name="activity_id" domain="[('id', 'in', economic_activities_ids)]" options="{&quot;no_create&quot;: True, &quot;active_test&quot;: False}" attrs="{'invisible': [('supplier', '!=', True)]}" colspan="4" />
+                            <field name="activity_id" domain="[('id', 'in', economic_activities_ids)]" options="{'no_create': True, 'active_test': False}" attrs="{'invisible': [('supplier', '!=', True)]}" colspan="4" />
                             <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" attrs="{'invisible': [('supplier', '!=', True)]}"/> 
-                            <field name="economic_activities_ids" readonly="0"  widget="section_and_note_one2many" mode="tree" context="{'partner_id': id}" colspan="5" >
-                                <tree editable="bottom" >
+                            <field name="economic_activities_ids" readonly="0"  widget="section_and_note_one2many" mode="tree" colspan="5" >
+                                <tree editable="bottom" options="{'no_create': True, 'active_test': False}">
                                 <field name="code" />
                                 <field name="name"/>
                                 <field name="sale_type"/>
