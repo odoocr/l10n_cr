@@ -1115,8 +1115,19 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     if tax:
                         total_tax += float(tax_node.xpath("inv:Monto", namespaces=namespaces)[0].text)
 
-                        # TODO: Add exonerations
-                        taxes.append((4, tax.id))
+                        exonerations = tax_node.xpath("inv:Exoneracion", namespaces=namespaces)
+                        if exonerations:
+                            for exoneration_node in exonerations:
+                                exoneration_percentage = float(exoneration_node.xpath("inv:PorcentajeExoneracion", namespaces=namespaces)[0].text)
+                                tax = invoice.env['account.tax'].search(
+                                [('percentage_exoneration', '=', exoneration_percentage),
+                                ('type_tax_use', '=', 'purchase'),
+                                ('non_tax_deductible', '=', False),
+                                ('active', '=', True)],
+                                limit=1)
+                                taxes.append((4, tax.id))
+                        else:
+                            taxes.append((4, tax.id))
                     else:
                         if product_id and product_id.non_tax_deductible:
                             raise UserError(_('Tax code %s and percentage %s as non-tax deductible is not registered in the system' % (tax_code, tax_amount)))
