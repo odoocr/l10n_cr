@@ -1123,6 +1123,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                                 [('percentage_exoneration', '=', exoneration_percentage),
                                 ('type_tax_use', '=', 'purchase'),
                                 ('non_tax_deductible', '=', False),
+                                ('has_exoneration', '=', True),
                                 ('active', '=', True)],
                                 limit=1)
                                 taxes.append((4, tax.id))
