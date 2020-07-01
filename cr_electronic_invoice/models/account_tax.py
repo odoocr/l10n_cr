@@ -25,7 +25,7 @@ class IvaCodeType(models.Model):
         self.tax_compute_exoneration()
 
     def tax_compute_exoneration(self):
-        if datetime.datetime.today() < datetime.datetime.strptime('2020-09-01', '%Y-%m-%d'):
+        if datetime.datetime.today() < datetime.datetime.strptime('2020-07-02', '%Y-%m-%d'):
             if self.percentage_exoneration <= 100:
                 if self.tax_root:
                     _tax_amount = self.tax_root.amount / 100
