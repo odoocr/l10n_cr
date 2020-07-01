@@ -26,7 +26,9 @@ class PartnerElectronic(models.Model):
     date_issue = fields.Date(string="Issue Date", required=False, )
     date_expiration = fields.Date(string="Expiration Date", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", required=False, context={'active_test': False} )
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False})
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False},relation='economic_activity_res_partner_rel',
+                                       column1='res_partner_id',
+                                       column2='economic_activity_id',)
     export = fields.Boolean(string="It's export", default=False)
 
     @api.onchange('phone')
@@ -106,6 +108,9 @@ class PartnerElectronic(models.Model):
 
                 self.economic_activities_ids = economic_activities
                 self.name = json_response["name"]
+
+                if len(activities_codes) >= 1:
+                    self.activity_id = economic_activities[0]
             else:
                 alert = {
                     'title': json_response["status"],

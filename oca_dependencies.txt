@@ -1,10 +1,8 @@
 account-invoicing
 account-financial-tools
+account-financial-reporting
 bank-payment
 community-data-files
-connector-telephony
-currency
-edi
 partner-contact
 queue
 sale-workflow

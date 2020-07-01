@@ -10,14 +10,16 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <data>
-                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='city']" 
-                        position="attributes">
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='city']" position="attributes">
                         <attribute name="attrs">{'invisible': [('country_id','=',%(base.cr)d)]}</attribute>
                     </xpath>
 
-                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='zip']" 
-                        position="attributes">
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='zip']" position="attributes">
                         <attribute name="attrs">{'invisible': [('country_id','=',%(base.cr)d)]}</attribute>
+                    </xpath>
+
+                    <xpath expr="//field[@name='property_payment_term_id']" position="attributes">
+                        <attribute name="attrs">{'required': True}</attribute>
                     </xpath>
 
                     <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='state_id']" 
@@ -45,15 +47,12 @@
                             context="{'country_id': country_id, 'state_id': state_id, 'county_id': county_id, 'district_id': district_id, 'zip': zip}"/>
                     </xpath>
 
-                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='state_id']" 
-                        position="attributes">
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='state_id']" position="attributes">
                         <attribute name="context">{'country_id': country_id, 'zip': zip}</attribute>
                     </xpath>
 
-                    <field name="property_payment_term_id" 
-                        position="after">
-                        <field name="payment_methods_id" 
-                            groups="account.group_account_invoice"/>
+                    <field name="property_payment_term_id" position="after">
+                        <field name="payment_methods_id" groups="account.group_account_invoice" required="1"/>
                     </field>
 
                     <field name="vat" position="after">
@@ -62,14 +61,14 @@
 
                     <xpath expr="//form/sheet/notebook" position="before">
                         <group col="5">
-                            <separator colspan="5"/>
-                            <field name="activity_id" domain="[('id', 'in', economic_activities_ids)]" options="{&quot;no_create&quot;: True, &quot;active_test&quot;: False}" attrs="{'invisible': [('supplier', '!=', True)]}" colspan="4" />
+                            <separator colspan="5" string="Economic Activities"/>
+                            <field name="activity_id" domain="[('id', 'in', economic_activities_ids)]" options="{'no_create': True, 'active_test': False}" attrs="{'invisible': [('supplier', '!=', True)]}" colspan="4" />
                             <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" attrs="{'invisible': [('supplier', '!=', True)]}"/> 
-                            <field name="economic_activities_ids" readonly="0"  widget="section_and_note_one2many" mode="tree" context="{'partner_id': id}" colspan="5" >
+                            <field name="economic_activities_ids" colspan="5">
                                 <tree editable="bottom" >
-                                <field name="code" />
-                                <field name="name"/>
-                                <field name="sale_type"/>
+                                    <field name="code" />
+                                    <field name="name"/>
+                                    <field name="sale_type"/>
                                 </tree>
                             </field>
                         </group>

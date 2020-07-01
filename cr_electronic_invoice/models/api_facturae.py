@@ -892,11 +892,11 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        last_state = inv.state_send_invoice
+        last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-        inv.state_send_invoice = estado_m_h
+        inv.state_tributacion = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
@@ -1059,6 +1059,14 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
         _logger.debug('FECR - load_lines: %s - account: %s' %
                       (load_lines, account_id))
+        
+        product = False
+        if product_id:
+            product = product_id.id
+
+        analytic_account = False
+        if analytic_account_id:
+            analytic_account = analytic_account_id.id
 
         # if load_lines and not invoice.invoice_line_ids:
         if load_lines:
@@ -1116,8 +1124,20 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     if tax:
                         total_tax += float(tax_node.xpath("inv:Monto", namespaces=namespaces)[0].text)
 
-                        # TODO: Add exonerations
-                        taxes.append((4, tax.id))
+                        exonerations = tax_node.xpath("inv:Exoneracion", namespaces=namespaces)
+                        if exonerations:
+                            for exoneration_node in exonerations:
+                                exoneration_percentage = float(exoneration_node.xpath("inv:PorcentajeExoneracion", namespaces=namespaces)[0].text)
+                                tax = invoice.env['account.tax'].search(
+                                [('percentage_exoneration', '=', exoneration_percentage),
+                                ('type_tax_use', '=', 'purchase'),
+                                ('non_tax_deductible', '=', False),
+                                ('has_exoneration', '=', True),
+                                ('active', '=', True)],
+                                limit=1)
+                                taxes.append((4, tax.id))
+                        else:
+                            taxes.append((4, tax.id))
                     else:
                         if product_id and product_id.non_tax_deductible:
                             raise UserError(_('Tax code %s and percentage %s as non-tax deductible is not registered in the system' % (tax_code, tax_amount)))
@@ -1135,11 +1155,12 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'discount': discount_percentage,
                     'discount_note': discount_note,
                     # 'total_amount': total_amount,
-                    'product_id': product_id.id or False,
+                    'product_id': product,
                     'account_id': account_id.id or False,
-                    'account_analytic_id': analytic_account_id.id or False,
+                    'account_analytic_id': analytic_account,
                     'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                     'total_tax': total_tax,
+                    'economic_activity_id': invoice.economic_activity_id.id,
                 })
 
                 # This must be assigned after line is created
