@@ -211,7 +211,7 @@ class PosOrder(models.Model):
         for doc in pos_orders:
             current_order += 1
             _logger.error(
-                'MAB - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
+                'MAB - Consulta Hacienda - POS Order %s / %s number: %s', current_order, total_orders, doc.name)
 
             #response_json = fxunctions.token_hacienda(doc.company_id)
             token_m_h = api_facturae.get_token_hacienda(
@@ -243,30 +243,33 @@ class PosOrder(models.Model):
                     doc.xml_respuesta_tributacion = response_json.get(
                         'respuesta-xml')
                     if doc.partner_id and doc.partner_id.email:  # and not doc.partner_id.opt_out:
-                        #email_template = self.env.ref('account.email_template_edi_invoice', False)
-                        email_template = self.env.ref(
-                            'cr_electronic_invoice_pos.email_template_pos_invoice', False)
-                        attachment = self.env['ir.attachment'].search(
-                            [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
-                             ('res_field', '=', 'xml_comprobante')], limit=1)
-                        attachment.name = doc.fname_xml_comprobante
-                        attachment.datas_fname = doc.fname_xml_comprobante
+                        try:
+                            #email_template = self.env.ref('account.email_template_edi_invoice', False)
+                            email_template = self.env.ref(
+                                'cr_electronic_invoice_pos.email_template_pos_invoice', False)
+                            attachment = self.env['ir.attachment'].search(
+                                [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
+                                ('res_field', '=', 'xml_comprobante')], limit=1)
+                            attachment.name = doc.fname_xml_comprobante
+                            attachment.datas_fname = doc.fname_xml_comprobante
 
-                        attachment_resp = self.env['ir.attachment'].search(
-                            [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
-                             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
-                        attachment_resp.name = doc.fname_xml_respuesta_tributacion
-                        attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
+                            attachment_resp = self.env['ir.attachment'].search(
+                                [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
+                                ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+                            attachment_resp.name = doc.fname_xml_respuesta_tributacion
+                            attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
 
-                        email_template.attachment_ids = [
-                            (6, 0, [attachment.id, attachment_resp.id])]
-                        email_template.with_context(type='binary', default_type='binary').send_mail(doc.id,
-                                                                                                    raise_exception=False,
-                                                                                                    force_send=True)  # default_type='binary'
-                        #                        email_template.attachment_ids = [(3, attachment.id)]
-                        #                        email_template.attachment_ids = [(4, attachment_resp.id)]
-                        email_template.attachment_ids = [(5)]
-                        doc.state_email = 'sent'
+                            email_template.attachment_ids = [
+                                (6, 0, [attachment.id, attachment_resp.id])]
+                            email_template.with_context(type='binary', default_type='binary').send_mail(doc.id,
+                                                                                                        raise_exception=False,
+                                                                                                        force_send=True)  # default_type='binary'
+                            #                        email_template.attachment_ids = [(3, attachment.id)]
+                            #                        email_template.attachment_ids = [(4, attachment_resp.id)]
+                            email_template.attachment_ids = [(5)]
+                            doc.state_email = 'sent'
+                        except:
+                            doc.state_email = 'fe_error'
                     else:
                         doc.state_email = 'no_email'
                         _logger.info('email no enviado - cliente no definido')
@@ -303,7 +306,7 @@ class PosOrder(models.Model):
                         doc.state_tributacion = ''
                     #doc.state_tributacion = 'no_encontrado'
                     _logger.error(
-                        'MAB - Consulta Hacienda - POS Order not found: %s', doc.number_electronic)
+                        'MAB - Consulta Hacienda - POS Order %s in state "%s" - Error count: %s', doc.number_electronic, estado_m_h, doc.error_count)
             else:
                 doc.state_tributacion = 'error'
                 _logger.error(

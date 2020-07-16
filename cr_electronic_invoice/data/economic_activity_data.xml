@@ -550,6 +550,7 @@
                 <field name="code">181001</field>
                 <field name="name">SERVICIOS DE COSTURA Y SASTRERIA (COSTURERAS Y SASTRES)</field>
                 <field name="description">SE REFIERE A LA CONFECCION DE PRENDAS DE VESTIR, DONDE EL CLIENTE SUMINISTRA LA TELA. NO EXISTE VENTA DE PRODUCTOS, SOLO LA PRESTACION DEL SERVICIO. ADEMAS INCLUYASE LA ACTIVIDAD DE CUALQUIER ARREGLO EN LAS PRENDAS DE VESTIR.</field>
+                <field name="sale_type">services</field>
         </record>
         <record id="activity_181002" model="economic.activity">
                 <field name="code">181002</field>
@@ -2580,6 +2581,11 @@
                 <field name="code">672001</field>
                 <field name="name">ACTIVIDADES AUXILIARES DE LA FINANCIACION DE PLANES DE SEGUROS Y DE PENSIONES</field>
                 <field name="description">EN ESTA CLASE, QUE ABARCA LAS ACTIVIDADES AUXILIARES DE LA FINANCIACION Y ADMINISTRACION DE PLANES DE SEGUROS Y DE PENSIONES O ESTRECHAMENTE RELACIONADAS CON ELLAS, PERO DISTINTAS DE LAS DE INTERMEDIACION FINANCIERA, SE INCLUYEN LAS ACTIVIDADES DE LOS SERVICIOS DE CORREDORES DE SEGUROS, PERITOS TASADORES Y LIQUIDADORESDE SINIESTROS Y ACTUARIOS, Y LAS DE ADMINISTRACION DEL SALVAMENTO.(INCLUYE A LOS INSPECTORES DE SINIESTROS DEL INS)</field>
+        </record>
+        <record id="activity_701001" model="economic.activity">
+                <field name="code">701001</field>
+                <field name="name">ALQUILER DE CASAS Y OTROS</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE EL ALQUIER DE EDIFICIOS DE APARTAMENTOS, CONDOMINIOS, CASAS DE HABITACION Y PISOS O APARTAMENTOS AMUEBLADOS O SIN AMUEBLAR A CAMBIO DE UNA RETRIBUCION O CONTRATA.</field>
         </record>
         <record id="activity_701002" model="economic.activity">
                 <field name="code">701002</field>

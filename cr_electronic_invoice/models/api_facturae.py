@@ -666,12 +666,26 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
                 'tipoIdentificacion': inv.company_id.identification_id.code,
                 'numeroIdentificacion': inv.company_id.vat
             },
-            'receptor': {
-                'tipoIdentificacion': inv.partner_id.identification_id.code,
-                'numeroIdentificacion': inv.partner_id.vat
-            },
             'comprobanteXml': xml_base64
             }
+    if inv.partner_id and inv.partner_id.vat:
+        if not inv.partner_id.identification_id:
+            if len(inv.partner_id.vat) == 9:  # cedula fisica
+                id_code = '01'
+            elif len(inv.partner_id.vat) == 10:  # cedula juridica
+                id_code = '02'
+            elif len(inv.partner_id.vat) == 11 or len(inv.partner_id.vat) == 12:  # dimex
+                id_code = '03'
+            else:
+                id_code = '05'
+        else:
+            id_code = inv.partner_id.identification_id.code
+
+        data['receptor']={
+                         'tipoIdentificacion': id_code,
+                         'numeroIdentificacion': inv.partner_id.vat
+                         }
+
 
     json_hacienda = json.dumps(data)
 
@@ -810,12 +824,16 @@ def consulta_clave(clave, token, tipo_ambiente):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
+        _logger.error('MAB - 200 - consulta_clave exitosa.  respuesta: %s',
+                      response.json().get('ind-estado'))
         response_json = {
             'status': 200,
             'ind-estado': response.json().get('ind-estado'),
             'respuesta-xml': response.json().get('respuesta-xml')
         }
     elif 400 <= response.status_code <= 499:
+        _logger.error('MAB - 400 - consulta_clave failed.  error: %s reason: %s',
+                      response.status_code, response.reason)
         response_json = {'status': 400, 'ind-estado': 'error'}
     else:
         _logger.error('MAB - consulta_clave failed.  error: %s',
@@ -878,11 +896,11 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        last_state = inv.state_send_invoice
+        last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-        inv.state_send_invoice = estado_m_h
+        inv.state_tributacion = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
