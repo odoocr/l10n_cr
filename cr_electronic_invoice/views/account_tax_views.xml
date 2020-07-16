@@ -11,6 +11,7 @@
                     <field name="iva_tax_desc"/>
                     <field name="iva_tax_code"/>
                     <field name="has_exoneration"/>
+                    <field name="non_tax_deductible"/>
                 </field>
                  <xpath expr="//page[2]" position="after">
                     <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">

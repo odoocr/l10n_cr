@@ -10,7 +10,12 @@
                     <field name="code_type_id" required="1"/>
                     <field name="commercial_measurement" required="0"/>
                 </field>
-
+                <field name="type" position="after">
+                    <field name="economic_activity_id" 
+                        domain="[('active', '=', True)]" 
+                        options='{"no_open": True, "no_create": True}'/>
+                    <field name="non_tax_deductible" default="0" groups="" />
+                </field>
             </field>
         </record>
         <record id="cr_electronic_product_category_form_view_inherit" model="ir.ui.view">
@@ -18,8 +23,10 @@
             <field name="model">product.category</field>
             <field name="inherit_id" ref="product.product_category_form_view"/>
             <field name="arch" type="xml">
-                <field name="type" position="after">
-                    <field name="economic_activity_id"/>
+                <field name="name" position="after">
+                    <field name="economic_activity_id" 
+                        domain="[('active', '=', True)]" 
+                        options='{"no_open": True, "no_create": True}'/>
                 </field>
             </field>
         </record>

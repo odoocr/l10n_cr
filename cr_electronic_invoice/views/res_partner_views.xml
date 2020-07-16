@@ -10,14 +10,16 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <data>
-                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='city']" 
-                        position="attributes">
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='city']" position="attributes">
                         <attribute name="attrs">{'invisible': [('country_id','=',%(base.cr)d)]}</attribute>
                     </xpath>
 
-                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='zip']" 
-                        position="attributes">
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='zip']" position="attributes">
                         <attribute name="attrs">{'invisible': [('country_id','=',%(base.cr)d)]}</attribute>
+                    </xpath>
+
+                    <xpath expr="//field[@name='property_payment_term_id']" position="attributes">
+                        <attribute name="attrs">{'required': True}</attribute>
                     </xpath>
 
                     <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='state_id']" 
@@ -45,30 +47,32 @@
                             context="{'country_id': country_id, 'state_id': state_id, 'county_id': county_id, 'district_id': district_id, 'zip': zip}"/>
                     </xpath>
 
-                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='state_id']" 
-                        position="attributes">
+                    <xpath expr="//form/sheet/group/group/div[hasclass('o_address_format')]/field[@name='state_id']" position="attributes">
                         <attribute name="context">{'country_id': country_id, 'zip': zip}</attribute>
                     </xpath>
 
-                    <field name="property_payment_term_id" 
-                        position="after">
-                        <field name="payment_methods_id" 
-                            groups="account.group_account_invoice"/>
+                    <field name="property_payment_term_id" position="after">
+                        <field name="payment_methods_id" groups="account.group_account_invoice" required="1"/>
                     </field>
 
                     <field name="website"
                         position="before">
                         <field name="identification_id"/>
                         <field name="vat"/>
-                        <field name="activity_id" 
-                            options='{"no_open": True, "no_create": True}' 
-                            attrs="{'invisible': [('supplier', '!=', True)]}" />
-                        <field name="economic_activities_ids" invisible="1" readonly="1" />
-                        <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" colspan="2" /> 
+                        <field name="activity_id" domain="[('id', 'in', economic_activities_ids)]" options="{'no_create': True, 'active_test': False}" attrs="{'invisible': [('supplier', '!=', True)]}" colspan="4" />                        <field name="economic_activities_ids" invisible="1" readonly="1" />
+                        <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" attrs="{'invisible': [('supplier', '!=', True)]}"/> 
+                        <field name="economic_activities_ids" colspan="5">
+                            <tree editable="bottom" >
+                                <field name="code" />
+                                <field name="name"/>
+                                <field name="sale_type"/>
+                            </tree>
+                        </field>
                     </field>
 
                     <field name="category_id" position="after">
-                        <field name="has_exoneration"/>
+                        <field name="has_exoneration" attrs="{'invisible': [('customer', '!=', True)]}" />
+                        <field name="export" attrs="{'invisible': [('customer', '!=', True)]}" />
                     </field>
                 </data>
                 <xpath expr="//page[3]" position="after">
