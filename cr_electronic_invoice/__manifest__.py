@@ -63,6 +63,8 @@
         "python": [
             'xmlsig',
             'OpenSSL',
+            'phonenumbers',
+            'jsonschema',
         ],
     },
     'installable': True,
