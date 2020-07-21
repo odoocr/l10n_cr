@@ -207,7 +207,7 @@ class InvoiceLineElectronic(models.Model):
             self.economic_activity_id = self.product_id.categ_id.economic_activity_id
         else:
             self.economic_activity_id = self.invoice_id.economic_activity_id
-        
+    
 
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.invoice"
@@ -1111,8 +1111,7 @@ class AccountInvoiceElectronic(models.Model):
                                     # Se genera la exoneración si existe para este impuesto
                                     if _tax_exoneration:
                                         _tax_amount_exoneration = round(
-                                            tax_amount - subtotal_line * taxes_lookup[i['id']][
-                                                'amount_exoneration'] / 100, 5)
+                                            tax_amount - subtotal_line * taxes_lookup[i['id']]['amount_exoneration'] / 100, 5)
 
                                         if _tax_amount_exoneration == 0.0:
                                             _tax_amount_exoneration = tax_amount
@@ -1121,8 +1120,7 @@ class AccountInvoiceElectronic(models.Model):
                                         _percentage_exoneration = taxes_lookup[i['id']]['exoneration_percentage']/100.0 #int(taxes_lookup[i['id']]['exoneration_percentage']) / 100
                                         tax["exoneracion"] = {
                                             "montoImpuesto": _tax_amount_exoneration,
-                                            "porcentajeCompra": int(
-                                                taxes_lookup[i['id']]['exoneration_percentage'])
+                                            "porcentajeCompra": int(taxes_lookup[i['id']]['exoneration_percentage'])
                                         }
 
                                     taxes[tax_index] = tax
