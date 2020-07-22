@@ -64,7 +64,7 @@
                             <separator colspan="5" string="Economic Activities"/>
                             <field name="activity_id" domain="[('id', 'in', economic_activities_ids)]" options="{'no_create': True, 'active_test': False}" attrs="{'invisible': [('supplier', '!=', True)]}" colspan="4" />
                             <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" attrs="{'invisible': [('supplier', '!=', True)]}"/> 
-                            <field name="economic_activities_ids" colspan="5">
+                            <field name="economic_activities_ids" colspan="5" attrs="{'invisible': [('supplier', '!=', True)]}">
                                 <tree editable="bottom" >
                                     <field name="code" />
                                     <field name="name"/>
