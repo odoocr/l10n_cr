@@ -11,6 +11,12 @@ from odoo.exceptions import UserError
 from odoo.tools import float_compare
 from . import api_facturae
 
+# Start - Import vendor bill from Email
+_logger = logging.getLogger(__name__)
+
+MAX_POP_MESSAGES = 50
+MAIL_TIMEOUT = 60
+# End - Import vendor bill from Email
 
 class ImportInvoiceImportWizardCR(models.TransientModel):
     _inherit = "account.invoice.import.wizard"

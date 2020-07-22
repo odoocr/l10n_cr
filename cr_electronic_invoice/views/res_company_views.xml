@@ -93,6 +93,22 @@
                                 <field name="sucursal_MR"/>
                                 <field name="terminal_MR"/>
                             </group>
+
+                            <!-- Start - Import vendor bill from Email -->
+                            <group cols="2">
+                                <field name="import_bill_automatic"/>
+                                <field name="import_bill_mail_server_id" attrs="{'invisible':[('import_bill_automatic','=',False)],
+                                               'required': [('import_bill_automatic', '=', True)]}"/>
+                                <field name="import_bill_journal_id"
+                                       attrs="{'invisible':[('import_bill_automatic','=',False)],
+                                               'required': [('import_bill_automatic', '=', True)]}"/>
+                                <field name="import_bill_product_id" attrs="{'invisible':[('import_bill_automatic','=',False)]}"/>
+                                <field name="import_bill_account_id" attrs="{'invisible':[('import_bill_automatic','=',False)],
+                                               'required': [('import_bill_automatic', '=', True)]}"/>
+                                <field name="import_bill_account_analytic_id" attrs="{'invisible':[('import_bill_automatic','=',False)]}"/>
+                            </group>
+                            <!-- End - Import vendor bill from Email -->
+
                         </group>
                     </page>
                 </xpath>

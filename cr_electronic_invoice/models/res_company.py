@@ -28,6 +28,11 @@ class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
 
+    # Start - Import vendor bill from Email
+    def _get_default_journal_id(self):
+        return self.env['account.journal'].search([('type', '=', 'purchase')], limit=1)
+    # End - Import vendor bill from Email
+
     commercial_name = fields.Char(string="Commercial Name", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
@@ -86,6 +91,18 @@ class CompanyElectronic(models.Model):
         string='Secuencia de Facturas Electrónicas de Compra',
         readonly=False, copy=False,
     )
+
+    # Start - Import vendor bill from Email
+    import_bill_automatic = fields.Boolean(
+        string='Importar Facturas del Correo',
+        help='Si marca esta opción se importarán las facturas de proveedor desde el correo electrónico')
+    import_bill_mail_server_id = fields.Many2one('fetchmail.server', string='Servidor de Correo')
+    import_bill_journal_id = fields.Many2one(string='Diario', comodel_name='account.journal', domain="[('type', '=', 'purchase')]", default=_get_default_journal_id, help='Journal where to generate automatic the bills')
+    import_bill_product_id = fields.Many2one('product.product', string='Producto a asignar en cada línea',
+                                        domain=[('purchase_ok', '=', True)])
+    import_bill_account_id = fields.Many2one('account.account', string='Expense Account', domain=[('deprecated', '=', False)])
+    import_bill_account_analytic_id = fields.Many2one('account.analytic.account', string='Cuenta Analítica')
+    # End - Import vendor bill from Email
 
     @api.onchange('mobile')
     def _onchange_mobile(self):

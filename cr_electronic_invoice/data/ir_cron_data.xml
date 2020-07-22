@@ -34,16 +34,18 @@
             <field name="doall" eval="False" />
         </record>
 
-        <record id="ir_cron_mr_hacienda_invoice" model="ir.cron">
-            <field name="name">Envio Mensaje Receptor</field>
-            <field name="model_id" ref="model_account_invoice" />
+        <!-- Start - Import vendor bill from Email -->
+        <record id="ir_cron_automatic_import_bill_from_mail" model="ir.cron">
+            <field name="name">Importar Facturas de Proveedor desde el Correo</field>
+            <field name="model_id" ref="model_fetchmail_server"/>
             <field name="state">code</field>
-            <field name="code">model.send_mrs_to_hacienda()</field>
-            <field name="interval_number">10</field>
-            <field name="interval_type">minutes</field>
+            <field name="code">model._create_invoice_from_email()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False" />
         </record>
+        <!-- End - Import vendor bill from Email -->
 
     </data>
 </odoo>
