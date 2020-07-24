@@ -320,7 +320,9 @@ class AccountInvoiceElectronic(models.Model):
                 
             # Temporal hack while Hacienda force us to use Economic activity per line
             for line in inv.invoice_line_ids:
-                line.economic_activity_id = inv.economic_activities_id
+                # Fix Error
+                # line.economic_activity_id = inv.economic_activities_id
+                line.economic_activity_id = inv.economic_activity_id
 
     @api.multi
     @api.onchange('partner_id')
