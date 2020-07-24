@@ -94,7 +94,7 @@
                                 <field name="terminal_MR"/>
                             </group>
 
-                            # For import vendor bill from email
+                            <!-- # For import vendor bill from email -->
                             <group cols="2">
                                 <field name="import_bill_automatic"/>
                                 <field name="import_bill_mail_server_id" attrs="{'invisible':[('import_bill_automatic','=',False)],
@@ -107,7 +107,7 @@
                                                'required': [('import_bill_automatic', '=', True)]}"/>
                                 <field name="import_bill_account_analytic_id" attrs="{'invisible':[('import_bill_automatic','=',False)]}"/>
                             </group>
-                            # End for import vendor bill from email
+                            <!--  # End for import vendor bill from email -->
 
                         </group>
                     </page>
