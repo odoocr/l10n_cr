@@ -12,35 +12,29 @@ _logger = logging.getLogger(__name__)
 class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
-    commercial_name = fields.Char(string="Nombre comercial", required=False, )
-    state_id = fields.Many2one(
-        "res.country.state", string="Provincia", required=False, )
-    district_id = fields.Many2one(
-        "res.country.district", string="Distrito", required=False, )
-    county_id = fields.Many2one(
-        "res.country.county", string="Cantón", required=False, )
-    neighborhood_id = fields.Many2one(
-        "res.country.neighborhood", string="Barrios", required=False, )
-    identification_id = fields.Many2one("identification.type", string="Tipo de identificacion",
-                                        required=False, )
-    payment_methods_id = fields.Many2one(
-        "payment.methods", string="Métodos de Pago", required=False, )
-
-    has_exoneration = fields.Boolean(string="Posee exoneración", required=False)
-    type_exoneration = fields.Many2one("aut.ex", string="Tipo Autorizacion", required=False, )
-    exoneration_number = fields.Char(string="Número de exoneración", required=False, )
-    institution_name = fields.Char(string="Institucion Emisora", required=False, )
-    date_issue = fields.Date(string="Fecha de Emisión", required=False, )
-    date_expiration = fields.Date(string="Fecha de Vencimiento", required=False, )
-    activity_id = fields.Many2one("economic.activity", string=u"Actividad Económica por defecto", required=False, )
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
-
+    commercial_name = fields.Char(string="Commercial Name", required=False, )
+    state_id = fields.Many2one("res.country.state", string="Province", required=False, )
+    district_id = fields.Many2one("res.country.district", string="District", required=False, )
+    county_id = fields.Many2one("res.country.county", string="Canton", required=False, )
+    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Neighborhood", required=False, )
+    identification_id = fields.Many2one("identification.type", string="Id Type",required=False, )
+    payment_methods_id = fields.Many2one("payment.methods", string="Payment Method", required=False, )
+    has_exoneration = fields.Boolean(string="Has Exoneration?", required=False)
+    type_exoneration = fields.Many2one("aut.ex", string="Authorization Type", required=False, )
+    exoneration_number = fields.Char(string="Exoneration Number", required=False, )
+    institution_name = fields.Char(string="Exoneration Issuer", required=False, )
+    date_issue = fields.Date(string="Issue Date", required=False, )
+    date_expiration = fields.Date(string="Expiration Date", required=False, )
+    activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", required=False, context={'active_test': False} )
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False},relation='economic_activity_res_partner_rel',
+                                       column1='res_partner_id',
+                                       column2='economic_activity_id',)
+    export = fields.Boolean(string="It's export", default=False)
 
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:
-            phone = phonenumbers.parse(self.phone,
-            self.country_id and self.country_id.code or 'CR')
+            phone = phonenumbers.parse(self.phone, self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(phone)
             if not valid:
                 alert = {
@@ -52,8 +46,7 @@ class PartnerElectronic(models.Model):
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:
-            mobile = phonenumbers.parse(self.mobile, 
-                self.country_id and self.country_id.code or 'CR')
+            mobile = phonenumbers.parse(self.mobile, self.country_id and self.country_id.code or 'CR')
             valid = phonenumbers.is_valid_number(mobile)
             if not valid:
                 alert = {
@@ -104,16 +97,26 @@ class PartnerElectronic(models.Model):
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
+            _logger.debug('E-INV CR  - Economic Activities: %s', json_response)
+            if json_response["status"] == 200:
+                activities = json_response["activities"]
+                activities_codes = list()
+                for activity in activities:
+                    if activity["estado"] == "A":
+                        activities_codes.append(activity["codigo"])
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
 
-            activities = json_response["activities"]
-            activities_codes = list()
-            for activity in activities:
-                if activity["estado"] == "A":
-                    activities_codes.append(activity["codigo"])
-            economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
+                self.economic_activities_ids = economic_activities
+                self.name = json_response["name"]
 
-            self.economic_activities_ids = economic_activities
-            #print(economic_activities)
+                if len(activities_codes) >= 1:
+                    self.activity_id = economic_activities[0]
+            else:
+                alert = {
+                    'title': json_response["status"],
+                    'message': json_response["text"]
+                }
+                return {'value': {'vat': ''}, 'warning': alert}
         else:
             alert = {
                 'title': 'Atención',

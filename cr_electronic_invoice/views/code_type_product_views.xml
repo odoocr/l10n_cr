@@ -20,7 +20,7 @@
             <field name="name">code.type.product.tree</field>
             <field name="model">code.type.product</field>
             <field name="arch" type="xml">
-                <tree string="Tipos de códigos">
+                <tree string="Tipos de códigos" editable="bottom">
                     <field name="code"/>
                     <field name="name"/>
                 </tree>

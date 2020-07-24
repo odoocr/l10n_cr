@@ -18,10 +18,8 @@
 
                 <field name="website" position="before">
                     <field name="commercial_name"/>
-                    <field name="activity_id" 
-                            options='{"no_open": True, "no_create": True}' />
-                    <field name="economic_activities_ids" invisible="1" readonly="1" />
-                    <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" /> 
+                    <field name="activity_id"  domain="[('active', '=', True)]" options='{"no_open": True, "no_create": True}' />
+                    <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" colspan="2" /> 
                 </field>
 
                 <field name="city" position="attributes">
@@ -81,6 +79,7 @@
                                 <field name="frm_pin" password="True"/>
                             </group>
                             <group cols="2">
+                                <button name="test_get_token" type="object" string="Test get token" colspan="2" />
                                 <field name="frm_ws_ambiente" widget="radio"/>
                             </group>
                             <group cols="2">
@@ -93,6 +92,10 @@
                             <group cols="2">
                                 <field name="sucursal_MR"/>
                                 <field name="terminal_MR"/>
+                                <field name="expense_product_id"/>
+                                <field name="expense_account_id"/>
+                                <field name="expense_analytic_account_id"/>
+                                <field name="load_lines"/>
                             </group>
                         </group>
                     </page>

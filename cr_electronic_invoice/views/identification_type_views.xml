@@ -20,7 +20,7 @@
             <field name="name">identification.type.tree</field>
             <field name="model">identification.type</field>
             <field name="arch" type="xml">
-                <tree string="Tipo de identificación">
+                <tree string="Tipo de identificación" editable="bottom">
                     <field name="code"/>
                     <field name="name"/>
                     <field name="notes"/>

@@ -2,7 +2,7 @@
 
 import logging
 import phonenumbers
-from odoo import models, fields, api
+from odoo import _, api, fields, models
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -24,41 +24,56 @@ class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
 
-    commercial_name = fields.Char(string="Nombre comercial", required=False, )
-
-    activity_id = fields.Many2one("economic.activity", string=u"Actividad Económica por defecto", required=False, )
-
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas',)
-
+    commercial_name = fields.Char(string="Commercial Name", required=False, )
+    activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
-    identification_id = fields.Many2one(
-        "identification.type", string="Tipo de identificacion", required=False)
-    district_id = fields.Many2one("res.country.district", string="Distrito",
-                                  required=False)
-    county_id = fields.Many2one("res.country.county", string="Cantón",
-                                required=False)
-    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Barrios",
-                                      required=False)
-    frm_ws_identificador = fields.Char(
-        string="Usuario de Factura Electrónica", required=False)
-    frm_ws_password = fields.Char(
-        string="Password de Factura Electrónica", required=False)
+    identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
+    district_id = fields.Many2one("res.country.district", string="District", required=False)
+    county_id = fields.Many2one("res.country.county", string="Canton", required=False)
+    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Neighborhood", required=False)
+    frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
+    frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
 
-    frm_ws_ambiente = fields.Selection(
-        selection=[('disabled', 'Deshabilitado'), ('api-stag', 'Pruebas'),
-                   ('api-prod', 'Producción')],
-        string="Ambiente",
-        required=True, default='disabled',
-        help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
-             'de calidad (stag), para el ambiente de producción (prod). Requerido.')
+    frm_ws_ambiente = fields.Selection(selection=[('disabled', 'Deshabilitado'), 
+                                                  ('api-stag', 'Pruebas'),
+                                                  ('api-prod', 'Producción')],
+                                    string="Environment",
+                                    required=True, 
+                                    default='disabled',
+                                    help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
+                                    'de calidad (stag), para el ambiente de producción (prod). Requerido.')
 
-    frm_pin = fields.Char(string="Pin", required=False,
+    frm_pin = fields.Char(string="Pin", 
+                          required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
 
-    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", required=False,
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", 
+                                 required=False,
                                  default="1")
-    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", required=False,
+
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", 
+                                 required=False,
                                  default="1")
+    expense_product_id = fields.Many2one(
+        'product.product',
+        string=_("Default product for expenses when loading data from XML"),
+        help=_("The default product used when loading Costa Rican digital invoice"))
+
+
+    expense_account_id = fields.Many2one(
+        'account.account',
+        string=_("Default Expense Account for loading data from XML"),
+        domain=[('deprecated', '=', False)],
+        help=_("The expense account used when loading Costa Rican digital invoice"))
+
+    expense_analytic_account_id = fields.Many2one(
+        'account.analytic.account',
+        string=_("Default Analytic Account for expenses when loading data from XML"),
+        help=_("The analytic account used when loading Costa Rican digital invoice"))
+
+    load_lines = fields.Boolean(
+        string=_('Indicates if invoice lines should be load when loading a Costa Rican Digital Invoice'),
+    )
 
     CCE_sequence_id = fields.Many2one(
         'ir.sequence',
@@ -121,12 +136,11 @@ class CompanyElectronic(models.Model):
             of the name or commercial name.
         """
         new_comp_id = super(CompanyElectronic, self).create(vals)
-        new_comp = self.browse(new_comp_id)
-        new_comp.try_create_configuration_sequences()
-        return new_comp.id
+        #new_comp = self.browse(new_comp_id)
+        new_comp_id.try_create_configuration_sequences()
+        return new_comp_id #new_comp.id
 
-    @api.model
-    def try_create_confirmation_sequeces(self):
+    def try_create_configuration_sequences(self):
         """ Try to automatically add the Comprobante Confirmation sequence to the company.
             It will first check if sequence already exists before attempt to create. The s
             equence is coded with the following syntax:
@@ -157,19 +171,42 @@ class CompanyElectronic(models.Model):
             self.write(to_write)
 
     @api.multi
+    def test_get_token(self):
+        token_m_h = api_facturae.get_token_hacienda(
+            self.env.user, self.frm_ws_ambiente)
+        if token_m_h:
+           _logger.info('E-INV CR - I got the token')
+        return 
+
+    @api.multi
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
 
-            activities = json_response["activities"]
-            activities_codes = list()
-            for activity in activities:
-                if activity["estado"] == "A":
-                    activities_codes.append(activity["codigo"])
-            economic_activities = self.env['economic.activity'].search([('code', 'in', activities_codes)])
+            self.env.cr.execute('update economic_activity set active=False')
 
-            self.economic_activities_ids = economic_activities
-            #print(economic_activities)
+            self.message_post(subject='Actividades Económicas',
+                            body='Aviso!.\n Cargando actividades económicas desde Hacienda')
+
+            if json_response["status"] == 200:
+                activities = json_response["activities"]
+                activities_codes = list()
+                for activity in activities:
+                    if activity["estado"] == "A":
+                        activities_codes.append(activity["codigo"])
+
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
+
+                for activity in economic_activities:
+                    activity.active = True
+
+                self.name = json_response["name"]
+            else:
+                alert = {
+                    'title': json_response["status"],
+                    'message': json_response["text"]
+                }
+                return {'value': {'vat': ''}, 'warning': alert}
         else:
             alert = {
                 'title': 'Atención',
