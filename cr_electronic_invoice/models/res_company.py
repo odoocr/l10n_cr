@@ -28,6 +28,11 @@ class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
 
+    # For import vendor bill from email
+    def _get_default_journal_id(self):
+        return self.env['account.journal'].search([('type', '=', 'purchase')], limit=1)
+    # End for import vendor bill from email
+
     commercial_name = fields.Char(string="Commercial Name", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
@@ -86,6 +91,25 @@ class CompanyElectronic(models.Model):
         string='Secuencia de Facturas Electrónicas de Compra',
         readonly=False, copy=False,
     )
+
+    # For import vendor bill from email
+    import_bill_automatic = fields.Boolean(
+        string='Importar Facturas de Proveedor',
+        help='Al marcar esta opción se cargarán las facturas de proveedor desde el correo entrante')
+    import_bill_mail_server_id = fields.Many2one('fetchmail.server', string='Servidor de Correo',
+                                                 help='Seleccionar el Servidor de Correo Entrante')
+    import_bill_journal_id = fields.Many2one(string='Diario', comodel_name='account.journal',
+                                             domain="[('type', '=', 'purchase')]", default=_get_default_journal_id,
+                                             help='Diario de Facturas de Proveedores')
+    import_bill_product_id = fields.Many2one('product.product', string='Producto',
+                                             domain=[('purchase_ok', '=', True)],
+                                             help='Asigna un producto a Cada Línea')
+    import_bill_account_id = fields.Many2one('account.account', string='Cuenta de Gastos',
+                                             domain=[('deprecated', '=', False)],
+                                             help='Asigna una Cuenta de Gastos a Cada Línea')
+    import_bill_account_analytic_id = fields.Many2one('account.analytic.account', string='Cuenta Analítica',
+                                             help='Asigna una Cuenta Analítica a Cada Línea')
+    # End for import vendor bill from email
 
     @api.onchange('mobile')
     def _onchange_mobile(self):

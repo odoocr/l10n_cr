@@ -21,3 +21,5 @@ from . import aut_ex
 from . import account_tax
 from . import economic_activity
 from . import account_invoice_import_wizard
+# For Import vendor bill from email
+from . import ir_mail_server
