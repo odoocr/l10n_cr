@@ -30,7 +30,7 @@ class AccountInvoiceRefund(models.TransientModel):
         return ''
 
     reference_code_id = fields.Many2one(
-        "reference.code", string="Code reference",
+        "reference.code", string="Reference Code",
         required=True, )
     reference_document_id = fields.Many2one(
         "reference.document", string="Reference Document Id",
@@ -167,8 +167,6 @@ class InvoiceLineElectronic(models.Model):
         for line in self:
             line.economic_activity_id = line.product_id and line.product_id.categ_id and line.product_id.categ_id.economic_activity_id and line.product_id.categ_id.economic_activity_id.id
 
-    # total_amount = fields.Float(string="Monto total", required=False, )
-    # total_discount = fields.Float(string="Total descuento", required=False, )
     discount_note = fields.Char(string="Nota de descuento", required=False, )
     total_tax = fields.Float(string="Total impuesto", required=False, )
 
@@ -301,6 +299,10 @@ class AccountInvoiceElectronic(models.Model):
 
     economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities', context={'active_test': False})
 
+    not_loaded_invoice = fields.Char(string='Numero Factura Original no cargada', readonly=True, )
+
+    not_loaded_invoice_date = fields.Date(string='Fecha Factura Original no cargada', readonly=True, )
+
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
@@ -370,7 +372,7 @@ class AccountInvoiceElectronic(models.Model):
 
                     email_template.attachment_ids = [
                         (6, 0, [attachment.id, attachment_resp.id])]
-
+                    """
                     email_template.with_context(type='binary',
                                                 default_type='binary').send_mail(
                         self.id,
@@ -383,6 +385,29 @@ class AccountInvoiceElectronic(models.Model):
                         'invoice_mailed': True,
                         'sent': True,
                     })
+                    """
+                    compose_form = self.env.ref('account.account_invoice_send_wizard_form', False)
+                    ctx = dict(
+                        default_model='account.invoice',
+                        default_res_id=self.id,
+                        default_use_template=bool(email_template),
+                        default_template_id=email_template and email_template.id or False,
+                        default_composition_mode='comment',
+                        mark_invoice_as_sent=True,
+                        custom_layout="mail.mail_notification_paynow",
+                        force_email=True
+                    )
+                    return {
+                        'name': _('Send Invoice'),
+                        'type': 'ir.actions.act_window',
+                        'view_type': 'form',
+                        'view_mode': 'form',
+                        'res_model': 'account.invoice.send',
+                        'views': [(compose_form.id, 'form')],
+                        'view_id': compose_form.id,
+                        'target': 'new',
+                        'context': ctx,
+                    }
                 else:
                     raise UserError(_('Response XML from Hacienda has not been received'))
             else:
@@ -494,6 +519,15 @@ class AccountInvoiceElectronic(models.Model):
 
                     if inv.state_tributacion and inv.state_tributacion in ('aceptado', 'rechazado', 'na'):
                         raise UserError('Aviso!.\n La factura de proveedor ya fue confirmada')
+                    if not inv.amount_total_electronic_invoice and inv.xml_supplier_approval:
+                        try:
+                            inv.load_xml_data()
+                        except UserError as error:
+                            inv.state_tributacion='error'
+                            inv.message_post(
+                                subject='Error',
+                                body='Aviso!.\n Error en carga del XML del proveedor'+str(error))
+                            continue
 
                     if abs(
                             inv.amount_total_electronic_invoice - inv.amount_total) > 1:
@@ -563,6 +597,11 @@ class AccountInvoiceElectronic(models.Model):
                             inv.consecutive_number_receiver = response_json.get(
                                 'consecutivo')
                             '''Generamos el Mensaje Receptor'''
+                            if inv.amount_total_electronic_invoice is None or inv.amount_total_electronic_invoice == 0:
+                                inv.state_tributacion = 'error'
+                                inv.message_post(subject='Error',
+                                                body='El monto Total de la Factura para el Mensaje Receptro es inválido')
+                                continue
 
                             xml = api_facturae.gen_xml_mr_43(
                                 inv.number_electronic, inv.partner_id.vat,
@@ -891,7 +930,6 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
-        #if self.company_id.frm_ws_ambiente != 'disabled':
         _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
         invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
                                                       ('state', 'in', ('open', 'paid')),
@@ -958,14 +996,18 @@ class AccountInvoiceElectronic(models.Model):
                 currency = inv.currency_id
                 invoice_comments = inv.comment
 
-                if inv.invoice_id and inv.reference_code_id and inv.reference_document_id:
-                    if inv.invoice_id.number_electronic:
-                        numero_documento_referencia = inv.invoice_id.number_electronic
-                        fecha_emision_referencia = inv.invoice_id.date_issuance
+                if (inv.invoice_id or inv.not_loaded_invoice) and inv.reference_code_id and inv.reference_document_id:
+                    if inv.invoice_id:
+                        if inv.invoice_id.number_electronic:
+                            numero_documento_referencia = inv.invoice_id.number_electronic
+                            fecha_emision_referencia = inv.invoice_id.date_issuance
+                        else:
+                            numero_documento_referencia = inv.invoice_id and re.sub('[^0-9]+', '', inv.invoice_id.sequence).rjust(50, '0') or '0000000'
+                            date_invoice = datetime.datetime.strptime(inv.invoice_id and inv.invoice_id.date_invoice or '2018-08-30', "%Y-%m-%d")
+                            fecha_emision_referencia = date_invoice.strftime("%Y-%m-%d") + "T12:00:00-06:00"
                     else:
-                        numero_documento_referencia = inv.invoice_id and re.sub('[^0-9]+', '', inv.invoice_id.sequence).rjust(50, '0') or '0000000'
-                        date_invoice = datetime.datetime.strptime(inv.invoice_id and inv.invoice_id.date_invoice or '2018-08-30', "%Y-%m-%d")
-                        fecha_emision_referencia = date_invoice.strftime("%Y-%m-%d") + "T12:00:00-06:00"
+                        numero_documento_referencia = inv.not_loaded_invoice
+                        fecha_emision_referencia = inv.not_loaded_invoice_date.strftime("%Y-%m-%d") + "T12:00:00-06:00"
                     tipo_documento_referencia = inv.reference_document_id.code
                     codigo_referencia = inv.reference_code_id.code
                     razon_referencia = inv.reference_code_id.name
@@ -998,6 +1040,8 @@ class AccountInvoiceElectronic(models.Model):
                 total_descuento = 0.0
                 total_impuestos = 0.0
                 base_subtotal = 0.0
+                _old_rate_exoneration = False
+                
                 for inv_line in inv.invoice_line_ids:
                     # Revisamos si está línea es de Otros Cargos
                     if inv_line.product_id and inv_line.product_id.id == self.env.ref('cr_electronic_invoice.product_iva_devuelto').id:
@@ -1078,16 +1122,22 @@ class AccountInvoiceElectronic(models.Model):
                             taxes_lookup = {}
                             for i in inv_line.invoice_line_tax_ids:
                                 if i.has_exoneration:
-                                    _tax_exoneration = i.has_exoneration
+                                    _tax_exoneration = True
+                                    _tax_rate = i.tax_root.amount
+                                    _tax_exoneration_rate = min(i.percentage_exoneration, _tax_rate)
+                                    _percentage_exoneration = _tax_exoneration_rate / _tax_rate
+                                    if i.percentage_exoneration > 13:
+                                        _old_rate_exoneration = True
                                     taxes_lookup[i.id] = {'tax_code': i.tax_root.tax_code,
-                                                          'tarifa': i.tax_root.amount,
+                                                          'tarifa': _tax_rate,
                                                           'iva_tax_desc': i.tax_root.iva_tax_desc,
                                                           'iva_tax_code': i.tax_root.iva_tax_code,
-                                                          'exoneration_percentage': i.percentage_exoneration,
+                                                          'exoneration_percentage': _tax_exoneration_rate,
                                                           'amount_exoneration': i.amount}
                                 else:
+                                    _tax_rate = i.amount
                                     taxes_lookup[i.id] = {'tax_code': i.tax_code,
-                                                          'tarifa': i.amount,
+                                                          'tarifa': _tax_rate,
                                                           'iva_tax_desc': i.iva_tax_desc,
                                                           'iva_tax_code': i.iva_tax_code}
 
@@ -1117,7 +1167,7 @@ class AccountInvoiceElectronic(models.Model):
                                             _tax_amount_exoneration = tax_amount
 
                                         _line_tax -= _tax_amount_exoneration
-                                        _percentage_exoneration = taxes_lookup[i['id']]['exoneration_percentage']/100.0 #int(taxes_lookup[i['id']]['exoneration_percentage']) / 100
+                                        
                                         tax["exoneracion"] = {
                                             "montoImpuesto": _tax_amount_exoneration,
                                             "porcentajeCompra": int(taxes_lookup[i['id']]['exoneration_percentage'])
@@ -1179,6 +1229,13 @@ class AccountInvoiceElectronic(models.Model):
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
+
+                if _old_rate_exoneration:
+                    inv.state_tributacion = 'error'
+                    inv.message_post(
+                        subject='Error',
+                        body='Revisar definición de impuesto con exoneración, está en base 100 y debe ser base 13')
+                    continue
 
                 if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.5:
                     inv.state_tributacion = 'error'
@@ -1272,7 +1329,11 @@ class AccountInvoiceElectronic(models.Model):
 
             currency = inv.currency_id
             sequence = False
-            
+            if (inv.invoice_id ) and not (inv.invoice_id and inv.reference_code_id and inv.reference_document_id):
+                raise UserError('Datos incompletos de referencia para nota de crédito')
+            elif (inv.not_loaded_invoice or inv.not_loaded_invoice_date) and not (inv.not_loaded_invoice and inv.not_loaded_invoice_date and inv.reference_code_id and inv.reference_document_id):
+                raise UserError('Datos incompletos de referencia para nota de crédito no cargada')
+
             # Digital Invoice or ticket
             if inv.type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
                 pass   
@@ -1305,7 +1366,7 @@ class AccountInvoiceElectronic(models.Model):
 
             # Digital Supplier Invoice
             elif inv.type == 'in_invoice' and inv.partner_id.country_id and \
-                inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and inv.partner_id.vat and inv.xml_supplier_approval is False:
+                inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and inv.partner_id.vat and not inv.xml_supplier_approval:
                 if inv.tipo_documento == 'FEC':
                     sequence = inv.company_id.FEC_sequence_id.next_by_id()
 
@@ -1339,12 +1400,12 @@ class AccountInvoiceElectronic(models.Model):
                 elif id_code == '04' and len(identificacion) != 10:
                     raise UserError('La identificación NITE del receptor debe de tener 10 dígitos')
 
-                if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
-                    raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para %s' % (inv.payment_term_id.name))
+            if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
+                raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para %s' % (inv.payment_term_id.name))
 
-                # Validate if invoice currency is the same as the company currency
-                if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
-                    raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
+            # Validate if invoice currency is the same as the company currency
+            if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
+                raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
 
             # actividad_clinica = self.env.ref('cr_electronic_invoice.activity_851101')
             # if actividad_clinica.id == inv.economic_activity_id.id and inv.payment_methods_id.sequence == '02':
@@ -1364,8 +1425,6 @@ class AccountInvoiceElectronic(models.Model):
                         'price_unit': -iva_devuelto,
                         'quantity': 1,
                     })
-            
-            
 
             super(AccountInvoiceElectronic, inv).action_invoice_open()
             if not inv.number_electronic:
