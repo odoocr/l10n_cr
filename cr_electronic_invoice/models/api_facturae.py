@@ -229,7 +229,7 @@ def get_token_hacienda(inv, tipo_ambiente):
                 last_tokens_refresh[inv.company_id.id] = response_json.get(
                     'refresh_expires_in')
             else:
-                _logger.error('MAB - token_hacienda failed.  error: %s' % (response.status_code))
+                _logger.error('FECR - token_hacienda failed.  error: %s' % (response.status_code))
 
         except requests.exceptions.RequestException as e:
             raise Warning(_('Error Obteniendo el Token desde MH. Excepcion %s' % (e)))
@@ -268,7 +268,10 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
                   monto_total_impuesto_acreditar=False,
                   monto_total_gasto_aplicable=False):
     '''Verificamos si la clave indicada corresponde a un numeros'''
-    mr_clave = re.sub('[^0-9]', '', clave)
+    if clave:
+        mr_clave = re.sub('[^0-9]', '', clave)
+    else:
+        mr_clave = False
     if len(mr_clave) != 50:
         raise UserError(
             'La clave a utilizar es inválida. Debe contener al menos 50 digitos')
@@ -366,13 +369,20 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 fecha_emision_referencia, codigo_referencia, razon_referencia):
 
     numero_linea = 0
+    payment_methods_id = []
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
-        payment_methods_id = '01'
+        inv_statement_length = len(inv.statement_ids)
+        for statement_counter in range(inv_statement_length):
+            if inv.statement_ids[statement_counter].statement_id.journal_id.type == 'cash':
+                payment_methods_id.append('01')
+            else:
+                payment_methods_id.append('02')
+
         cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id = str(inv.payment_methods_id.sequence)
+        payment_methods_id.append (str(inv.payment_methods_id.sequence))
         plazo_credito = str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0)
         cod_moneda = str(inv.currency_id.name)
 
@@ -485,7 +495,9 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
     sb.Append('<CondicionVenta>' + sale_conditions + '</CondicionVenta>')
     sb.Append('<PlazoCredito>' + plazo_credito + '</PlazoCredito>')
-    sb.Append('<MedioPago>' + payment_methods_id + '</MedioPago>')
+    payment_method_length = len(payment_methods_id)
+    for payment_method_counter in range(payment_method_length):
+        sb.Append('<MedioPago>' + payment_methods_id[payment_method_counter] + '</MedioPago>')
     sb.Append('<DetalleServicio>')
 
     detalle_factura = lines
@@ -500,7 +512,11 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
             sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
 
-        # sb.Append('<CodigoComercial>' + str(v['codigoProducto']) + '</CodigoComercial>')
+        if v.get('codigo'):
+            sb.Append('<CodigoComercial>')
+            sb.Append('<Tipo>04</Tipo>')
+            sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
+            sb.Append('</CodigoComercial>')
 
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
@@ -622,7 +638,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<TotalComprobante>' + str(round(base_total + total_impuestos + totalOtrosCargos - total_iva_devuelto, 5)) + '</TotalComprobante>')
     sb.Append('</ResumenFactura>')
 
-    if inv.invoice_id and inv.reference_code_id and inv.reference_document_id:
+    if tipo_documento_referencia and numero_documento_referencia and fecha_emision_referencia:
         sb.Append('<InformacionReferencia>')
         sb.Append('<TipoDoc>' + str(tipo_documento_referencia) + '</TipoDoc>')
         sb.Append('<Numero>' + str(numero_documento_referencia) + '</Numero>')
@@ -658,14 +674,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             },
             'comprobanteXml': xml_base64
             }
-    if inv.partner_id and inv.partner_id.identification_id and inv.partner_id.identification_id.code:
-        data['receptor']= {
-            'tipoIdentificacion': inv.partner_id.identification_id.code,
-            'numeroIdentificacion': inv.partner_id.vat
-        }
-
-
-    if inv.partner_id.vat:
+    if inv.partner_id and inv.partner_id.vat:
         if not inv.partner_id.identification_id:
             if len(inv.partner_id.vat) == 9:  # cedula fisica
                 id_code = '01'
@@ -804,7 +813,7 @@ def consulta_clave(clave, token, tipo_ambiente):
         'Content-Type': 'application/x-www-form-urlencoded',
     }
 
-    _logger.debug('MAB - consulta_clave - url: %s' % endpoint)
+    _logger.debug('FECR - consulta_clave - url: %s' % endpoint)
 
     try:
         # response = requests.request("GET", url, headers=headers)
@@ -821,9 +830,11 @@ def consulta_clave(clave, token, tipo_ambiente):
             'respuesta-xml': response.json().get('respuesta-xml')
         }
     elif 400 <= response.status_code <= 499:
+        _logger.error('FECR - 400 - consulta_clave failed.  error: %s reason: %s',
+                      response.status_code, response.reason)
         response_json = {'status': 400, 'ind-estado': 'error'}
     else:
-        _logger.error('MAB - consulta_clave failed.  error: %s',
+        _logger.error('FECR - consulta_clave failed.  error: %s',
                       response.status_code)
         response_json = {'status': response.status_code,
                          'text': 'token_hacienda failed: %s' % response.reason}
@@ -845,7 +856,7 @@ def get_economic_activities(company):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
-        _logger.debug('MAB - get_economic_activities response: %s' % (response.json()))
+        _logger.debug('FECR - get_economic_activities response: %s' % (response.json()))
         response_json = {
             'status': 200,
             'activities': response.json().get('actividades'),
@@ -854,7 +865,7 @@ def get_economic_activities(company):
     #elif 400 <= response.status_code <= 499:
     #    response_json = {'status': 400, 'ind-estado': 'error'}
     else:
-        _logger.error('MAB - get_economic_activities failed.  error: %s',
+        _logger.error('FECR - get_economic_activities failed.  error: %s',
                       response.status_code)
         response_json = {'status': response.status_code,
                          'text': 'get_economic_activities failed: %s' % response.reason}
@@ -933,7 +944,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
                                                                                             raise_exception=False,
                                                                                             force_send=True)  # default_type='binary'
             except:
-                _logger.error('MAB - consulta documento error al enviar correo: %s',
+                _logger.error('FECR - consulta documento error al enviar correo: %s',
                              inv.number_electronic)
 
             # limpia el template de los attachments
@@ -973,7 +984,7 @@ def send_message(inv, date_cr, xml, token, env):
         # raise Exception(e)
 
     if not (200 <= response.status_code <= 299):
-        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' %
+        _logger.error('FECR - ERROR SEND MESSAGE - RESPONSE:%s' %
                       response.headers.get('X-Error-Cause', 'Unknown'))
         return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause', 'Unknown')}
     else:
@@ -1014,7 +1025,11 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
         emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
-        receptor = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+        receptor_node = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)
+        if receptor_node:
+            receptor = receptor_node[0].text
+        else:
+            raise UserError('El receptor no está definido en el xml')  # noqa
 
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
@@ -1048,7 +1063,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         else:
             invoice.payment_methods_id = partner.payment_methods_id
 
-        _logger.debug('MAB - load_lines: %s - account: %s' %
+        _logger.debug('FECR - load_lines: %s - account: %s' %
                       (load_lines, account_id))
         
         product = False
@@ -1092,8 +1107,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 for tax_node in tax_nodes:
                     tax_code = re.sub(r"[^0-9]+", "", tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text)
                     tax_amount = float(tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text)
-                    _logger.debug('MAB - tax_code: %s', tax_code)
-                    _logger.debug('MAB - tax_amount: %s', tax_amount)
+                    _logger.debug('FECR - tax_code: %s', tax_code)
+                    _logger.debug('FECR - tax_amount: %s', tax_amount)
 
                     if product_id and product_id.non_tax_deductible:
                         tax = invoice.env['account.tax'].search(
@@ -1135,7 +1150,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                         else:
                             raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))
 
-                _logger.debug('MAB - impuestos de linea: %s' % (taxes))
+                _logger.debug('FECR - impuestos de linea: %s' % (taxes))
                 invoice_line = invoice.env['account.invoice.line'].create({
                     'name': line.xpath("inv:Detalle", namespaces=namespaces)[0].text,
                     'invoice_id': invoice.id,
@@ -1151,7 +1166,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'account_analytic_id': analytic_account,
                     'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                     'total_tax': total_tax,
-                    'economic_activity_id': invoice.economic_activity_id.id,
+                    #'economic_activity_id': invoice.economic_activity_id.id,
                 })
 
                 # This must be assigned after line is created
