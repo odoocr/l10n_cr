@@ -5,7 +5,6 @@ from . import account_invoice
 from . import account_payment
 from . import api_facturae
 from . import code_type_product
-from . import account_invoice
 from . import fe_enums
 from . import identification_type
 from . import product_template

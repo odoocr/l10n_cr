@@ -133,7 +133,7 @@ class PosOrder(models.Model):
         selection=[('FE', 'Electronic Invoice'),
                    ('TE', 'Electronic Ticket'),
                    ('NC', 'Electronic Credit Note')],
-        string="Receipt Type",
+        string="Document Type",
         required=False, default='FE',
         help='Show document type in concordance with '
              'Ministerio de Hacienda classification')
@@ -236,8 +236,9 @@ class PosOrder(models.Model):
             'MAB - Consulta Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.info(
-                'MAB - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
+            _logger.error(
+                'MAB - Consulta Hacienda - POS Order %s / %s number: %s', current_order, total_orders, doc.name)
+
             token_m_h = api_facturae.get_token_hacienda(
                 doc, doc.company_id.frm_ws_ambiente)
             if doc.number_electronic and len(doc.number_electronic) == 50:
@@ -260,26 +261,31 @@ class PosOrder(models.Model):
                     doc.fname_xml_respuesta_tributacion = 'AHC_' + doc.number_electronic + '.xml'
                     doc.xml_respuesta_tributacion = response_json.get(
                         'respuesta-xml')
-                    if doc.partner_id and doc.partner_id.email:
-                        email_template = self.env.ref(
-                            'cr_electronic_invoice_pos.email_template_pos_invoice', False)
-                        attachment = self.env['ir.attachment'].search(
-                            [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
-                             ('res_field', '=', 'xml_comprobante')], limit=1)
-                        attachment.name = doc.fname_xml_comprobante
-                        attachment.datas_fname = doc.fname_xml_comprobante
-                        attachment_resp = self.env['ir.attachment'].search(
-                            [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
-                             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
-                        attachment_resp.name = doc.fname_xml_respuesta_tributacion
-                        attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
-                        email_template.attachment_ids = [
-                            (6, 0, [attachment.id, attachment_resp.id])]
-                        email_template.with_context(type='binary', default_type='binary').send_mail(doc.id,
-                                                                                                    raise_exception=False,
-                                                                                                    force_send=True)  # default_type='binary'
-                        email_template.attachment_ids = [(5)]
-                        doc.state_email = 'sent'
+                    if doc.partner_id and doc.partner_id.email:  # and not doc.partner_id.opt_out:
+                        try:
+                            email_template = self.env.ref(
+                                'cr_electronic_invoice_pos.email_template_pos_invoice', False)
+                            attachment = self.env['ir.attachment'].search(
+                                [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
+                                ('res_field', '=', 'xml_comprobante')], limit=1)
+                            attachment.name = doc.fname_xml_comprobante
+                            attachment.datas_fname = doc.fname_xml_comprobante
+
+                            attachment_resp = self.env['ir.attachment'].search(
+                                [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
+                                ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+                            attachment_resp.name = doc.fname_xml_respuesta_tributacion
+                            attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
+
+                            email_template.attachment_ids = [
+                                (6, 0, [attachment.id, attachment_resp.id])]
+                            email_template.with_context(type='binary', default_type='binary').send_mail(doc.id,
+                                                                                                        raise_exception=False,
+                                                                                                        force_send=True)  # default_type='binary'
+                            email_template.attachment_ids = [(5)]
+                            doc.state_email = 'sent'
+                        except:
+                            doc.state_email = 'fe_error'
                     else:
                         doc.state_email = 'no_email'
                         _logger.info('MAB - Email no enviado - Cliente no definido')
@@ -315,7 +321,7 @@ class PosOrder(models.Model):
                         doc.error_count += 1
                         doc.state_tributacion = ''
                     _logger.error(
-                        'MAB - Consulta Hacienda - POS Order no encontrada: %s', doc.number_electronic)
+                        'MAB - Consulta Hacienda - POS Order %s in state "%s" - Error count: %s', doc.number_electronic, estado_m_h, doc.error_count)
             else:
                 doc.state_tributacion = 'error'
                 _logger.error(
@@ -509,6 +515,8 @@ class PosOrder(models.Model):
                                 }
                     dline["impuesto"] = taxes
                     dline["impuestoNeto"] = _line_tax
+
+                    # Si no hay product_id se asume como mercaderia
                     if line.product_id and line.product_id.type == 'service':
                         if taxes:
                             total_servicio_gravado += base_line
