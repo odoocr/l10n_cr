@@ -1080,14 +1080,6 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         _logger.debug('FECR - load_lines: %s - account: %s' %
                       (load_lines, account_id))
         
-        product = False
-        if product_id:
-            product = product_id.id
-
-        analytic_account = False
-        if analytic_account_id:
-            analytic_account = analytic_account_id.id
-
         # if load_lines and not invoice.invoice_line_ids:
         if load_lines:
             lines = invoice_xml.xpath("inv:DetalleServicio/inv:LineaDetalle", namespaces=namespaces)
@@ -1175,9 +1167,9 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'discount': discount_percentage,
                     'discount_note': discount_note,
                     # 'total_amount': total_amount,
-                    'product_id': product,
-                    'account_id': account_id.id or False,
-                    'account_analytic_id': analytic_account,
+                    'product_id': product_id,
+                    'account_id': account_id,
+                    'account_analytic_id': analytic_account_id,
                     'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                     'total_tax': total_tax,
                     #'economic_activity_id': invoice.economic_activity_id.id,
