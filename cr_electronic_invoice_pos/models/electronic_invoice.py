@@ -65,6 +65,27 @@ class PosOrder(models.Model):
     _name = "pos.order"
     _inherit = ["pos.order", "mail.thread"]
 
+    @api.multi
+    def action_invoice_sent(self):
+        email_template = self.env.ref(
+            'cr_electronic_invoice_pos.email_template_pos_invoice', False)
+        attachment = self.env['ir.attachment'].search(
+            [('res_model', '=', 'pos.order'), ('res_id', '=', self.id),
+             ('res_field', '=', 'xml_comprobante')], limit=1)
+        attachment.name = self.fname_xml_comprobante
+        attachment.datas_fname = self.fname_xml_comprobante
+        attachment_resp = self.env['ir.attachment'].search(
+            [('res_model', '=', 'pos.order'), ('res_id', '=', self.id),
+             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+        attachment_resp.name = self.fname_xml_respuesta_tributacion
+        attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
+        email_template.attachment_ids = [
+            (6, 0, [attachment.id, attachment_resp.id])]
+        email_template.with_context(type='binary', default_type='binary').send_mail(self.id,
+             raise_exception=False,
+             force_send=True)  # default_type='binary'
+        email_template.attachment_ids = [(5)]
+
     @api.model
     def sequence_number_sync(self, vals):
         tipo_documento = vals.get('tipo_documento', False)

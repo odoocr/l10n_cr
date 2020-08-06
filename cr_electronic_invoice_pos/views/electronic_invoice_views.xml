@@ -96,6 +96,9 @@
                         <field name="message_ids" widget="mail_thread"/>
                     </div>
                 </xpath>
+                <xpath expr="//button[@name='refund']" position="after">
+                    <button name="action_invoice_sent" type="object" string="Re-send mail" attrs="{'invisible':[('state_tributacion','!=','aceptado')]}"/>
+                </xpath>
             </field>
         </record>
         <record id="view_pos_order_electronic_invoice_tree" model="ir.ui.view">
