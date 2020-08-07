@@ -1179,7 +1179,7 @@ class AccountInvoiceElectronic(models.Model):
                             line["impuestoNeto"] = round(_line_tax, 5)
 
                         # Si no hay uom_id se asume como Servicio
-                        if not inv_line.uom_id or inv_line.uom_id.category_id.name == 'Services':  # inv_line.product_id.type == 'service'
+                        if not inv_line.uom_id or inv_line.uom_id.category_id.name in ('Services', 'Servicios'):  # inv_line.product_id.type == 'service'
                             if taxes:
                                 if _tax_exoneration:
                                     if _percentage_exoneration < 1:
