@@ -30,7 +30,7 @@ Update Invoice QWEB template to meet DGT requirements for Costa Rica
     'category': 'Accounting & Finance',
     'sequence': 4,
     'website' : 'http://cysfuturo.com',
-    'depends' : ['cr_electronic_invoice', 'sale'],
+    'depends' : ['cr_electronic_invoice', 'sale_stock'],
     'demo' : [],
     'data' : [
         'views/res_company_view.xml',

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-extend="PosTicket">
+        <t t-jquery="div.pos-center-align:first" t-operation="after">
+          <t t-if="order.attributes.number_electronic">
+            <div class="pos-center-align">
+                  Clave: <br/>
+                  <t t-esc="order.attributes.number_electronic.substring(0,25)"/><br/>
+                  <t t-esc="order.attributes.number_electronic.substring(25,50)"/>
+            </div>
+            <div class="pos-center-align">
+                  Consecutivo: <br/>
+                  <t t-esc="order.attributes.number_electronic.substring(21,41)"/>
+            </div>
+          </t>
+        </t>
+        <t t-jquery="t[t-esc='widget.pos.company.name']" t-operation="after">
+            <t t-if="widget.pos.company.vat">
+                <br/>
+                Cédula: <t t-esc="widget.pos.company.vat"/>
+            </t>
+        </t>
+        <t t-jquery='t[t-esc="widget.pos.company.phone || &apos;&apos;"]' t-operation="after">
+            <!--br />
+            <t t-esc="widget.pos.company.street" t-if="widget.pos.company.street" /><br />
+            <t t-esc="widget.pos.company.zip" t-if="widget.pos.company.zip"  />
+            <t t-esc="widget.pos.company.city" t-if="widget.pos.company.city"  />
+            <t t-if="widget.pos.company.state_id">
+                (<t t-esc="widget.pos.company.state_id[1]" />)
+            </t>
+            <br /-->
+        </t>
+        <t t-jquery="table.receipt-orderlines" t-operation="before">
+            <t t-if="order.get_client()">
+                Cliente: <t t-esc="order.get_client().name" /><br />
+                <t t-if="order.get_client().vat">
+                    Cédula: <t t-esc="order.get_client().vat" /><br />
+                </t>
+                <t t-if="order.get_client().address != ',  , '">
+                    <t t-esc="order.get_client().address" />
+                </t>
+                <br/>
+                <br/>
+            </t>
+        </t>
+    </t>
+    <t t-extend="PosTicket">
+        <t t-jquery=".receipt-orderlines" t-operation="replace">
+            <table class='receipt-orderlines'>
+                <colgroup>
+                    <col width='15%' />
+                    <col width='60%' />
+                    <col width='25%' />
+                </colgroup>
+                <tr t-foreach="orderlines" t-as="orderline" style="line-height: initial;">
+                    <td style="padding: 2px 0;" class="pos-left-align">
+                        <t t-esc="orderline.get_quantity_str_with_unit()"/>
+                    </td>
+                    <td style="padding: 2px 0;">
+                        <t t-esc="orderline.get_product().display_name"/>
+                        <t t-if="widget.pos.config.show_second_product_name_in_receipt">
+                            <t t-set="second_product_name" t-value="orderline.get_product().second_product_name"/>
+                            <t t-if="second_product_name">
+                                (<t t-esc="second_product_name"/>)
+                            </t>
+                        </t>
+                         <t t-if="orderline.get_discount() > 0 and widget.pos.config.show_discount_in_receipt">
+                            <div class="pos-disc-font">
+                                With a <t t-esc="orderline.get_discount()"/>% discount
+                            </div>
+                        </t>
+                    </td>
+                    <td style="padding: 2px 0;" class="pos-right-align">
+                        <t t-esc="widget.format_currency(orderline.get_display_price())"/>
+                    </td>
+                </tr>
+            </table>
+        </t>
+    </t>
+    <!--t t-extend="XmlReceipt">
+        <t t-jquery=".receipt" t-operation="replace">
+            <receipt align='center' width='40' value-thousands-separator='.' >
+            </receipt>
+        </t>
+    </t-->
+
+</templates>

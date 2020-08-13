@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<openerp>
 <data>
-<!--<template id="sale.report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
+<template id="sale.report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
 </template>
 
-<template id="sale_stock.report_invoice_document_inherit_sale_stock" inherit_id="account.report_invoice_document">
-</template>-->
+<template id="sale_stock.sale_stock_report_invoice_document" inherit_id="account.report_invoice_document">
+</template>
 
 <template id="account.report_invoice_document_with_payments" inherit_id="account.report_invoice_document">
 </template>
@@ -52,7 +52,7 @@
                         <span style="font-weight:bolder" t-if="not o.number_electronic">NOTA DE CRÉDITO</span><br/>
                     </t>
                     <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'" t-esc="o.reference"/>
-                    <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.number"/>
+                    <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.name"/>
                 </div>
                 <div class="text-center">
                     <table t-if="o.date_issuance" style="width:100%;" class="dtheader rounded2">
@@ -63,9 +63,9 @@
                         <td class="text-center">HORA</td>
                     </tr>
                     <tr>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[8:10]) or o.date_invoice and (o.date_invoice[8:10]) or ''"/></td>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[5:7]) or o.date_invoice and (o.date_invoice[5:7]) or ''"/></td>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[0:4]) or o.date_invoice and (o.date_invoice[0:4]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[8:10]) or o.invoice_date and (o.invoice_date[8:10]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[5:7]) or o.invoice_date and (o.invoice_date[5:7]) or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[0:4]) or o.invoice_date and (o.invoice_date[0:4]) or ''"/></td>
                         <td class="dtcls text-center dtbg"><span t-esc="o.date_issuance and (o.date_issuance[11:16]) or ''"/></td>
                     </tr>
                     </table>
@@ -74,7 +74,7 @@
                         <td class="text-center">FECHA</td>
                     </tr>
                     <tr>
-                        <td class="dtcls text-center dtbg"><span t-esc="o.date_invoice or ''"/></td>
+                        <td class="dtcls text-center dtbg"><span t-esc="o.invoice_date or ''"/></td>
                     </tr>
                     </table>
                 </div>
@@ -295,7 +295,7 @@
                             <strong>CONDICIÓN VENTA:</strong>
                         </td>
                         <td>
-                            <span t-esc="o.payment_term_id and o.payment_term_id.name or 'CONTADO'"/>
+                            <span t-esc="o.invoice_payment_term_id and o.invoice_payment_term_id.name or 'CONTADO'"/>
                         </td>
                     </tr>
                     <tr style="border:1px solid black;">
@@ -309,7 +309,7 @@
                             <strong>FECHA VENCE:</strong><br/>
                         </td>
                         <td>
-                            <span t-field="o.date_due"/><br/>
+                            <span t-field="o.invoice_date_due"/><br/>
                         </td>
                     </tr>
 
@@ -338,10 +338,10 @@
                         </td>
                         <td>
                             <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
-                                <span t-field="o.sequence"/>-<span t-field="o.origin"/><br/>
+                                <span t-field="o.sequence"/>-<span t-field="o.invoice_origin"/><br/>
                             </span>
                             <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
-                                <span t-field="o.name"/>-<span t-field="o.origin"/><br/>
+                                <span t-field="o.name"/>-<span t-field="o.invoice_origin"/><br/>
                             </span>
                         </td>
                         <td>
@@ -367,7 +367,7 @@
                             <strong>TIPO CAMBIO:</strong>
                         </td>
                         <td>
-                            <span t-esc="o.amount_total_company_signed / o.amount_total_signed"/>
+                            <span t-esc="abs(o.amount_total / o.amount_total_signed)"/>
                         </td>
                     </tr>
                 </tbody>
@@ -382,7 +382,7 @@
                 <thead class="tble-header">
                         <tr>
                             <th>Producto</th>
-                            <th class="hidden">Source Document</th>
+                            <!--th class="hidden">Source Document</th-->
                             <th class="text-right">Cant.</th>
                             <th width="15%" class="text-right">Precio</th>
                             <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
@@ -393,7 +393,7 @@
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l" style="height:25px;font-size:16px">
                             <td><span t-field="l.name"/></td>
-                            <td class="hidden"><span t-field="l.origin"/></td>
+                            <!--td class="hidden"><span t-field="l.invoice_origin"/></td-->
                             <td class="text-right">
                                 <span t-field="l.quantity"/>
                                 <span t-field="l.uom_id" groups="product.group_uom"/>
@@ -405,8 +405,8 @@
                                 <span t-field="l.discount"/>
                             </td>
                             <td class="text-right">
-                                <span t-if="l.invoice_line_tax_ids" t-esc="', '.join(map(lambda x: (x.description or x.name), l.invoice_line_tax_ids))"/>
-                                <span t-if="not l.invoice_line_tax_ids">EXE</span>
+                                <span t-if="l.tax_ids" t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_ids))"/>
+                                <span t-if="not l.tax_ids">EXE</span>
                             </td>
                             <td class="text-right">
                                 <span t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
@@ -419,9 +419,9 @@
                         </tr>
                         <tr>
                             <td colspan="6">
-                                <t t-if="o.comment" class="text-center" style="height:25px;">
+                                <t t-if="o.narration" class="text-center" style="height:25px;">
                                     <span class="text-center">
-                                        <br/><br/><span t-field="o.comment"/>
+                                        <br/><br/><span t-field="o.narration"/>
                                     </span>
                                 </t>
                             </td>
@@ -453,7 +453,7 @@
                                         </tr>
                                         <t t-foreach="o.amount_by_group" t-as="amount_by_group">
                                             <tr style="">
-                                                <t t-if="len(o.tax_line_ids) == 1 and o.amount_untaxed == amount_by_group[2]">
+                                                <!--t t-if="len(o.tax_line_ids) == 1 and o.amount_untaxed == amount_by_group[2]">
                                                     <td><span t-esc="amount_by_group[0]"/></td>
                                                     <td class="text-right o_price_total">
                                                         <span t-esc="amount_by_group[3]"/>
@@ -469,7 +469,16 @@
                                                     <td class="text-right o_price_total">
                                                         <span t-esc="amount_by_group[3]"/>
                                                     </td>
-                                                </t>
+                                                </t-->
+                                                <td>
+                                                    <span t-esc="amount_by_group[0]"/>
+                                                    <span>&amp;nbsp;<span>on</span>
+                                                        <t t-esc="amount_by_group[4]"/>
+                                                    </span>
+                                                </td>
+                                                <td class="text-right o_price_total">
+                                                    <span t-esc="amount_by_group[3]"/>
+                                                </td>
                                             </tr>
                                         </t>
                                         <tr class="border-black o_total">
@@ -601,15 +610,16 @@
     </div>
 </template>
 
-<template id="account.report_invoice">
+<!--template id="account.report_invoice">
     <t t-call="report.html_container">
         <t t-foreach="docs" t-as="o">
             <t t-call="account.report_invoice_document" t-lang="o.partner_id.lang"/>
         </t>
     </t>
-</template>
+</template-->
+
 </data>
-</odoo>
+</openerp>
 
 
 
