@@ -216,12 +216,12 @@ class AccountInvoiceElectronic(models.Model):
     state_invoice_partner = fields.Selection(
         [('1', 'Aceptado'), 
          ('2', 'Aceptacion parcial'),
-         ('3', 'Rechazado')], 
-         'Respuesta del Cliente')
+         ('3', 'Rechazado')],
+         'Respuesta del Cliente', copy=False)
 
-    reference_code_id = fields.Many2one("reference.code", string="Código de referencia", required=False, )
+    reference_code_id = fields.Many2one("reference.code", string="Código de referencia", required=False, copy=False)
 
-    reference_document_id = fields.Many2one("reference.document", string="Tipo Documento de referencia", required=False, )
+    reference_document_id = fields.Many2one("reference.document", string="Tipo Documento de referencia", required=False, copy=False)
 
     payment_methods_id = fields.Many2one("payment.methods", string="Métodos de Pago", required=False, )
 
@@ -229,8 +229,7 @@ class AccountInvoiceElectronic(models.Model):
 
     xml_respuesta_tributacion = fields.Binary( string="Respuesta Tributación XML", required=False, copy=False, attachment=True)
 
-    electronic_invoice_return_message = fields.Char(
-        string='Respuesta Hacienda', readonly=True, )
+    electronic_invoice_return_message = fields.Char(string='Respuesta Hacienda', readonly=True, )
 
     fname_xml_respuesta_tributacion = fields.Char(
         string="Nombre de archivo XML Respuesta Tributación", required=False,
@@ -270,11 +269,11 @@ class AccountInvoiceElectronic(models.Model):
     state_email = fields.Selection([('no_email', 'Sin cuenta de correo'), (
         'sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
 
-    invoice_amount_text = fields.Char(string='Monto en Letras', readonly=True, required=False, )
+    invoice_amount_text = fields.Char(string='Monto en Letras', readonly=True, required=False, copy=False)
 
     ignore_total_difference = fields.Boolean(string="Ingorar Diferencia en Totales", required=False, default=False)
 
-    error_count = fields.Integer(string="Cantidad de errores", required=False, default="0")
+    error_count = fields.Integer(string="Cantidad de errores", required=False, default="0", copy=False)
 
     economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )
 
@@ -744,14 +743,14 @@ class AccountInvoiceElectronic(models.Model):
     def _check_hacienda_for_invoices(self, max_invoices=10):
         out_invoices = self.env['account.move'].search(
             [('type', 'in', ('out_invoice', 'out_refund')),
-             ('state', 'in', ('posted', 'paid')),
+             ('state', '=', 'posted'),
              ('state_tributacion', 'in', ('recibido', 'procesando', 'ne'))],  # , 'error'
             limit=max_invoices)
 
         in_invoices = self.env['account.move'].search(
             [('type', '=', 'in_invoice'),
              ('tipo_documento', '=', 'FEC'),
-             ('state', 'in', ('open', 'paid')),
+             ('state', '=', 'posted'),
              ('state_tributacion', 'in', ('procesando', 'ne', 'error'))],
             limit=max_invoices)
 
@@ -870,7 +869,7 @@ class AccountInvoiceElectronic(models.Model):
         invoices = self.env['account.move'].search(
             [('type', 'in', ('in_invoice', 'in_refund')),
              ('tipo_documento', '!=', 'FEC'),
-             ('state', 'in', ('open', 'paid')),
+             ('state', '=', 'posted'),
              ('xml_supplier_approval', '!=', False),
              ('state_invoice_partner', '!=', False),
              ('state_tributacion', 'not in', ('aceptado', 'rechazado', 'error', 'na'))],
@@ -897,8 +896,7 @@ class AccountInvoiceElectronic(models.Model):
         #if self.company_id.frm_ws_ambiente != 'disabled':
         _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
         invoices = self.env['account.move'].search([('type', 'in', ('out_invoice', 'out_refund')),
-                                                      #('state', 'in', ('open', 'paid')),
-                                                      ('state', 'in', ('posted', 'paid')),
+                                                      ('state', '=', 'posted'),
                                                       ('number_electronic', '!=', False),
                                                       ('invoice_date', '>=', '2019-07-01'),
                                                       '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
@@ -1065,6 +1063,11 @@ class AccountInvoiceElectronic(models.Model):
                             line["codigo"] = inv_line.product_id.default_code or ''
                             line["codigoProducto"] = inv_line.product_id.code or ''
 
+                            if inv_line.product_id.cabys_code:
+                                line["codigoCabys"] = inv_line.product_id.cabys_code
+                            elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
+                                line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
+
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
 
@@ -1137,7 +1140,7 @@ class AccountInvoiceElectronic(models.Model):
                             line["impuestoNeto"] = round(_line_tax, 5)
 
                         # Si no hay uom_id se asume como Servicio
-                        if not inv_line.product_uom_id or inv_line.product_uom_id.category_id.name == 'Services':  # inv_line.product_id.type == 'service'
+                        if not inv_line.product_uom_id or inv_line.product_uom_id.category_id.name in ('Service', 'Services', 'Servicio', 'Servicios'):
                             if taxes:
                                 if _tax_exoneration:
                                     if _percentage_exoneration < 1:

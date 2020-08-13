@@ -15,7 +15,7 @@
 
         <record id="cr_electronic_invoice.CodeTypeProduct_03" model="code.type.product">
             <field name="code">03</field>
-            <field name="name">CédCódigo del producto asignado por la industriaula</field>
+            <field name="name">Código del producto asignado por la industria</field>
         </record>
 
         <record id="cr_electronic_invoice.CodeTypeProduct_04" model="code.type.product">

@@ -109,6 +109,7 @@
                     <field name="sequence" string="Consecutivo"/>
                     <field name="type" invisible="1" readonly="1"/>
                     <field name="state_tributacion" string="Estado FE" />
+                    <field name="invoice_payment_state" />
                 </field>
             </field>
         </record>
