@@ -512,12 +512,15 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
             sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
 
+        if v.get('codigoCabys'):
+            sb.Append('<Codigo>' + (v['codigoCabys']) + '</Codigo>')
+
         if v.get('codigo'):
             sb.Append('<CodigoComercial>')
             sb.Append('<Tipo>04</Tipo>')
             sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
             sb.Append('</CodigoComercial>')
-
+        
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
         sb.Append('<UnidadMedida>' +
                   str(v['unidadMedida']) + '</UnidadMedida>')

@@ -1102,6 +1102,11 @@ class AccountInvoiceElectronic(models.Model):
                         if inv_line.product_id:
                             line["codigo"] = inv_line.product_id.default_code or ''
                             line["codigoProducto"] = inv_line.product_id.code or ''
+                            
+                            if inv_line.product_id.cabys_code:
+                                line["codigoCabys"] = inv_line.product_id.cabys_code
+                            elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
+                                line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
 
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
