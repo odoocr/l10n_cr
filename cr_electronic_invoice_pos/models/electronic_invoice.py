@@ -37,7 +37,6 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     #@stacktrace
-    @api.model
     def create(self, vals):
         return super(StockPicking, self).create(vals)
 
@@ -65,7 +64,6 @@ class PosOrder(models.Model):
     _name = "pos.order"
     _inherit = ["pos.order", "mail.thread"]
 
-    @api.multi
     def action_invoice_sent(self):
         email_template = self.env.ref(
             'cr_electronic_invoice_pos.email_template_pos_invoice', False)
@@ -86,7 +84,6 @@ class PosOrder(models.Model):
              force_send=True)  # default_type='binary'
         email_template.attachment_ids = [(5)]
 
-    @api.model
     def sequence_number_sync(self, vals):
         tipo_documento = vals.get('tipo_documento', False)
         sequence = vals.get('sequence', False)
@@ -98,7 +95,6 @@ class PosOrder(models.Model):
             elif tipo_documento == 'TE' and sequence >= session.config_id.TE_sequence_id.number_next_actual:
                     session.config_id.TE_sequence_id.number_next_actual = sequence + 1
 
-    @api.model
     def _order_fields(self, ui_order):
         vals = super(PosOrder, self)._order_fields(ui_order)
         vals['tipo_documento'] = ui_order.get('tipo_documento')
@@ -106,7 +102,6 @@ class PosOrder(models.Model):
         vals['number_electronic'] = ui_order.get('number_electronic')
         return vals
 
-    @api.model
     def create(self, vals):
         number_electronic = vals.get('number_electronic', False)
         if vals.get('pos_order_id', False):
@@ -242,7 +237,6 @@ class PosOrder(models.Model):
             'target': 'current',
         }
 
-    @api.model
     def _consultahacienda_pos(self, max_orders=10):  # cron
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    ('number_electronic',
@@ -341,7 +335,6 @@ class PosOrder(models.Model):
                     'MAB - POS Order %s - x Number Electronic: %s formato incorrecto', doc.name, doc.number_electronic)
         _logger.info('MAB - Consulta Hacienda POS - Finalizad Exitosamente')
 
-    @api.model
     def _reenviacorreos_pos(self, max_orders=1):  # cron
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    ('date_order', '>=',
@@ -393,7 +386,6 @@ class PosOrder(models.Model):
                 _logger.info('MAB - Email no enviado - cuenta no definida')
         _logger.info('MAB - Reenvia Correos - Finalizado')
 
-    @api.model
     def _validahacienda_pos(self, max_orders=10, no_partner=True):  # cron
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    '|', (no_partner, '=', True), 
