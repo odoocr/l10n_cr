@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="actualizar_pos" name="actualizar_pos" xml:space="preserve">
+    <!--t t-name="CustomButton"><div class="control-button">Obtener Nombre
+        </div></t-->
+    <t t-extend="ClientDetailsEdit">
+        <t t-jquery="input.client-name" t-operation="replace"/>
+        <!--Artilugio para poder eliminar el NIF o VAT ya que compartia la misma clase con otros campos-->
+        <t t-jquery="div.client-details-right" t-operation="replace">
+            <div class="client-details-right">
+                <div class="client-detail">
+                    <span class="label">Email</span>
+                    <input class="detail client-email" name="email" t-att-value="partner.email || &quot;&quot;" type="email"/>
+                </div>
+                <div class="client-detail">
+                    <span class="label">Phone</span>
+                    <input class="detail client-phone" name="phone" t-att-value="partner.phone || &quot;&quot;" type="tel"/>
+                </div>
+                <div class="client-detail">
+                    <span class="label">Barcode</span>
+                    <input class="detail barcode" name="barcode" t-att-value="partner.barcode || &quot;&quot;"/>
+                </div>
+                <div t-attf-class="client-detail #{widget.pos.pricelists.length &lt;= 1 ? &quot;oe_hidden&quot; : &quot;&quot;}">
+                    <span class="label">Pricelist</span>
+                    <select class="detail needsclick" name="property_product_pricelist">
+                        <t t-as="pricelist" t-foreach="widget.pos.pricelists">
+                            <option t-att-selected="partner.property_product_pricelist ? (pricelist.id === partner.property_product_pricelist[0] ? true : undefined) : undefined" t-att-value="pricelist.id">
+                                <t t-esc="pricelist.display_name"/>
+                            </option>
+                        </t>
+                    </select>
+                </div>
+            </div>
+        </t>
+        <t t-jquery="div.client-picture" t-operation="after">
+            <input class="detail client-name" id="vat" name="vat" onchange="obtener_nombre(this.value)" placeholder="Cédula" t-att-value="partner.vat"/>
+            <input class="detail" id="identification_id" hidden="hidden" name="identification_id"  t-att-value="ninguno"/>
+        </t>
+        <t t-jquery="div.client-details-box" t-operation="before">
+            <div class="client-detail">
+                <span class="label"/>
+                <input class="detail client-address-city" name="name" placeholder="Name" t-att-value="partner.name"/>
+            </div>
+        </t>
+    </t>
+</templates>
