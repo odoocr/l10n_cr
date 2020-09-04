@@ -77,7 +77,7 @@
 
 		<record id="email_template_client_exoneration_expired" model="mail.template">
             <field name="name">Exoneration Expired</field>
-            <field name="email_from">${(user.company_id.commercial_name+' ('+(user.email or '')+')')|safe}</field>
+            <field name="email_from">${(user.email or '')|safe}</field>
             <field name="subject">${user.company_id.commercial_name}: VAT exoneration expired</field>
             <field name="email_to">${object.email|safe}</field>
             <field name="lang">${object.lang}</field>
