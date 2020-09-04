@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import phonenumbers
 import logging
+import datetime
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -123,3 +124,11 @@ class PartnerElectronic(models.Model):
                 'message': _('Company VAT is invalid')
             }
             return {'value': {'vat': ''}, 'warning': alert}
+    
+    @api.multi
+    def check_exonerations(self):
+        clients = self.env["res.partner"].search([("has_exoneration", "=", True), ("date_expiration", "<", datetime.date.today())])
+        for client in clients:
+            email_template = client.env.ref("cr_electronic_invoice.email_template_client_exoneration_expired")
+            if email_template:
+                email_template.send_mail(client.id)
