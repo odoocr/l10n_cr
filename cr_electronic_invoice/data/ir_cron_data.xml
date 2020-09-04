@@ -51,7 +51,7 @@
 			<field name="state">code</field>
 			<field name="code">model.check_exonerations()</field>
 			<field name="interval_number">1</field>
-			<field name="interval_type">weeks</field>
+			<field name="interval_type">days</field>
 			<field name="numbercall">-1</field>
 			<field name="doall" eval="False" />
 		</record>
