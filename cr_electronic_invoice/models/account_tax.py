@@ -1,3 +1,4 @@
+import datetime
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import logging
@@ -12,7 +13,7 @@ class IvaCodeType(models.Model):
     iva_tax_code = fields.Char(string="VAT Rate Code", default='N/A', required=False, )
     has_exoneration = fields.Boolean(string="Has Exoneration", required=False)
     percentage_exoneration = fields.Integer(string="Percentage of VAT Exoneration", required=False)
-    tax_root = fields.Many2one("account.tax", string="Tax Parent", required=False, )
+    tax_root = fields.Many2one("account.tax", string="Parent Tax", required=False, )
     non_tax_deductible = fields.Boolean(string='Indicates if this tax is no deductible for Rent and VAT',)
 
     @api.onchange('percentage_exoneration')
@@ -24,13 +25,17 @@ class IvaCodeType(models.Model):
         self.tax_compute_exoneration()
 
     def tax_compute_exoneration(self):
-        if self.percentage_exoneration <= 100:
-            if self.tax_root:
-                _tax_amount = self.tax_root.amount / 100
-                _procentage = self.percentage_exoneration / 100
-                self.amount = (_tax_amount * (1 - _procentage)) * 100
+        if datetime.datetime.today() < datetime.datetime.strptime('2020-07-02', '%Y-%m-%d'):
+            if self.percentage_exoneration <= 100:
+                if self.tax_root:
+                    _tax_amount = self.tax_root.amount / 100
+                    _procentage = self.percentage_exoneration / 100
+                    self.amount = (_tax_amount * (1 - _procentage)) * 100
+            else:
+                raise UserError('El porcentaje no puede ser mayor a 100')
         else:
-            raise UserError('El porcentaje no puede ser mayor a 100')
-
-
-
+            if self.percentage_exoneration <= 13:
+                if self.tax_root:
+                    self.amount = self.tax_root.amount - self.percentage_exoneration
+            else:
+                raise UserError('El porcentaje no puede ser mayor a 13')

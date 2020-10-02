@@ -32,11 +32,12 @@
                     <field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="reference_document_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="not_loaded_invoice" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="not_loaded_invoice_date" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="state_tributacion" readonly="1"/>
                     <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
                     <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion"/>
                     <field name="state_invoice_partner" invisible="1"/>
-                    <field name="state_send_invoice" invisible="1"/>
                     <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
                     <field name="xml_comprobante" filename="fname_xml_comprobante"/>
                     <field name="electronic_invoice_return_message" readonly="1"/>
@@ -69,29 +70,29 @@
             <field name="inherit_id" ref="account.invoice_supplier_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='action_invoice_draft']" position="after">
-                    <button name="action_send_mrs_to_hacienda" type="object" string="Enviar Mensaje Receptor" colspan="2" attrs="{'invisible':['|', ('tipo_documento','==','FEC'),('state_send_invoice','!=', False), ('state_send_invoice','!=','rechazado'),('state_send_invoice','!=','error')]}"/>
-                    <button name="action_create_fec" type="object" string="Enviar FEC" colspan="2" attrs="{'invisible':['|', ('tipo_documento','!=','FEC'), ('state_send_invoice','not in', (False,'rechazado', 'error'))]}"/>
+                    <button name="action_send_mrs_to_hacienda" type="object" string="Enviar Mensaje Receptor" colspan="2" attrs="{'invisible':['|', ('tipo_documento','==','FEC'),('state_tributacion','!=', False), ('state_tributacion','!=','rechazado'),('state_tributacion','!=','error')]}"/>
+                    <button name="action_create_fec" type="object" string="Enviar FEC" colspan="2" attrs="{'invisible':['|', ('tipo_documento','!=','FEC'), ('state_tributacion','not in', (False,'rechazado', 'error'))]}"/>
                     <button name="action_check_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
                 </xpath>
 
                 <xpath expr="//group[1]" position="after">
                     <group string="Facturación Electrónica" col="2">
-                        <group>
-                            <field name='tipo_documento'/>
-                            <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], }" />
-                            <field name="fname_xml_supplier_approval" invisible="1" />
-                            <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}" />
-                            <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="2" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('state','!=','draft')]}" />
+                        <group colspan="2" col="5">
+                            <field name='tipo_documento' colspan="5" />
+                            <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], }" colspan="5" />
+                            <field name="fname_xml_supplier_approval" invisible="1" colspan="5"/>
+                            <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" colspan="4" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}" />
+                            <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="1" attrs="{'invisible':['|', '|', ('xml_supplier_approval', '=', False), ('tipo_documento','=', 'FEC'), ('state','!=','draft')]}" />
                         </group>
-                        <group>
+                        <group colspan="2">
                             <field name="state_invoice_partner" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}"/>
                             <field name="date_issuance" readonly="1"/>
                             <field name="number_electronic" attrs="{'readonly':[('state','!=','draft')]}" />
                             <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
                             <field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
-                            <field name="state_send_invoice" readonly="1"/>
                             <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
                             <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
+                            <field name="state_tributacion" readonly="1"/>
                         </group>
                     </group>
                 </xpath>
@@ -132,11 +133,11 @@
             <field name="arch" type="xml">
                 <tree position="attributes">
                     <attribute name="decoration-danger">
-                         state_send_invoice == 'rechazado'
+                         state_tributacion == 'rechazado'
                     </attribute>
                 </tree>
                 <field name="state" position="before">
-                    <field name="state_send_invoice" string="Estado FE"/>
+                    <field name="state_tributacion" string="Estado FE"/>
                 </field>
             </field>
         </record>

@@ -129,20 +129,20 @@
                 <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
                     <div class="page">
                         <div class="text-center">
-                            <t t-if="o.tipo_documento=='FE'">FACTURA ELECTRONICA</t>
-                            <t t-if="o.tipo_documento=='TE'">TIQUETE ELECTRONICO</t>
-                            <t t-if="o.tipo_documento=='NC'">NOTA DE CREDITO ELECTRONICA</t>
+                            <t t-if="o.tipo_documento=='FE'">FACTURA ELECTRÓNICA</t>
+                            <t t-if="o.tipo_documento=='TE'">TIQUETE ELECTRÓNICO</t>
+                            <t t-if="o.tipo_documento=='NC'">NOTA DE CRÉDITO ELECTRÓNICA</t>
                             <br/>
-                            Version Documento: 4.3<br/>
+                            Versión Documento: 4.3<br/>
                             <h2 t-esc="o.user_id.company_id.commercial_name"/>
                             <t t-esc="o.user_id.company_id.name"/><br/>
-                            Ced.Jur: <t t-esc="o.user_id.company_id.vat"/><br/>
-                            Tel: <t t-esc="o.user_id.company_id.phone"/><br/>
+                            Cédula: <t t-esc="o.user_id.company_id.vat"/><br/>
+                            Teléfono: <t t-esc="o.user_id.company_id.phone"/><br/>
                             <t t-esc="o.user_id.company_id.email"/><br/>
                             <br/>
                             <table class="text-center">
                                 <tr>
-                                    <td>Clave Numerica:</td>
+                                    <td>Clave Numérica:</td>
                                 </tr>
                                 <tr>
                                     <td><t t-esc="o.number_electronic[0:25]"/></td>
@@ -155,7 +155,7 @@
                         <br/>
                             <table>
                                 <tr>
-                                    <td>Factura:</td>
+                                    <td>Consecutivo:</td>
                                     <td><t t-esc="o.number_electronic[21:41]"/></td>
                                 </tr>
                                 <tr>
@@ -174,7 +174,7 @@
                                     </t>
                                     <t t-if="o.partner_id.vat">
                                     <tr>
-                                        <td>Cedula:</td>
+                                        <td>Cédula:</td>
                                         <td><span t-field="o.partner_id.vat"/><br/></td>
                                     </tr>
                                 </t>
@@ -186,7 +186,7 @@
                         <table class="table table-condensed">
                             <thead>
                                 <tr>
-                                    <th>Descripcion</th>
+                                    <th>Descripción</th>
                                     <th class="text-right">Cant</th>
                                     <th class="text-right">Precio</th>
                                 </tr>
