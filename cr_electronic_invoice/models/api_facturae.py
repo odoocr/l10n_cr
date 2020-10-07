@@ -679,7 +679,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             error_caused_by = response.headers.get(
                 'X-Error-Cause') if 'X-Error-Cause' in response.headers else ''
             error_caused_by += response.headers.get('validation-exception', '')
-            _logger.info('Status: {}, Text {}'.format(
+            _logger.error('Status: {}, Text {}'.format(
                 response.status_code, error_caused_by))
 
             return {'status': response.status_code, 'text': error_caused_by}

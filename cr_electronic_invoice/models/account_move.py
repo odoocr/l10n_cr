@@ -349,6 +349,8 @@ class AccountInvoiceElectronic(models.Model):
                  ('res_id', '=', self.id),
                  ('res_field', '=', 'xml_comprobante')], limit=1)
 
+            _logger.error('send_mail - id:%s attachment:%s' % (self.id, attachment))
+
             if attachment:
                 attachment.name = self.fname_xml_comprobante
                 attachment.datas_fname = self.fname_xml_comprobante
@@ -367,7 +369,7 @@ class AccountInvoiceElectronic(models.Model):
                 else:
                     raise UserError(_('Response XML from Hacienda has not been received'))
             else:
-                raise UserError(_('Invoice XML has not been generated'))
+                raise UserError(_('Invoice XML has not been generated for id:'+str(self.id)))
 
         else:
             raise UserError(_('Partner is not assigne to this invoice'))
