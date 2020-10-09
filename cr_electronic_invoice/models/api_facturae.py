@@ -366,9 +366,8 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
-        inv_statement_length = len(inv.statement_ids)
-        for statement_counter in range(inv_statement_length):
-            if inv.statement_ids[statement_counter].statement_id.journal_id.type == 'cash':
+        for payment in inv.payment_ids:
+            if payment.payment_method_id.is_cash_count:
                 payment_methods_id.append('01')
             else:
                 payment_methods_id.append('02')

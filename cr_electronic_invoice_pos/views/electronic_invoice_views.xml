@@ -198,12 +198,12 @@
                                 <tr t-foreach="o.lines" t-as="line">
                                     <td><span t-field="line.product_id"/></td>
                                     <td class="text-right">
-                                        <t t-if="o.state != 'cancel' and o.statement_ids">
+                                        <t t-if="o.state != 'cancel' and o.payment_ids">
                                             <span t-field="line.qty"/>
                                         </t>
                                     </td>
                                     <td class="text-right">
-                                        <t t-if="o.state != 'cancel' and o.statement_ids">
+                                        <t t-if="o.state != 'cancel' and o.payment_ids">
                                             <span t-esc="line.price_subtotal_incl"/>
                                         </t>
                                         <t t-if="line.discount != 0.0">
@@ -234,9 +234,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr t-foreach="o.statement_ids" t-as="d">
+                                <tr t-foreach="o.payment_ids" t-as="d">
                                     <td>
-                                        <span t-esc="d.statement_id.journal_id.name"/>
+                                        <span t-esc="d.payment_method_id.name"/>
                                     </td>
                                     <td>
                                         <span t-esc="d.amount"/>
