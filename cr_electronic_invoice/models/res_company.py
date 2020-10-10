@@ -87,6 +87,11 @@ class CompanyElectronic(models.Model):
         readonly=False, copy=False,
     )
 
+    # Se agrega campos para consultar información de código CAByS colocado
+    ultima_respuesta_cabys = fields.Text(string="Última Respuesta de API CAByS", help="Última Respuesta de API CAByS, esto permite depurar errores en caso de existir")
+    url_base_cabys = fields.Char(string="URL Base CAByS", required=False, help="URL Base del END POINT CAByS", default="https://api.hacienda.go.cr/fe/cabys?")
+
+
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:

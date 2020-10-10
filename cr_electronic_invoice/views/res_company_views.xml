@@ -69,6 +69,22 @@
                     </attribute>
                 </field> -->
 
+                <!-- Página para consultar información de Códigos CAByS-->
+                <xpath expr="//page[1]" position="after">
+                    <page string="Impuesto de Producto Automático">
+                        <separator string="URL Base"/>
+                        <group col="4" colspan="2">
+                            <group col="2">
+                                <field name="url_base_cabys" nolabel="1"/>
+                            </group>
+                            <group col="2"/>
+                        </group>
+                        <group col="4">
+                            <field attrs="{'invisible' : [('ultima_respuesta_cabys', 'in', (False,''))], 'readonly' : [('ultima_respuesta_cabys', '!=', False)]}" colspan="4" name="ultima_respuesta_cabys"/>
+                        </group>
+                    </page>
+                </xpath>
+
                 <xpath expr="//page[1]" position="after">
                     <page string="Facturación Electrónica">
                         <group cols="2">
