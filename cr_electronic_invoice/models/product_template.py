@@ -1,8 +1,9 @@
  # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-import json, requests, re
+import requests
 from datetime import datetime
+from odoo.exceptions import UserError
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class ProductElectronic(models.Model):
     def _cabys_code_changed(self):
         if self.cabys_code:
             url_base = self.company_id.url_base_cabys
+            id_product = self.id
 
             # Valida que existan el campo url_base
             if url_base:
@@ -47,7 +49,7 @@ class ProductElectronic(models.Model):
                     'content-type': 'application/json',
                 }
 
-                # PeticiÃ³n GET a la API
+                # Petición GET a la API
                 peticion = requests.get(end_point, headers=headers, timeout=10)
 
                 ultimo_mensaje = 'Fecha/Hora: ' + str(datetime.now()) + ', Codigo: ' + str(peticion.status_code) + ', Mensaje: ' + str(peticion._content.decode())
@@ -56,15 +58,22 @@ class ProductElectronic(models.Model):
 
                 if peticion.status_code == 200:
                     obj_json = peticion.json()
-                    for etiquetas in obj_json:
-                        # Busco los impuestos que puedan utilizarse para FE
-                        tax = self.env['account.tax'].search([('type_tax_use', '=', 'sale'),
-                                                              ('amount', '=', float(etiquetas['impuesto'])),
-                                                               ('tax_code','!=',''),
-                                                               ('iva_tax_desc','!=',''),
-                                                               ('iva_tax_code','!=','')], limit=1)
-                        # Guardo el impuesto que concuerda mejor para el producto
-                        self.taxes_id = tax
+                    if (len(obj_json)) > 0:
+                        for etiquetas in obj_json:
+                            # Busco los impuestos que puedan utilizarse para FE
+                            tax = self.env['account.tax'].search([('type_tax_use', '=', 'sale'),
+                                                                  ('amount', '=', float(etiquetas['impuesto'])),
+                                                                   ('tax_code','!=',''),
+                                                                   ('iva_tax_desc','!=',''),
+                                                                   ('iva_tax_code','!=','')], limit=1)
+                            # Guardo el impuesto que concuerda mejor para el producto
+                            self.taxes_id = tax
+                    else:
+                        # Por mejorar -> Se debe limpiar el campo de impuestos
+                        raise UserError(_('Ocurrió un error al consultar el código: ' + str(self.cabys_code) + ', por favor verifiquelo y vuelva a intentarlo'))
+                else:
+                    # Por mejorar -> Se debe limpiar el campo de impuestos
+                    raise UserError(_('El servicio de Hacienda no está disponible en este momento'))
 
 class ProductCategory(models.Model):
     _inherit = "product.category"
