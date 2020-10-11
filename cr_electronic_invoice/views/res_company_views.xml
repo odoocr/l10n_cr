@@ -97,6 +97,7 @@
                             <group cols="2">
                                 <button name="test_get_token" type="object" string="Test get token" colspan="2" />
                                 <field name="frm_ws_ambiente" widget="radio"/>
+                                <field name="frm_ws_expiracion"/>
                             </group>
                             <group cols="2">
                                 <field name="CCE_sequence_id"/>

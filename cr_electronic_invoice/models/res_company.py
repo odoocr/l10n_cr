@@ -7,6 +7,16 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
+# Validar Fecha de expiración de Llave Criptográfica
+import base64
+from datetime import datetime
+try:
+    from OpenSSL import crypto
+    from cryptography import x509
+    from cryptography.hazmat.backends import default_backend
+except(ImportError, IOError) as err:
+    logging.info(err)
+
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -46,6 +56,7 @@ class CompanyElectronic(models.Model):
                                     default='disabled',
                                     help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
                                     'de calidad (stag), para el ambiente de producción (prod). Requerido.')
+    frm_ws_expiracion = fields.Date(string='Fecha de Vencimiento de Llave Criptográfica', readonly=True, )
 
     frm_pin = fields.Char(string="Pin", 
                           required=False,
@@ -166,6 +177,12 @@ class CompanyElectronic(models.Model):
             self.env.user, self.frm_ws_ambiente)
         if token_m_h:
            _logger.info('E-INV CR - I got the token')
+
+        certificate = crypto.load_pkcs12(base64.b64decode(self.signature), self.frm_pin)
+        pem_data = crypto.dump_certificate(crypto.FILETYPE_PEM, certificate.get_certificate())
+        cert = x509.load_pem_x509_certificate(pem_data, default_backend())
+        self.frm_ws_expiracion = str(cert.not_valid_after)
+
         return 
 
     @api.multi
