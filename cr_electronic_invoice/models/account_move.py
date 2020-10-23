@@ -343,20 +343,16 @@ class AccountInvoiceElectronic(models.Model):
             pass
             #template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
         elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
-
-            attachment = self.env['ir.attachment'].search(
-                [('res_model', '=', 'account.move'),
-                 ('res_id', '=', self.id),
-                 ('res_field', '=', 'xml_comprobante')], limit=1)
+            domain = [('res_model', '=', 'account.move'),('res_id', '=', self.id),('res_field', '=', 'xml_comprobante')]
+            attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
 
             if attachment:
                 attachment.name = self.fname_xml_comprobante
                 attachment.datas_fname = self.fname_xml_comprobante
 
-                attachment_resp = self.env['ir.attachment'].search(
-                    [('res_model', '=', 'account.move'),
-                     ('res_id', '=', self.id),
-                     ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+                domain_resp = [('res_model', '=', 'account.move'),('res_id', '=', self.id),
+                                ('res_field', '=', 'xml_respuesta_tributacion')]
+                attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
                 if attachment_resp:
                     attachment_resp.name = self.fname_xml_respuesta_tributacion
