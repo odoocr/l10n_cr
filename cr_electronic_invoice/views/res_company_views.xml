@@ -69,9 +69,8 @@
                     </attribute>
                 </field> -->
 
-                <!---->
 
-                <!-- Página para consultar información de Códigos CAByS- ->
+                <!-- Página para consultar información de Códigos CAByS-->
                 <xpath expr="//page[1]" position="after">
                     <page string="Impuesto de Producto Automático">
                         <separator string="URL Base"/>
@@ -87,8 +86,6 @@
                     </page>
                 </xpath>
 
-                -->
-
                 <xpath expr="//page[1]" position="after">
                     <page string="Facturación Electrónica">
                         <group cols="2">
@@ -101,7 +98,7 @@
                             <group cols="2">
                                 <button name="test_get_token" type="object" string="Test get token" colspan="2" />
                                 <field name="frm_ws_ambiente" widget="radio"/>
-                                <!--<field name="frm_ws_expiracion"/>-->
+                                <field name="frm_ws_expiracion"/>
                             </group>
                             <group cols="2">
                                 <field name="CCE_sequence_id"/>
