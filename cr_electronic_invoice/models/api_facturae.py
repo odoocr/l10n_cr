@@ -366,9 +366,8 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
-        inv_statement_length = len(inv.statement_ids)
-        for statement_counter in range(inv_statement_length):
-            if inv.statement_ids[statement_counter].statement_id.journal_id.type == 'cash':
+        for payment in inv.payment_ids:
+            if payment.payment_method_id.is_cash_count:
                 payment_methods_id.append('01')
             else:
                 payment_methods_id.append('02')
@@ -679,7 +678,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             error_caused_by = response.headers.get(
                 'X-Error-Cause') if 'X-Error-Cause' in response.headers else ''
             error_caused_by += response.headers.get('validation-exception', '')
-            _logger.info('Status: {}, Text {}'.format(
+            _logger.error('Status: {}, Text {}'.format(
                 response.status_code, error_caused_by))
 
             return {'status': response.status_code, 'text': error_caused_by}
