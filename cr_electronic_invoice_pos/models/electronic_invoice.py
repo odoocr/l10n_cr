@@ -506,6 +506,12 @@ class PosOrder(models.Model):
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
                     }
+
+                    if line.product_id.cabys_code:
+                        dline["codigoCabys"] = line.product_id.cabys_code
+                    elif line.product_id.categ_id and line.product_id.categ_id.cabys_code:
+                        dline["codigoCabys"] = line.product_id.categ_id.cabys_code 
+                        
                     if line.discount:
                         descuento = abs(round(base_line - subtotal_line, 5))
                         total_descuento += descuento
