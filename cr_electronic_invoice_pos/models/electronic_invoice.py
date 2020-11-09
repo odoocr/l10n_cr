@@ -65,6 +65,27 @@ class PosOrder(models.Model):
     _name = "pos.order"
     _inherit = ["pos.order", "mail.thread"]
 
+    @api.multi
+    def action_invoice_sent(self):
+        email_template = self.env.ref(
+            'cr_electronic_invoice_pos.email_template_pos_invoice', False)
+        attachment = self.env['ir.attachment'].search(
+            [('res_model', '=', 'pos.order'), ('res_id', '=', self.id),
+             ('res_field', '=', 'xml_comprobante')], limit=1)
+        attachment.name = self.fname_xml_comprobante
+        attachment.datas_fname = self.fname_xml_comprobante
+        attachment_resp = self.env['ir.attachment'].search(
+            [('res_model', '=', 'pos.order'), ('res_id', '=', self.id),
+             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+        attachment_resp.name = self.fname_xml_respuesta_tributacion
+        attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
+        email_template.attachment_ids = [
+            (6, 0, [attachment.id, attachment_resp.id])]
+        email_template.with_context(type='binary', default_type='binary').send_mail(self.id,
+             raise_exception=False,
+             force_send=True)  # default_type='binary'
+        email_template.attachment_ids = [(5)]
+
     @api.model
     def sequence_number_sync(self, vals):
         tipo_documento = vals.get('tipo_documento', False)
@@ -469,8 +490,11 @@ class PosOrder(models.Model):
                         line.tax_ids, line.product_id, line.order_id.partner_id) if fpos else line.tax_ids
                     line_taxes = tax_ids.compute_all(
                         price, line.order_id.pricelist_id.currency_id, 1, product=line.product_id, partner=line.order_id.partner_id)
-                    price_unit = round(
-                        line_taxes['total_excluded'] / (1 - line.discount / 100.0), 5)
+                    if line.discount != 100:
+                        price_unit = round(
+                            line_taxes['total_excluded'] / (1 - line.discount / 100.0), 5)
+                    else:
+                        price_unit = 0
                     base_line = abs(round(price_unit * qty, 5))
                     subtotal_line = abs(
                         round(price_unit * qty * (1 - line.discount / 100.0), 5))
@@ -482,6 +506,12 @@ class PosOrder(models.Model):
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
                     }
+
+                    if line.product_id.cabys_code:
+                        dline["codigoCabys"] = line.product_id.cabys_code
+                    elif line.product_id.categ_id and line.product_id.categ_id.cabys_code:
+                        dline["codigoCabys"] = line.product_id.categ_id.cabys_code 
+                        
                     if line.discount:
                         descuento = abs(round(base_line - subtotal_line, 5))
                         total_descuento += descuento
