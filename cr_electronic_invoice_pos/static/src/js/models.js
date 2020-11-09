@@ -77,9 +77,11 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             if (order !== undefined) {
                 // revisar si es normal o devolucion . Pendiente !!!
                 if (order.get('client') && order.get('client').vat) {
-                    order.set({'sequence': this.FE_sequence.number_next_actual});
-                    order.set({'number_electronic': _sequence_next(this.FE_sequence)});
-                    order.set({'tipo_documento': 'FE'});
+                    if (!order.get('client').skipMH){
+                        order.set({'sequence': this.FE_sequence.number_next_actual});
+                        order.set({'number_electronic': _sequence_next(this.FE_sequence)});
+                        order.set({'tipo_documento': 'FE'});
+                    }
                 }
                 else{
                     order.set({'sequence': this.TE_sequence.number_next_actual});
@@ -114,6 +116,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
     });
 
     //models.load_fields('res.company', ['street', 'city', 'state_id', 'zip']);
+    models.load_fields('res.partner', ['identification_id','skipMH'])
 
     return exports;
 });

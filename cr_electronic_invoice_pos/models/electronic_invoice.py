@@ -247,8 +247,7 @@ class PosOrder(models.Model):
     @api.model
     def _consultahacienda_pos(self, max_orders=10):  # cron
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
-                                                   ('number_electronic',
-                                                    '!=', False),
+                                                   ('number_electronic', '!=', False),
                                                    ('state_tributacion', 'in', ('recibido', 'procesando'))],
                                                   limit=max_orders)
         total_orders = len(pos_orders)
