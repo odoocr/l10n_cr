@@ -54,7 +54,6 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
         var prefix = format(seq.prefix, idict);
         var suffix = format(seq.suffix, idict);
         seq.number_next_actual += seq.number_increment;
-        debugger;
         return prefix + pad(num, seq.padding) + suffix;
     };
 
@@ -75,15 +74,14 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
         push_order: function(order, opts) {
             //debugger;
             if (order !== undefined) {
-                // revisar si es normal o devolucion . Pendiente !!!
-                if (order.get('client') && order.get('client').vat) {
-                    if (!order.get('client').skipMH){
-                        order.set({'sequence': this.FE_sequence.number_next_actual});
-                        order.set({'number_electronic': _sequence_next(this.FE_sequence)});
-                        order.set({'tipo_documento': 'FE'});
-                    }
-                }
-                else{
+                if (order.get('client') && order.get('client').skipMH) {
+                    console.log('cliente');
+                } else if (order.get('client') && order.get('client').vat) {
+                    order.set({'sequence': this.FE_sequence.number_next_actual});
+                    order.set({'number_electronic': _sequence_next(this.FE_sequence)});
+                    order.set({'tipo_documento': 'FE'});
+
+                } else {
                     order.set({'sequence': this.TE_sequence.number_next_actual});
                     order.set({'number_electronic': _sequence_next(this.TE_sequence)});
                     order.set({'tipo_documento': 'TE'});
