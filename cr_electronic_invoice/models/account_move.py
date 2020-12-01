@@ -998,6 +998,9 @@ class AccountInvoiceElectronic(models.Model):
                 total_descuento = 0.0
                 total_impuestos = 0.0
                 base_subtotal = 0.0
+                _old_rate_exoneration = False
+                _no_CABYS_code = False
+
                 for inv_line in inv.invoice_line_ids:
                     # Revisamos si está línea es de Otros Cargos
                     if inv_line.product_id and inv_line.product_id.id == self.env.ref('cr_electronic_invoice.product_iva_devuelto').id:
@@ -1058,6 +1061,16 @@ class AccountInvoiceElectronic(models.Model):
                         if inv_line.product_id:
                             line["codigo"] = inv_line.product_id.default_code or ''
                             line["codigoProducto"] = inv_line.product_id.code or ''
+                            if inv_line.product_id.cabys_code:
+                                line["codigoCabys"] = inv_line.product_id.cabys_code
+                            #elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
+                            #    line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
+                            else:
+                                _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                                continue
+                        else:
+                            _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                            continue
 
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
@@ -1131,7 +1144,7 @@ class AccountInvoiceElectronic(models.Model):
                             line["impuestoNeto"] = round(_line_tax, 5)
 
                         # Si no hay uom_id se asume como Servicio
-                        if not inv_line.product_uom_id or inv_line.product_uom_id.category_id.name == 'Services':  # inv_line.product_id.type == 'service'
+                        if not inv_line.product_uom_id or inv_line.product_uom_id.category_id.name in ('Services', 'Servicios'):  # inv_line.product_id.type == 'service'
                             if taxes:
                                 if _tax_exoneration:
                                     if _percentage_exoneration < 1:
@@ -1180,6 +1193,13 @@ class AccountInvoiceElectronic(models.Model):
                 #if not inv.origin:
                 #    inv.move_name = inv.invoice_id.display_name
                 #    inv.origin = inv.invoice_id.display_name
+
+                if _no_CABYS_code and inv.tipo_documento == 'FE':
+                    inv.state_tributacion = 'error'
+                    inv.message_post(
+                        subject='Error',
+                        body=_no_CABYS_code)
+                    continue
 
                 if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.5:
                     inv.state_tributacion = 'error'
@@ -1318,18 +1338,6 @@ class AccountInvoiceElectronic(models.Model):
             if self.type == 'in_invoice' and self.partner_id.country_id and \
                 self.partner_id.country_id.code == 'CR' and self.partner_id.identification_id and self.partner_id.vat and self.economic_activity_id is False:
                 raise UserError('Las facturas FEC requieren que el proveedor tenga definida la actividad económica')
-
-            # Digital Invoice or ticket
-            if inv.type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
-                pass
-            else:
-                (tipo_documento, sequence) = inv.get_invoice_sequence()
-                if tipo_documento and sequence:
-                    inv.tipo_documento = tipo_documento
-                else:
-                    super(AccountInvoiceElectronic, inv).action_post()
-                    continue
-
             # tipo de identificación
             if not inv.company_id.identification_id:
                 raise UserError('Seleccione el tipo de identificación del emisor en el perfil de la compañía')
@@ -1362,6 +1370,19 @@ class AccountInvoiceElectronic(models.Model):
             # Validate if invoice currency is the same as the company currency
             if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
                 raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
+
+
+            # Digital Invoice or ticket
+            if inv.type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
+                pass
+            else:
+                (tipo_documento, sequence) = inv.get_invoice_sequence()
+                if tipo_documento and sequence:
+                    inv.tipo_documento = tipo_documento
+                else:
+                    super(AccountInvoiceElectronic, inv).action_post()
+                    continue
+
 
             # actividad_clinica = self.env.ref('cr_electronic_invoice.activity_851101')
             # if actividad_clinica.id == inv.economic_activity_id.id and inv.payment_methods_id.sequence == '02':

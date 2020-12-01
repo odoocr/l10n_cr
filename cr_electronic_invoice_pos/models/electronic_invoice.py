@@ -271,32 +271,31 @@ class PosOrder(models.Model):
                 if estado_m_h == 'aceptado':
                     doc.state_tributacion = estado_m_h
                     doc.fname_xml_respuesta_tributacion = 'AHC_' + doc.number_electronic + '.xml'
-                    doc.xml_respuesta_tributacion = response_json.get(
-                        'respuesta-xml')
+                    doc.xml_respuesta_tributacion = response_json.get('respuesta-xml')
                     if doc.partner_id and doc.partner_id.email:
-                        email_template = self.env.ref(
-                            'cr_electronic_invoice_pos.email_template_pos_invoice', False)
+                        email_template = self.env.ref('cr_electronic_invoice_pos.email_template_pos_invoice', False)
                         attachment = self.env['ir.attachment'].search(
                             [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
                              ('res_field', '=', 'xml_comprobante')], limit=1)
                         attachment.name = doc.fname_xml_comprobante
                         attachment.datas_fname = doc.fname_xml_comprobante
+                        attachment.mimetype = 'text/xml'
                         attachment_resp = self.env['ir.attachment'].search(
                             [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
                              ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
                         attachment_resp.name = doc.fname_xml_respuesta_tributacion
                         attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
+                        attachment_resp.mimetype = 'text/xml'
                         email_template.attachment_ids = [
                             (6, 0, [attachment.id, attachment_resp.id])]
                         email_template.with_context(type='binary', default_type='binary').send_mail(doc.id,
                                                                                                     raise_exception=False,
                                                                                                     force_send=True)  # default_type='binary'
-                        email_template.attachment_ids = [(5)]
+                        email_template.attachment_ids = [(5,0,0)]
                         doc.state_email = 'sent'
                     else:
                         doc.state_email = 'no_email'
                         _logger.info('MAB - Email no enviado - cliente no definido')
-
                 elif estado_m_h in ('firma_invalida'):
                     if doc.error_count > 10:
                         doc.state_tributacion = estado_m_h
