@@ -462,7 +462,7 @@ class AccountInvoiceElectronic(models.Model):
         load_lines = self.company_id.load_lines and not self.invoice_line_ids
         account = self.company_id.expense_account_id and self.company_id.expense_account_id.id
         analytic_account = self.company_id.expense_account_id and self.company_id.expense_analytic_account_id.id
-        product = self.company_id.expense_product_id and self.company_id.expense_product_id.id
+        product = self.company_id.expense_product_id #and self.company_id.expense_product_id.id
         api_facturae.load_xml_data(self, load_lines, account, product, analytic_account)
 
     @api.multi
@@ -810,16 +810,16 @@ class AccountInvoiceElectronic(models.Model):
                             'account.email_template_edi_invoice', False)
                         attachment = self.env['ir.attachment'].search(
                             [('res_model', '=', 'account.invoice'),
-                            ('res_id', '=', i.id),
-                            ('res_field', '=', 'xml_comprobante')], limit=1)
+                             ('res_id', '=', i.id),
+                             ('res_field', '=', 'xml_comprobante')], limit=1)
                         attachment.name = i.fname_xml_comprobante
                         attachment.datas_fname = i.fname_xml_comprobante
                         attachment.mimetype = 'text/xml'
 
                         attachment_resp = self.env['ir.attachment'].search(
                             [('res_model', '=', 'account.invoice'),
-                            ('res_id', '=', i.id),
-                            ('res_field', '=', 'xml_respuesta_tributacion')],
+                             ('res_id', '=', i.id),
+                             ('res_field', '=', 'xml_respuesta_tributacion')],
                             limit=1)
                         attachment_resp.name = i.fname_xml_respuesta_tributacion
                         attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
@@ -936,7 +936,7 @@ class AccountInvoiceElectronic(models.Model):
                     continue
 
                 _logger.debug('generate_and_send_invoices - Invoice %s / %s  -  number:%s',
-                            current_invoice, total_invoices, inv.number_electronic)
+                              current_invoice, total_invoices, inv.number_electronic)
 
                 if not inv.economic_activity_id:
                     if inv.type in ('in_invoice', 'in_refund'):
@@ -948,12 +948,12 @@ class AccountInvoiceElectronic(models.Model):
 
                     if inv.tipo_documento == 'FEC' and inv.state_tributacion == 'rechazado':
                         inv.message_post(body='Se está enviando otra FEC porque la anterior fue rechazada por Hacienda. Adjuntos los XMLs anteriores. Clave anterior: ' + inv.number_electronic,
-                                        subject='Envío de una segunda FEC',
-                                        message_type='notification',
-                                        subtype=None,
-                                        parent_id=False,
-                                        attachments=[[inv.fname_xml_respuesta_tributacion, inv.fname_xml_respuesta_tributacion],
-                                                    [inv.fname_xml_comprobante, inv.fname_xml_comprobante]],)
+                                         subject='Envío de una segunda FEC',
+                                         message_type='notification',
+                                         subtype=None,
+                                         parent_id=False,
+                                         attachments=[[inv.fname_xml_respuesta_tributacion, inv.fname_xml_respuesta_tributacion],
+                                                      [inv.fname_xml_comprobante, inv.fname_xml_comprobante]],)
 
                         sequence = inv.company_id.FEC_sequence_id.next_by_id()
                         response_json = api_facturae.get_clave_hacienda(self,
@@ -1029,7 +1029,8 @@ class AccountInvoiceElectronic(models.Model):
                     total_impuestos = 0.0
                     base_subtotal = 0.0
                     _old_rate_exoneration = False
-                    
+                    _no_CABYS_code = False
+
                     for inv_line in inv.invoice_line_ids:
                         # Revisamos si está línea es de Otros Cargos
                         if inv_line.product_id and inv_line.product_id.id == self.env.ref('cr_electronic_invoice.product_iva_devuelto').id:
@@ -1091,6 +1092,17 @@ class AccountInvoiceElectronic(models.Model):
                                 line["codigo"] = inv_line.product_id.default_code or ''
                                 line["codigoProducto"] = inv_line.product_id.code or ''
 
+                                if inv_line.product_id.cabys_code:
+                                    line["codigoCabys"] = inv_line.product_id.cabys_code
+                                elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
+                                    line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
+                                else:
+                                    _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                                    continue
+                            else:
+                                _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                                continue
+
                             if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                                 line["partidaArancelaria"] = inv_line.tariff_head
 
@@ -1117,17 +1129,17 @@ class AccountInvoiceElectronic(models.Model):
                                         if i.percentage_exoneration > 13:
                                             _old_rate_exoneration = True
                                         taxes_lookup[i.id] = {'tax_code': i.tax_root.tax_code,
-                                                            'tarifa': _tax_rate,
-                                                            'iva_tax_desc': i.tax_root.iva_tax_desc,
-                                                            'iva_tax_code': i.tax_root.iva_tax_code,
-                                                            'exoneration_percentage': _tax_exoneration_rate,
-                                                            'amount_exoneration': i.amount}
+                                                              'tarifa': _tax_rate,
+                                                              'iva_tax_desc': i.tax_root.iva_tax_desc,
+                                                              'iva_tax_code': i.tax_root.iva_tax_code,
+                                                              'exoneration_percentage': _tax_exoneration_rate,
+                                                              'amount_exoneration': i.amount}
                                     else:
                                         _tax_rate = i.amount
                                         taxes_lookup[i.id] = {'tax_code': i.tax_code,
-                                                            'tarifa': _tax_rate,
-                                                            'iva_tax_desc': i.iva_tax_desc,
-                                                            'iva_tax_code': i.iva_tax_code}
+                                                              'tarifa': _tax_rate,
+                                                              'iva_tax_desc': i.iva_tax_desc,
+                                                              'iva_tax_code': i.iva_tax_code}
 
                                 for i in line_taxes['taxes']:
                                     if taxes_lookup[i['id']]['tax_code'] == 'service':
@@ -1169,7 +1181,7 @@ class AccountInvoiceElectronic(models.Model):
                                 line["impuestoNeto"] = round(_line_tax, 5)
 
                             # Si no hay uom_id se asume como Servicio
-                            if not inv_line.uom_id or inv_line.uom_id.category_id.name == 'Services':  # inv_line.product_id.type == 'service'
+                            if not inv_line.uom_id or inv_line.uom_id.category_id.name in ('Services', 'Servicios'):  # inv_line.product_id.type == 'service'
                                 if taxes:
                                     if _tax_exoneration:
                                         if _percentage_exoneration < 1:
@@ -1227,6 +1239,13 @@ class AccountInvoiceElectronic(models.Model):
                             body='Revisar definición de impuesto con exoneración, está en base 100 y debe ser base 13')
                         continue
 
+                    if _no_CABYS_code and inv.tipo_documento == 'FE':
+                        inv.state_tributacion = 'error'
+                        inv.message_post(
+                            subject='Error',
+                            body=_no_CABYS_code)
+                        continue
+
                     if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.5:
                         inv.state_tributacion = 'error'
                         inv.message_post(
@@ -1274,9 +1293,9 @@ class AccountInvoiceElectronic(models.Model):
                     inv, inv.company_id.frm_ws_ambiente)
 
                 response_json = api_facturae.send_xml_fe(inv, token_m_h,
-                                                        inv.date_issuance,
-                                                        xml_firmado,
-                                                        inv.company_id.frm_ws_ambiente)
+                                                         inv.date_issuance,
+                                                         xml_firmado,
+                                                         inv.company_id.frm_ws_ambiente)
 
                 response_status = response_json.get('status')
                 response_text = response_json.get('text')
@@ -1322,6 +1341,9 @@ class AccountInvoiceElectronic(models.Model):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 inv.tipo_documento = None
                 continue
+            
+            if inv.partner_id.has_exoneration and inv.partner_id.date_expiration and (inv.partner_id.date_expiration < datetime.date.today()):
+                raise UserError('La exoneración de este cliente se encuentra vencida')
 
             currency = inv.currency_id
             sequence = False
@@ -1329,6 +1351,39 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError('Datos incompletos de referencia para nota de crédito')
             elif (inv.not_loaded_invoice or inv.not_loaded_invoice_date) and not (inv.not_loaded_invoice and inv.not_loaded_invoice_date and inv.reference_code_id and inv.reference_document_id):
                 raise UserError('Datos incompletos de referencia para nota de crédito no cargada')
+
+            # tipo de identificación
+            if not inv.company_id.identification_id:
+                raise UserError('Seleccione el tipo de identificación del emisor en el perfil de la compañía')
+
+            if inv.partner_id and inv.partner_id.vat:
+                identificacion = re.sub('[^0-9]', '', inv.partner_id.vat)
+                id_code = inv.partner_id.identification_id and inv.partner_id.identification_id.code
+                if not id_code:
+                    if len(identificacion) == 9:
+                        id_code = '01'
+                    elif len(identificacion) == 10:
+                        id_code = '02'
+                    elif len(identificacion) in (11, 12):
+                        id_code = '03'
+                    else:
+                        id_code = '05'
+
+                if id_code == '01' and len(identificacion) != 9:
+                    raise UserError('La Cédula Física del receptor debe de tener 9 dígitos')
+                elif id_code == '02' and len(identificacion) != 10:
+                    raise UserError('La Cédula Jurídica del receptor debe de tener 10 dígitos')
+                elif id_code == '03' and len(identificacion) not in (11, 12):
+                    raise UserError('La identificación DIMEX del receptor debe de tener 11 o 12 dígitos')
+                elif id_code == '04' and len(identificacion) != 10:
+                    raise UserError('La identificación NITE del receptor debe de tener 10 dígitos')
+
+            if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
+                raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para %s' % (inv.payment_term_id.name))
+
+            # Validate if invoice currency is the same as the company currency
+            if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
+                raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
 
             # Digital Invoice or ticket
             if inv.type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
@@ -1366,42 +1421,10 @@ class AccountInvoiceElectronic(models.Model):
                 if inv.tipo_documento == 'FEC':
                     sequence = inv.company_id.FEC_sequence_id.next_by_id()
 
-            if not inv.tipo_documento or (inv.type == 'in_invoice' and inv.tipo_documento in ("CCE", "CPCE", "RCE", "FE")):
+            if not inv.tipo_documento or (inv.type in ('in_invoice', 'in_refund') and inv.tipo_documento in ("CCE", "CPCE", "RCE", "FE", "NC")):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 continue
 
-            # tipo de identificación
-            if not inv.company_id.identification_id:
-                raise UserError('Seleccione el tipo de identificación del emisor en el perfil de la compañía')
-
-            if inv.partner_id and inv.partner_id.vat:
-                identificacion = re.sub('[^0-9]', '', inv.partner_id.vat)
-                id_code = inv.partner_id.identification_id and inv.partner_id.identification_id.code
-                if not id_code:
-                    if len(identificacion) == 9:
-                        id_code = '01'
-                    elif len(identificacion) == 10:
-                        id_code = '02'
-                    elif len(identificacion) in (11, 12):
-                        id_code = '03'
-                    else:
-                        id_code = '05'
-
-                if id_code == '01' and len(identificacion) != 9:
-                    raise UserError('La Cédula Física del receptor debe de tener 9 dígitos')
-                elif id_code == '02' and len(identificacion) != 10:
-                    raise UserError('La Cédula Jurídica del receptor debe de tener 10 dígitos')
-                elif id_code == '03' and len(identificacion) not in (11, 12):
-                    raise UserError('La identificación DIMEX del receptor debe de tener 11 o 12 dígitos')
-                elif id_code == '04' and len(identificacion) != 10:
-                    raise UserError('La identificación NITE del receptor debe de tener 10 dígitos')
-
-            if inv.payment_term_id and not inv.payment_term_id.sale_conditions_id:
-                raise UserError('No se pudo Crear la factura electrónica: \n Debe configurar condiciones de pago para %s' % (inv.payment_term_id.name))
-
-            # Validate if invoice currency is the same as the company currency
-            if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
-                raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
             if inv.type in ('in_invoice', 'in_refund') and not inv.economic_activity_id:
                 inv.economic_activity_id = inv.partner_id.activity_id
             else:

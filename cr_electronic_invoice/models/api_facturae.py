@@ -514,6 +514,9 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
             sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
 
+        if v.get('codigoCabys'):
+            sb.Append('<Codigo>' + (v['codigoCabys']) + '</Codigo>')
+
         if v.get('codigo'):
             sb.Append('<CodigoComercial>')
             sb.Append('<Tipo>04</Tipo>')
@@ -1167,7 +1170,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'discount': discount_percentage,
                     'discount_note': discount_note,
                     # 'total_amount': total_amount,
-                    'product_id': product_id,
+                    'product_id': product_id.id,
                     'account_id': account_id,
                     'account_analytic_id': analytic_account_id,
                     'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
