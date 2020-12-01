@@ -343,11 +343,8 @@ class AccountInvoiceElectronic(models.Model):
             pass
             #template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
         elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
-
-            attachment = self.env['ir.attachment'].search(
-                [('res_model', '=', 'account.move'),
-                 ('res_id', '=', self.id),
-                 ('res_field', '=', 'xml_comprobante')], limit=1)
+            domain = [('res_model', '=', 'account.move'),('res_id', '=', self.id),('res_field', '=', 'xml_comprobante')]
+            attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
 
             _logger.error('send_mail - id:%s attachment:%s' % (self.id, attachment))
 
@@ -355,10 +352,9 @@ class AccountInvoiceElectronic(models.Model):
                 attachment.name = self.fname_xml_comprobante
                 attachment.datas_fname = self.fname_xml_comprobante
 
-                attachment_resp = self.env['ir.attachment'].search(
-                    [('res_model', '=', 'account.move'),
-                     ('res_id', '=', self.id),
-                     ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+                domain_resp = [('res_model', '=', 'account.move'),('res_id', '=', self.id),
+                                ('res_field', '=', 'xml_respuesta_tributacion')]
+                attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
                 if attachment_resp:
                     attachment_resp.name = self.fname_xml_respuesta_tributacion
@@ -695,26 +691,22 @@ class AccountInvoiceElectronic(models.Model):
         else:
             new_invoices = self.browse()
             for invoice in self:
-                # create the new invoice
-                values = self._prepare_refund(
-                    invoice, invoice_date=invoice_date, date=date,
-                    description=description, journal_id=journal_id)
-
-                values.update({'invoice_id': invoice_id,
+                # create the new invoice                
+                values = [{'invoice_id': invoice_id,
                                'type': invoice_type,
                                'tipo_documento': doc_type,
                                'reference_code_id': reference_code_id,
                                'reference_document_id': reference_document_id,
                                'economic_activity_id': invoice.economic_activity_id.id,
-                               'payment_methods_id': invoice.payment_methods_id.id})
-                refund_invoice = self.create(values)
+                               'payment_methods_id': invoice.payment_methods_id.id}]
+                refund_invoice = self._reverse_moves(values)
                 doc_type = {
                     'out_invoice': ('customer invoices refund'),
                     'in_invoice': ('vendor bill refund'),
                     'out_refund': ('customer refund refund'),
                     'in_refund': ('vendor refund refund')
                 }
-                message = _("This %s has been created from: <a href=# data-oe-model=account.move data-oe-id=%d>%s</a>") % (doc_type[invoice.type], invoice.id, invoice.number)
+                message = _("This %s has been created from: <a href=# data-oe-model=account.move data-oe-id=%d>%s</a>") % (doc_type[invoice.type], invoice.id, invoice.name)
                 refund_invoice.message_post(body=message)
                 new_invoices += refund_invoice
             return new_invoices
@@ -805,7 +797,7 @@ class AccountInvoiceElectronic(models.Model):
                 i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
                 i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
                 if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
-                    email_template = self.env.ref('account.email_template_edi_invoice', False)
+                    #email_template = self.env.ref('account.email_template_edi_invoice', False)
                     attachment = self.env['ir.attachment'].search(
                         [('res_model', '=', 'account.move'),
                          ('res_id', '=', i.id),
@@ -823,16 +815,16 @@ class AccountInvoiceElectronic(models.Model):
                     attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
                     attachment_resp.mimetype = 'text/xml'
 
-                    email_template.attachment_ids = [
-                        (6, 0, [attachment.id, attachment_resp.id])]
+                    #email_template.attachment_ids = [
+                    #    (6, 0, [attachment.id, attachment_resp.id])]
 
-                    email_template.with_context(type='binary',
-                                                default_type='binary').send_mail(
-                        i.id,
-                        raise_exception=False,
-                        force_send=True)  # default_type='binary'
+                    #email_template.with_context(type='binary',
+                    #                            default_type='binary').send_mail(
+                    #    i.id,
+                    #    raise_exception=False,
+                    #    force_send=True)  # default_type='binary'
 
-                    email_template.attachment_ids = [(5,0,0)]
+                    #email_template.attachment_ids = [(5,0,0)]
 
             elif estado_m_h in ('firma_invalida'):
                 if i.error_count > 10:
