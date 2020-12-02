@@ -420,9 +420,10 @@ class PosOrder(models.Model):
                           doc.number_electronic, current_order, total_orders)
             docName = doc.number_electronic
             if not docName or not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
-                _logger.error(
-                    'MAB - Valida Hacienda - skipped Invoice %s', docName)
                 doc.state_tributacion = 'no_aplica'
+                doc.message_post(
+                    subject='Error',
+                    body='MAB - Valida Hacienda - skipped Invoice %s' % docName)
                 continue
             now_utc = datetime.datetime.now(pytz.timezone('UTC'))
             now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
@@ -441,8 +442,9 @@ class PosOrder(models.Model):
                 if not doc.pos_order_id:   #.number_electronic:
                     if doc.amount_total < 0:
                         doc.state_tributacion = 'error'
-                        _logger.error(
-                            'MAB - Error documento %s tiene monto negativo pero no tiene documento referencia', doc.number_electronic)
+                        doc.message_post(
+                            subject='Error',
+                            body='MAB - Error documento %s tiene monto negativo pero no tiene documento referencia' % doc.number_electronic)
                         continue
                 else:
                     if doc.amount_total >= 0:
@@ -479,6 +481,7 @@ class PosOrder(models.Model):
                 base_subtotal = 0.0
                 total_otros_cargos = 0.0
                 total_iva_devuelto = 0.0
+                _no_CABYS_code = False
                 for line in doc.lines:
                     line_number += 1
                     price = line.price_unit * (1 - line.discount / 100.0)
@@ -511,6 +514,9 @@ class PosOrder(models.Model):
                         dline["codigoCabys"] = line.product_id.cabys_code
                     elif line.product_id.categ_id and line.product_id.categ_id.cabys_code:
                         dline["codigoCabys"] = line.product_id.categ_id.cabys_code 
+                    else:
+                        _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % line.product_id.name
+                        continue
                         
                     if line.discount:
                         descuento = abs(round(base_line - subtotal_line, 5))
@@ -562,6 +568,14 @@ class PosOrder(models.Model):
                     base_subtotal += subtotal_line
                     dline["montoTotalLinea"] = round(subtotal_line + _line_tax, 5)
                     lines[line_number] = dline
+
+                if _no_CABYS_code and doc.tipo_documento != 'NC': #CAByS is not required for financial NCs
+                    doc.state_tributacion = 'error'
+                    doc.message_post(
+                        subject='Error',
+                        body=_no_CABYS_code)
+                    continue
+
                 if total_otros_cargos:
                     total_otros_cargos = round( total_otros_cargos, 5)
                     otros_cargos_id = 1
@@ -591,6 +605,7 @@ class PosOrder(models.Model):
 
             else:
                 xml_firmado = doc.xml_comprobante
+
             # get token
             token_m_h = api_facturae.get_token_hacienda(
                 doc, doc.company_id.frm_ws_ambiente)
