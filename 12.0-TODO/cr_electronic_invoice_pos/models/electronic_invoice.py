@@ -12,7 +12,7 @@ def stacktrace(func):
         # Get all but last line returned by traceback.format_stack()
         # which is the line below.
         callstack = '\n'.join([INDENT+line.strip() for line in traceback.format_stack()][:-1])
-        _logger.error('MAB - {}() called:'.format(func.__name__))
+        _logger.error('E-INV CR - {}() called:'.format(func.__name__))
         _logger.error(callstack)
         return func(*args, **kwds)
 
@@ -247,17 +247,17 @@ class PosOrder(models.Model):
         total_orders = len(pos_orders)
         current_order = 0
         _logger.error(
-            'MAB - Consulta Hacienda - POS Orders to check: %s', total_orders)
+            'E-INV CR - Consulta Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
             _logger.error(
-                'MAB - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
+                'E-INV CR - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
 
             #response_json = fxunctions.token_hacienda(doc.company_id)
             token_m_h = api_facturae.get_token_hacienda(
                 doc, doc.company_id.frm_ws_ambiente)
             # if response_json['status'] != 200:
-            #    _logger.error('MAB - Consulta Hacienda - HALTED - Failed to get token')
+            #    _logger.error('E-INV CR - Consulta Hacienda - HALTED - Failed to get token')
             #    return
 
             if doc.number_electronic and len(doc.number_electronic) == 50:
@@ -271,10 +271,10 @@ class PosOrder(models.Model):
                 elif status == 400:
                     estado_m_h = response_json.get('ind-estado')
                     _logger.error(
-                        'MAB - Error: %s Documento:%s no encontrado en Hacienda', estado_m_h, doc.number_electronic)
+                        'E-INV CR - Error: %s Documento:%s no encontrado en Hacienda', estado_m_h, doc.number_electronic)
                 else:
                     _logger.error(
-                        'MAB - Error inesperado en Consulta Hacienda - Abortando')
+                        'E-INV CR - Error inesperado en Consulta Hacienda - Abortando')
                     return
 
                 if estado_m_h == 'aceptado':
@@ -343,12 +343,12 @@ class PosOrder(models.Model):
                         doc.state_tributacion = ''
                     #doc.state_tributacion = 'no_encontrado'
                     _logger.error(
-                        'MAB - Consulta Hacienda - POS Order not found: %s', doc.number_electronic)
+                        'E-INV CR - Consulta Hacienda - POS Order not found: %s', doc.number_electronic)
             else:
                 doc.state_tributacion = 'error'
                 _logger.error(
-                    'MAB - POS Order %s  - x Number Electronic: %s formato incorrecto', doc.name, doc.number_electronic)
-        _logger.error('MAB - Consulta Hacienda POS- Finalizad Exitosamente')
+                    'E-INV CR - POS Order %s  - x Number Electronic: %s formato incorrecto', doc.name, doc.number_electronic)
+        _logger.error('E-INV CR - Consulta Hacienda POS- Finalizad Exitosamente')
 
     @api.model
     def _reenviacorreos_pos(self, max_orders=1):  # cron
@@ -364,10 +364,10 @@ class PosOrder(models.Model):
         total_orders = len(pos_orders)
         current_order = 0
         _logger.error(
-            'MAB - Reenvia Correos- POS Orders to send: %s', total_orders)
+            'E-INV CR - Reenvia Correos- POS Orders to send: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.error('MAB - Reenvia Correos- POS Order %s - %s / %s',
+            _logger.error('E-INV CR - Reenvia Correos- POS Order %s - %s / %s',
                           doc.name, current_order, total_orders)
             if doc.partner_id.email and not doc.partner_id.opt_out and doc.state_tributacion == 'aceptado':
                 comprobante = self.env['ir.attachment'].search(
@@ -404,7 +404,7 @@ class PosOrder(models.Model):
             else:
                 doc.state_email = 'no_email'
                 _logger.info('email no enviado - cuenta no definida')
-        _logger.error('MAB - Reenvia Correos - Finalizado')
+        _logger.error('E-INV CR - Reenvia Correos - Finalizado')
 
     @api.model
     def _validahacienda_pos(self, max_orders=10, no_partner=True):  # cron
@@ -423,10 +423,10 @@ class PosOrder(models.Model):
         total_orders = len(pos_orders)
         current_order = 0
         _logger.error(
-            'MAB - Valida Hacienda - POS Orders to check: %s', total_orders)
+            'E-INV CR - Valida Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.error('MAB - Valida Hacienda - POS Order: "%s"  -  %s / %s',
+            _logger.error('E-INV CR - Valida Hacienda - POS Order: "%s"  -  %s / %s',
                           doc.number_electronic, current_order, total_orders)
 
             docName = doc.number_electronic
@@ -435,7 +435,7 @@ class PosOrder(models.Model):
 
             if not docName or not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
                 _logger.error(
-                    'MAB - Valida Hacienda - skipped Invoice %s', docName)
+                    'E-INV CR - Valida Hacienda - skipped Invoice %s', docName)
                 doc.state_tributacion = 'no_aplica'
                 continue
 
@@ -462,12 +462,12 @@ class PosOrder(models.Model):
                     if doc.amount_total < 0:
                         doc.state_tributacion = 'error'
                         _logger.error(
-                            'MAB - Error documento %s tiene monto negativo pero no tiene documento referencia', doc.number_electronic)
+                            'E-INV CR - Error documento %s tiene monto negativo pero no tiene documento referencia', doc.number_electronic)
                         continue
                 else:
                     if doc.amount_total >= 0:
                         _logger.error(
-                            'MAB - Valida Hacienda - skipped Invoice %s', docName)
+                            'E-INV CR - Valida Hacienda - skipped Invoice %s', docName)
                         doc.state_tributacion = 'no_aplica'
                         continue
                         doc.tipo_documento = 'ND'
@@ -488,7 +488,7 @@ class PosOrder(models.Model):
                 #if not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
                 #if not doc.statement_ids or not doc.statement_ids[0].statement_id or not doc.statement_ids[0].statement_id.journal_id or not doc.statement_ids[0].statement_id.journal_id.payment_method_id:
                 #    _logger.error(
-                #        'MAB 001 - codigo seguridad : %s  -- Pedido: %s Metodo de pago de diario no definido, utilizando efectivo', codigo_seguridad, docName)
+                #        'E-INV CR 001 - codigo seguridad : %s  -- Pedido: %s Metodo de pago de diario no definido, utilizando efectivo', codigo_seguridad, docName)
                 #    medio_pago = '01'
                 #else:
                 #    medio_pago = doc.statement_ids[0].statement_id.journal_id.payment_method_id and doc.statement_ids[0].statement_id.journal_id.payment_method_id.sequence 
@@ -627,7 +627,7 @@ class PosOrder(models.Model):
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
 
                 # if response_json['status'] != 200:
-                #    _logger.error('MAB - API Error creating XML:%s', response_json['text'])
+                #    _logger.error('E-INV CR - API Error creating XML:%s', response_json['text'])
                 #    doc.state_tributacion = 'error'
                 #    continue
 
@@ -636,7 +636,7 @@ class PosOrder(models.Model):
                 #    tipo_documento = 'FE'
                 #response_json = fxunctions.sign_xml(doc, tipo_documento, url, xml)
                 # if response_json['status'] != 200:
-                #    _logger.error('MAB - API Error signing XML:%s', response_json['text'])
+                #    _logger.error('E-INV CR - API Error signing XML:%s', response_json['text'])
                 #    doc.state_tributacion = 'error'
                 #    continue
 
@@ -644,7 +644,7 @@ class PosOrder(models.Model):
                 #doc.xml_comprobante = response_json.get('xmlFirmado')
                 doc.xml_comprobante = base64.encodestring(xml_firmado)
 
-                _logger.error('MAB - SIGNED XML:%s', doc.fname_xml_comprobante)
+                _logger.error('E-INV CR - SIGNED XML:%s', doc.fname_xml_comprobante)
 
             else:
                 xml_firmado = doc.xml_comprobante
@@ -674,17 +674,17 @@ class PosOrder(models.Model):
                 elif doc.error_count > 10:
                     doc.message_post(subject='Error', body=response_text)
                     doc.state_tributacion = 'error'
-                    _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
+                    _logger.error('E-INV CR - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
                                   response_status, response_text)
                 else:
                     doc.error_count += 1
                     doc.state_tributacion = 'procesando'
                     doc.message_post(subject='Error', body=response_text)
-                    _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
+                    _logger.error('E-INV CR - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
                                   response_status, response_text)
             # else:
             #    doc.state_tributacion = 'error'
             #    doc.message_post(body='Error obteniendo token_hacienda', subject='Error')
-            #    _logger.error('MAB - Error obteniendo token_hacienda')
+            #    _logger.error('E-INV CR - Error obteniendo token_hacienda')
 
-        _logger.info('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
+        _logger.info('E-INV CR 014 - Valida Hacienda POS- Finalizado Exitosamente')
