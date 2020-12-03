@@ -834,7 +834,7 @@ def consulta_clave(clave, token, tipo_ambiente):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
-        _logger.error('MAB - 200 - consulta_clave exitosa.  respuesta: %s',
+        _logger.error('E-INV CR - 200 - consulta_clave exitosa.  respuesta: %s',
                       response.json().get('ind-estado'))
         response_json = {
             'status': 200,

@@ -666,11 +666,11 @@ class AccountInvoiceElectronic(models.Model):
                                     elif status == 400:
                                         inv.state_tributacion = 'ne'
                                         _logger.error(
-                                            'MAB - Aceptacion Documento:%s no encontrado en Hacienda.',
+                                            'E-INV CR - Aceptacion Documento:%s no encontrado en Hacienda.',
                                             inv.number_electronic + '-' + inv.consecutive_number_receiver)
                                     else:
                                         _logger.error(
-                                            'MAB - Error inesperado en Send Acceptance File - Abortando')
+                                            'E-INV CR - Error inesperado en Send Acceptance File - Abortando')
                                         return
 
     @api.multi
@@ -861,7 +861,7 @@ class AccountInvoiceElectronic(models.Model):
                         i.error_count += 1
                         i.state_tributacion = ''
                     # doc.state_tributacion = 'no_encontrado'
-                    _logger.error('MAB - Consulta Hacienda - Invoice not found: %s  -  Estado Hacienda: %s', i.number_electronic, estado_m_h)
+                    _logger.error('E-INV CR - Consulta Hacienda - Invoice not found: %s  -  Estado Hacienda: %s', i.number_electronic, estado_m_h)
             except Exception as error:
                 i.state_tributacion='error'
                 i.message_post(
