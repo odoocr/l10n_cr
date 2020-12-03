@@ -675,5 +675,13 @@
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
+        <!--record id="l10n_cr.1_account_tax_template_IV_0" model="account.tax">
+            <field name="active">0</field>
+        </record>
+
+        <record id="l10n_cr.1_account_tax_template_IV_1" model="account.tax">
+            <field name="active">0</field>
+        </record-->
+
     </data>
 </odoo>
