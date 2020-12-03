@@ -12,7 +12,7 @@
                     <field name="cabys_code" />                
                     <field name="economic_activity_id" 
                         domain="[('active', '=', True)]"  />
-                    <field name="non_tax_deductible" default="0" groups="" />
+                    <field name="non_tax_deductible" default="0" />
                 </field>
             </field>
         </record>
