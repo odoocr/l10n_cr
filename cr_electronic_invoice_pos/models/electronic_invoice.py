@@ -421,6 +421,8 @@ class PosOrder(models.Model):
                 razon_referencia = False
                 invoice_comments = False
                 tipo_documento_referencia = False
+                _no_CABYS_code = False
+
                 if not doc.pos_order_id:   #.number_electronic:
                     if doc.amount_total < 0:
                         doc.state_tributacion = 'error'
@@ -489,6 +491,15 @@ class PosOrder(models.Model):
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
                     }
+
+                    if line.product_id.cabys_code:
+                        dline["codigoCabys"] = line.product_id.cabys_code
+                    elif line.product_id.categ_id and line.product_id.categ_id.cabys_code:
+                        dline["codigoCabys"] = line.product_id.categ_id.cabys_code
+                    else:
+                        _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % line.product_id.name
+                        continue
+
                     if line.discount:
                         descuento = abs(round(base_line - subtotal_line, 5))
                         total_descuento += descuento
@@ -537,6 +548,13 @@ class PosOrder(models.Model):
                     base_subtotal += subtotal_line
                     dline["montoTotalLinea"] = round(subtotal_line + _line_tax, 5)
                     lines[line_number] = dline
+                if _no_CABYS_code and doc.tipo_documento != 'NC': #CAByS is not required for financial NCs
+                    doc.state_tributacion = 'error'
+                    doc.message_post(
+                        subject='Error',
+                        body=_no_CABYS_code)
+                    continue
+
                 if total_otros_cargos:
                     total_otros_cargos = round( total_otros_cargos, 5)
                     otros_cargos_id = 1

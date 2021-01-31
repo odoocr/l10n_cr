@@ -193,7 +193,6 @@ class InvoiceLineElectronic(models.Model):
             self.economic_activity_id = self.product_id.categ_id.economic_activity_id
         else:
             self.economic_activity_id = self.company_id.activity_id
-            #self.economic_activity_id = self.invoice_id.economic_activity_id
         
 
 class AccountInvoiceElectronic(models.Model):
@@ -538,7 +537,6 @@ class AccountInvoiceElectronic(models.Model):
 
                     if inv.company_id.frm_ws_ambiente != 'disabled' and inv.state_invoice_partner:
 
-                        # url = self.company_id.frm_callback_url
                         message_description = "<p><b>Enviando Mensaje Receptor</b></p>"
 
                         '''Si por el contrario es un documento nuevo, asignamos todos los valores'''
@@ -1002,6 +1000,9 @@ class AccountInvoiceElectronic(models.Model):
                 _no_CABYS_code = False
 
                 for inv_line in inv.invoice_line_ids:
+                    if inv_line.display_type:  # skip sections and notes
+                        continue
+
                     # Revisamos si está línea es de Otros Cargos
                     if inv_line.product_id and inv_line.product_id.id == self.env.ref('cr_electronic_invoice.product_iva_devuelto').id:
                         total_iva_devuelto = -inv_line.price_total
@@ -1063,8 +1064,8 @@ class AccountInvoiceElectronic(models.Model):
                             line["codigoProducto"] = inv_line.product_id.code or ''
                             if inv_line.product_id.cabys_code:
                                 line["codigoCabys"] = inv_line.product_id.cabys_code
-                            #elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
-                            #    line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
+                            elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
+                                line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
                             else:
                                 _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
                                 continue
@@ -1189,11 +1190,6 @@ class AccountInvoiceElectronic(models.Model):
                 # convertir el monto de la factura a texto
                 inv.invoice_amount_text = extensions.text_converter.number_to_text_es(base_subtotal + total_impuestos - total_iva_devuelto)
 
-                # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
-                #if not inv.origin:
-                #    inv.move_name = inv.invoice_id.display_name
-                #    inv.origin = inv.invoice_id.display_name
-
                 if _no_CABYS_code and inv.tipo_documento == 'FE':
                     inv.state_tributacion = 'error'
                     inv.message_post(
@@ -1286,13 +1282,6 @@ class AccountInvoiceElectronic(models.Model):
             # tipo de identificación
             if self.partner_id and self.partner_id.vat and not self.partner_id.identification_id:
                 raise UserError('Seleccione el tipo de identificación del cliente en su perfil')
-            # Verificar si es nota DEBITO
-            # if self.invoice_id and self.journal_id and (
-            #         self.journal_id.code == 'NDV'):
-            #     tipo_documento = 'ND'
-            #     sequence = self.journal_id.ND_sequence_id.next_by_id()
-            #
-            # else:
 
             if tipo_documento == 'FE' and (not self.partner_id.vat or self.partner_id.identification_id.code == '05'):
                 tipo_documento = 'TE'
