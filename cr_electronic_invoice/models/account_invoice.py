@@ -1154,7 +1154,7 @@ class AccountInvoiceElectronic(models.Model):
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     # tax_amount = round(i['amount'], 5) * quantity
-                                    tax_amount = round(subtotal_line * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                    tax_amount = round(i['base'] * taxes_lookup[i['id']]['tarifa'] / 100, 5)
                                     _line_tax += tax_amount
                                     tax = {
                                         'codigo': taxes_lookup[i['id']]['tax_code'],
@@ -1331,7 +1331,7 @@ class AccountInvoiceElectronic(models.Model):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 inv.tipo_documento = None
                 continue
-            
+
             if inv.partner_id.has_exoneration and inv.partner_id.date_expiration and (inv.partner_id.date_expiration < datetime.date.today()):
                 raise UserError('La exoneración de este cliente se encuentra vencida')
 
