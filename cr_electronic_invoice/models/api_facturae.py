@@ -550,8 +550,8 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
                 if tax_code.isdigit():
                     sb.Append('<CodigoTarifa>' + tax_code + '</CodigoTarifa>')
-            sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
-            sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
+                sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
+                sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
 
                 if inv.tipo_documento != 'FEE':
                     if b.get('exoneracion'):
