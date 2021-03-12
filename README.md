@@ -17,4 +17,4 @@ git clone --branch ${BRANCH} --depth 1 --single-branch https://github.com/odoocr
 
 Esto es una versión EN CONSTANTE DESARROLLO, por favor uselo bajo su propio riesgo y responsabilidad.
 
-***No nos hacemos responsables por los datos que una actualización de código pueda ocasionar***
+***No nos hacemos responsables por la pérdida de datos que una actualización de código pueda ocasionar***
