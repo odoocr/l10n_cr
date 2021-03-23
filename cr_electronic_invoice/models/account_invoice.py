@@ -1345,6 +1345,9 @@ class AccountInvoiceElectronic(models.Model):
                 inv.tipo_documento = None
                 continue
 
+            if inv.partner_id.has_exoneration and inv.partner_id.date_expiration and (inv.partner_id.date_expiration < datetime.date.today()):
+                raise UserError('La exoneración de este cliente se encuentra vencida')
+
             currency = inv.currency_id
             sequence = False
             if (inv.invoice_id ) and not (inv.invoice_id and inv.reference_code_id and inv.reference_document_id):
