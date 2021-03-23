@@ -114,7 +114,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
     });
 
     //models.load_fields('res.company', ['street', 'city', 'state_id', 'zip']);
-    models.load_fields('res.partner', ['identification_id','skipMH'])
+    //models.load_fields('res.partner', ['identification_id'])
 
     return exports;
 });

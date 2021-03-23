@@ -360,7 +360,7 @@
             <field name="sequence">10</field>
             <field name="iva_tax_desc">Transitorio 8%</field>
             <field name="iva_tax_code">07</field>
-        </record>z
+        </record>
 
         <record id="iva_tax_14_ND" model="account.tax">
             <field name="tax_code">01</field>
