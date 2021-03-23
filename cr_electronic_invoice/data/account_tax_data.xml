@@ -360,7 +360,7 @@
             <field name="sequence">10</field>
             <field name="iva_tax_desc">Transitorio 8%</field>
             <field name="iva_tax_code">07</field>
-        </record>
+        </record>z
 
         <record id="iva_tax_14_ND" model="account.tax">
             <field name="tax_code">01</field>
@@ -382,7 +382,7 @@
             <field name="type_tax_use">sale</field>
             <field name="tax_group_id" ref="tax_group_SC"/>
             <field name="description">Impuesto Selectivo de Consumo</field>
-            <field name="sequence">10</field>
+            <field name="sequence">5</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -394,7 +394,7 @@
             <field name="type_tax_use">purchase</field>
             <field name="tax_group_id" ref="tax_group_SC"/>
             <field name="description">Impuesto Selectivo de Consumo</field>
-            <field name="sequence">10</field>
+            <field name="sequence">5</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -405,7 +405,7 @@
             <field name="amount">0</field>
             <field name="type_tax_use">purchase</field>
             <field name="description">Impuesto Selectivo de Consumo (No deducible)</field>
-            <field name="sequence">10</field>
+            <field name="sequence">5</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
             <field name="tax_group_id" ref="tax_group_IVA_ND"/>
