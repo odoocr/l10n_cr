@@ -74,9 +74,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
         push_order: function(order, opts) {
             //debugger;
             if (order !== undefined) {
-                if (order.get('client') && order.get('client').skipMH) {
-                    console.log('cliente');
-                } else if (order.get('client') && order.get('client').vat) {
+                if (order.get('client') && order.get('client').vat) {
                     order.set({'sequence': this.FE_sequence.number_next_actual});
                     order.set({'number_electronic': _sequence_next(this.FE_sequence)});
                     order.set({'tipo_documento': 'FE'});
