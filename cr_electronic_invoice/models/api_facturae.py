@@ -514,6 +514,9 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
             sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
 
+        if v.get('codigoCabys'):
+            sb.Append('<Codigo>' + (v['codigoCabys']) + '</Codigo>')
+
         if v.get('codigo'):
             sb.Append('<CodigoComercial>')
             sb.Append('<Tipo>04</Tipo>')
@@ -831,7 +834,7 @@ def consulta_clave(clave, token, tipo_ambiente):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
-        _logger.error('MAB - 200 - consulta_clave exitosa.  respuesta: %s',
+        _logger.error('E-INV CR - 200 - consulta_clave exitosa.  respuesta: %s',
                       response.json().get('ind-estado'))
         response_json = {
             'status': 200,
@@ -1080,14 +1083,6 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         _logger.debug('FECR - load_lines: %s - account: %s' %
                       (load_lines, account_id))
         
-        product = False
-        if product_id:
-            product = product_id.id
-
-        analytic_account = False
-        if analytic_account_id:
-            analytic_account = analytic_account_id.id
-
         # if load_lines and not invoice.invoice_line_ids:
         if load_lines:
             lines = invoice_xml.xpath("inv:DetalleServicio/inv:LineaDetalle", namespaces=namespaces)
@@ -1175,9 +1170,9 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     'discount': discount_percentage,
                     'discount_note': discount_note,
                     # 'total_amount': total_amount,
-                    'product_id': product,
-                    'account_id': account_id.id or False,
-                    'account_analytic_id': analytic_account,
+                    'product_id': product_id.id,
+                    'account_id': account_id,
+                    'account_analytic_id': analytic_account_id,
                     'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                     'total_tax': total_tax,
                     #'economic_activity_id': invoice.economic_activity_id.id,

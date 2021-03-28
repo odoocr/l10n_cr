@@ -8,13 +8,11 @@
             <field name="arch" type="xml">
                 <field name="type" position="after">
                     <field name="code_type_id" required="1"/>
-                    <field name="commercial_measurement" required="0"/>
-                </field>
-                <field name="type" position="after">
+                    <field name="commercial_measurement"/>
+                    <field name="cabys_code" />                
                     <field name="economic_activity_id" 
-                        domain="[('active', '=', True)]" 
-                        options='{"no_open": True, "no_create": True}'/>
-                    <field name="non_tax_deductible" default="0" groups="" />
+                        domain="[('active', '=', True)]"  />
+                    <field name="non_tax_deductible" default="0" />
                 </field>
             </field>
         </record>
@@ -25,8 +23,8 @@
             <field name="arch" type="xml">
                 <field name="name" position="after">
                     <field name="economic_activity_id" 
-                        domain="[('active', '=', True)]" 
-                        options='{"no_open": True, "no_create": True}'/>
+                        domain="[('active', '=', True)]" />
+                    <field name="cabys_code" />
                 </field>
             </field>
         </record>
