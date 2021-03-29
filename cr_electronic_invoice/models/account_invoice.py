@@ -1041,6 +1041,7 @@ class AccountInvoiceElectronic(models.Model):
                 total_impuestos = 0.0
                 base_subtotal = 0.0
                 _old_rate_exoneration = False
+                _no_CABYS_code = False
                 
                 for inv_line in inv.invoice_line_ids:
                     # Revisamos si está línea es de Otros Cargos
@@ -1102,11 +1103,17 @@ class AccountInvoiceElectronic(models.Model):
                         if inv_line.product_id:
                             line["codigo"] = inv_line.product_id.default_code or ''
                             line["codigoProducto"] = inv_line.product_id.code or ''
-                            
+
                             if inv_line.product_id.cabys_code:
                                 line["codigoCabys"] = inv_line.product_id.cabys_code
                             elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
                                 line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
+                            else:
+                                _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                                continue
+                        else:
+                            _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                            continue
 
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
@@ -1153,8 +1160,8 @@ class AccountInvoiceElectronic(models.Model):
 
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
-                                    # tax_amount = round(i['amount'], 5) * quantity
-                                    tax_amount = round(subtotal_line * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                    product_amount = round(i['base']*quantity)
+                                    tax_amount = round(product_amount * taxes_lookup[i['id']]['tarifa'] / 100, 5)
                                     _line_tax += tax_amount
                                     tax = {
                                         'codigo': taxes_lookup[i['id']]['tax_code'],
@@ -1234,6 +1241,12 @@ class AccountInvoiceElectronic(models.Model):
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
+
+                if _no_CABYS_code and inv.tipo_documento != 'NC':  # CAByS is not required for financial NCs
+                    inv.message_post(
+                        subject='Error',
+                        body=_no_CABYS_code)
+                    continue
 
                 if _old_rate_exoneration:
                     inv.state_tributacion = 'error'
@@ -1331,6 +1344,9 @@ class AccountInvoiceElectronic(models.Model):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 inv.tipo_documento = None
                 continue
+
+            if inv.partner_id.has_exoneration and inv.partner_id.date_expiration and (inv.partner_id.date_expiration < datetime.date.today()):
+                raise UserError('La exoneración de este cliente se encuentra vencida')
 
             currency = inv.currency_id
             sequence = False
