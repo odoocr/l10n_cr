@@ -3,13 +3,11 @@ xmlsig
 jsonschema
 pyopenssl
 zeep
-suds-py3
 PyPDF2
 passlib
 werkzeug
 python-dateutil
 PyYAML
-psycopg2
 psutil
 image
 jinja2
