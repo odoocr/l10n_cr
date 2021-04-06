@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
 
         <!-- Account Tax Group -->
         <record id="tax_group_IVA0" model="account.tax.group">
@@ -382,7 +382,7 @@
             <field name="type_tax_use">sale</field>
             <field name="tax_group_id" ref="tax_group_SC"/>
             <field name="description">Impuesto Selectivo de Consumo</field>
-            <field name="sequence">10</field>
+            <field name="sequence">5</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -394,7 +394,7 @@
             <field name="type_tax_use">purchase</field>
             <field name="tax_group_id" ref="tax_group_SC"/>
             <field name="description">Impuesto Selectivo de Consumo</field>
-            <field name="sequence">10</field>
+            <field name="sequence">5</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
         </record>
@@ -405,7 +405,7 @@
             <field name="amount">0</field>
             <field name="type_tax_use">purchase</field>
             <field name="description">Impuesto Selectivo de Consumo (No deducible)</field>
-            <field name="sequence">10</field>
+            <field name="sequence">5</field>
             <field name="iva_tax_desc">N/A</field>
             <field name="iva_tax_code">N/A</field>
             <field name="tax_group_id" ref="tax_group_IVA_ND"/>

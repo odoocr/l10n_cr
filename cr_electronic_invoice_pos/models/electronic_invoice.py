@@ -65,6 +65,27 @@ class PosOrder(models.Model):
     _name = "pos.order"
     _inherit = ["pos.order", "mail.thread"]
 
+    @api.multi
+    def action_invoice_sent(self):
+        email_template = self.env.ref(
+            'cr_electronic_invoice_pos.email_template_pos_invoice', False)
+        attachment = self.env['ir.attachment'].search(
+            [('res_model', '=', 'pos.order'), ('res_id', '=', self.id),
+             ('res_field', '=', 'xml_comprobante')], limit=1)
+        attachment.name = self.fname_xml_comprobante
+        attachment.datas_fname = self.fname_xml_comprobante
+        attachment_resp = self.env['ir.attachment'].search(
+            [('res_model', '=', 'pos.order'), ('res_id', '=', self.id),
+             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+        attachment_resp.name = self.fname_xml_respuesta_tributacion
+        attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
+        email_template.attachment_ids = [
+            (6, 0, [attachment.id, attachment_resp.id])]
+        email_template.with_context(type='binary', default_type='binary').send_mail(self.id,
+             raise_exception=False,
+             force_send=True)  # default_type='binary'
+        email_template.attachment_ids = [(5)]
+
     @api.model
     def sequence_number_sync(self, vals):
         tipo_documento = vals.get('tipo_documento', False)
@@ -226,8 +247,7 @@ class PosOrder(models.Model):
     @api.model
     def _consultahacienda_pos(self, max_orders=10):  # cron
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
-                                                   ('number_electronic',
-                                                    '!=', False),
+                                                   ('number_electronic', '!=', False),
                                                    ('state_tributacion', 'in', ('recibido', 'procesando'))],
                                                   limit=max_orders)
         total_orders = len(pos_orders)
@@ -458,6 +478,7 @@ class PosOrder(models.Model):
                 base_subtotal = 0.0
                 total_otros_cargos = 0.0
                 total_iva_devuelto = 0.0
+                _no_CABYS_code = False
                 for line in doc.lines:
                     line_number += 1
                     price = line.price_unit * (1 - line.discount / 100.0)
@@ -485,6 +506,15 @@ class PosOrder(models.Model):
                         "montoTotal": base_line,
                         "subtotal": subtotal_line,
                     }
+
+                    if line.product_id.cabys_code:
+                        dline["codigoCabys"] = line.product_id.cabys_code
+                    elif line.product_id.categ_id and line.product_id.categ_id.cabys_code:
+                        dline["codigoCabys"] = line.product_id.categ_id.cabys_code
+                    else:
+                        _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % line.product_id.name
+                        continue
+
                     if line.discount:
                         descuento = abs(round(base_line - subtotal_line, 5))
                         total_descuento += descuento
@@ -535,6 +565,12 @@ class PosOrder(models.Model):
                     base_subtotal += subtotal_line
                     dline["montoTotalLinea"] = round(subtotal_line + _line_tax, 5)
                     lines[line_number] = dline
+
+                if _no_CABYS_code and doc.tipo_documento != 'NC':  # CAByS is not required for financial NCs
+                    doc.message_post(
+                        subject='Error',
+                        body=_no_CABYS_code)
+                    continue
                 if total_otros_cargos:
                     total_otros_cargos = round( total_otros_cargos, 5)
                     otros_cargos_id = 1
