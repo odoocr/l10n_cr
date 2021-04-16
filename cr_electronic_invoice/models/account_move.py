@@ -182,7 +182,23 @@ class InvoiceLineElectronic(models.Model):
     def product_changed(self):
         # Check if the product is non deductible to use a non_deductible tax
         if self.product_id.non_tax_deductible:
+            taxes = []
             self.non_tax_deductible = True
+            for tax in self.invoice_line_tax_ids:
+                new_tax = self.env['account.tax'].search(
+                                                [('tax_code', '=', tax.tax_code),
+                                                ('amount', '=', tax.amount),
+                                                ('type_tax_use', '=', 'purchase'),
+                                                ('non_tax_deductible', '=', True),
+                                                ('active', '=', True)],
+                                                limit=1)
+                if new_tax:
+                    taxes.append((3, tax.id))
+                    taxes.append((4, new_tax.id))
+                else:
+                    raise UserError(_('There is no "Non tax deductible" tax with the tax percentage of this product'))
+            
+            self.invoice_line_tax_ids = taxes
         else:
             self.non_tax_deductible = False
 
