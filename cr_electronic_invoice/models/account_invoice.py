@@ -194,7 +194,23 @@ class InvoiceLineElectronic(models.Model):
 	def product_changed(self):
 		# Check if the product is non deductible to use a non_deductible tax
 		if self.product_id.non_tax_deductible:
+			taxes = []
 			self.non_tax_deductible = True
+			for tax in self.invoice_line_tax_ids:
+				new_tax = self.env['account.tax'].search(
+												[('tax_code', '=', tax.tax_code),
+												('amount', '=', tax.amount),
+												('type_tax_use', '=', 'purchase'),
+												('non_tax_deductible', '=', True),
+												('active', '=', True)],
+												limit=1)
+				if new_tax:
+					taxes.append((3, tax.id))
+					taxes.append((4, new_tax.id))
+				else:
+					raise UserError(_('There is no "Non tax deductible" tax with the tax percentage of this product'))
+			
+			self.invoice_line_tax_ids = taxes
 		else:
 			self.non_tax_deductible = False
 
@@ -1242,6 +1258,8 @@ class AccountInvoiceElectronic(models.Model):
 					inv.message_post(
 						subject='Error',
 						body=_no_CABYS_code)
+					if inv.tipo_documento == 'FEC':
+						raise UserError(_no_CABYS_code)
 					continue
 
 				if _old_rate_exoneration:
@@ -1445,11 +1463,22 @@ class AccountInvoiceElectronic(models.Model):
 
 			super(AccountInvoiceElectronic, inv).action_invoice_open()
 			if not inv.number_electronic:
+				# if journal doesn't have sucursal use default from company
+				sucursal_id = inv.journal_id.sucursal
+				if not sucursal_id:
+					sucursal_id = self.env.user.company_id.sucursal_MR
+
+				# if journal doesn't have terminal use default from company
+				terminal_id = inv.journal_id.terminal
+				if not terminal_id:
+					sucursal_id = self.env.user.company_id.terminal_MR
+
 				response_json = api_facturae.get_clave_hacienda(inv,
 															inv.tipo_documento,
 															sequence,
-															inv.journal_id.sucursal,
-															inv.journal_id.terminal)
+															sucursal_id,
+															terminal_id)
+
 				inv.number_electronic = response_json.get('clave')
 				inv.sequence = response_json.get('consecutivo')
 			
