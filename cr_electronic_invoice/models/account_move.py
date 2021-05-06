@@ -202,6 +202,17 @@ class AccountInvoiceElectronic(models.Model):
     date_issuance = fields.Char(string="Fecha de emisión", required=False, copy=False)
     consecutive_number_receiver = fields.Char(string="Número Consecutivo Receptor", required=False, copy=False, readonly=True, index=True)
 
+    state_send_invoice = fields.Selection([('aceptado', 'Aceptado'),
+                                          ('rechazado', 'Rechazado'),
+                                          ('error', 'Error'),
+                                          ('na', 'No Aplica'),
+                                          ('ne', 'No Encontrado')],
+                                          ('firma_invalida', 'Firma Inválida'),
+                                          ('procesando', 'Procesando'),
+                                         'Estado FE Proveedor',
+                                         copy=False)
+
+
     state_tributacion = fields.Selection([('aceptado', 'Aceptado'),
                                           ('rechazado', 'Rechazado'),
                                           ('recibido', 'Recibido'),
@@ -271,7 +282,7 @@ class AccountInvoiceElectronic(models.Model):
     state_email = fields.Selection([('no_email', 'Sin cuenta de correo'), (
         'sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
 
-    invoice_amount_text = fields.Char(string='Monto en Letras', readonly=True, required=False, )
+    invoice_amount_text = fields.Char(string='Monto en Letras', required=False, )
 
     ignore_total_difference = fields.Boolean(string="Ingorar Diferencia en Totales", required=False, default=False)
 
@@ -997,7 +1008,6 @@ class AccountInvoiceElectronic(models.Model):
                 total_impuestos = 0.0
                 base_subtotal = 0.0
                 _old_rate_exoneration = False
-                _no_CABYS_code = False
 
                 for inv_line in inv.invoice_line_ids:
                     if inv_line.display_type:  # skip sections and notes
@@ -1066,12 +1076,6 @@ class AccountInvoiceElectronic(models.Model):
                                 line["codigoCabys"] = inv_line.product_id.cabys_code
                             elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
                                 line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
-                            else:
-                                _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
-                                continue
-                        else:
-                            _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
-                            continue
 
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
@@ -1113,7 +1117,7 @@ class AccountInvoiceElectronic(models.Model):
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     # tax_amount = round(i['amount'], 5) * quantity
-                                    tax_amount = round(subtotal_line * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                    tax_amount = round(subtotal_line * taxes_lookup[i['id']]['tarifa'] / 100, 5) 
                                     _line_tax += tax_amount
                                     tax = {
                                         'codigo': taxes_lookup[i['id']]['tax_code'],
@@ -1187,14 +1191,15 @@ class AccountInvoiceElectronic(models.Model):
                         'MontoCargo': total_servicio_salon
                     }
 
-                # convertir el monto de la factura a texto
-                inv.invoice_amount_text = extensions.text_converter.number_to_text_es(base_subtotal + total_impuestos - total_iva_devuelto)
+                # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
+                if not inv.origin:
+                    inv.origin = inv.invoice_id.display_name
 
-                if _no_CABYS_code and inv.tipo_documento == 'FE':
+                if _old_rate_exoneration:
                     inv.state_tributacion = 'error'
                     inv.message_post(
                         subject='Error',
-                        body=_no_CABYS_code)
+                        body='Revisar definición de impuesto con exoneración, está en base 100 y debe ser base 13')
                     continue
 
                 if abs(base_subtotal + total_impuestos + total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.5:
@@ -1405,5 +1410,8 @@ class AccountInvoiceElectronic(models.Model):
             inv.state_tributacion = False
             inv.invoice_amount_text = ''
 
-            
-            
+    @api.onchange('amount_total')
+    def update_text_amount(self):
+        for inv in self:
+            inv.invoice_amount_text = extensions.text_converter.number_to_text_es(inv.amount_total)
+
