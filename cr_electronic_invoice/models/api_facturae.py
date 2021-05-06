@@ -160,9 +160,9 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
             'La situación indicada para el comprobante electŕonico es inválida: ' + situacion)
 
     '''Creamos la fecha para la clave'''
-    dia = str(doc.date_invoice.day).zfill(2) #[8:10]#'%02d' % now_cr.day,
-    mes = str(doc.date_invoice.month).zfill(2) #[5:7]#'%02d' % now_cr.month,
-    anno = str(doc.date_invoice.year)[2:]#str(now_cr.year)[2:4],
+    dia = str(doc.invoice_date.day).zfill(2) #[8:10]#'%02d' % now_cr.day,
+    mes = str(doc.invoice_date.month).zfill(2) #[5:7]#'%02d' % now_cr.month,
+    anno = str(doc.invoice_date.year)[2:]#str(now_cr.year)[2:4],
     cur_date = dia+mes+anno
 
     phone = phonenumbers.parse(doc.company_id.phone, 
@@ -229,7 +229,7 @@ def get_token_hacienda(inv, tipo_ambiente):
                 last_tokens_refresh[inv.company_id.id] = response_json.get(
                     'refresh_expires_in')
             else:
-                _logger.error('FECR - token_hacienda failed.  error: %s' % (response.status_code))
+                _logger.error('E-INV CR - token_hacienda failed.  error: %s' % (response.status_code))
 
         except requests.exceptions.RequestException as e:
             raise Warning(_('Error Obteniendo el Token desde MH. Excepcion %s' % (e)))
@@ -335,23 +335,16 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
 
     # TODO: Estar atento a la publicación de Hacienda de cómo utilizar esto
     if monto_total_impuesto_acreditar:
-        sb.Append(
-            '<MontoTotalImpuestoAcreditar>' +
-            str(monto_total_impuesto_acreditar) +
-            '</MontoTotalImpuestoAcreditar>')
+        sb.Append('<MontoTotalImpuestoAcreditar>' + str(monto_total_impuesto_acreditar) + '</MontoTotalImpuestoAcreditar>')
 
     # TODO: Estar atento a la publicación de Hacienda de cómo utilizar esto
     if monto_total_gasto_aplicable:
-        sb.Append('<MontoTotalDeGastoAplicable>' +
-                  str(monto_total_gasto_aplicable) +
-                  '</MontoTotalDeGastoAplicable>')
+        sb.Append('<MontoTotalDeGastoAplicable>' + str(monto_total_gasto_aplicable) + '</MontoTotalDeGastoAplicable>')
 
     if mr_total_factura is not None and mr_total_factura > 0:
         sb.Append('<TotalFactura>' + str(mr_total_factura) + '</TotalFactura>')
     else:
-        raise UserError(
-            'El monto Total de la Factura para el Mensaje Receptro es inválido'
-        )
+        raise UserError('El monto Total de la Factura para el Mensaje Receptro es inválido')
 
     sb.Append('<NumeroCedulaReceptor>' + mr_cedula_receptor + '</NumeroCedulaReceptor>')
     sb.Append('<NumeroConsecutivoReceptor>' + mr_consecutivo_receptor + '</NumeroConsecutivoReceptor>')
@@ -373,17 +366,15 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
-        inv_statement_length = len(inv.statement_ids)
-        for statement_counter in range(inv_statement_length):
-            if inv.statement_ids[statement_counter].statement_id.journal_id.type == 'cash':
+        for payment in inv.payment_ids:
+            if payment.payment_method_id.is_cash_count:
                 payment_methods_id.append('01')
             else:
                 payment_methods_id.append('02')
-
         cod_moneda = str(inv.company_id.currency_id.name)
     else:
-        payment_methods_id.append (str(inv.payment_methods_id.sequence))
-        plazo_credito = str(inv.payment_term_id and inv.payment_term_id.line_ids[0].days or 0)
+        payment_methods_id.append(str(inv.payment_methods_id.sequence))
+        plazo_credito = str(inv.invoice_payment_term_id and inv.invoice_payment_term_id.line_ids[0].days or 0)
         cod_moneda = str(inv.currency_id.name)
 
     if inv.tipo_documento == 'FEC':
@@ -520,21 +511,18 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
             sb.Append('<Tipo>04</Tipo>')
             sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
             sb.Append('</CodigoComercial>')
-        
+
         sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
-        sb.Append('<UnidadMedida>' +
-                  str(v['unidadMedida']) + '</UnidadMedida>')
+        sb.Append('<UnidadMedida>' + str(v['unidadMedida']) + '</UnidadMedida>')
         sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
-        sb.Append('<PrecioUnitario>' +
-                  str(v['precioUnitario']) + '</PrecioUnitario>')
+        sb.Append('<PrecioUnitario>' + str(v['precioUnitario']) + '</PrecioUnitario>')
         sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
         if v.get('montoDescuento'):
             sb.Append('<Descuento>')
             sb.Append('<MontoDescuento>' +
                       str(v['montoDescuento']) + '</MontoDescuento>')
             if v.get('naturalezaDescuento'):
-                sb.Append('<NaturalezaDescuento>' +
-                          str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
+                sb.Append('<NaturalezaDescuento>' + str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
             sb.Append('</Descuento>')
 
         sb.Append('<SubTotal>' + str(v['subtotal']) + '</SubTotal>')
@@ -546,24 +534,24 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         if v.get('impuesto'):
             for (a, b) in v['impuesto'].items():
                 tax_code = str(b['iva_tax_code'])
-                sb.Append('<Impuesto>')
-                sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
                 if tax_code.isdigit():
+                    sb.Append('<Impuesto>')
+                    sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
                     sb.Append('<CodigoTarifa>' + tax_code + '</CodigoTarifa>')
-                sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
-                sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
+                    sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
+                    sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
 
-                if inv.tipo_documento != 'FEE':
-                    if b.get('exoneracion'):
-                        sb.Append('<Exoneracion>')
-                        sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
-                        sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
-                        sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
-                        sb.Append('<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
-                        sb.Append('<PorcentajeExoneracion>' + str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
-                        sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
-                        sb.Append('</Exoneracion>')
-                sb.Append('</Impuesto>')
+                    if inv.tipo_documento != 'FEE':
+                        if b.get('exoneracion'):
+                            sb.Append('<Exoneracion>')
+                            sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
+                            sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
+                            sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
+                            sb.Append('<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                            sb.Append('<PorcentajeExoneracion>' + str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                            sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
+                            sb.Append('</Exoneracion>')
+                    sb.Append('</Impuesto>')
 
             sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
 
@@ -574,40 +562,27 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     if otrosCargos:
         sb.Append('<OtrosCargos>')
         for otro_cargo in otrosCargos:
-            sb.Append('<TipoDocumento>' +
-                      str(otrosCargos[otro_cargo]['TipoDocumento']) +
-                      '</TipoDocumento>')
+            sb.Append('<TipoDocumento>' + str(otrosCargos[otro_cargo]['TipoDocumento']) + '</TipoDocumento>')
 
             if otrosCargos[otro_cargo].get('NumeroIdentidadTercero'):
-                sb.Append('<NumeroIdentidadTercero>' +
-                          str(otrosCargos[otro_cargo]['NumeroIdentidadTercero']) +
-                          '</NumeroIdentidadTercero>')
+                sb.Append('<NumeroIdentidadTercero>' + str(otrosCargos[otro_cargo]['NumeroIdentidadTercero']) + '</NumeroIdentidadTercero>')
 
             if otrosCargos[otro_cargo].get('NombreTercero'):
-                sb.Append('<NombreTercero>' +
-                          str(otrosCargos[otro_cargo]['NombreTercero']) +
-                          '</NombreTercero>')
+                sb.Append('<NombreTercero>' + str(otrosCargos[otro_cargo]['NombreTercero']) + '</NombreTercero>')
 
-            sb.Append('<Detalle>' +
-                      str(otrosCargos[otro_cargo]['Detalle']) +
-                      '</Detalle>')
+            sb.Append('<Detalle>' + str(otrosCargos[otro_cargo]['Detalle']) + '</Detalle>')
 
             if otrosCargos[otro_cargo].get('Porcentaje'):
-                sb.Append('<Porcentaje>' +
-                          str(otrosCargos[otro_cargo]['Porcentaje']) +
-                          '</Porcentaje>')
+                sb.Append('<Porcentaje>' + str(otrosCargos[otro_cargo]['Porcentaje']) + '</Porcentaje>')
 
-            sb.Append('<MontoCargo>' +
-                      str(otrosCargos[otro_cargo]['MontoCargo']) +
-                      '</MontoCargo>')
+            sb.Append('<MontoCargo>' + str(otrosCargos[otro_cargo]['MontoCargo']) + '</MontoCargo>')
         sb.Append('</OtrosCargos>')
 
     sb.Append('<ResumenFactura>')
-    sb.Append('<CodigoTipoMoneda><CodigoMoneda>' +
-              cod_moneda +
-              '</CodigoMoneda><TipoCambio>' +
-              str(currency_rate) +
-              '</TipoCambio></CodigoTipoMoneda>')
+    sb.Append('<CodigoTipoMoneda>')
+    sb.Append('<CodigoMoneda>' + cod_moneda + '</CodigoMoneda>')
+    sb.Append('<TipoCambio>' + str(currency_rate) + '</TipoCambio>')
+    sb.Append('</CodigoTipoMoneda>')
 
     sb.Append('<TotalServGravados>' + str(total_servicio_gravado) + '</TotalServGravados>')
     sb.Append('<TotalServExentos>' + str(total_servicio_exento) + '</TotalServExentos>')
@@ -699,15 +674,14 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
 
     try:
         #  enviando solicitud post y guardando la respuesta como un objeto json
-        response = requests.request(
-            "POST", endpoint, data=json_hacienda, headers=headers)
+        response = requests.request("POST", endpoint, data=json_hacienda, headers=headers)
 
         # Verificamos el codigo devuelto, si es distinto de 202 es porque hacienda nos está devolviendo algun error
         if response.status_code != 202:
             error_caused_by = response.headers.get(
                 'X-Error-Cause') if 'X-Error-Cause' in response.headers else ''
             error_caused_by += response.headers.get('validation-exception', '')
-            _logger.info('Status: {}, Text {}'.format(
+            _logger.error('Status: {}, Text {}'.format(
                 response.status_code, error_caused_by))
 
             return {'status': response.status_code, 'text': error_caused_by}
@@ -728,9 +702,7 @@ def schema_validator(xml_file, xsd_file) -> bool:
     :return:
     """
 
-    xmlschema = etree.XMLSchema(etree.parse(os.path.join(
-        os.path.dirname(__file__), "xsd/" + xsd_file
-    )))
+    xmlschema = etree.XMLSchema(etree.parse(os.path.join(os.path.dirname(__file__), "xsd/" + xsd_file)))
 
     xml_doc = base64decode(xml_file)
     root = etree.fromstring(xml_doc, etree.XMLParser(remove_blank_text=True))
@@ -745,7 +717,7 @@ def get_invoice_attachments(invoice, record_id):
     attachments = []
 
     attachment = invoice.env['ir.attachment'].search(
-        [('res_model', '=', 'account.invoice'), ('res_id', '=', record_id),
+        [('res_model', '=', 'account.move'), ('res_id', '=', record_id),
          ('res_field', '=', 'xml_comprobante')], limit=1)
 
     if attachment.id:
@@ -754,7 +726,7 @@ def get_invoice_attachments(invoice, record_id):
         attachments.append(attachment.id)
 
     attachment_resp = invoice.env['ir.attachment'].search(
-        [('res_model', '=', 'account.invoice'), ('res_id', '=', record_id),
+        [('res_model', '=', 'account.move'), ('res_id', '=', record_id),
          ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
 
     if attachment_resp.id:
@@ -816,7 +788,7 @@ def consulta_clave(clave, token, tipo_ambiente):
         'Content-Type': 'application/x-www-form-urlencoded',
     }
 
-    _logger.debug('FECR - consulta_clave - url: %s' % endpoint)
+    _logger.debug('E-INV CR - consulta_clave - url: %s' % endpoint)
 
     try:
         # response = requests.request("GET", url, headers=headers)
@@ -833,11 +805,11 @@ def consulta_clave(clave, token, tipo_ambiente):
             'respuesta-xml': response.json().get('respuesta-xml')
         }
     elif 400 <= response.status_code <= 499:
-        _logger.error('FECR - 400 - consulta_clave failed.  error: %s reason: %s',
+        _logger.error('E-INV CR - 400 - consulta_clave failed.  error: %s reason: %s',
                       response.status_code, response.reason)
         response_json = {'status': 400, 'ind-estado': 'error'}
     else:
-        _logger.error('FECR - consulta_clave failed.  error: %s',
+        _logger.error('E-INV CR - consulta_clave failed.  error: %s',
                       response.status_code)
         response_json = {'status': response.status_code,
                          'text': 'token_hacienda failed: %s' % response.reason}
@@ -859,7 +831,7 @@ def get_economic_activities(company):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
-        _logger.debug('FECR - get_economic_activities response: %s' % (response.json()))
+        _logger.debug('E-INV CR - get_economic_activities response: %s' % (response.json()))
         response_json = {
             'status': 200,
             'activities': response.json().get('actividades'),
@@ -868,7 +840,7 @@ def get_economic_activities(company):
     #elif 400 <= response.status_code <= 499:
     #    response_json = {'status': 400, 'ind-estado': 'error'}
     else:
-        _logger.error('FECR - get_economic_activities failed.  error: %s',
+        _logger.error('E-INV CR - get_economic_activities failed.  error: %s',
                       response.status_code)
         response_json = {'status': response.status_code,
                          'text': 'get_economic_activities failed: %s' % response.reason}
@@ -922,7 +894,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         attachments = []
 
         attachment = self.env['ir.attachment'].search(
-            [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+            [('res_model', '=', 'account.move'), ('res_id', '=', inv.id),
              ('res_field', '=', 'xml_comprobante')], limit=1)
 
         if attachment.id:
@@ -931,7 +903,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
             attachments.append(attachment.id)
 
         attachment_resp = self.env['ir.attachment'].search(
-            [('res_model', '=', 'account.invoice'), ('res_id', '=', inv.id),
+            [('res_model', '=', 'account.move'), ('res_id', '=', inv.id),
              ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
 
         if attachment_resp.id:
@@ -947,11 +919,11 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
                                                                                             raise_exception=False,
                                                                                             force_send=True)  # default_type='binary'
             except:
-                _logger.error('FECR - consulta documento error al enviar correo: %s',
+                _logger.error('E-INV CR - consulta documento error al enviar correo: %s',
                              inv.number_electronic)
 
             # limpia el template de los attachments
-            email_template.attachment_ids = [(5, 0, 0)]
+            email_template.attachment_ids = [(5,0,0)]
 
 
 def send_message(inv, date_cr, xml, token, env):
@@ -976,8 +948,7 @@ def send_message(inv, date_cr, xml, token, env):
         'comprobanteXml': xml_base64,
     }
 
-    headers = {'Content-Type': 'application/json',
-               'Authorization': 'Bearer {}'.format(token)}
+    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer {}'.format(token)}
     try:
         response = requests.post(endpoint, data=json.dumps(comprobante), headers=headers)
 
@@ -987,7 +958,7 @@ def send_message(inv, date_cr, xml, token, env):
         # raise Exception(e)
 
     if not (200 <= response.status_code <= 299):
-        _logger.error('FECR - ERROR SEND MESSAGE - RESPONSE:%s' %
+        _logger.error('E-INV CR - ERROR SEND MESSAGE - RESPONSE:%s' %
                       response.headers.get('X-Error-Cause', 'Unknown'))
         return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause', 'Unknown')}
     else:
@@ -1015,38 +986,30 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
         invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
         activity_node = invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)
+        activity_id = False
         activity = False
         if activity_node:
-            activity_id = activity_node[0].text
-            activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_id)], limit=1)
-        else:
-            activity_id = False
+            activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_node[0].text)], limit=1)
+            activity_id = activity.id
+            
         invoice.economic_activity_id = activity
         invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
-        invoice.date_invoice = invoice.date_issuance
-        invoice.tipo_documento= False
-
+        invoice.invoice_date = invoice.date_issuance
         emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
-
-        receptor_node = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)
-        if receptor_node:
-            receptor = receptor_node[0].text
-        else:
-            raise UserError('El receptor no está definido en el xml')  # noqa
+        receptor = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+        invoice.tipo_documento= False
 
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
                              receptor + '. Por favor active la compañía correcta.')  # noqa
 
         currency_node = invoice_xml.xpath("inv:ResumenFactura/inv:CodigoTipoMoneda/inv:CodigoMoneda", namespaces=namespaces)
-        
         if currency_node:
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', currency_node[0].text)], limit=1).id
         else:
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
 
         partner = invoice.env['res.partner'].search([('vat', '=', emisor),
-                                                    ('supplier', '=', True),
                                                     '|',
                                                      ('company_id', '=', invoice.company_id.id),
                                                      ('company_id', '=', False)],
@@ -1058,7 +1021,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             raise UserError(_('The provider in the invoice does not exists. Please review it.'))
 
         invoice.account_id = partner.property_account_payable_id
-        invoice.payment_term_id = partner.property_supplier_payment_term_id
+        invoice.invoice_payment_term_id = partner.property_supplier_payment_term_id
 
         payment_method_node = invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)
         if payment_method_node:
@@ -1066,21 +1029,23 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         else:
             invoice.payment_methods_id = partner.payment_methods_id
 
-        _logger.debug('FECR - load_lines: %s - account: %s' %
+
+        _logger.debug('E-INV CR - load_lines: %s - account: %s' %
                       (load_lines, account_id))
         
         product = False
         if product_id:
-            product = product_id.id
+            product = product_id
 
         analytic_account = False
         if analytic_account_id:
             analytic_account = analytic_account_id.id
 
+
         # if load_lines and not invoice.invoice_line_ids:
         if load_lines:
             lines = invoice_xml.xpath("inv:DetalleServicio/inv:LineaDetalle", namespaces=namespaces)
-            new_lines = invoice.env['account.invoice.line']
+            new_lines = []
             for line in lines:
                 product_uom = invoice.env['uom.uom'].search(
                     [('code', '=', line.xpath("inv:UnidadMedida", namespaces=namespaces)[0].text)],
@@ -1110,8 +1075,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 for tax_node in tax_nodes:
                     tax_code = re.sub(r"[^0-9]+", "", tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text)
                     tax_amount = float(tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text)
-                    _logger.debug('FECR - tax_code: %s', tax_code)
-                    _logger.debug('FECR - tax_amount: %s', tax_amount)
+                    _logger.debug('E-INV CR - tax_code: %s', tax_code)
+                    _logger.debug('E-INV CR - tax_amount: %s', tax_amount)
 
                     if product_id and product_id.non_tax_deductible:
                         tax = invoice.env['account.tax'].search(
@@ -1133,50 +1098,32 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     if tax:
                         total_tax += float(tax_node.xpath("inv:Monto", namespaces=namespaces)[0].text)
 
-                        exonerations = tax_node.xpath("inv:Exoneracion", namespaces=namespaces)
-                        if exonerations:
-                            for exoneration_node in exonerations:
-                                exoneration_percentage = float(exoneration_node.xpath("inv:PorcentajeExoneracion", namespaces=namespaces)[0].text)
-                                tax = invoice.env['account.tax'].search(
-                                [('percentage_exoneration', '=', exoneration_percentage),
-                                ('type_tax_use', '=', 'purchase'),
-                                ('non_tax_deductible', '=', False),
-                                ('has_exoneration', '=', True),
-                                ('active', '=', True)],
-                                limit=1)
-                                taxes.append((4, tax.id))
-                        else:
-                            taxes.append((4, tax.id))
+                        # TODO: Add exonerations
+                        taxes.append((4, tax.id))
                     else:
                         if product_id and product_id.non_tax_deductible:
                             raise UserError(_('Tax code %s and percentage %s as non-tax deductible is not registered in the system' % (tax_code, tax_amount)))
                         else:
                             raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))
 
-                _logger.debug('FECR - impuestos de linea: %s' % (taxes))
-                invoice_line = invoice.env['account.invoice.line'].create({
+                _logger.debug('E-INV CR - impuestos de linea: %s' % (taxes))
+                columns = {
                     'name': line.xpath("inv:Detalle", namespaces=namespaces)[0].text,
-                    'invoice_id': invoice.id,
+                    'move_id': invoice.id,
                     'price_unit': line.xpath("inv:PrecioUnitario", namespaces=namespaces)[0].text,
                     'quantity': line.xpath("inv:Cantidad", namespaces=namespaces)[0].text,
-                    'uom_id': product_uom,
+                    'product_uom_id': product_uom,
                     'sequence': line.xpath("inv:NumeroLinea", namespaces=namespaces)[0].text,
                     'discount': discount_percentage,
                     'discount_note': discount_note,
-                    # 'total_amount': total_amount,
                     'product_id': product,
-                    'account_id': account_id.id or False,
-                    'account_analytic_id': analytic_account,
-                    'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
-                    'total_tax': total_tax,
-                    #'economic_activity_id': invoice.economic_activity_id.id,
-                })
-
-                # This must be assigned after line is created
-                invoice_line.invoice_line_tax_ids = taxes
-                invoice_line.economic_activity_id = activity
-                new_lines += invoice_line
-
+                    'account_id': account_id.id,
+                    'analytic_account_id': analytic_account,
+                    'economic_activity_id': activity_id,
+                    'tax_ids': taxes,
+                }
+                new_lines.append((0, 0, columns))
+            
             invoice.invoice_line_ids = new_lines
 
         invoice.amount_total_electronic_invoice = invoice_xml.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)[0].text
@@ -1184,5 +1131,5 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         tax_node = invoice_xml.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
         if tax_node:
             invoice.amount_tax_electronic_invoice = tax_node[0].text
-
-        invoice.compute_taxes()
+        
+        invoice._compute_amount()

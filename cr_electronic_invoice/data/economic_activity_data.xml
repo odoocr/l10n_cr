@@ -12,172 +12,172 @@
                 <field name="description">SE INCLUYE LA EXTRACCION DE PETROLEO CRUDO Y DE MINERALES BITUMINO SOS, ES DECIR,PRODUCTOS NATURALES,CUALESQUIERA SEA SU COMPOSICION E INDEPENDIENTEMENTE DE QUE SEAN OBTENIDOS MEDIANTE LA PERFORACION DE POZOS EN YACIMIENTOS DE PETROLEO NORMAL O CONDENSADO, O MEDIANTE LA EXTRACCION DE MINERALES BITUMINOSOS. LA EXTRACCION DE PETROLEO CRUDO PUEDE INCLUIR LOS PROCESOS SIGUIENTES: DECANTACION; DESHITRATACION; ESTABILIZACION;ELIMINACION DE FRACCIONES MUY LIVIANAS Y OTROS PROCESOS MENOS IMPORTANTES,SIEMPRE QUE NO ALTEREN LAS PROPIEDADES FUNDAMENTALES DEL PRODUCTO. PRODUCCION DE HIDROCARBUROS CRUDOS EN ESTADO GASEOSO (GAS NATURAL). EXPLOTACION CON EL MISMO FIN DE DEPOSITOS DE ARENAS ALQUITRANADAS Y ESQUISTOS BUTUMINOSOS. LA EXTRACCION INCLUYE LAS OPERACIONES DE PERFORACION, TERMINACION Y EQUIPAMIENTO DE POZOS NO REALIZADAS POR CONTRATA NI A CAMBIO DE UNARETRIBUCION. TAMBIEN INCLUYE LA LICUEFACCION Y REGASIFICACION DEL GAS NATURAL PARA FACILITAR SU TRANSPORTE Y LA PRODUCCION EN LUGAR DE EXTRACCION, CON GASES DE PETROLEO Y DE YACIMIENTOS DE GAS, DE HIDROCARBUROS LIQUIDOS.</field>
         </record>
         <record id="activity_11102" model="economic.activity">
-                <field name="code">011102</field>
+                <field name="code">11102</field>
                 <field name="name">CULTIVO DE PALMA AFRICANA Y OTROS FRUTOS OLEAGINOSOS</field>
                 <field name="description">ESTA CLASE COMPRENDE EL CULTIVO DE FRUTOS OLEAGINOSOS COMO: PALMAS DE ACEITES, OLIVOS (ACEITUNAS), COCOS Y OTROS FRUTOS OLEAGINOSOS. NO SE INCLUYE EL CULTIVO DE SEMILLAS OLEAGINOSAS, VEASE EL CODIGO 11322</field>
         </record>
         <record id="activity_11102" model="economic.activity">
-                <field name="code">011102</field>
+                <field name="code">11102</field>
                 <field name="name">CULTIVO DE PALMA AFRICANA Y OTROS FRUTOS OLEAGINOSOS</field>
                 <field name="description">ESTA CLASE COMPRENDE EL CULTIVO DE FRUTOS OLEAGINOSOS COMO: PALMAS DE ACEITES, OLIVOS (ACEITUNAS), COCOS Y OTROS FRUTOS OLEAGINOSOS. NO SE INCLUYE EL CULTIVO DE SEMILLAS OLEAGINOSAS, VEASE EL CODIGO 11322</field>
         </record>
         <record id="activity_11103" model="economic.activity">
-                <field name="code">011103</field>
+                <field name="code">11103</field>
                 <field name="name">CULTIVO Y COMERCIALIZACION DE CESPED</field>
                 <field name="description">EN ESTA CLASESE INCLUYE EL CULTIVO Y COMERCIALIZACION DE TODA VARIEDAD DE CESPED O ZACATE DECORATIVO</field>
         </record>
         <record id="activity_11103" model="economic.activity">
-                <field name="code">011103</field>
+                <field name="code">11103</field>
                 <field name="name">CULTIVO Y COMERCIALIZACION DE CESPED</field>
                 <field name="description">EN ESTA CLASESE INCLUYE EL CULTIVO Y COMERCIALIZACION DE TODA VARIEDAD DE CESPED O ZACATE DECORATIVO</field>
         </record>
         <record id="activity_11201" model="economic.activity">
-                <field name="code">011201</field>
+                <field name="code">11201</field>
                 <field name="name">CULTIVO HORTALIZAS LEGUMBRES ESPECIALIDADES HORTICOLAS PRODUCTOS DE VIVERO EXCENTO DE VENTAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYEN LOS CULTIVOS AL AIRE LIBRE Y BAJO TECHADO DE: HORTALIZAS Y LEGUMBRES;COMO POR EJEMPLO MELONES, MAIZ DULCE; CALABAZAS; PEPINOS, TOMATES,PRODUCCION DE ESPECIALIDADES HORTICOLAS, INCLUSO SEMILLAS DE FLORES, FRUTAS Y HORTALIZAS; ESQUEJES SIN RAICES; BULBOS, TUBERCULOS, RAICES TUBEROSAS, CEBOLLAS, BROTES Y RIZOMAS; TODO LO ANTERIOR INCLUIDOS EN LA NUEVA CANASTA BASICA (DECRETO NO. 37132-H)</field>
         </record>
         <record id="activity_11201" model="economic.activity">
-                <field name="code">011201</field>
+                <field name="code">11201</field>
                 <field name="name">CULTIVO HORTALIZAS LEGUMBRES ESPECIALIDADES HORTICOLAS PRODUCTOS DE VIVERO EXCENTO DE VENTAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYEN LOS CULTIVOS AL AIRE LIBRE Y BAJO TECHADO DE: HORTALIZAS Y LEGUMBRES;COMO POR EJEMPLO MELONES, MAIZ DULCE; CALABAZAS; PEPINOS, TOMATES,PRODUCCION DE ESPECIALIDADES HORTICOLAS, INCLUSO SEMILLAS DE FLORES, FRUTAS Y HORTALIZAS; ESQUEJES SIN RAICES; BULBOS, TUBERCULOS, RAICES TUBEROSAS, CEBOLLAS, BROTES Y RIZOMAS; TODO LO ANTERIOR INCLUIDOS EN LA NUEVA CANASTA BASICA (DECRETO NO. 37132-H)</field>
         </record>
         <record id="activity_11218" model="economic.activity">
-                <field name="code">011218</field>
+                <field name="code">11218</field>
                 <field name="name">PRODUCCION DE MINIVEGETALES</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE MINIVEGETALES</field>
         </record>
         <record id="activity_11218" model="economic.activity">
-                <field name="code">011218</field>
+                <field name="code">11218</field>
                 <field name="name">PRODUCCION DE MINIVEGETALES</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE MINIVEGETALES</field>
         </record>
         <record id="activity_11231" model="economic.activity">
-                <field name="code">011231</field>
+                <field name="code">11231</field>
                 <field name="name">CULTIVO HORTALIZAS LEGUMBRES ESPECIALIDADES HORTICOLAS PRODUCTOS VIVERO GRABADOS VENTAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYEN LOS CULTIVOS AL AIRE LIBRE Y BAJO TECHADO DE HORTALIZAS Y LEGUMBRES NO INCLUIDOS EN LA NUEVA CANASTA BASICA (DECRETO NO. 37132-H) ASI COMO EL CULTIVO Y RECOLECCION DE HONGOS, TRUFAS, ACEITUNAS, ALCAPARRAS, PEREJIL. CULTIVO DE PLANTAS QUE DAN FLORES Y CAPULLOS.CULTIVO DE PLANTAS PARA TRASPLANTE Y PARA ORNAMENTACION</field>
         </record>
         <record id="activity_11231" model="economic.activity">
-                <field name="code">011231</field>
+                <field name="code">11231</field>
                 <field name="name">CULTIVO HORTALIZAS LEGUMBRES ESPECIALIDADES HORTICOLAS PRODUCTOS VIVERO GRABADOS VENTAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYEN LOS CULTIVOS AL AIRE LIBRE Y BAJO TECHADO DE HORTALIZAS Y LEGUMBRES NO INCLUIDOS EN LA NUEVA CANASTA BASICA (DECRETO NO. 37132-H) ASI COMO EL CULTIVO Y RECOLECCION DE HONGOS, TRUFAS, ACEITUNAS, ALCAPARRAS, PEREJIL. CULTIVO DE PLANTAS QUE DAN FLORES Y CAPULLOS.CULTIVO DE PLANTAS PARA TRASPLANTE Y PARA ORNAMENTACION</field>
         </record>
         <record id="activity_11301" model="economic.activity">
-                <field name="code">011301</field>
+                <field name="code">11301</field>
                 <field name="name">CULTIVO DE ESPECIAS DE TODO TIPO</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE ESPECIAS DE HOJA COMO LAUREL, TOMILLO, ALBAHACA, OREGANO, ETC., ESPECIAS DE SEMILLA COMO ANIS Y COMINO Y ESPECIAS DE FLOR COMO CANELA, CLAVO DE OLOR Y OTRAS ESPECIES COMO NUEZ MOSCADA Y JENGIBRE, ACHIOTE Y PIMIENTA.</field>
         </record>
         <record id="activity_11301" model="economic.activity">
-                <field name="code">011301</field>
+                <field name="code">11301</field>
                 <field name="name">CULTIVO DE ESPECIAS DE TODO TIPO</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE ESPECIAS DE HOJA COMO LAUREL, TOMILLO, ALBAHACA, OREGANO, ETC., ESPECIAS DE SEMILLA COMO ANIS Y COMINO Y ESPECIAS DE FLOR COMO CANELA, CLAVO DE OLOR Y OTRAS ESPECIES COMO NUEZ MOSCADA Y JENGIBRE, ACHIOTE Y PIMIENTA.</field>
         </record>
         <record id="activity_11302" model="economic.activity">
-                <field name="code">011302</field>
+                <field name="code">11302</field>
                 <field name="name">CULTIVO DE FRUTAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE FRUTAS N.C.P. TALES COMO AGUACATE, ANONA, CAIMITO, CARAMBOLA, CAS, GUANABANA, GUAYABA, LIMO DE TODO TIPO, MANZANA(SOLO DE AGUA Y ROSA), SANDIA, TAMARINDO, ETC</field>
         </record>
         <record id="activity_11302" model="economic.activity">
-                <field name="code">011302</field>
+                <field name="code">11302</field>
                 <field name="name">CULTIVO DE FRUTAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE FRUTAS N.C.P. TALES COMO AGUACATE, ANONA, CAIMITO, CARAMBOLA, CAS, GUANABANA, GUAYABA, LIMO DE TODO TIPO, MANZANA(SOLO DE AGUA Y ROSA), SANDIA, TAMARINDO, ETC</field>
         </record>
         <record id="activity_11322" model="economic.activity">
-                <field name="code">011322</field>
+                <field name="code">11322</field>
                 <field name="name">CULTIVO DE SEMILLAS COMESTIBLES Y GERMINACION DE SEMILLAS OLEAGINOSAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE NUECES Y SEMILLAS COMESTIBLES COMO EL MANI, MACADAMIA Y ALMENDRAS ENTRE OTROS. ADEMAS, LA GERMINACION DE SEMILLAS OLEAGINOSAS (PALMA ACEITERA).</field>
         </record>
         <record id="activity_11322" model="economic.activity">
-                <field name="code">011322</field>
+                <field name="code">11322</field>
                 <field name="name">CULTIVO DE SEMILLAS COMESTIBLES Y GERMINACION DE SEMILLAS OLEAGINOSAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE NUECES Y SEMILLAS COMESTIBLES COMO EL MANI, MACADAMIA Y ALMENDRAS ENTRE OTROS. ADEMAS, LA GERMINACION DE SEMILLAS OLEAGINOSAS (PALMA ACEITERA).</field>
         </record>
         <record id="activity_11329" model="economic.activity">
-                <field name="code">011329</field>
+                <field name="code">11329</field>
                 <field name="name">CULTIVO DE PLANTAS PARA PREPARAR BEBIDAS Y MEDICINAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE PLANTAS DE CUYAS HOJAS SE PREPARAN BEBIDAS COMO TE, MANZANILLA, MENTA, HIERBABUENA. SE INCLUYE TAMBIEN EL CULTIVO DE PLANTAS MEDICINALES.</field>
         </record>
         <record id="activity_11329" model="economic.activity">
-                <field name="code">011329</field>
+                <field name="code">11329</field>
                 <field name="name">CULTIVO DE PLANTAS PARA PREPARAR BEBIDAS Y MEDICINAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE PLANTAS DE CUYAS HOJAS SE PREPARAN BEBIDAS COMO TE, MANZANILLA, MENTA, HIERBABUENA. SE INCLUYE TAMBIEN EL CULTIVO DE PLANTAS MEDICINALES.</field>
         </record>
         <record id="activity_11340" model="economic.activity">
-                <field name="code">011340</field>
-                <field name="name">CULTIVO DE PIÑA</field>
-                <field name="description">ESTA ACTIVIDAD INCLUYE EL CULTIVO DE DIVERSAS CLASES DE PIÑA</field>
+                <field name="code">11340</field>
+                <field name="name">CULTIVO DE PIÃ‘A</field>
+                <field name="description">ESTA ACTIVIDAD INCLUYE EL CULTIVO DE DIVERSAS CLASES DE PIÃ‘A</field>
         </record>
         <record id="activity_11340" model="economic.activity">
-                <field name="code">011340</field>
-                <field name="name">CULTIVO DE PIÑA</field>
-                <field name="description">ESTA ACTIVIDAD INCLUYE EL CULTIVO DE DIVERSAS CLASES DE PIÑA</field>
+                <field name="code">11340</field>
+                <field name="name">CULTIVO DE PI�A</field>
+                <field name="description">ESTA ACTIVIDAD INCLUYE EL CULTIVO DE DIVERSAS CLASES DE PI�A</field>
         </record>
         <record id="activity_11349" model="economic.activity">
-                <field name="code">011349</field>
+                <field name="code">11349</field>
                 <field name="name">CULTIVO DE CACAO</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CACAO</field>
         </record>
         <record id="activity_11349" model="economic.activity">
-                <field name="code">011349</field>
+                <field name="code">11349</field>
                 <field name="name">CULTIVO DE CACAO</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CACAO</field>
         </record>
         <record id="activity_11401" model="economic.activity">
-                <field name="code">011401</field>
+                <field name="code">11401</field>
                 <field name="name">CULTIVO DE CAFE</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DEL CAFE</field>
         </record>
         <record id="activity_11401" model="economic.activity">
-                <field name="code">011401</field>
+                <field name="code">11401</field>
                 <field name="name">CULTIVO DE CAFE</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DEL CAFE</field>
         </record>
         <record id="activity_11501" model="economic.activity">
-                <field name="code">011501</field>
+                <field name="code">11501</field>
                 <field name="name">CULTIVO DE BANANO</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DEL BANANO DE TODO TIPO, YA SEA PARA EXPORTACION O CONSUMO LOCAL.</field>
         </record>
         <record id="activity_11501" model="economic.activity">
-                <field name="code">011501</field>
+                <field name="code">11501</field>
                 <field name="name">CULTIVO DE BANANO</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DEL BANANO DE TODO TIPO, YA SEA PARA EXPORTACION O CONSUMO LOCAL.</field>
         </record>
         <record id="activity_11701" model="economic.activity">
-                <field name="code">011701</field>
-                <field name="name">CULTIVO DE CAÑA DE AZUCAR</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CAÑA DE AZUCAR.</field>
+                <field name="code">11701</field>
+                <field name="name">CULTIVO DE CAÃ‘A DE AZUCAR</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CAÃ‘A DE AZUCAR.</field>
         </record>
         <record id="activity_11701" model="economic.activity">
-                <field name="code">011701</field>
-                <field name="name">CULTIVO DE CAÑA DE AZUCAR</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CAÑA DE AZUCAR.</field>
+                <field name="code">11701</field>
+                <field name="name">CULTIVO DE CA�A DE AZUCAR</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CA�A DE AZUCAR.</field>
         </record>
         <record id="activity_11802" model="economic.activity">
-                <field name="code">011802</field>
+                <field name="code">11802</field>
                 <field name="name">CULTIVO DE CEREALES (INCLUSIVE EL ARROZ), LEGUMBRES Y GRANOS BASICOS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYEN LOS SIGUIENTES CEREALES: ARROZ, TRIGO, MAIZ, SORGO, CEBADA, AVENA, MIJO, OTROS CEREALES N.C.P; LEGUMINOSAS: FRIJOLES, GARBANZOS, LENTEJAS, HABAS, GUISANTES, OTRAS LEGUMINOSAS; SEMILLAS: LINAZA, MOSTAZA, NIGER, COLZA, CARTAMO, SESAMO, GIRASOL, OTRAS SEMILLAS.</field>
         </record>
         <record id="activity_11802" model="economic.activity">
-                <field name="code">011802</field>
+                <field name="code">11802</field>
                 <field name="name">CULTIVO DE CEREALES (INCLUSIVE EL ARROZ), LEGUMBRES Y GRANOS BASICOS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYEN LOS SIGUIENTES CEREALES: ARROZ, TRIGO, MAIZ, SORGO, CEBADA, AVENA, MIJO, OTROS CEREALES N.C.P; LEGUMINOSAS: FRIJOLES, GARBANZOS, LENTEJAS, HABAS, GUISANTES, OTRAS LEGUMINOSAS; SEMILLAS: LINAZA, MOSTAZA, NIGER, COLZA, CARTAMO, SESAMO, GIRASOL, OTRAS SEMILLAS.</field>
         </record>
         <record id="activity_11901" model="economic.activity">
-                <field name="code">011901</field>
+                <field name="code">11901</field>
                 <field name="name">CULTIVO DE FLORES DE TODO TIPO</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE FLORES VIVAS PARA VENDER O COMERCIALIZAR SIN NINGUN TIPO DE PROCESAMIENTO; POR EJEMPLO: EL CULTIVO DE AMAPOLAS, FLORESTROPICALES EXOTICAS, ANTURIOS, ORQUIDEAS, HELECHOS, AVES DEL PARAISO, AZALIAS,CACTUS ORNAMENTALES, CALAS, CLAVELES, MARGINATA, ESPARRAGO,GERANIOS ENTRE OTRAS;ESTA GRAVADA EN EL IMPUESTO DE VENTAS SEGUN EL ARTICULO 4 DE LA LEY DEL IMPUESTOGENERAL SOBRE LAS VENTAS Y SUS REFORMAS Y EL ARTICULO 5 DE SU REGLAMENTO Y SUSREFORMAS. TAMBIEN EN CONCORDANCIA CON EL DECRETO EJECUTIVO 37132-H DE 17/05/2012</field>
         </record>
         <record id="activity_11901" model="economic.activity">
-                <field name="code">011901</field>
+                <field name="code">11901</field>
                 <field name="name">CULTIVO DE FLORES DE TODO TIPO</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE FLORES VIVAS PARA VENDER O COMERCIALIZAR SIN NINGUN TIPO DE PROCESAMIENTO; POR EJEMPLO: EL CULTIVO DE AMAPOLAS, FLORESTROPICALES EXOTICAS, ANTURIOS, ORQUIDEAS, HELECHOS, AVES DEL PARAISO, AZALIAS,CACTUS ORNAMENTALES, CALAS, CLAVELES, MARGINATA, ESPARRAGO,GERANIOS ENTRE OTRAS;ESTA GRAVADA EN EL IMPUESTO DE VENTAS SEGUN EL ARTICULO 4 DE LA LEY DEL IMPUESTOGENERAL SOBRE LAS VENTAS Y SUS REFORMAS Y EL ARTICULO 5 DE SU REGLAMENTO Y SUSREFORMAS. TAMBIEN EN CONCORDANCIA CON EL DECRETO EJECUTIVO 37132-H DE 17/05/2012</field>
         </record>
         <record id="activity_11903" model="economic.activity">
-                <field name="code">011903</field>
+                <field name="code">11903</field>
                 <field name="name">VIVEROS</field>
                 <field name="description">SE REFIERE A LA VENTA DE TODO TIPO DE PLANTAS VIVAS, ACCESORIOS E IMPLEMENTOS GRAVADOS EN EL IMPUESTO DE VENTAS.</field>
         </record>
         <record id="activity_11907" model="economic.activity">
-                <field name="code">011907</field>
+                <field name="code">11907</field>
                 <field name="name">PEQUENOS PRODUCTORES AGRICOLAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYEN LOS PEQUENOS PRODUCTORES AGRICOLAS QUE VENDEN SUS PRODUCTOS EXCLUSIVAMENTE AL CONSUMIDOR FINAL Y POR MEDIO DE LAS FERIAS DEL AGRICULTOR, QUE CUMPLEN CON LOS REQUISITOS QUE ESTABLECE LA LEY N 8533 DEL 18 DE JULIO DE 2006, DENOMINADA “LEY DE REGULACION DELAS FERIAS DEL AGRICULTOR” Y SU REGLAMENTO Y QUE CUENTAN CON CARNE VIGENTE PARA PARTICIPAR EN DICHAS FERIAS.</field>
         </record>
@@ -187,92 +187,92 @@
                 <field name="description">EN ESTA CLASE SE INCLUYE LA EXTRACCION DE MINERALES ESTIMADOS PRINCIPALMENTE POR SU CONTENIDO DE URANIO O TORIO, COMO POR EJEMPLO LA PECBLENDA. TAMBIEN SE INCLUYE LA CONCENTRACION DE ESOS MINERALES.</field>
         </record>
         <record id="activity_12101" model="economic.activity">
-                <field name="code">012101</field>
+                <field name="code">12101</field>
                 <field name="name">CRIA DE CABALLOS Y OTROS EQUINOS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA CRIA Y REPRODUCCION DE CABALLOS, BURROS, MULOS Y BURDEGANOS.</field>
         </record>
         <record id="activity_12102" model="economic.activity">
-                <field name="code">012102</field>
+                <field name="code">12102</field>
                 <field name="name">PRODUCCION DE SEMEN BOVINO, VENTA DE SEMEN CONGELADO Y DILUYENTE PARA SEMEN</field>
                 <field name="description">ESTA CLASE INCLUYE LA PRODUCCION DE SEMEN BOVINO Y SEGUN EL ARTICULO 5 DEL REGLAMENTO DE LA LEY DEL IMPUESTO GENERAL SOBRE LAS VENTAS SE ENCUENTRA COMO EXENTO, DENTRO DE LOS PRODUCTOS VETERINARIOS, EL "SEMEN CONGELADO Y DILUYENTE PARA SEMEN</field>
         </record>
         <record id="activity_12103" model="economic.activity">
-                <field name="code">012103</field>
+                <field name="code">12103</field>
                 <field name="name">CRIA DE ANIMALES DOMESTICOS COMO: GANADO VACUNO , OVEJAS Y CABRAS</field>
                 <field name="description">ESTA CLASE INCLUYE LA CRIA DE ANIMALES DOMESTICADOS, COMO GANADO VACUNO, OVEJAS,CABRAS. CRIA DE GANADO REPRODUCTOR Y SERVICIO DE ENGORDE DEL GANADO DE CORRALES. PRODUCCION DE LECHE CRUDA Y SEMEN BOVINO ESQUILA DE OVEJAS POR EL PROPIETARIO DEL REBANO. EXCLUSIONES: EL ALBERGUE, CUIDA DO Y REPRODUCCION DE GANADO. LA ESQUILA DE OVEJAS POR CONTRATO O A CAMBIO DE UNA RETRIBUCION, LA LANA DE MATADERO. LA ELABORACION DE LECHE FUERA DEL ESTABLECIMIENTO. LA CRIA DE CABALLOS Y OTROS EQUINOS SE INCLUYE EN LA ACTIVIDAD 012101.</field>
         </record>
         <record id="activity_12201" model="economic.activity">
-                <field name="code">012201</field>
+                <field name="code">12201</field>
                 <field name="name">CRIA DE CERDOS</field>
                 <field name="description">CRIA DE CERDOS (ANIMALES DOMESTICADOS)</field>
         </record>
         <record id="activity_12202" model="economic.activity">
-                <field name="code">012202</field>
+                <field name="code">12202</field>
                 <field name="name">CRIA DE ANIMALES DOMESTICADOS (AVES DE CORRAL)</field>
                 <field name="description">CRIA DE ANIMALES DOMESTICADOS (AVES DE CORRAL, TALES COMO LOS POLLOS, PAVOS, PATOS, GANSOS, EL FAISAN, LA CODORNIZ Y OTRAS ESPECIES EMPARENTADAS)</field>
         </record>
         <record id="activity_12203" model="economic.activity">
-                <field name="code">012203</field>
+                <field name="code">12203</field>
                 <field name="name">CRIA DE MARIPOSAS</field>
                 <field name="description">SE REFIERE A LOS CRIADEROS DE MARIPOSAS, OBTENCION DE CAPULLOS DE GUSANO DE SEDA Y CAPULLO DE MARIPOSAS DE TODA ESPECIE. GRAVADO EN EL IMPUESTO SOBRE LAS VENTAS DEBIDO A QUE EL DECRETO NO.31189 MAG-H-MEIC QUE LAS EXIMIA DE ESTE IMPUESTO, FUE DEROGADO POR EL DECRETO NO. 31939 MAG-H-MEIC DEL 20/08/2004.</field>
         </record>
         <record id="activity_12204" model="economic.activity">
-                <field name="code">012204</field>
+                <field name="code">12204</field>
                 <field name="name">CRIA Y VENTA DE OTROS ANIMALES SEMIDOMESTICADOS O SALVAJES</field>
                 <field name="description">ESTA CLASE INCLUYE LA CRIA DE ANIMALES EN CAUTIVERIO SEMIDOMESTICADOS O SALVAJES COMO LOS PAJAROS, INSECTOS, REPTILES, CONEJOS Y VISONES.</field>
         </record>
         <record id="activity_12303" model="economic.activity">
-                <field name="code">012303</field>
+                <field name="code">12303</field>
                 <field name="name">PRODUCCION DE QUESO Y OTROS PRODUCTOS LACTEOS EXENTOS DEL IMPUESTO SOBRE LAS VENTAS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE LECHE AGRIA, LECHE EN POLVO, LECHE FRESCA, LECHES MODIFICADAS Y SUCEDANEOS DE LECHE, FORMULAS PARA LACTANTES, LECHE Y CREMAS FRESCAS INCLUSO SUEROS DE MANTEQUILLA O DE QUESO, LECHE DESCREMADA, CREMAS AGRIAS, CUAJADA NO ENVASADA, NATILLA FRESCA, QUESO BLANCO TIPO DURO, SEMIDURO NO ENVASADO, REQUESON NO ENVASADO, SUERO DE LECHE NO ENVASADO. TODO LO ANTERIOR DE CONFORMIDAD CON EL ART.5 DEL REGLAMENTO DE LA LEY DEL IMPUESTO SOBRE LAS VENTAS. LA PRODUCCION DE OTROS PRODUCTOS LACTEOS AFECTOS AL IMPUESTO, SE ENCUENTRAN EN EL CODIGO 152001.</field>
         </record>
         <record id="activity_12401" model="economic.activity">
-                <field name="code">012401</field>
+                <field name="code">12401</field>
                 <field name="name">PRODUCCION Y VENTA DE HUEVOS DE CUALQUIER TIPO, EXCEPTO LOS DE GALLINA</field>
                 <field name="description">INCLUYE LA PRODUCCION Y VENTA DE HUEVOS DE TODO TIPO DE AVES DE CORRAL, ASI COMO LA INDUSTRIALIZACION DE HUEVOS ENTEROS, YEMAS DE HUEVO Y HUEVOS EN CONSERVA. SE EXCEPTUAN DE ESTA CLASE LOS HUEVOS DE GALLINA FRESCOS CON CASCARON, LOS CUALES SE ENCUENTRAN EXENTOS DEL IMPUESTO SOBRE LAS VENTAS Y SE CLASIFICAN EN EL CODIGO 522008</field>
         </record>
         <record id="activity_12402" model="economic.activity">
-                <field name="code">012402</field>
+                <field name="code">12402</field>
                 <field name="name">PRODUCCION Y VENTA DE MIEL DE ABEJA NATURAL</field>
                 <field name="description">ESTA CLASE INCLUYE LA PRODUCCION Y VENTA DE MIEL DE ABEJA NATURAL</field>
         </record>
         <record id="activity_12403" model="economic.activity">
-                <field name="code">012403</field>
+                <field name="code">12403</field>
                 <field name="name">PRODUCCION DE HUEVOS DE GALLINA INCLUIDOS EN LA CANASTA BASICA</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE HUEVOS DE GALLINA FRESCOS CON CASCARON EXENTOS DEL IMPUESTO GENERAL SOBRE LAS VENTAS.</field>
         </record>
         <record id="activity_13001" model="economic.activity">
-                <field name="code">013001</field>
+                <field name="code">13001</field>
                 <field name="name">CULTIVO DE PRODUCTOS AGRICOLAS EN COMBINACION CON LA CRIA DE ANIMALES (EXPLOTACI</field>
                 <field name="description">ESTA CLASE COMPRENDE LA EXPLOTACION MIXTA DE CULTIVOS Y ANIMALES SIN ESPECIALIZACION EN NINGUNA DE LAS ACTIVIDADES. SI EL CULTIVO DE PRODUC AGRIC O LA CRIA DE ANIMALES REPRESENTAN POR UNIDAD UNA PROPORCION IGUAL O SUPERIOR AL 66%, LA ACTIVIDAD MIXTA NO DEBE CLASIFICARSE EN ESTA CLASE, SINO ENTRE LOS CULTIVOS O LAS ACTIV DE CRIA DE ANIMALES.</field>
         </record>
         <record id="activity_14001" model="economic.activity">
-                <field name="code">014001</field>
-                <field name="name">SERVICIO DE JARDINERIA Y/O DISEÑO PAISAJISTA</field>
+                <field name="code">14001</field>
+                <field name="name">SERVICIO DE JARDINERIA Y/O DISE�O PAISAJISTA</field>
                 <field name="description">INCLUYE LAS ACTIVIDADES POR CONTRATA O A CAMBIO DE UNA RETRIBUCION EL CUIDO, RECORTE E INSTALACION DE PRADOS Y JARDINES</field>
         </record>
         <record id="activity_14002" model="economic.activity">
-                <field name="code">014002</field>
+                <field name="code">14002</field>
                 <field name="name">RECOLECCION DE COSECHAS Y ACTIVIDADES CONEXAS</field>
                 <field name="description">INCLUYE LAS ACTIVIDADES POR CONTRATA O A CAMBIO DE UNA RETRIBUCION SUMINISTRO DE MAQUINARFIA AGRICOLA ( INCLUYE OPERARIOS), LA RECOLECCION DE COSECHAS DE TODO TIPO DE CULTIVOS Y ACTIVIDADES RELACIONADAS CON LA MISMA TALES COMO: CORTA, LIMPIEZA, SECADO, DESCASCARILLADO, ENRIADO, REFRIGERACION Y ENVASE A GRANEL. ASI COMO LAS ACTIVIDADES DE CONTRATISTAS DE MANO DE OBRA PARA EL SECTOR AGROPECUARIO Y GANADERO.</field>
         </record>
         <record id="activity_14003" model="economic.activity">
-                <field name="code">014003</field>
+                <field name="code">14003</field>
                 <field name="name">FUMIGACION DE CULTIVOS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LOS SERVICIOS POR CONTRATA O A CAMBIO DE RETRIBUCION DE CUALQUIER ACTIVIDAD FITOSANITARIAS POR EJEMPLO: FUMIGADO AEREO O TERRESTRE PARA EL CUIDADO DE TODO TIPO DE CULTIVOS O PREPARACION DE TERRENOS PARA USO AGRICOLA</field>
         </record>
         <record id="activity_14004" model="economic.activity">
-                <field name="code">014004</field>
+                <field name="code">14004</field>
                 <field name="name">SERVICIO DE PLANTACION DE ARBOLES Y SIMILARES</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE EL SERVICIO A CAMBIO DE UNA RETRIBUCION O POR CONTRATO, DE PLANTACION DE ARBOLES, PLANTAS, ETC. PRESTADOS POR UNA EMPRESA O INDIVIDUO.</field>
         </record>
         <record id="activity_14005" model="economic.activity">
-                <field name="code">014005</field>
+                <field name="code">14005</field>
                 <field name="name">MANEJO E INSTALACION DE SISTEMAS DE RIEGO</field>
                 <field name="description">ESTA CLASE INCLUYE MANEJO DE SISTEMAS DE RIEGO CON FINES AGRICOLAS, LOS CUALES SIRVEN PARA HUMEDECER EL SUELO DESTINADO A LA PRODUCCION AGRICOLA.</field>
         </record>
         <record id="activity_141001" model="economic.activity">
-                <field name="code">0141001</field>
+                <field name="code">141001</field>
                 <field name="name">EXTRACCION DE PIEDRA, ARENA Y ARCILLA</field>
                 <field name="description">SE REFIERE A LA EXPLOTACION DE CANTERAS QUE PRODUCEN PIEDRA PARA CONSTRUCCION, PIEDRA SIN LABRAR, CANTERAS DE ARENA, ARCILLA PARA INDUSTRIA.</field>
         </record>
@@ -297,7 +297,7 @@
                 <field name="description">ASTA CLASE INCLUYE LA VENTA DE MEZCLA DE ASFALTO CAPA ASFALTICA, Y LA QUE SE DE NOMINA MACADAM ALQUINATRADO (NO ES ASFALTO) LA CLASIFICASION ARANCELARIA ES LA 2517.30.00.00 SUJETA AL IMPUESTO GENERAL SOBRE LAS VENTAS.</field>
         </record>
         <record id="activity_15001" model="economic.activity">
-                <field name="code">015001</field>
+                <field name="code">15001</field>
                 <field name="name">CAZA ORDINARIA MEDIANTE TRAMPAS, Y REPOBLACION DE ANIMALES DE CAZA, INCLUSO LAS ACTIVIDADES DE SERVICIOS CONEXAS.</field>
                 <field name="description">EN ESTA CLASE SE INCLUYEN LA CAZA ORDINARIA Y MEDIANTE TRAMPAS EFECTUADAS CON FINES COMERCIALES: LA CAPTURA DE ANIMALES, VIVOS O MUERTOS, PARA ALIMENTO, POR SUS PIELES Y CUEROS, Y PARA SU UTILIZACION EN INVESTIGACIONES, EN PARQUES ZOOLOGICOS Y COMO ANIMALES CASEROS; LA CAPTURA DE MAMIFEROS MARINOS, COMO POR EJEMPLO MORSAS Y FOCAS. PRODUCCION DE PIELES FINAS, CUEROS DE REPTILES Y OLUMAS DE AVES MEDIANTE ACTIVIDADES DE CAZA ORDINARIA Y CON TRAMPAS. REPRODUCCIONY REPOBLACION DE ANIMALES DE CAZA. ACTIVIDADES DE SERVICIOS PARA PROMOVER LA CAZA ORDINARIA Y MEDIANTE TRAMPAS CON FINES COMERCIALES</field>
         </record>
@@ -404,12 +404,12 @@
         <record id="activity_154201" model="economic.activity">
                 <field name="code">154201</field>
                 <field name="name">ELABORACION DE AZUCAR Y SUS DERIVADOS</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE AZUCAR DE CAÑA Y DE REMOLACHA: AZUCAR DE CAÑA EN BRUTO, AZUCAR REFINADA DE CAÑA Y DE REMOLACHA, JARABES DE AZUCAR DE REMOLACHA Y DE CAÑA, OTROS AZUCARES Y JARABES DE AZUCAR (AZUCAR DE ARCE, AZUCAR INVERTIDO, AZUCAR DE PALMA). PRODUCCION DE MELAZAS. BAGAZO HIDROLIZADO.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE AZUCAR DE CA�A Y DE REMOLACHA: AZUCAR DE CA�A EN BRUTO, AZUCAR REFINADA DE CA�A Y DE REMOLACHA, JARABES DE AZUCAR DE REMOLACHA Y DE CA�A, OTROS AZUCARES Y JARABES DE AZUCAR (AZUCAR DE ARCE, AZUCAR INVERTIDO, AZUCAR DE PALMA). PRODUCCION DE MELAZAS. BAGAZO HIDROLIZADO.</field>
         </record>
         <record id="activity_154202" model="economic.activity">
                 <field name="code">154202</field>
-                <field name="name">ELABORACION DE PRODUCTOS DERIVADOS DE LA CAÑA DE AZUCAR</field>
-                <field name="description">ESTA CLASE INCLUYE LA ELABORACION DE PRODUCTOS DERIVADOS DE LA CAÑA DE AZUCAR TALES COMO JUGO DE CAÑA, JARABE, SIROPE Y TAPAS DE DULCE LOS CUALES SE ENCUENTRAN EXENTOS DEL IMPUESTO SOBRE LAS VENTAS, DE ACUERDO CON EL ARTICULO 5 DE SU REGLAMENTO.</field>
+                <field name="name">ELABORACION DE PRODUCTOS DERIVADOS DE LA CA�A DE AZUCAR</field>
+                <field name="description">ESTA CLASE INCLUYE LA ELABORACION DE PRODUCTOS DERIVADOS DE LA CA�A DE AZUCAR TALES COMO JUGO DE CA�A, JARABE, SIROPE Y TAPAS DE DULCE LOS CUALES SE ENCUENTRAN EXENTOS DEL IMPUESTO SOBRE LAS VENTAS, DE ACUERDO CON EL ARTICULO 5 DE SU REGLAMENTO.</field>
         </record>
         <record id="activity_154301" model="economic.activity">
                 <field name="code">154301</field>
@@ -434,7 +434,7 @@
         <record id="activity_154401" model="economic.activity">
                 <field name="code">154401</field>
                 <field name="name">ELABORACION DE MACARRONES, FIDEOS, ALCUZCUZ Y PRODUCTOS FARINACEOS SIMILARES</field>
-                <field name="description">ESTA CLASE INCLUYE LA ELABORACION DE PRODUCTOS FARINACEOS SIN COCER: ESPAGUETIS, MACARRONES, FIDEOS Y OTROS PRODUCTOS DE PASTA PARA PREPARAR LASAÑA, CANELONES, RAVIOLES, ETC. ELABORACION DE ALCUZCUZ. ELABORACION DE PASTAS RELLENAS, COCIDAS O SIN COCER. ELABORACION DE OTROS PRODUCTOS DE PASTA COCIDOS. ELABORACION DE PRODUCTOS DE PASTA CONSERVADOS EN RECIPIENTES HERMETICOS O POR CONGELACION.</field>
+                <field name="description">ESTA CLASE INCLUYE LA ELABORACION DE PRODUCTOS FARINACEOS SIN COCER: ESPAGUETIS, MACARRONES, FIDEOS Y OTROS PRODUCTOS DE PASTA PARA PREPARAR LASA�A, CANELONES, RAVIOLES, ETC. ELABORACION DE ALCUZCUZ. ELABORACION DE PASTAS RELLENAS, COCIDAS O SIN COCER. ELABORACION DE OTROS PRODUCTOS DE PASTA COCIDOS. ELABORACION DE PRODUCTOS DE PASTA CONSERVADOS EN RECIPIENTES HERMETICOS O POR CONGELACION.</field>
         </record>
         <record id="activity_154902" model="economic.activity">
                 <field name="code">154902</field>
@@ -499,12 +499,12 @@
         <record id="activity_171101" model="economic.activity">
                 <field name="code">171101</field>
                 <field name="name">FABRICACION DE TODO TIPO DE TELAS Y/O HILOS</field>
-                <field name="description">EN ESTA CLASE SE INCLUYEN LAS OPERACIONES DE PREPARACION DE FIBRAS TEXTILES, TALES COMO DEVANADO Y LAVADO DE LA SEDA; DESENGRASE, CARBONIZACION Y TEÑIDO DEL VELLON (MECHA, LANA), CARDADO (SUAVIZADO O ALISADO) Y PEINADO DE ESAS FIBRAS Y DE LAS DE YUTE, SISAL, LINO, RAMIO, CAÑAMO DE MANILA, COCO Y OTRAS FIBRAS VEGETALES O ANIMALES, ASI COMO DE TODOS LOS TIPOS DE FIBRAS TEXTILES MANUFACTURADAS. SE INCLUYE TAMBIEN, LA PRODUCCION DE FIBRAS A PARTIR DE HILACHAS (HEBRAS, HILOS) , FABRICACION DE HILADOS E HILOS PARA TEJEDURA Y COSTURA DE DISTINTOS TIPOS DE MATERIAL TEXTIL, PARA VENTA AL POR MENOR Y AL POR MAYOR Y PARA PROCESAMIENTO POSTERIOR. TAMBIEN SE INCLUYE LA FABRICACION DE HILADOS DE PAPEL. TEJEDURA, FABRICACION DE TEJIDOS ANCHOS DE TODOS LOS MATERIALES MENCIONADOS ANTERIORMENTE, INCLUSO SUS MEZCLAS. TAMBIEN SE INCLUYEN LOS TEJIDOS DE FIBRA DE VIDRIO Y LA FABRICACION DE FIBRAS ESPECIALES, COMO TEJIDOS ATERCIOPELADOS Y DE FELPILLA, TEJIDOS DE RIZO PARA TOALLAS, GASA, ETC. INCLUYANSE ADEMAS, LAS OPERACIONES DE ACABADO, TALES COMO BLANQUEO, TEÑIDO, CALANDRADO, PERCHADO, ENCOGIMIENTO Y ESTAMPADO.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYEN LAS OPERACIONES DE PREPARACION DE FIBRAS TEXTILES, TALES COMO DEVANADO Y LAVADO DE LA SEDA; DESENGRASE, CARBONIZACION Y TE�IDO DEL VELLON (MECHA, LANA), CARDADO (SUAVIZADO O ALISADO) Y PEINADO DE ESAS FIBRAS Y DE LAS DE YUTE, SISAL, LINO, RAMIO, CA�AMO DE MANILA, COCO Y OTRAS FIBRAS VEGETALES O ANIMALES, ASI COMO DE TODOS LOS TIPOS DE FIBRAS TEXTILES MANUFACTURADAS. SE INCLUYE TAMBIEN, LA PRODUCCION DE FIBRAS A PARTIR DE HILACHAS (HEBRAS, HILOS) , FABRICACION DE HILADOS E HILOS PARA TEJEDURA Y COSTURA DE DISTINTOS TIPOS DE MATERIAL TEXTIL, PARA VENTA AL POR MENOR Y AL POR MAYOR Y PARA PROCESAMIENTO POSTERIOR. TAMBIEN SE INCLUYE LA FABRICACION DE HILADOS DE PAPEL. TEJEDURA, FABRICACION DE TEJIDOS ANCHOS DE TODOS LOS MATERIALES MENCIONADOS ANTERIORMENTE, INCLUSO SUS MEZCLAS. TAMBIEN SE INCLUYEN LOS TEJIDOS DE FIBRA DE VIDRIO Y LA FABRICACION DE FIBRAS ESPECIALES, COMO TEJIDOS ATERCIOPELADOS Y DE FELPILLA, TEJIDOS DE RIZO PARA TOALLAS, GASA, ETC. INCLUYANSE ADEMAS, LAS OPERACIONES DE ACABADO, TALES COMO BLANQUEO, TE�IDO, CALANDRADO, PERCHADO, ENCOGIMIENTO Y ESTAMPADO.</field>
         </record>
         <record id="activity_171201" model="economic.activity">
                 <field name="code">171201</field>
                 <field name="name">MAQUILA DE PRODUCTOS TEXTILES</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE EL ACABADO, MEDIANTE PROCESOS TALES COMO BLANQUEO, TEÑIDO, CALANDRADO, PERCHADO, ENCOGIMIENTO Y ESTAMPADO DE TEJIDOS ANCHOS DE ALGODON, LANA, LANA PEINADA O SEDA, INCLUIDOS LOS FABRICADOS A PARTIR DE MEZCLAS O DE HILADOS SINTETICOS O ARTIFICIALES FABRICACION DE OTROS TEJIDOS ANCHOS DE LINO, RAMIO, CAÑAMO, YUTE Y FIBRAS BLANDAS Y DE HILADOS ESPECIALES SE INCLUYEN TAMBIEN LA FABRICACION DE TEJIDOS ATERCIOPELADOS Y DE FELPILLA, TEJIDOS DE RIZO PARA TOALLAS, GASA, ETC, FABRICACION DE TEJIDOS DE FIBRAS DE VIDRIO FABRICACION DE TEJIDOS DE CARBONO Y DE ARAMIDOS FABRICACION DE TEJIDOS QUE IMITAN LAS PIELES FINAS</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE EL ACABADO, MEDIANTE PROCESOS TALES COMO BLANQUEO, TE�IDO, CALANDRADO, PERCHADO, ENCOGIMIENTO Y ESTAMPADO DE TEJIDOS ANCHOS DE ALGODON, LANA, LANA PEINADA O SEDA, INCLUIDOS LOS FABRICADOS A PARTIR DE MEZCLAS O DE HILADOS SINTETICOS O ARTIFICIALES FABRICACION DE OTROS TEJIDOS ANCHOS DE LINO, RAMIO, CA�AMO, YUTE Y FIBRAS BLANDAS Y DE HILADOS ESPECIALES SE INCLUYEN TAMBIEN LA FABRICACION DE TEJIDOS ATERCIOPELADOS Y DE FELPILLA, TEJIDOS DE RIZO PARA TOALLAS, GASA, ETC, FABRICACION DE TEJIDOS DE FIBRAS DE VIDRIO FABRICACION DE TEJIDOS DE CARBONO Y DE ARAMIDOS FABRICACION DE TEJIDOS QUE IMITAN LAS PIELES FINAS</field>
         </record>
         <record id="activity_171202" model="economic.activity">
                 <field name="code">171202</field>
@@ -514,12 +514,12 @@
         <record id="activity_172101" model="economic.activity">
                 <field name="code">172101</field>
                 <field name="name">FABRICACION DE ARTICULOS CONFECCIONADOS DE MATERIALES TEXTILES, EXEPTO PRENDAS DE VESTIR</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION, CON TEJIDOS NO PRODUCIDOS EN LA MISMA UNIDAD, DE ARTICULOS CONFECCIONADOS CON CUALQUIER TIPO DE MATERIAL TEXTIL, INCLUSO TEJIDOS DE PUNTO Y GANCHILLO. SE INCLUYE LA FABRICACION DE ARTICULOS TALES COMO: FRAZADAS, MANTAS DE VIAJE Y TODA CLASE DE ROPA DE CAMA, PAÑOS DE MESA Y OTROS TIPOS DE ROPA BLANCA. ACCESORIOS PARA EL HOGAR, COMO CORTINAS, CENEFAS, VISILLOS Y SOBRECAMAS. ALGUNOS ARTICULOS CON RELLENO, COMO ACOLCHADOS, EDREDONES, COJINES, PUFES, ALMOHADAS Y SACOS PARA DORMIR. ENCERADOS, TIENDAS DE CAMPAÑA, ARTICULOS PARA ACAMPAR, VELAS, TOLDOS DE PROTECCION CONTRA EL SOL, FUNDAS PARA AUTOMOVILES, MAQUINAS Y MUEBLES. BANDERAS, GALLARDETES Y ESTANDARTES. PAÑOS PARA DESEMPOLVAR, PAÑOS DE COCINA, CHALECOS SALVAVIDAS, ETC. PARACAIDAS. LA FABRICACION DE TAPICES TEJIDOS A MANO SE INCLUYE EN ESTA CLASE. TAMBIEN SE INCLUYE LA FABRICACION DE TEJIDOS PARA MANTAS ELECTRICAS. EXCLUSION: CUANDO LOS ARTICULOS ABARCADOS POR ESTA CLASE SE FABRICAN EN LA MISMA UNIDAD QUE PRODUCE LOS TEJIDOS, LA ACTIVIDAD SE CONSIDERA UNA ACTIVIDADAUXILIAR DE LA TEJEDURA, O SEA, DE LA CLASE 1711 (PREPARACION E HILATURA DE FIBRAS TEXTILES; TEJEDURA DE PRODUCTOS TEXTILES)</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION, CON TEJIDOS NO PRODUCIDOS EN LA MISMA UNIDAD, DE ARTICULOS CONFECCIONADOS CON CUALQUIER TIPO DE MATERIAL TEXTIL, INCLUSO TEJIDOS DE PUNTO Y GANCHILLO. SE INCLUYE LA FABRICACION DE ARTICULOS TALES COMO: FRAZADAS, MANTAS DE VIAJE Y TODA CLASE DE ROPA DE CAMA, PA�OS DE MESA Y OTROS TIPOS DE ROPA BLANCA. ACCESORIOS PARA EL HOGAR, COMO CORTINAS, CENEFAS, VISILLOS Y SOBRECAMAS. ALGUNOS ARTICULOS CON RELLENO, COMO ACOLCHADOS, EDREDONES, COJINES, PUFES, ALMOHADAS Y SACOS PARA DORMIR. ENCERADOS, TIENDAS DE CAMPA�A, ARTICULOS PARA ACAMPAR, VELAS, TOLDOS DE PROTECCION CONTRA EL SOL, FUNDAS PARA AUTOMOVILES, MAQUINAS Y MUEBLES. BANDERAS, GALLARDETES Y ESTANDARTES. PA�OS PARA DESEMPOLVAR, PA�OS DE COCINA, CHALECOS SALVAVIDAS, ETC. PARACAIDAS. LA FABRICACION DE TAPICES TEJIDOS A MANO SE INCLUYE EN ESTA CLASE. TAMBIEN SE INCLUYE LA FABRICACION DE TEJIDOS PARA MANTAS ELECTRICAS. EXCLUSION: CUANDO LOS ARTICULOS ABARCADOS POR ESTA CLASE SE FABRICAN EN LA MISMA UNIDAD QUE PRODUCE LOS TEJIDOS, LA ACTIVIDAD SE CONSIDERA UNA ACTIVIDADAUXILIAR DE LA TEJEDURA, O SEA, DE LA CLASE 1711 (PREPARACION E HILATURA DE FIBRAS TEXTILES; TEJEDURA DE PRODUCTOS TEXTILES)</field>
         </record>
         <record id="activity_172103" model="economic.activity">
                 <field name="code">172103</field>
-                <field name="name">DISEÑO ARTISTICO PARA COSTURA (MOLDES)</field>
-                <field name="description">SE INCLUYE EN ESTA ACTIVIDAD EL DISEÑO DE PRENDAS DE VESTIR DE CUALQUIER TIPO, EN DIFERENTES MOLDES A CAMBIO DE UNA RETRIBUCION ECONOMICA.</field>
+                <field name="name">DISE�O ARTISTICO PARA COSTURA (MOLDES)</field>
+                <field name="description">SE INCLUYE EN ESTA ACTIVIDAD EL DISE�O DE PRENDAS DE VESTIR DE CUALQUIER TIPO, EN DIFERENTES MOLDES A CAMBIO DE UNA RETRIBUCION ECONOMICA.</field>
         </record>
         <record id="activity_172201" model="economic.activity">
                 <field name="code">172201</field>
@@ -534,7 +534,7 @@
         <record id="activity_172302" model="economic.activity">
                 <field name="code">172302</field>
                 <field name="name">FABRICACION DE HILOS Y CUERDAS PARA USO AGRICOLA Y PESCA</field>
-                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE HILOS DE NYLON PARA SARAN (TIRAS CRUDAS O TEÑIDAS PARA TEJIDOS DE USO AGRICOLA) Y REDES DE PESCA ASI COMO EL MECATE DE NYLON POLIPROPILENO DE MAS DE 18 MM Y CUERDAS PLASTICAS PARA PESCA TIPO MONOFILAMENTO DE TODO DIAMETRO. TAMBIEN INCLUYE EL CORDEL DE FIBRA DE COCO PARA APUNTALAMIENTO DE CULTIVOS AGRICOLAS.</field>
+                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE HILOS DE NYLON PARA SARAN (TIRAS CRUDAS O TE�IDAS PARA TEJIDOS DE USO AGRICOLA) Y REDES DE PESCA ASI COMO EL MECATE DE NYLON POLIPROPILENO DE MAS DE 18 MM Y CUERDAS PLASTICAS PARA PESCA TIPO MONOFILAMENTO DE TODO DIAMETRO. TAMBIEN INCLUYE EL CORDEL DE FIBRA DE COCO PARA APUNTALAMIENTO DE CULTIVOS AGRICOLAS.</field>
         </record>
         <record id="activity_172902" model="economic.activity">
                 <field name="code">172902</field>
@@ -550,16 +550,15 @@
                 <field name="code">181001</field>
                 <field name="name">SERVICIOS DE COSTURA Y SASTRERIA (COSTURERAS Y SASTRES)</field>
                 <field name="description">SE REFIERE A LA CONFECCION DE PRENDAS DE VESTIR, DONDE EL CLIENTE SUMINISTRA LA TELA. NO EXISTE VENTA DE PRODUCTOS, SOLO LA PRESTACION DEL SERVICIO. ADEMAS INCLUYASE LA ACTIVIDAD DE CUALQUIER ARREGLO EN LAS PRENDAS DE VESTIR.</field>
-                <field name="sale_type">services</field>
         </record>
         <record id="activity_181002" model="economic.activity">
                 <field name="code">181002</field>
                 <field name="name">FABRICACION DE PRENDAS DE VESTIR (ROPA DE TODO TIPO)</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE PRENDAS DE VESTIR ES DECIR, ROPA DE TODO TIPO PARA HOMBRES, NIÑOS, BEBES, ROPA INTERIOR Y DE DORMIR, ROPA DE DIARIO Y DE ETIQUETA, ROPA DE TRABAJO Y PARA PRACTICA DE DEPORTES, DE SOMBREROS Y GORROS, DE TODO TIPO DE ACCESORIOS DE VESTIR, TALES COMO GUANTES, CINTURONES, CHALES, CORBATAS, CORBATINES, REDECILLAS PARA EL CABELLO, ETC. TAMBIEN SE INCLUYE LA FABRICACION DE PARTES DE ESTOS PRODUCTOS.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE PRENDAS DE VESTIR ES DECIR, ROPA DE TODO TIPO PARA HOMBRES, NI�OS, BEBES, ROPA INTERIOR Y DE DORMIR, ROPA DE DIARIO Y DE ETIQUETA, ROPA DE TRABAJO Y PARA PRACTICA DE DEPORTES, DE SOMBREROS Y GORROS, DE TODO TIPO DE ACCESORIOS DE VESTIR, TALES COMO GUANTES, CINTURONES, CHALES, CORBATAS, CORBATINES, REDECILLAS PARA EL CABELLO, ETC. TAMBIEN SE INCLUYE LA FABRICACION DE PARTES DE ESTOS PRODUCTOS.</field>
         </record>
         <record id="activity_182001" model="economic.activity">
                 <field name="code">182001</field>
-                <field name="name">ADOBO Y TEÑIDO DE PIELES; FABRICACION DE ARTICULOS DE PIEL NATURAL O ARTIFICIAL</field>
+                <field name="name">ADOBO Y TE�IDO DE PIELES; FABRICACION DE ARTICULOS DE PIEL NATURAL O ARTIFICIAL</field>
                 <field name="description">ESTA CLASE ABARCA LA PRODUCCION DE PIELES FINAS ADOBADAS Y DE CUEROS Y PIELES CURTIDOS Y ADOBADOS SIN DEPILAR Y LA FABRICACION DE ARTICULOS DE PIELES FINAS O DE CUEROS SIN DEPILAR. LA PRODUCCION DE PIELES FINAS INCLUYE OPERACIONES TALES COMO DESCARNADURA, ENGRASE, CURTIDO, BLANQUEO, DEPILACION Y DESPINZADO PARA PONER LAS PIELES EN CONDICIONES DE COMERCIALIZACION. LOS ARTICULOS MAS IMPORTANTES QUE SE CONFECCIONAN CON PIELES FINAS Y OTRAS PIELES SIN DEPILAR SON PRENDAS DE VESTIR Y ACCESORIOS, CONJUNTOS DE PELETERIA, TALES COMO PLANCHAS, CUADRADOS, TIRAS, ETC.</field>
         </record>
         <record id="activity_191101" model="economic.activity">
@@ -573,17 +572,17 @@
                 <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION INDUSTRIAL O ARTESANAL DE CALZADO PARA TODO USO Y DE CUALQUIER MATERIAL TALES COMO CUERO, CAUCHO, PLASTICO, MATERIALES TEXTILES, MADERA, ETC. Y MEDIANTE CUALQUIER PROCESO: CORTE Y COSTURA, MOLDEADO, ENGOMADO, ETC. INCLUYE LA FABRICACION DE BOTINES, POLAINAS Y ARTICULOS SIMILARES. COMPRENDE ADEMAS SUELAS Y PLANTILLAS DE TODO TIPO DE MATERIAL. LA FABRICACION DE CALZADO ORTOPEDICO SE INCLUYE EN EL CODIGO 331103.</field>
         </record>
         <record id="activity_20001" model="economic.activity">
-                <field name="code">020001</field>
+                <field name="code">20001</field>
                 <field name="name">VENTA DE ARBOLES EN PIE (ARBOLES DE REFORESTACION)</field>
                 <field name="description">ESTA ACTIVIDAD SE BASA EN LA PLANTACION DE ARBOLES DE REFORESTACION, LOS CUALESUNA VEZ LISTOS PARA LA PRODUCCION DE MADERA, SON VENDIDOS EN PIE A TERCERAS PERSONAS QUIENES LOS TALAN Y SACAN LA MADERA PARA LA VENTA.ESTA ACTIVIDAD NO ESTA SUJETA AL IMPUESTO DE VENTAS,DE CONFORMIDAD CON LOS ARTICULOS 9 DE LA LEY DEL IMPUESTO GENERAL SOBRE LAS VENTAS Y 5 DE SU REGLAMENTO.</field>
         </record>
         <record id="activity_20002" model="economic.activity">
-                <field name="code">020002</field>
+                <field name="code">20002</field>
                 <field name="name">EXTRACCION Y/O VENTA DE MADERA</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA EXTRACCION DE MADERA PARA LA VENTA, REALIZADA PORCAMPAMENTOS MADEREROS, CONTRATISTAS Y LEÑADORES QUE SE DEDICAN PRINCIPALMENTE ALA TALA DE ARBOLES Y A PRODUCIR MADERA EN BRUTO, COMO ENTIBOS, TROZAS, ESTACAS,DURMIENTES, ETC. LA VENTA DE MADERA SE ENCUENTRA AFECTA AL 10% DEL IMPUESTOSOBRE LAS VENTAS.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA EXTRACCION DE MADERA PARA LA VENTA, REALIZADA PORCAMPAMENTOS MADEREROS, CONTRATISTAS Y LE�ADORES QUE SE DEDICAN PRINCIPALMENTE ALA TALA DE ARBOLES Y A PRODUCIR MADERA EN BRUTO, COMO ENTIBOS, TROZAS, ESTACAS,DURMIENTES, ETC. LA VENTA DE MADERA SE ENCUENTRA AFECTA AL 10% DEL IMPUESTOSOBRE LAS VENTAS.</field>
         </record>
         <record id="activity_20005" model="economic.activity">
-                <field name="code">020005</field>
+                <field name="code">20005</field>
                 <field name="name">ACTIVIDADES DE CONSERVACION DE BOSQUES. (SERVICIOS AMBIENTALES, VENTA DE OXIGENO).</field>
                 <field name="description">ESTA ACTIVIDAD LA REALIZAN LOS FINQUEROS QUE CONSERVAN SUS BOSQUES PRIVADOS. ESTA REMUNERACION ECONOMICA DE PROPIETARIOS DE BOSQUES PRIVADOS EN EL PAIS ES POR LA VENTA DE CERTIFICADOS DE FIJACION DE CARBONO AL SUELO, LO QUE SE CONOCE COMO VENTA DE OXIGENO. ESTOS CERTIFICADOS DE FIJACION DE CARBONO SIRVEN PARA QUE LOS PAISES INDUSTRIALIZADOS CUMPLAN CON SU CUOTA PARA DISMINUIR LA GENERACION DE GASES DE EFECTO INVERNADERO, YA QUE ALGUNAS NACIONES INDUSTRIALIZADAS NO TIENEN SUFICIENTES BOSQUES, COMPRAN ESTOS CERTIFICADOS A PAISES COMO COSTA RICA, QUE CUENTAN CON PLANES DE CONSERVACION DE BOSQUES. EXENTA DE OBLIGACIONES SEGUN OFICIO DGT-1326-07 DEL 18 DE OCTUBRE DE 2007</field>
         </record>
@@ -595,7 +594,7 @@
         <record id="activity_202101" model="economic.activity">
                 <field name="code">202101</field>
                 <field name="name">FABRICACION DE HOJAS DE MADERA PARA ENCHAPADO Y TABLEROS COMO PLYWOOD, DURPANEL Y SIMILARES</field>
-                <field name="description">ENTEMENTE DELGADAS PARA PRODUCIR MADERA ENCHAPADA Y TABLEROS CONTRACHAPADOS, Y PARA OTROS FINES. LAS HOJAS PUEDEN OBTENERSE MEDIANTE ASERRADO, REBANADO Y DESENROLLO (MONDADURA) Y PUEDEN ESTAR ALISADAS, TEÑIDAS, BAÑADAS E IMPREGNADAS, O REFORZADAS CON PAPEL O TELA, O CORTADAS EN FIGURAS TAMBIEN SE INCLUYEN LA FABRICACION DE TABLEROS CONTRACHAPADOS, TABLEROS DE MADERA ENCHAPADA Y OTROS PRODUCTOS SIMILARES DE MADERA LAMINADA, Y LA FABRICACION DE TABLEROS DE PARTICULAS Y DE FIBRA. LA FABRICACION DE ESTOS PRODUCTOS SE CARACTERIZA POR LA UTILIZACION DE PRENSAS DE ALTA PRESION Y COLAS, EN COMBINACION O POR SEPARADO. LA PRODUCCION DE MADERA COMPACTADA TAMBIEN SE INCLUYE EN ESTA CLASE. RA COMPACTADA TAMBIEN SE INCLUYE EN ESTA CLASE.</field>
+                <field name="description">ENTEMENTE DELGADAS PARA PRODUCIR MADERA ENCHAPADA Y TABLEROS CONTRACHAPADOS, Y PARA OTROS FINES. LAS HOJAS PUEDEN OBTENERSE MEDIANTE ASERRADO, REBANADO Y DESENROLLO (MONDADURA) Y PUEDEN ESTAR ALISADAS, TE�IDAS, BA�ADAS E IMPREGNADAS, O REFORZADAS CON PAPEL O TELA, O CORTADAS EN FIGURAS TAMBIEN SE INCLUYEN LA FABRICACION DE TABLEROS CONTRACHAPADOS, TABLEROS DE MADERA ENCHAPADA Y OTROS PRODUCTOS SIMILARES DE MADERA LAMINADA, Y LA FABRICACION DE TABLEROS DE PARTICULAS Y DE FIBRA. LA FABRICACION DE ESTOS PRODUCTOS SE CARACTERIZA POR LA UTILIZACION DE PRENSAS DE ALTA PRESION Y COLAS, EN COMBINACION O POR SEPARADO. LA PRODUCCION DE MADERA COMPACTADA TAMBIEN SE INCLUYE EN ESTA CLASE. RA COMPACTADA TAMBIEN SE INCLUYE EN ESTA CLASE.</field>
         </record>
         <record id="activity_202201" model="economic.activity">
                 <field name="code">202201</field>
@@ -620,7 +619,7 @@
         <record id="activity_210201" model="economic.activity">
                 <field name="code">210201</field>
                 <field name="name">FABRICACION DE OTROS ARTICULOS DE PAPEL Y CARTON</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE: FABRICACION DE PRODUCTOS DE PAPEL Y GUATA DE CELULOSA DE USO DOMESTICO Y PARA LA HIGIENE PERSONAL: PAÑUELITOS FACIALES, PAÑUELOS, TOALLAS, SERVILLETAS, PAPEL HIGIENICO, TOALLAS HIGIENICAS Y TAMPONES, PAÑALES Y FORROS DE PAÑALES PARA BEBES, VASOS, PLATOS Y BANDEJAS. FABRICACION DE GUATA DE MATERIALES TEXTILES Y ARTICULOS DE GUATA: TOALLAS HIGIENICAS, TAMPONES, ETC. FABRICACION DE PAPEL PARA IMPRIMIR Y PARA ESCRIBIR LISTO PARA USAR. FABRICACION DE PAPEL PARA IMPRESORA LISTO PARA USAR. FABRICACION DE PAPEL AUTOCOPIA LISTO PARA USAR. FABRICACION DE PAPEL PARA COPIAR O TRANSFERIR Y PAPEL CARBON LISTO PARA USAR. FABRICACION NDE SOBRES Y AEROGRAMAS. FABRICACION DE REGISTROS, LIBROS DE CONTABILIDAD, ENCUADERNADORES, ALBUMES Y ARTICULOS DE PAPELERIA SIMILARES, ENTRE OTROS.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE: FABRICACION DE PRODUCTOS DE PAPEL Y GUATA DE CELULOSA DE USO DOMESTICO Y PARA LA HIGIENE PERSONAL: PA�UELITOS FACIALES, PA�UELOS, TOALLAS, SERVILLETAS, PAPEL HIGIENICO, TOALLAS HIGIENICAS Y TAMPONES, PA�ALES Y FORROS DE PA�ALES PARA BEBES, VASOS, PLATOS Y BANDEJAS. FABRICACION DE GUATA DE MATERIALES TEXTILES Y ARTICULOS DE GUATA: TOALLAS HIGIENICAS, TAMPONES, ETC. FABRICACION DE PAPEL PARA IMPRIMIR Y PARA ESCRIBIR LISTO PARA USAR. FABRICACION DE PAPEL PARA IMPRESORA LISTO PARA USAR. FABRICACION DE PAPEL AUTOCOPIA LISTO PARA USAR. FABRICACION DE PAPEL PARA COPIAR O TRANSFERIR Y PAPEL CARBON LISTO PARA USAR. FABRICACION NDE SOBRES Y AEROGRAMAS. FABRICACION DE REGISTROS, LIBROS DE CONTABILIDAD, ENCUADERNADORES, ALBUMES Y ARTICULOS DE PAPELERIA SIMILARES, ENTRE OTROS.</field>
         </record>
         <record id="activity_221101" model="economic.activity">
                 <field name="code">221101</field>
@@ -635,7 +634,7 @@
         <record id="activity_221901" model="economic.activity">
                 <field name="code">221901</field>
                 <field name="name">ARTES GRAFICAS</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA ELABORACION DE TODO TIPO DE ELEMENTOS VISUALES FUNDAMENTALMENTE A TECNICAS DE GRABADO Y_DIBUJO, AUNQUE SUELE RESTRINGIRSE EL TERMINO A LAS TECNICAS RELACIONADAS CON LA IMPRENTA. ASIMISMO, ES UN PROCESO ARTISTICO DE LA CREACION DE UN DISEÑO USANDO UN MEDIO Y LA TRANSFERENCIA DE LA IMAGEN HACIA UN SUSTRATO (COMO EL PAPEL), CREANDO ASI UNA EXPRESION ARTISTICA.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA ELABORACION DE TODO TIPO DE ELEMENTOS VISUALES FUNDAMENTALMENTE A TECNICAS DE GRABADO Y_DIBUJO, AUNQUE SUELE RESTRINGIRSE EL TERMINO A LAS TECNICAS RELACIONADAS CON LA IMPRENTA. ASIMISMO, ES UN PROCESO ARTISTICO DE LA CREACION DE UN DISE�O USANDO UN MEDIO Y LA TRANSFERENCIA DE LA IMAGEN HACIA UN SUSTRATO (COMO EL PAPEL), CREANDO ASI UNA EXPRESION ARTISTICA.</field>
         </record>
         <record id="activity_222102" model="economic.activity">
                 <field name="code">222102</field>
@@ -660,7 +659,7 @@
         <record id="activity_232001" model="economic.activity">
                 <field name="code">232001</field>
                 <field name="name">REFINERIAS DE PETROLEO</field>
-                <field name="description">ESTA CLASE COMPRENDE LA TRANSFORMACION DEL PETROLEO CRUDO Y EL CARBON EN PRODUCTOS UTILIZABLES. EL PROCESO PRINCIPAL ES LA REFINERIA DEL PETROLEO, QUE ENTRAÑA LA SEPARACION DEL PETROLEO CRUDO EN LOS DISTINTOS PRODUCTOS QUE LO COMPONEN MEDIANTE TECNICAS COMO LA PIROLIZACION Y DESTILACION. FABRICACION DE COMBUSTIBLES LIQUIDOS O GASEOSOS O DE OTROS PRODUCTOS A PARTIR DEL PETROLEO CRUDO Y DE MINERALES BITUMINOSOS O DE LOS PRODUCTOS DE SU FRACCIONAMIENTO</field>
+                <field name="description">ESTA CLASE COMPRENDE LA TRANSFORMACION DEL PETROLEO CRUDO Y EL CARBON EN PRODUCTOS UTILIZABLES. EL PROCESO PRINCIPAL ES LA REFINERIA DEL PETROLEO, QUE ENTRA�A LA SEPARACION DEL PETROLEO CRUDO EN LOS DISTINTOS PRODUCTOS QUE LO COMPONEN MEDIANTE TECNICAS COMO LA PIROLIZACION Y DESTILACION. FABRICACION DE COMBUSTIBLES LIQUIDOS O GASEOSOS O DE OTROS PRODUCTOS A PARTIR DEL PETROLEO CRUDO Y DE MINERALES BITUMINOSOS O DE LOS PRODUCTOS DE SU FRACCIONAMIENTO</field>
         </record>
         <record id="activity_232002" model="economic.activity">
                 <field name="code">232002</field>
@@ -710,12 +709,12 @@
         <record id="activity_242301" model="economic.activity">
                 <field name="code">242301</field>
                 <field name="name">FABRICACION PRODUCTOS FARMACEUTICOS, SUSTANCIAS QUIMICAS YPRODUCTOS BOTANICOS</field>
-                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE SUSTANCIAS MEDICINALES ACTIVAS QUE SE UTILIZAN POR SUS PROPIEDADES FARMACOLOGICAS EN LA FABRICACION DE MEDICAMENTOS: ANTIBIOTICOS, VITAMINAS BASICAS, ACIDO SALICILICO Y ACETILSALICILICO, ETC. FABRICACION DE MEDICAMENTOS: ANTISUEROS Y OTRAS FRACCIONES DE SANGRE, VACUNAS, MDEICAMENTOS DIVERSOS, INCLUIDOS PREPARADOS HOMEOPATICOS. FABRICACION DE PRODUCTOS QUIMICOS ANTICONCEPTIVOS DE USO EXTERNO Y DE MEDICAMNETOS ANTICONCEPTIVOS HORMONALES. FABRICACION DE PRODUCTOS DE BIOTECNOLOGIA. FABRICACION DE PÑREPARADOS PARA EL DIAGNOSTICO MEDICO. PREPARACION DE PRODUCTOS BOTANICOS, EMTRE OTROS.</field>
+                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE SUSTANCIAS MEDICINALES ACTIVAS QUE SE UTILIZAN POR SUS PROPIEDADES FARMACOLOGICAS EN LA FABRICACION DE MEDICAMENTOS: ANTIBIOTICOS, VITAMINAS BASICAS, ACIDO SALICILICO Y ACETILSALICILICO, ETC. FABRICACION DE MEDICAMENTOS: ANTISUEROS Y OTRAS FRACCIONES DE SANGRE, VACUNAS, MDEICAMENTOS DIVERSOS, INCLUIDOS PREPARADOS HOMEOPATICOS. FABRICACION DE PRODUCTOS QUIMICOS ANTICONCEPTIVOS DE USO EXTERNO Y DE MEDICAMNETOS ANTICONCEPTIVOS HORMONALES. FABRICACION DE PRODUCTOS DE BIOTECNOLOGIA. FABRICACION DE P�REPARADOS PARA EL DIAGNOSTICO MEDICO. PREPARACION DE PRODUCTOS BOTANICOS, EMTRE OTROS.</field>
         </record>
         <record id="activity_242401" model="economic.activity">
                 <field name="code">242401</field>
                 <field name="name">FABRICACION JABONES, DETERGENTES, PREPARADOS DE TOCADOR, PARA LIMPIAR PULIR Y PERFUMES</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE JABONES Y PREPARACIONES TENSO ACTIVAS, PREPARACIONES PARA LAVAR EN POLVO, LIQUIDOS, BARRAS, PANES, TROZOS O PIEZAS TROQUELADAS O MOLDEADAS Y DETERGENTES. ASI COMO LAS PREPARACIONES PARA ENJUAGADO SUAVIZANTE PARA LA ROPA (PARTIDA 3402902010). FABRICACION DE PREPARACIONES UTILIZADAS PARA LA LIMPIEZA, TALES COMO DESINFECTANTES Y LIMPIADORES MULTIUSO DE LAS PARTIDAS 3402200090 Y 3402902090 EXCEPTO LOS JABONES QUE SE CLASIFICAN EN LAS ACTIVIDADES 242404 Y 242405, PREPARACIONES PARA AFEITAR O PARA ANTES O DESPUES DEL AFEITADO, DESODORANTES CORPORALES, PREPARACIONES PARA EL BAÑO, DEPILATORIOS Y DEMAS PREPARACIONES DE PERFUMERIA DE TOCADOR O COSMETICA, INCLUSO CAMPUS, LACA, PREPARACIONES DE DESODORANTES DE LOCALES, INCLUSO SIN PERFUMAR AUNQUE TENGAN PROPIEDADES DESINFECTANTES.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE JABONES Y PREPARACIONES TENSO ACTIVAS, PREPARACIONES PARA LAVAR EN POLVO, LIQUIDOS, BARRAS, PANES, TROZOS O PIEZAS TROQUELADAS O MOLDEADAS Y DETERGENTES. ASI COMO LAS PREPARACIONES PARA ENJUAGADO SUAVIZANTE PARA LA ROPA (PARTIDA 3402902010). FABRICACION DE PREPARACIONES UTILIZADAS PARA LA LIMPIEZA, TALES COMO DESINFECTANTES Y LIMPIADORES MULTIUSO DE LAS PARTIDAS 3402200090 Y 3402902090 EXCEPTO LOS JABONES QUE SE CLASIFICAN EN LAS ACTIVIDADES 242404 Y 242405, PREPARACIONES PARA AFEITAR O PARA ANTES O DESPUES DEL AFEITADO, DESODORANTES CORPORALES, PREPARACIONES PARA EL BA�O, DEPILATORIOS Y DEMAS PREPARACIONES DE PERFUMERIA DE TOCADOR O COSMETICA, INCLUSO CAMPUS, LACA, PREPARACIONES DE DESODORANTES DE LOCALES, INCLUSO SIN PERFUMAR AUNQUE TENGAN PROPIEDADES DESINFECTANTES.</field>
         </record>
         <record id="activity_242404" model="economic.activity">
                 <field name="code">242404</field>
@@ -735,7 +734,7 @@
         <record id="activity_242901" model="economic.activity">
                 <field name="code">242901</field>
                 <field name="name">FABRICACION DE OTROS PRODUCTOS QUIMICOS.</field>
-                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: REPELENTE CONTRA MOSQUITOS, TANTO DE USO AMBIENTAL COMO CORPORAL. EXPLOSIVOS, PRODUCTOS PIROTECNICOS (ANTORCHAS, ARTICULOS ENCENDEDORES Y PRODUCTOS SIMILARES), POLVORAS PROPULSORAS, OTROS PREPARADOS EXPLOSIVOS, MECHAS DETONADORAS Y DE SEGURIDAD, CAPSULAS, FUEGOS ARTIFICIALES, BENGALAS DE SEÑALES Y ARTICULOS SIMILARES. GELATINA Y DERIVADOS DE LA GELATINA, COLAS DE ORIGEN ANIMAL Y OTROS ADHESIVOS PREPARADOS, INCLUSO ADHESIVOS PREPARADOS A BASE DE CAUCHO Y PLASTICO. PEPTONAS Y SUS DERIVADOS, OTRAS SUSTANCIAS PROTEINICAS Y SUS DERIVADOS NO CLASIFICADAS EN OTRA PARTE. ACEITES ESENCIALES. MODIFICACION MEDIANTE PROCESOS QUIMICOS (POR EJEMPLO, OXIDACION, POLIMERIZACION, ETC.) DE ACEITES Y GRASAS. MATERIALES PARA EL ACABADO DE PRODUCTOS TEXTILES. POLVOS Y PASTAS PARA SOLDADURA BLANDA, DURAURA Y AUTOGENA. SUSTANCIAS PARA EL DECAPADO DE METALES. CARBON ACTIVADO, ADITIVOS PARA ACEITES LUBRICANTES, PREPARADOS PARA ACELERAR LA VULCANIZACION DEL CAUCHO, CATALIZADORES Y OTROS PRODUCTOS QUIMICOS DE USO INDUSTRIAL. PREPARADOS ANTIDETONANTES, PREPARADOS ANTICONGELANTES, LIQUIDOS PARA TRANSMISIONES HIDRAULICAS, REACTIVOS COMPUESTOS PARA DIAGNOSTICO Y DE LABORATORIO, ETC. PRODUCTOS FOTOQUIMICOS, COMO PLACAS FOTOGRAFICAS, PELICULAS, PAPEL SENSIBILIZADO, OTROS MATERIALES SENSIBILIZADOS SIN IMPRESIONAR Y PREPARADOS QUIMICOS DE USO FOTOGRAFICO. TINTAS PARA ESCRIBIR Y DIBUJAR. MATERIALES VIRGENES DE REPRODUCCION PARA GRABACIONES SONORAS Y DE OTRO TIPO. SAL PROCESADA.</field>
+                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: REPELENTE CONTRA MOSQUITOS, TANTO DE USO AMBIENTAL COMO CORPORAL. EXPLOSIVOS, PRODUCTOS PIROTECNICOS (ANTORCHAS, ARTICULOS ENCENDEDORES Y PRODUCTOS SIMILARES), POLVORAS PROPULSORAS, OTROS PREPARADOS EXPLOSIVOS, MECHAS DETONADORAS Y DE SEGURIDAD, CAPSULAS, FUEGOS ARTIFICIALES, BENGALAS DE SE�ALES Y ARTICULOS SIMILARES. GELATINA Y DERIVADOS DE LA GELATINA, COLAS DE ORIGEN ANIMAL Y OTROS ADHESIVOS PREPARADOS, INCLUSO ADHESIVOS PREPARADOS A BASE DE CAUCHO Y PLASTICO. PEPTONAS Y SUS DERIVADOS, OTRAS SUSTANCIAS PROTEINICAS Y SUS DERIVADOS NO CLASIFICADAS EN OTRA PARTE. ACEITES ESENCIALES. MODIFICACION MEDIANTE PROCESOS QUIMICOS (POR EJEMPLO, OXIDACION, POLIMERIZACION, ETC.) DE ACEITES Y GRASAS. MATERIALES PARA EL ACABADO DE PRODUCTOS TEXTILES. POLVOS Y PASTAS PARA SOLDADURA BLANDA, DURAURA Y AUTOGENA. SUSTANCIAS PARA EL DECAPADO DE METALES. CARBON ACTIVADO, ADITIVOS PARA ACEITES LUBRICANTES, PREPARADOS PARA ACELERAR LA VULCANIZACION DEL CAUCHO, CATALIZADORES Y OTROS PRODUCTOS QUIMICOS DE USO INDUSTRIAL. PREPARADOS ANTIDETONANTES, PREPARADOS ANTICONGELANTES, LIQUIDOS PARA TRANSMISIONES HIDRAULICAS, REACTIVOS COMPUESTOS PARA DIAGNOSTICO Y DE LABORATORIO, ETC. PRODUCTOS FOTOQUIMICOS, COMO PLACAS FOTOGRAFICAS, PELICULAS, PAPEL SENSIBILIZADO, OTROS MATERIALES SENSIBILIZADOS SIN IMPRESIONAR Y PREPARADOS QUIMICOS DE USO FOTOGRAFICO. TINTAS PARA ESCRIBIR Y DIBUJAR. MATERIALES VIRGENES DE REPRODUCCION PARA GRABACIONES SONORAS Y DE OTRO TIPO. SAL PROCESADA.</field>
         </record>
         <record id="activity_242902" model="economic.activity">
                 <field name="code">242902</field>
@@ -765,17 +764,17 @@
         <record id="activity_251901" model="economic.activity">
                 <field name="code">251901</field>
                 <field name="name">FABRICACION DE OTROS PRODUCTOS DE CAUCHO</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE PRODUCTOS DE CAUCHO NO CLASIFICADOS EN OTRA PARTE. FABRICACION DE PRODUCTOS DE CAUCHO ACABADOS Y SEMIACABADOS; PRODUCTOS DE CAUCHO ENDURECIDO, VULCANIZADO Y SIN VULCANIZAR; PRODUCTOS CONSTITUIDOS EN TODO O EN PARTE POR CAUCHO NATURAL O SINTETICO O POR GOMAS PARECIDAS AL CAUCHO. ENTRE LA GRAN VARIEDAD DE ACTIVIDADES DE ESTA CLASE SE INCLUYE LA FABRICACION DE PLANCHAS, LAMINAS, TIRAS, VARILLAS Y PERFILES; TUBOS, CAÑOS Y MANGUERAS; CORREAS Y CINTAS TRANSPORTADORAS Y DE TRANSMISION; ARTICULOS HIGIENICOS Y FARMACEUTICOS; ARTICULOS DE VESTUARIO; PRODUCTOS PARA EL REVESTIMIENTO DE PISOS, ETC.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE PRODUCTOS DE CAUCHO NO CLASIFICADOS EN OTRA PARTE. FABRICACION DE PRODUCTOS DE CAUCHO ACABADOS Y SEMIACABADOS; PRODUCTOS DE CAUCHO ENDURECIDO, VULCANIZADO Y SIN VULCANIZAR; PRODUCTOS CONSTITUIDOS EN TODO O EN PARTE POR CAUCHO NATURAL O SINTETICO O POR GOMAS PARECIDAS AL CAUCHO. ENTRE LA GRAN VARIEDAD DE ACTIVIDADES DE ESTA CLASE SE INCLUYE LA FABRICACION DE PLANCHAS, LAMINAS, TIRAS, VARILLAS Y PERFILES; TUBOS, CA�OS Y MANGUERAS; CORREAS Y CINTAS TRANSPORTADORAS Y DE TRANSMISION; ARTICULOS HIGIENICOS Y FARMACEUTICOS; ARTICULOS DE VESTUARIO; PRODUCTOS PARA EL REVESTIMIENTO DE PISOS, ETC.</field>
         </record>
         <record id="activity_252001" model="economic.activity">
                 <field name="code">252001</field>
                 <field name="name">FABRICACION DE ARTICULOS DE PLASTICO</field>
-                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE PRODUCTOS PLASTICOS, TALES COMO PLANCHAS, LAMINAS, PELICULAS, HOJAS Y TIRAS; TUBOS, CAÑOS Y MANGUERAS; ACCESORIOS DE CAÑOS Y MANGUERAS, PLANCHAS, Y OTRAS FORMAS PLANAS AUTOADHESIVAS; REVESTIMIENTOS DE PLASTICO PARA PISOS, PAREDES Y TECHOS, EN ROLLOS Y EN FORMA DE LOSETAS; Y OTROS PRODUCTOS PRIMARIOS DE PLASTICO. TAMBIEN INCLUYE LA FABRICACION DE ARTICULOS DE PLASTICO SANITARIOS (BAÑERAS, DUCHEROS, LAVADOS, TAZAS DE INODOROS, CISTERNAS DE INODOROS, ETC); ENVASES COMO BOLSAS, SACOS, CAJONES, CAJAS, GARRAFONES, BOTELLAS,ETC.; SERVICIOS DE MESA, UTENSILIOS DE COCINA Y ARTICULOS DE TOCADOR; ARTICULOS PARA OBRAS DE CONSTRUCCION, COMO PUERTAS, VENTANAS Y SUS MARCOS, POSTIGOS Y PERSSIANAS; Y OTROS ARTICULOS, COMO CUBRECABEZAS, ACCESORIOS PARA AISLAMIENTO, PIEZAS DE LAMPARAS Y ACCESORIOS PARA ALUMBRADO, MATERIAL ESCOLAR Y DE OFICINA, ARTICULOS DE VESTUARIO, ACCESORIOS PARA MUEBLES, CARROCERIAS DE VEHICULOS Y ARTICULOS SIMILARES, ESTATUILLAS Y OTROS ARTICULOS ORNAMENTALES.</field>
+                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE PRODUCTOS PLASTICOS, TALES COMO PLANCHAS, LAMINAS, PELICULAS, HOJAS Y TIRAS; TUBOS, CA�OS Y MANGUERAS; ACCESORIOS DE CA�OS Y MANGUERAS, PLANCHAS, Y OTRAS FORMAS PLANAS AUTOADHESIVAS; REVESTIMIENTOS DE PLASTICO PARA PISOS, PAREDES Y TECHOS, EN ROLLOS Y EN FORMA DE LOSETAS; Y OTROS PRODUCTOS PRIMARIOS DE PLASTICO. TAMBIEN INCLUYE LA FABRICACION DE ARTICULOS DE PLASTICO SANITARIOS (BA�ERAS, DUCHEROS, LAVADOS, TAZAS DE INODOROS, CISTERNAS DE INODOROS, ETC); ENVASES COMO BOLSAS, SACOS, CAJONES, CAJAS, GARRAFONES, BOTELLAS,ETC.; SERVICIOS DE MESA, UTENSILIOS DE COCINA Y ARTICULOS DE TOCADOR; ARTICULOS PARA OBRAS DE CONSTRUCCION, COMO PUERTAS, VENTANAS Y SUS MARCOS, POSTIGOS Y PERSSIANAS; Y OTROS ARTICULOS, COMO CUBRECABEZAS, ACCESORIOS PARA AISLAMIENTO, PIEZAS DE LAMPARAS Y ACCESORIOS PARA ALUMBRADO, MATERIAL ESCOLAR Y DE OFICINA, ARTICULOS DE VESTUARIO, ACCESORIOS PARA MUEBLES, CARROCERIAS DE VEHICULOS Y ARTICULOS SIMILARES, ESTATUILLAS Y OTROS ARTICULOS ORNAMENTALES.</field>
         </record>
         <record id="activity_261001" model="economic.activity">
                 <field name="code">261001</field>
                 <field name="name">FABRICACION DE VIDRIO Y PRODUCTOS DE VIDRIO</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE VIDRIO EN TODAS SUS FORMAS Y DE ARTICULOS DE VIDRIO: VIDRIO EN MASA Y EN OTROS ESTADOS, LABRADO O NO, INCLUSO LAMINAS, PLANCHAS, TUBOS Y VARILLAS. VIDRIO DE DIVERSA COMPOSICION QUIMICA, INCLUSO CUARZO FUNDIDO Y OTROS SILICES FUNDIDOS. VIDRIO DE DISTINTAS CARACTERISTICAS FISICAS, INCLUSO VIDRIO CON ARMADO DE ALAMBRE Y VIDRIO COLOREADO, TEÑIDO, ENDURECIDO Y LAMINADO. VIDRIO COLADO, ESTIRADO, SOPLADO, LAMINADO Y TEMPLADO, O FABRICADO POR OTROS PROCESOS. ARTICULOS DE VIDRIO UTILIZADOS EN LA CONSTRUCCION, COMO BLOQUES DE VIDRIO; RECIPIENTES DE VIDRIO, INCLUSO TAPAS Y TAPONES; ENVOLTURAS DE VIDRIO, INCLUSO CAMISAS, PARA DIVERSOS RECIPIENTES; ARTICULOS DE VIDRIO PARA LA COCINA, PARA SERVICIOS DE MESA Y PARA EL TOCADOR, Y PARA LA OFICINA Y OTROS LUGARES; CRISTALERIA DE LABORATORIO, HIGIENICA Y FARMACEUTICA; VIDRIO PARA RELOJES, VIDRIO OPTICO Y PIEZAS DE VIDRIO OPTICO SIN LABRAR, ETC. PIEZAS DE VIDRIO UTILIZADAS EN JOYAS DE FANTASIA (PERO NO LAS JOYAS DE FANTASIA EN SI). FIBRAS DE VIDRIO (INCLUSO LANA DE VIDRIO) E HILADOS DE FIBRAS DE VIDRIO. PRODUCTOS NO TEJIDOS DE FIBRAS DE VIDRIO, COMO ESTERAS, COLCHONES, TABLEROS Y ARTICULOS SIMILARES.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE VIDRIO EN TODAS SUS FORMAS Y DE ARTICULOS DE VIDRIO: VIDRIO EN MASA Y EN OTROS ESTADOS, LABRADO O NO, INCLUSO LAMINAS, PLANCHAS, TUBOS Y VARILLAS. VIDRIO DE DIVERSA COMPOSICION QUIMICA, INCLUSO CUARZO FUNDIDO Y OTROS SILICES FUNDIDOS. VIDRIO DE DISTINTAS CARACTERISTICAS FISICAS, INCLUSO VIDRIO CON ARMADO DE ALAMBRE Y VIDRIO COLOREADO, TE�IDO, ENDURECIDO Y LAMINADO. VIDRIO COLADO, ESTIRADO, SOPLADO, LAMINADO Y TEMPLADO, O FABRICADO POR OTROS PROCESOS. ARTICULOS DE VIDRIO UTILIZADOS EN LA CONSTRUCCION, COMO BLOQUES DE VIDRIO; RECIPIENTES DE VIDRIO, INCLUSO TAPAS Y TAPONES; ENVOLTURAS DE VIDRIO, INCLUSO CAMISAS, PARA DIVERSOS RECIPIENTES; ARTICULOS DE VIDRIO PARA LA COCINA, PARA SERVICIOS DE MESA Y PARA EL TOCADOR, Y PARA LA OFICINA Y OTROS LUGARES; CRISTALERIA DE LABORATORIO, HIGIENICA Y FARMACEUTICA; VIDRIO PARA RELOJES, VIDRIO OPTICO Y PIEZAS DE VIDRIO OPTICO SIN LABRAR, ETC. PIEZAS DE VIDRIO UTILIZADAS EN JOYAS DE FANTASIA (PERO NO LAS JOYAS DE FANTASIA EN SI). FIBRAS DE VIDRIO (INCLUSO LANA DE VIDRIO) E HILADOS DE FIBRAS DE VIDRIO. PRODUCTOS NO TEJIDOS DE FIBRAS DE VIDRIO, COMO ESTERAS, COLCHONES, TABLEROS Y ARTICULOS SIMILARES.</field>
         </record>
         <record id="activity_269101" model="economic.activity">
                 <field name="code">269101</field>
@@ -785,12 +784,12 @@
         <record id="activity_269201" model="economic.activity">
                 <field name="code">269201</field>
                 <field name="name">FABRICACION DE PRODUCTOS DE CERAMICA REFRACTARIA</field>
-                <field name="description">ESTA CLASE ABARCA LA FABRICACION DE ARTICULOS DE CERAMICA PARA AISLAMIENTO TERMICO MEDIANTE EL MOLDEADO Y LA COCHURA DE TIERRAS SILICEAS FOSILES. LADRILLOS, BLOQUES, LOSETAS Y OTROS ARTICULOS SIMILARES DE CERAMICA REFRACTARIA PARA LA CONSTRUCCION. PRODUCTOS DE CERAMICA RESISTENTES A LAS ELEVADAS TEMPERATURAS DE LA METALURGIA. CEMENTOS REFRACTARIOS. RETORTAS, CRISOLES, MUFLAS, TOBERAS, TUBOS, CAÑOS, ETC.</field>
+                <field name="description">ESTA CLASE ABARCA LA FABRICACION DE ARTICULOS DE CERAMICA PARA AISLAMIENTO TERMICO MEDIANTE EL MOLDEADO Y LA COCHURA DE TIERRAS SILICEAS FOSILES. LADRILLOS, BLOQUES, LOSETAS Y OTROS ARTICULOS SIMILARES DE CERAMICA REFRACTARIA PARA LA CONSTRUCCION. PRODUCTOS DE CERAMICA RESISTENTES A LAS ELEVADAS TEMPERATURAS DE LA METALURGIA. CEMENTOS REFRACTARIOS. RETORTAS, CRISOLES, MUFLAS, TOBERAS, TUBOS, CA�OS, ETC.</field>
         </record>
         <record id="activity_269301" model="economic.activity">
                 <field name="code">269301</field>
                 <field name="name">FABRICACION DE PRODUCTOS DE ARCILLA Y CERAMICA NO REFRACTARIAS PARA USO ESTRUCTURAL</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE MATERIALES DE CERAMICA PARA LA CONSTRUCCION, COMO LADRILLOS, BLOQUES PARA PISOS, TEJAS Y SOMBRERETES DE CHIMENEA. FABRICACION DE TUBOS, CONDUCTOS, CANALONES Y ACCESORIOS PARA TUBERIAS DE CERAMICA. FABRICACION DE BALDOSAS Y LOSAS PARA PAVIMENTOS, LOSETAS PARA LA PARED Y PARA CAÑONES DE CHIMENEAS, TESELAS DE MOSAICO Y PRODUCTOS SIMILARES DE CERAMICA, ESMALTADOS O NO.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE MATERIALES DE CERAMICA PARA LA CONSTRUCCION, COMO LADRILLOS, BLOQUES PARA PISOS, TEJAS Y SOMBRERETES DE CHIMENEA. FABRICACION DE TUBOS, CONDUCTOS, CANALONES Y ACCESORIOS PARA TUBERIAS DE CERAMICA. FABRICACION DE BALDOSAS Y LOSAS PARA PAVIMENTOS, LOSETAS PARA LA PARED Y PARA CA�ONES DE CHIMENEAS, TESELAS DE MOSAICO Y PRODUCTOS SIMILARES DE CERAMICA, ESMALTADOS O NO.</field>
         </record>
         <record id="activity_269401" model="economic.activity">
                 <field name="code">269401</field>
@@ -815,12 +814,12 @@
         <record id="activity_271001" model="economic.activity">
                 <field name="code">271001</field>
                 <field name="name">INDUSTRIAS BASICAS DE HIERRO Y ACERO</field>
-                <field name="description">ESTA CLASE INCLUYE: FUNCIONAMIENTO DE ALTOS HORNOS, CONVERTIDORES DE ACERO, TALLERES DE LAMINADO Y DE ACABADO. FABRICACION DE PRODUCTOS PRIMARIOS DE HIERRO Y ACERO, COMO POR EJEMPLO: PRODUCTOS PRIMARIOS DE METAL FERROSO EN GRANALLA Y EN POLVO, Y EN FORMA DE ARRABIO, BLOQUES, GRUMOS Y LIQUIDOS A PARTIR DE MINERAL Y ESCORIAS DE HIERRO. HIERRO DE PUREZA EXCEPCIONAL, MEDIANTE ELECTROLISIS Y OTROS PROCESOS QUIMICOS. HIERRO EN LINGOTES, INCLUSO HIERRO ESPECULAR Y FERROALEACIONES, E HIERRO ESPONJOSO. ACERO, MEDIANTE PROCESOS NEUMATICOS Y DE COCCION. LINGOTES DE ACERO Y DE ACERO DE ALEACION. TOCHOS, BARRAS, PALASTROS Y OTRAS FORMAS DE HIERRO, ACERO Y ACERO DE ALEACION EN ESTADO SEMIACABADO. PRODUCTOS DE HIERRO, ACERO Y ACERO DE ALEACION, LAMINADOS, TREFILADOS, EXTRUDIDOS Y FORJADOS. EL TRATAMIENTO DE ESTOS PRODUCTOS PUEDE SER EN CALIENTE O EN FRIO Y PUEDE EMPEZAR EN CALIENTE Y TERMINAR EN FRIO. ENTRE LOS PRODUCTOS DE LOS TALLERES DE LAMINADO PLANO, LAMINADO TUBULAR Y ACABADO SE CUENTAN LAS HOJAS, PLANCHAS Y ROLLOS; BARRAS Y VARILLAS; BARRAS Y VARILLAS PARA BARRENAS; PIEZAS EN ANGULOS, PERFILES, SECCIONES Y ALAMBRE; TUBOS, CAÑOS Y PERFILES HUECOS DE HIERRO Y ACERO SIN COSTURA, INCLUSO TUBOS, CAÑOS Y PERFILES HUECOS DE FUNDICION CON COSTURA ABIERTA O SOLDADOS, REMACHADOS O UNIDOS EN FORMA SIMILAR; MATERIAL DE CONSTRUCCION PARA VIAS DE FERROCARRIL Y DE TRANVIA, COMO POR EJEMPLO CARRILES NO ENSAMBLADOS; Y OTROS PRODUCTOS ACABADOS DE HIERRO Y DE ACERO.</field>
+                <field name="description">ESTA CLASE INCLUYE: FUNCIONAMIENTO DE ALTOS HORNOS, CONVERTIDORES DE ACERO, TALLERES DE LAMINADO Y DE ACABADO. FABRICACION DE PRODUCTOS PRIMARIOS DE HIERRO Y ACERO, COMO POR EJEMPLO: PRODUCTOS PRIMARIOS DE METAL FERROSO EN GRANALLA Y EN POLVO, Y EN FORMA DE ARRABIO, BLOQUES, GRUMOS Y LIQUIDOS A PARTIR DE MINERAL Y ESCORIAS DE HIERRO. HIERRO DE PUREZA EXCEPCIONAL, MEDIANTE ELECTROLISIS Y OTROS PROCESOS QUIMICOS. HIERRO EN LINGOTES, INCLUSO HIERRO ESPECULAR Y FERROALEACIONES, E HIERRO ESPONJOSO. ACERO, MEDIANTE PROCESOS NEUMATICOS Y DE COCCION. LINGOTES DE ACERO Y DE ACERO DE ALEACION. TOCHOS, BARRAS, PALASTROS Y OTRAS FORMAS DE HIERRO, ACERO Y ACERO DE ALEACION EN ESTADO SEMIACABADO. PRODUCTOS DE HIERRO, ACERO Y ACERO DE ALEACION, LAMINADOS, TREFILADOS, EXTRUDIDOS Y FORJADOS. EL TRATAMIENTO DE ESTOS PRODUCTOS PUEDE SER EN CALIENTE O EN FRIO Y PUEDE EMPEZAR EN CALIENTE Y TERMINAR EN FRIO. ENTRE LOS PRODUCTOS DE LOS TALLERES DE LAMINADO PLANO, LAMINADO TUBULAR Y ACABADO SE CUENTAN LAS HOJAS, PLANCHAS Y ROLLOS; BARRAS Y VARILLAS; BARRAS Y VARILLAS PARA BARRENAS; PIEZAS EN ANGULOS, PERFILES, SECCIONES Y ALAMBRE; TUBOS, CA�OS Y PERFILES HUECOS DE HIERRO Y ACERO SIN COSTURA, INCLUSO TUBOS, CA�OS Y PERFILES HUECOS DE FUNDICION CON COSTURA ABIERTA O SOLDADOS, REMACHADOS O UNIDOS EN FORMA SIMILAR; MATERIAL DE CONSTRUCCION PARA VIAS DE FERROCARRIL Y DE TRANVIA, COMO POR EJEMPLO CARRILES NO ENSAMBLADOS; Y OTROS PRODUCTOS ACABADOS DE HIERRO Y DE ACERO.</field>
         </record>
         <record id="activity_272001" model="economic.activity">
                 <field name="code">272001</field>
                 <field name="name">FABRICACION DE PRODUCTOS PRIMARIOS DE METALES PRECIOSOS Y METALES NO FERROSOS</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE METALES PRECIOSOS: ORO, PLATA Y METALES DEL GRUPO DEL PLATINO. REFINACION DE DICHOS METALES PRECIOSOS. PRODUCCION DE METALES PRECIOSOS SIN LABRAR Y LABRADOS: PLATA EN GRUMOS, GRANOS, LINGOTES, BARRAS FUNDIDAS, PELLAS, ETC., Y EN BARRAS LAMINADAS, VARILLAS, SECCIONES, ALAMBRES, PLANCHAS, HOJAS Y TIRAS, Y EN TUBOS, CAÑOS, BARRAS HUECAS, HOJUELAS, POLVO, ETC.; ORO Y PLATINO Y METALES DEL GRUPO DEL PLATINO EN FORMAS SIMILARES A LAS INDICADAS PARA LA PLATA. PRODUCCION DE METALES PRECIOSOS ENCHAPADOS: METALES COMUNES ENCHAPADOS DE PLATA EN FORMA DE BARRAS, VARILLAS, SECCIONES, HOJAS, TUBOS, ETC.; METALES COMUNES Y PLATA ENCHAPADOS DE ORO EN FORMAS SIMILARES A LAS INDICADAS PARA LA PLATA; ORO, PLATA Y METALES COMUNES ENCHAPADOS DE PLATINO Y METALES DEL GRUPO DEL PLATINO EN FORMAS SIMILARES A LAS INDICADAS PARA LA PLATA. PRODUCCION DE METALES COMUNES NO FERROSOS UTILIZANDO MINERAL EN BRUTO, MINERAL EN MATA, OTRAS MATERIAS PRIMAS INTERMEDIAS ENTRE EL MINERAL EN BRUTO Y EL METAL (POR EJEMPLO, ALUMINA), Y CHATARRA. OPERACIONES REALIZADAS POR TALLERES DE FUNDICION, DE REFINACION ELECTROLITICA Y DE OTRA INDOLE PARA PRODUCIR METALES COMUNES NO FERROSOS SIN LABRAR. TALLERES DE FUNDICION Y REFINACION DE COBRE, PLOMO, CROMO, MANGANESO, ZINC, ALUMINIO, NIQUEL, ESTAÑO Y OTROS METALES COMUNES NO FERROSOS Y ALEACIONES DE ESOS METALES. PRODUCCION DE ALUMINA Y MATAS DE NIQUEL Y DE COBRE. FABRICACION DE PRODUCTOS DE METALES COMUNES NO FERROSOS MEDIANTE LAMINADO, TREFILADO Y EXTRUSION. FABRICACION DE POLVOS Y ESCAMAS; HOJAS DELGADAS; HOJAS, PLANCHAS Y TIRAS; BARRAS, VARILLAS Y PERFILES; ALAMBRE; TUBOS, CAÑOS Y ACCESORIOS PARA TUBOS Y CAÑOS. PRODUCCION DE ORO AMONEDADO.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE METALES PRECIOSOS: ORO, PLATA Y METALES DEL GRUPO DEL PLATINO. REFINACION DE DICHOS METALES PRECIOSOS. PRODUCCION DE METALES PRECIOSOS SIN LABRAR Y LABRADOS: PLATA EN GRUMOS, GRANOS, LINGOTES, BARRAS FUNDIDAS, PELLAS, ETC., Y EN BARRAS LAMINADAS, VARILLAS, SECCIONES, ALAMBRES, PLANCHAS, HOJAS Y TIRAS, Y EN TUBOS, CA�OS, BARRAS HUECAS, HOJUELAS, POLVO, ETC.; ORO Y PLATINO Y METALES DEL GRUPO DEL PLATINO EN FORMAS SIMILARES A LAS INDICADAS PARA LA PLATA. PRODUCCION DE METALES PRECIOSOS ENCHAPADOS: METALES COMUNES ENCHAPADOS DE PLATA EN FORMA DE BARRAS, VARILLAS, SECCIONES, HOJAS, TUBOS, ETC.; METALES COMUNES Y PLATA ENCHAPADOS DE ORO EN FORMAS SIMILARES A LAS INDICADAS PARA LA PLATA; ORO, PLATA Y METALES COMUNES ENCHAPADOS DE PLATINO Y METALES DEL GRUPO DEL PLATINO EN FORMAS SIMILARES A LAS INDICADAS PARA LA PLATA. PRODUCCION DE METALES COMUNES NO FERROSOS UTILIZANDO MINERAL EN BRUTO, MINERAL EN MATA, OTRAS MATERIAS PRIMAS INTERMEDIAS ENTRE EL MINERAL EN BRUTO Y EL METAL (POR EJEMPLO, ALUMINA), Y CHATARRA. OPERACIONES REALIZADAS POR TALLERES DE FUNDICION, DE REFINACION ELECTROLITICA Y DE OTRA INDOLE PARA PRODUCIR METALES COMUNES NO FERROSOS SIN LABRAR. TALLERES DE FUNDICION Y REFINACION DE COBRE, PLOMO, CROMO, MANGANESO, ZINC, ALUMINIO, NIQUEL, ESTA�O Y OTROS METALES COMUNES NO FERROSOS Y ALEACIONES DE ESOS METALES. PRODUCCION DE ALUMINA Y MATAS DE NIQUEL Y DE COBRE. FABRICACION DE PRODUCTOS DE METALES COMUNES NO FERROSOS MEDIANTE LAMINADO, TREFILADO Y EXTRUSION. FABRICACION DE POLVOS Y ESCAMAS; HOJAS DELGADAS; HOJAS, PLANCHAS Y TIRAS; BARRAS, VARILLAS Y PERFILES; ALAMBRE; TUBOS, CA�OS Y ACCESORIOS PARA TUBOS Y CA�OS. PRODUCCION DE ORO AMONEDADO.</field>
         </record>
         <record id="activity_273101" model="economic.activity">
                 <field name="code">273101</field>
@@ -830,7 +829,7 @@
         <record id="activity_273201" model="economic.activity">
                 <field name="code">273201</field>
                 <field name="name">FUNDICION DE METALES NO FERROSOS</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FUNDICION DE PRODUCTOS ACABADOS Y SEMIACABADOS DE METALES NO FERROSOS TALES COMO COBRE, PLOMO, CROMO, MANGANESO, ZINC, ALUMINIO, NIQUEL, ESTAÑO, COBALTO Y TITANIO, ASI COMO LAS ALEACIONES DE ESOS METALES.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FUNDICION DE PRODUCTOS ACABADOS Y SEMIACABADOS DE METALES NO FERROSOS TALES COMO COBRE, PLOMO, CROMO, MANGANESO, ZINC, ALUMINIO, NIQUEL, ESTA�O, COBALTO Y TITANIO, ASI COMO LAS ALEACIONES DE ESOS METALES.</field>
         </record>
         <record id="activity_281101" model="economic.activity">
                 <field name="code">281101</field>
@@ -855,7 +854,7 @@
         <record id="activity_289202" model="economic.activity">
                 <field name="code">289202</field>
                 <field name="name">SERVICIO DE TRATAMIENTO Y REVESTIMIENTO DE TODO TIPO DE MATERIALES</field>
-                <field name="description">ESTA CLASE INCLUYE LAS ACTIVIDADES DE ENCHAPADO, PULIMENTO, ANODIZACION, PINTURA, GRABADURA, IMPRESION, ENDURECIMIENTO, BRUÑIDO, DESBARBADO, LIMPIEZA CON CHORRO DE ARENA, PULIMENTO EN TAMBOR GIRATORIO, LIMPIEZA, SOLDADURA, ESMERILADO Y OTROS TRATAMIENTOS ESPECIALES DEL METAL Y DE ARTICULOS DE METAL QUE SE REALIZAN POR CONTRATA O A CAMBIO DE UNA RETRIBUCION. LAS UNIDADES QUE SE INCLUYEN EN ESTA CLASE POR LO GENERAL NO TOMAN POSESION DE LOS ARTICULOS NI LOS VENDEN A TERCEROS.</field>
+                <field name="description">ESTA CLASE INCLUYE LAS ACTIVIDADES DE ENCHAPADO, PULIMENTO, ANODIZACION, PINTURA, GRABADURA, IMPRESION, ENDURECIMIENTO, BRU�IDO, DESBARBADO, LIMPIEZA CON CHORRO DE ARENA, PULIMENTO EN TAMBOR GIRATORIO, LIMPIEZA, SOLDADURA, ESMERILADO Y OTROS TRATAMIENTOS ESPECIALES DEL METAL Y DE ARTICULOS DE METAL QUE SE REALIZAN POR CONTRATA O A CAMBIO DE UNA RETRIBUCION. LAS UNIDADES QUE SE INCLUYEN EN ESTA CLASE POR LO GENERAL NO TOMAN POSESION DE LOS ARTICULOS NI LOS VENDEN A TERCEROS.</field>
         </record>
         <record id="activity_289302" model="economic.activity">
                 <field name="code">289302</field>
@@ -870,7 +869,7 @@
         <record id="activity_289305" model="economic.activity">
                 <field name="code">289305</field>
                 <field name="name">FABRICACION DE PIEZAS, ARTICULOS Y ACCESORIOS DE METAL INCLUYE LAS CERRAJERIAS.</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE ACCESORIOS DE METAL COMO CERRADURAS,CANDADOS, PASADORES, LLAVES Y OTROS ACCESORIOS PARA EDIFICIOS, MUEBLES, VEHICU-LOS Y OTROS USOS, ASI COMO PIEZAS, MOLDES, TAPAS,SEÑALES METALICAS, SUJETADORES(CLAVOS, TACHUELAS, GRAPAS, ETC) DE METAL, ASI COMO LA TELA METALICA (MALLA, CEDAZO, ETC)</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE ACCESORIOS DE METAL COMO CERRADURAS,CANDADOS, PASADORES, LLAVES Y OTROS ACCESORIOS PARA EDIFICIOS, MUEBLES, VEHICU-LOS Y OTROS USOS, ASI COMO PIEZAS, MOLDES, TAPAS,SE�ALES METALICAS, SUJETADORES(CLAVOS, TACHUELAS, GRAPAS, ETC) DE METAL, ASI COMO LA TELA METALICA (MALLA, CEDAZO, ETC)</field>
         </record>
         <record id="activity_289306" model="economic.activity">
                 <field name="code">289306</field>
@@ -880,7 +879,7 @@
         <record id="activity_289902" model="economic.activity">
                 <field name="code">289902</field>
                 <field name="name">FABRICACION DE OTROS PRODUCTOS ELABORADOS DE METAL N.C.P.</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: SUJETADORES DE METAL: CLAVOS, REMACHES, TACHUELAS, ALFILERES, GRAPAS, ARANDELAS Y PRODUCTOS SIMILARES SIN ROSCA; Y TUERCAS, PERNOS, TORNILLOS Y OTROS ARTICULOS SIN ROSCA. PRODUCTOS DE TORNILLERIA. CABLES DE METAL, TRENZAS Y ARTICULOS SIMILARES DE HIERRO, ACERO, ALUMINIO Y COBRE. ARTICULOS HECHOS DE ALAMBRE: ALAMBRE DE PUAS, CERCAS DE ALAMBRE, REJILLAS, REDES Y TELAS DE ALAMBRE, ETC. RECIPIENTES UTILIZADOS PARA EL ENVASE Y TRANSPORTE DE MERCANCIAS: BARRILES, TAMBORES, BIDONES, TARROS, CAJAS, ETC. MUELLES, INCLUSO MUELLES SEMIACABADOS DE USO GENERAL, EXCEPTO MUELLES PARA RELOJES: MUELLES DE BALLESTA, MUELLES HELICOIDALES, BARRAS DE TORSION, ETC. MACHETES, ESPADAS Y ARMAS SIMILARES. VAJILLA DE MESA Y DE COCINA, SEAN O NO DE METALES COMUNES ENCHAPADOS CON METALES PRECIOSOS; SARTENES, CACEROLAS Y OTROS UTENSILIOS DE COCINA. PEQUEÑOS APARATOS DE COCINA ACCIONADOS A MANO PARA PREPARAR, ADEREZAR O SERVIR ALIMENTOS. ARTICULOS SANITARIOS DE METAL, INCLUSO BAÑERAS, PILAS, LAVATORIOS Y OTROS ARTICULOS SANITARIOS Y DE ASEO, ESMALTADOS O NO. ARTICULOS DE METAL PARA OFICINA, EXCEPTO MUEBLES DE METAL. CASCOS PROTECTORES DE METAL PARA LA CABEZA. CAJAS DE CAUDALES, CAJAS FUERTES, PORTICOS Y PUERTAS DE CAMARAS BLINDADAS, ETC., ACORAZADAS O REFORZADAS. PIEZAS Y ACCESORIOS PARA VIAS DE FERROCARRIL Y DE TRANVIA (POR EJEMPLO, CARRILES ENSAMBLADOS, PLATAFORMAS GIRATORIAS, POTROS DE CONTENCION, ETCOTROS ARTICULOS DE METAL NO CLASIFICADOS EN OTRA PARTE, INCLUSO CADENAS, EXCEPTO LAS DE TRANSMISION DE POTENCIA, HELICES PARA BARCOS Y PALAS PARA HELICES DE BARCOS, ANCLAS, CAMPANAS, MARCOS PARA CUADROS, TUBOS FLEXIBLES, CIERRES, HEBILLAS, CORCHETES, ALMOHADILLAS METALICAS PARA FREGAR, LETREROS Y ARTICULOS SIMILARES, CUALQUIERA QUE SEA EL METAL UTILIZADO, EXCEPTO METALES PRECIOSOS.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: SUJETADORES DE METAL: CLAVOS, REMACHES, TACHUELAS, ALFILERES, GRAPAS, ARANDELAS Y PRODUCTOS SIMILARES SIN ROSCA; Y TUERCAS, PERNOS, TORNILLOS Y OTROS ARTICULOS SIN ROSCA. PRODUCTOS DE TORNILLERIA. CABLES DE METAL, TRENZAS Y ARTICULOS SIMILARES DE HIERRO, ACERO, ALUMINIO Y COBRE. ARTICULOS HECHOS DE ALAMBRE: ALAMBRE DE PUAS, CERCAS DE ALAMBRE, REJILLAS, REDES Y TELAS DE ALAMBRE, ETC. RECIPIENTES UTILIZADOS PARA EL ENVASE Y TRANSPORTE DE MERCANCIAS: BARRILES, TAMBORES, BIDONES, TARROS, CAJAS, ETC. MUELLES, INCLUSO MUELLES SEMIACABADOS DE USO GENERAL, EXCEPTO MUELLES PARA RELOJES: MUELLES DE BALLESTA, MUELLES HELICOIDALES, BARRAS DE TORSION, ETC. MACHETES, ESPADAS Y ARMAS SIMILARES. VAJILLA DE MESA Y DE COCINA, SEAN O NO DE METALES COMUNES ENCHAPADOS CON METALES PRECIOSOS; SARTENES, CACEROLAS Y OTROS UTENSILIOS DE COCINA. PEQUE�OS APARATOS DE COCINA ACCIONADOS A MANO PARA PREPARAR, ADEREZAR O SERVIR ALIMENTOS. ARTICULOS SANITARIOS DE METAL, INCLUSO BA�ERAS, PILAS, LAVATORIOS Y OTROS ARTICULOS SANITARIOS Y DE ASEO, ESMALTADOS O NO. ARTICULOS DE METAL PARA OFICINA, EXCEPTO MUEBLES DE METAL. CASCOS PROTECTORES DE METAL PARA LA CABEZA. CAJAS DE CAUDALES, CAJAS FUERTES, PORTICOS Y PUERTAS DE CAMARAS BLINDADAS, ETC., ACORAZADAS O REFORZADAS. PIEZAS Y ACCESORIOS PARA VIAS DE FERROCARRIL Y DE TRANVIA (POR EJEMPLO, CARRILES ENSAMBLADOS, PLATAFORMAS GIRATORIAS, POTROS DE CONTENCION, ETCOTROS ARTICULOS DE METAL NO CLASIFICADOS EN OTRA PARTE, INCLUSO CADENAS, EXCEPTO LAS DE TRANSMISION DE POTENCIA, HELICES PARA BARCOS Y PALAS PARA HELICES DE BARCOS, ANCLAS, CAMPANAS, MARCOS PARA CUADROS, TUBOS FLEXIBLES, CIERRES, HEBILLAS, CORCHETES, ALMOHADILLAS METALICAS PARA FREGAR, LETREROS Y ARTICULOS SIMILARES, CUALQUIERA QUE SEA EL METAL UTILIZADO, EXCEPTO METALES PRECIOSOS.</field>
         </record>
         <record id="activity_290001" model="economic.activity">
                 <field name="code">290001</field>
@@ -925,12 +924,12 @@
         <record id="activity_292101" model="economic.activity">
                 <field name="code">292101</field>
                 <field name="name">FABRICACION DE MAQUINARIA AGRICOLA</field>
-                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: TRACTORES UTILIZADOS EN ACTIVIDADES AGROPECUARIAS Y SILVICOLAS, TRACTORES DE MANEJO A PIE (DIRIGIDOS POR UNA PERSONA DESDE FUERA). TRACTORES EQUIPADOS CON CABRESTANTES Y ARTEFACTOS DESTINADOS A FACILITAR EL REMOLQUE Y MANEJO DE HERRAMIENTAS Y DE DISPOSITIVOS DE TOMA DE FUERZA PARA EL MOVIMIENTO DE TIERRA Y LA MANIPULACION DE OTROS MATERIALES. REMOLQUES Y SEMIRREMOLQUES DE CARGA Y DESCARGA AUTOMATICA PARA USO AGRICOLA. MAQUINAS UTILIZADAS EN LA AGRICULTURA, LA HORTICULTURA Y LA SILVICULTURA PARA PREPARAR LOS SUELOS, PLANTAR Y ABONAR LOS CULTIVOS, INCLUSO ARADOS, GRADAS, DESBROZADORAS, BINADORAS, SEMBRADORAS, ESPARCIDORAS DE ESTIERCOL, ACLARADORAS, ETC., AUTOPROPULSADAS O NO.SE INCLUYE LA MAQUINARIA DE TRACCION ANIMAL. MAQUINAS PARA LA RECOLECCION Y TRILLA: SEGADORAS TRILLADORAS; COSECHADORAS DE ALGODON, MAIZ, FRUTAS, RAICES Y TUBERCULOS; SEGADORAS (CORTADORAS DE CESPED Y DE HENO Y OTRAS SEGADORAS EQUIPADAS CON CUCHILLAS); ENFARDADORAS; MAQUINAS PARA LIMPIAR, SELECCIONAR Y CLASIFICAR HUEVOS, FRUTAS Y OTROS PRODUCTOS AGROPECUARIOS. MAQUINARIA AUTOPROPULSADA, DE ARRASTRE POR TRACTOR Y DE TRACCION ANIMAL. MAQUINAS DE ORDEÑAR. ASPERSORES DE USO AGRICOLA. OTRA MAQUINARIA UTILIZADA EN LA AGRICULTURA, LA CRIA DE ANIMALES, LA HORTICULTURA Y LA SILVICULTURA: MAQUINAS UTILIZADAS EN AVICULTURA, EQUIPO PARA LA PREPARACION DE PIENSOS, MAQUINAS EMPLEADAS EN LA APICULTURA ETC.</field>
+                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: TRACTORES UTILIZADOS EN ACTIVIDADES AGROPECUARIAS Y SILVICOLAS, TRACTORES DE MANEJO A PIE (DIRIGIDOS POR UNA PERSONA DESDE FUERA). TRACTORES EQUIPADOS CON CABRESTANTES Y ARTEFACTOS DESTINADOS A FACILITAR EL REMOLQUE Y MANEJO DE HERRAMIENTAS Y DE DISPOSITIVOS DE TOMA DE FUERZA PARA EL MOVIMIENTO DE TIERRA Y LA MANIPULACION DE OTROS MATERIALES. REMOLQUES Y SEMIRREMOLQUES DE CARGA Y DESCARGA AUTOMATICA PARA USO AGRICOLA. MAQUINAS UTILIZADAS EN LA AGRICULTURA, LA HORTICULTURA Y LA SILVICULTURA PARA PREPARAR LOS SUELOS, PLANTAR Y ABONAR LOS CULTIVOS, INCLUSO ARADOS, GRADAS, DESBROZADORAS, BINADORAS, SEMBRADORAS, ESPARCIDORAS DE ESTIERCOL, ACLARADORAS, ETC., AUTOPROPULSADAS O NO.SE INCLUYE LA MAQUINARIA DE TRACCION ANIMAL. MAQUINAS PARA LA RECOLECCION Y TRILLA: SEGADORAS TRILLADORAS; COSECHADORAS DE ALGODON, MAIZ, FRUTAS, RAICES Y TUBERCULOS; SEGADORAS (CORTADORAS DE CESPED Y DE HENO Y OTRAS SEGADORAS EQUIPADAS CON CUCHILLAS); ENFARDADORAS; MAQUINAS PARA LIMPIAR, SELECCIONAR Y CLASIFICAR HUEVOS, FRUTAS Y OTROS PRODUCTOS AGROPECUARIOS. MAQUINARIA AUTOPROPULSADA, DE ARRASTRE POR TRACTOR Y DE TRACCION ANIMAL. MAQUINAS DE ORDE�AR. ASPERSORES DE USO AGRICOLA. OTRA MAQUINARIA UTILIZADA EN LA AGRICULTURA, LA CRIA DE ANIMALES, LA HORTICULTURA Y LA SILVICULTURA: MAQUINAS UTILIZADAS EN AVICULTURA, EQUIPO PARA LA PREPARACION DE PIENSOS, MAQUINAS EMPLEADAS EN LA APICULTURA ETC.</field>
         </record>
         <record id="activity_292201" model="economic.activity">
                 <field name="code">292201</field>
                 <field name="name">FABRICACION DE MAQUINAS HERRAMIENTA</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: MAQUINAS HERRAMIENTA PARA TRABAJAR METALES Y OTROS MATERIALES, TALES COMO MADERA, PIEDRA, CORCHO, HUESO, EBONITA, PLASTICOS DUROS, VIDRIO EN FRIO, ETC. MAQUINAS HERRAMIENTA PARA TORNEAR, PERFORAR, FRESAR, CONFORMAR, CEPILLAR, TALADRAR, RECTIFICAR Y REALIZAR OTRAS OPERACIONES. MAQUINAS HERRAMIENTA PARA ESTAMPAR Y PRENSAR. PUNZONADORAS, PRENSAS HIDRAULICAS, CIZALLAS MECANICAS, CORTADORAS EN TIRAS, MACHACADORAS, MARTINETES, MAQUINAS DE FORJAR, ETC. BANCOS DE TREFILAR, MAQUINAS DE ATERRAJAR POR LAMINADO A PRESION Y MAQUINAS PARA TRABAJAR ALAMBRE. MAQUINAS HERRAMIENTA DE DISEÑO SENCILLO (POR EJEMPLO, PRENSAS A PEDAL), DE DISEÑO TRADICIONAL (POR EJEMPLO, ACCIONADAS A MANO Y POR MOTOR) Y DE DISEÑO MODERNO (POR EJEMPLO, DE MANDO NUMERICO Y PARA HACER PASAR EL PRODUCTO POR VARIAS ESTACIONES DE TRABAJO). MAQUINAS HERRAMIENTA PARA TRABAJAR DISTINTOS TIPOS DE MATERIAL MEDIANTE RAYOS LASER Y PROCESOS SIMILARES. MAQUINAS PARA CLAVAR, ENGRAPAR, ENCOLAR Y MONTAR DE OTRA MANERA MADERA, CORCHO, HUESO, EBONITA, PLASTICOS DUROS Y MATERIAS DURAS SIMILARES. MAQUINAS ELECTRICAS Y DE GAS PARA SOLDADURA AUTOGENA, SOLDADURA DURA Y SOLDADURA BLANDA, CON O SIN CAPACIDAD PARA CORTAR METAL.SE INCLUYEN LAS MAQUINAS QUE UTILIZAN RAYOS LASER Y OTROS HACES DE LUZ Y DE FOTONES, ONDAS ULTRASONICAS, IMPULSOS MAGNETICOS Y ARCOS DE PLASMA. HERRAMIENTAS DE MANO CON MOTOR, ELECTRICO O NO ELECTRICO, Y DE FUNCIONAMIENTO CON AIRE COMPRIMIDO. TALADRADORAS ROTATORIAS Y DE PERCUSION, SIERRAS DE CADENA, LIMADORAS, MAQUINAS EQUIPADAS CON ESCOBILLAS DE ALAMBRE, MARTILLOS MECANICOS, REMACHADORAS, CORTADORAS DE LAMINAS DE METAL, ETC. PRENSAS PARA LA FABRICACION DE TABLEROS DE PARTICULAS Y FIBRAS DE MADERA U OTROS MATERIALES LEÑOSOS PARA LA CONSTRUCCION, Y OTRA MAQUINARIA PARA TRATAR LA MADERA Y EL CORCHO. PARTES Y ACCESORIOS DE LAS MAQUINAS HERRAMIENTA INCLUIDAS EN ESTA CLASE, TALES COMO DISPOSITIVOS PARA SUJETAR LOS MATERIALES QUE SON OBJETO DE TRABAJO (MANDRILES Y PLATOS DE MANDRIL), CABEZALES DIVISORIOS Y OTROS ACCESORIOS ESPECIALES PARA MAQUINAS HERRAMIENTA.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: MAQUINAS HERRAMIENTA PARA TRABAJAR METALES Y OTROS MATERIALES, TALES COMO MADERA, PIEDRA, CORCHO, HUESO, EBONITA, PLASTICOS DUROS, VIDRIO EN FRIO, ETC. MAQUINAS HERRAMIENTA PARA TORNEAR, PERFORAR, FRESAR, CONFORMAR, CEPILLAR, TALADRAR, RECTIFICAR Y REALIZAR OTRAS OPERACIONES. MAQUINAS HERRAMIENTA PARA ESTAMPAR Y PRENSAR. PUNZONADORAS, PRENSAS HIDRAULICAS, CIZALLAS MECANICAS, CORTADORAS EN TIRAS, MACHACADORAS, MARTINETES, MAQUINAS DE FORJAR, ETC. BANCOS DE TREFILAR, MAQUINAS DE ATERRAJAR POR LAMINADO A PRESION Y MAQUINAS PARA TRABAJAR ALAMBRE. MAQUINAS HERRAMIENTA DE DISE�O SENCILLO (POR EJEMPLO, PRENSAS A PEDAL), DE DISE�O TRADICIONAL (POR EJEMPLO, ACCIONADAS A MANO Y POR MOTOR) Y DE DISE�O MODERNO (POR EJEMPLO, DE MANDO NUMERICO Y PARA HACER PASAR EL PRODUCTO POR VARIAS ESTACIONES DE TRABAJO). MAQUINAS HERRAMIENTA PARA TRABAJAR DISTINTOS TIPOS DE MATERIAL MEDIANTE RAYOS LASER Y PROCESOS SIMILARES. MAQUINAS PARA CLAVAR, ENGRAPAR, ENCOLAR Y MONTAR DE OTRA MANERA MADERA, CORCHO, HUESO, EBONITA, PLASTICOS DUROS Y MATERIAS DURAS SIMILARES. MAQUINAS ELECTRICAS Y DE GAS PARA SOLDADURA AUTOGENA, SOLDADURA DURA Y SOLDADURA BLANDA, CON O SIN CAPACIDAD PARA CORTAR METAL.SE INCLUYEN LAS MAQUINAS QUE UTILIZAN RAYOS LASER Y OTROS HACES DE LUZ Y DE FOTONES, ONDAS ULTRASONICAS, IMPULSOS MAGNETICOS Y ARCOS DE PLASMA. HERRAMIENTAS DE MANO CON MOTOR, ELECTRICO O NO ELECTRICO, Y DE FUNCIONAMIENTO CON AIRE COMPRIMIDO. TALADRADORAS ROTATORIAS Y DE PERCUSION, SIERRAS DE CADENA, LIMADORAS, MAQUINAS EQUIPADAS CON ESCOBILLAS DE ALAMBRE, MARTILLOS MECANICOS, REMACHADORAS, CORTADORAS DE LAMINAS DE METAL, ETC. PRENSAS PARA LA FABRICACION DE TABLEROS DE PARTICULAS Y FIBRAS DE MADERA U OTROS MATERIALES LE�OSOS PARA LA CONSTRUCCION, Y OTRA MAQUINARIA PARA TRATAR LA MADERA Y EL CORCHO. PARTES Y ACCESORIOS DE LAS MAQUINAS HERRAMIENTA INCLUIDAS EN ESTA CLASE, TALES COMO DISPOSITIVOS PARA SUJETAR LOS MATERIALES QUE SON OBJETO DE TRABAJO (MANDRILES Y PLATOS DE MANDRIL), CABEZALES DIVISORIOS Y OTROS ACCESORIOS ESPECIALES PARA MAQUINAS HERRAMIENTA.</field>
         </record>
         <record id="activity_292301" model="economic.activity">
                 <field name="code">292301</field>
@@ -940,7 +939,7 @@
         <record id="activity_292401" model="economic.activity">
                 <field name="code">292401</field>
                 <field name="name">FABRICACION DE MAQUINARIA PARA LA EXPLOTACION DE MINAS Y CANTERAS Y PARA OBRAS DE CONSTRUCCION</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: MAQUINARIA DE ELEVACION Y MANIPULACION DISEÑADA ESPECIALMENTE PARA USO EN OBRAS SUBTERRANEAS, COMO POR EJEMPLO EQUIPO DE CINTAS TRANSPORTADORAS. MAQUINARIA PARA PERFORAR E HINCAR, DESTINADA O NO A USOS SUBTERRANEOS. MAQUINARIA PARA EL TRATAMIENTO DE MINERALES MEDIANTE CRIBADO, CLASIFICACION, SEPARACION, LAVADO, TRITURACION, PULVERIZACION, MEZCLA, AMASADO Y PROCESOS SIMILARES, INCLUSO MEZCLADORAS DE HORMIGON Y MORTERO, MAQUINAS DE MOLDEAMIENTO, EXTRUSORAS, ETC. TRACTORES DE ORUGA Y TRACTORES UTILIZADOS EN OBRAS DE CONSTRUCCION Y EN LA EXPLOTACION DE MINAS. TOPADORAS CORRIENTES Y DE PALA ANGULAR. OTRAS MAQUINAS PARA MOVIMIENTO DE TIERRA, AUTOPROPULSADAS O NO: EXPLA NADORAS, NIVELADORAS, TRAILLAS, PALAS MECANICAS, EXCAVADORAS, CARGADORAS DE CUCHARON, APISONADORAS Y APLANADORAS. MAQUINAS PARA HINCAR Y ARRANCAR PILOTES, Y MAQUINAS COMPACTADORAS. MAQUINAS UTILIZADAS EN LA CONSTRUCCION NO CLASIFICADAS NI INCLUIDAS EN OTRA PARTE: ESPARCIDORAS DE HORMIGON, EQUIPO DE CONSTRUCCION DE CAMINOS (POR EJEMPLO, ESPARCIDORAS DE ASFALTO), MAQUINARIA PARA PAVIMENTAR CON HORMIGON (ESTRIADORAS, ALISADORAS, ESCAQUEADORAS), ETC. PALAS PARA TOPADORAS CORRIENTES Y DE PALA ANGULAR Y OTRAS PARTES ESPECIALES DE LAS MAQUINAS MENCIONADAS ANTERIORMENTE.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: MAQUINARIA DE ELEVACION Y MANIPULACION DISE�ADA ESPECIALMENTE PARA USO EN OBRAS SUBTERRANEAS, COMO POR EJEMPLO EQUIPO DE CINTAS TRANSPORTADORAS. MAQUINARIA PARA PERFORAR E HINCAR, DESTINADA O NO A USOS SUBTERRANEOS. MAQUINARIA PARA EL TRATAMIENTO DE MINERALES MEDIANTE CRIBADO, CLASIFICACION, SEPARACION, LAVADO, TRITURACION, PULVERIZACION, MEZCLA, AMASADO Y PROCESOS SIMILARES, INCLUSO MEZCLADORAS DE HORMIGON Y MORTERO, MAQUINAS DE MOLDEAMIENTO, EXTRUSORAS, ETC. TRACTORES DE ORUGA Y TRACTORES UTILIZADOS EN OBRAS DE CONSTRUCCION Y EN LA EXPLOTACION DE MINAS. TOPADORAS CORRIENTES Y DE PALA ANGULAR. OTRAS MAQUINAS PARA MOVIMIENTO DE TIERRA, AUTOPROPULSADAS O NO: EXPLA NADORAS, NIVELADORAS, TRAILLAS, PALAS MECANICAS, EXCAVADORAS, CARGADORAS DE CUCHARON, APISONADORAS Y APLANADORAS. MAQUINAS PARA HINCAR Y ARRANCAR PILOTES, Y MAQUINAS COMPACTADORAS. MAQUINAS UTILIZADAS EN LA CONSTRUCCION NO CLASIFICADAS NI INCLUIDAS EN OTRA PARTE: ESPARCIDORAS DE HORMIGON, EQUIPO DE CONSTRUCCION DE CAMINOS (POR EJEMPLO, ESPARCIDORAS DE ASFALTO), MAQUINARIA PARA PAVIMENTAR CON HORMIGON (ESTRIADORAS, ALISADORAS, ESCAQUEADORAS), ETC. PALAS PARA TOPADORAS CORRIENTES Y DE PALA ANGULAR Y OTRAS PARTES ESPECIALES DE LAS MAQUINAS MENCIONADAS ANTERIORMENTE.</field>
         </record>
         <record id="activity_292402" model="economic.activity">
                 <field name="code">292402</field>
@@ -955,17 +954,17 @@
         <record id="activity_292601" model="economic.activity">
                 <field name="code">292601</field>
                 <field name="name">FABRICACION MAQUINARIA PARA LA ELABORACION DE PRODUCTOS TEXTILES, PRENDAS DE VESTIR Y CUEROS</field>
-                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: MAQUINAS DE PREPARACION DE FIBRAS TEXTILES (FIBRAS NATURALES Y ARTIFICIALES) PARA LA HILATURA, MAQUINAS PARA TRANSFORMAR LAS MECHAS EN HILOS, INCLUSO MANUARES DE RETORCER JUNTOS DOS O MAS HILOS PARA OBTENER HILOS RETORCIDOS Y CABLEADOS. MAQUINAS DE PREPARACION DE HILADOS TEXTILES PARA SU USO EN TELARES CORRIENTES Y TELARES PARA TEJIDOS DE PUNTO. MAQUINARIA PARA LAVAR, BLANQUEAR, TEÑIR, APRESTAR, ACABAR, REVESTIR E IMPREGNAR HILADOS TEXTILES, TELAS Y ARTICULOS CONFECCIONADOS DE MATERIALES TEXTILES; MAQUINAS PARA APLICAR LA PASTA AL TEJIDO U OTRO MATERIAL DE BASE UTILIZADAS EN LA FABRICACION DE LINOLEO Y OTROS MATERIALES SIMILARES PARA REVESTIMIENTO DE PISOS; MAQUINAS DE ENROLLAR, DESENROLLAR, PLEGAR, CORTAR Y CALAR TELAS. MAQUINAS DE PLANCHAR, INCLUSO PLANCHAS DE FUSION. MAQUINAS DE LAVAR Y SECAR DEL TIPO UTILIZADO EN LAVANDERIA, Y MAQUINAS DE LIMPIAR EN SECO. MAQUINAS DE COSER Y CABEZALES DE MAQUINAS DE COSER, SEAN O NO PARA USO DOMESTICO: MAQUINAS PARA COSER MATERIAS TEXTILES, CUERO, PIELES, ETC.; PARA CONFECCIONAR PRENDAS DE VESTIR, CALZADO, BORDADOS, MALETAS, CUBRECABEZAS, SACOS, ETC. AGUJAS PARA MAQUINAS DE COSER. MAQUINAS PARA LA MANUFACTURA Y EL ACABADO DE FIELTRO Y DE TEXTILES NO TEJIDOS, EN PIEZAS O EN CORTES CON FORMAS DETERMINADAS, INCLUSO MAQUINAS PARA LA FABRICACION DE SOMBREROS DE FIELTRO. MAQUINAS PARA PREPARAR, CURTIR Y TRABAJAR CUEROS Y PIELES,INCLUSO DEPILADORAS,DESCARNADORAS, BATANES DE MAZO Y DE TAMBOR, TUNDIDORAS Y MAQUINAS DE ACABAR, TALES COMO MAQUINAS DE CEPILLAR, GLASEAR Y GRANEAR EL CUERO. MAQUINARIA PARA FABRICAR Y REPARAR CALZADO Y OTROS ARTICULOS DE CUERO O PIEL.</field>
+                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: MAQUINAS DE PREPARACION DE FIBRAS TEXTILES (FIBRAS NATURALES Y ARTIFICIALES) PARA LA HILATURA, MAQUINAS PARA TRANSFORMAR LAS MECHAS EN HILOS, INCLUSO MANUARES DE RETORCER JUNTOS DOS O MAS HILOS PARA OBTENER HILOS RETORCIDOS Y CABLEADOS. MAQUINAS DE PREPARACION DE HILADOS TEXTILES PARA SU USO EN TELARES CORRIENTES Y TELARES PARA TEJIDOS DE PUNTO. MAQUINARIA PARA LAVAR, BLANQUEAR, TE�IR, APRESTAR, ACABAR, REVESTIR E IMPREGNAR HILADOS TEXTILES, TELAS Y ARTICULOS CONFECCIONADOS DE MATERIALES TEXTILES; MAQUINAS PARA APLICAR LA PASTA AL TEJIDO U OTRO MATERIAL DE BASE UTILIZADAS EN LA FABRICACION DE LINOLEO Y OTROS MATERIALES SIMILARES PARA REVESTIMIENTO DE PISOS; MAQUINAS DE ENROLLAR, DESENROLLAR, PLEGAR, CORTAR Y CALAR TELAS. MAQUINAS DE PLANCHAR, INCLUSO PLANCHAS DE FUSION. MAQUINAS DE LAVAR Y SECAR DEL TIPO UTILIZADO EN LAVANDERIA, Y MAQUINAS DE LIMPIAR EN SECO. MAQUINAS DE COSER Y CABEZALES DE MAQUINAS DE COSER, SEAN O NO PARA USO DOMESTICO: MAQUINAS PARA COSER MATERIAS TEXTILES, CUERO, PIELES, ETC.; PARA CONFECCIONAR PRENDAS DE VESTIR, CALZADO, BORDADOS, MALETAS, CUBRECABEZAS, SACOS, ETC. AGUJAS PARA MAQUINAS DE COSER. MAQUINAS PARA LA MANUFACTURA Y EL ACABADO DE FIELTRO Y DE TEXTILES NO TEJIDOS, EN PIEZAS O EN CORTES CON FORMAS DETERMINADAS, INCLUSO MAQUINAS PARA LA FABRICACION DE SOMBREROS DE FIELTRO. MAQUINAS PARA PREPARAR, CURTIR Y TRABAJAR CUEROS Y PIELES,INCLUSO DEPILADORAS,DESCARNADORAS, BATANES DE MAZO Y DE TAMBOR, TUNDIDORAS Y MAQUINAS DE ACABAR, TALES COMO MAQUINAS DE CEPILLAR, GLASEAR Y GRANEAR EL CUERO. MAQUINARIA PARA FABRICAR Y REPARAR CALZADO Y OTROS ARTICULOS DE CUERO O PIEL.</field>
         </record>
         <record id="activity_292701" model="economic.activity">
                 <field name="code">292701</field>
                 <field name="name">FABRICACION DE ARMAS Y MUNICIONES</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: TANQUES Y OTROS VEHICULOS DE COMBATE, INCLUSO CARROS BLINDADOS, VEHICULOS PARA LA RECUPERACION DE TANQUES Y VEHICULOS BLINDADOS DE ABASTECIMIENTO. ARMAS PESADAS, PIEZAS DE ARTILLERIA, CAÑONES MOVILES, INCLUSO CAÑONES MONTADOS EN VAGONES DE FERROCARRIL; LANZAPROYECTILES Y LANZACOHETES; TUBOS LANZATORPEDOS, LANZADORES DE CARGAS DE PROFUNDIDAD, AMETRALLADORAS PESADAS. ARMAS PORTATILES, COMO AMETRALLADORAS LIGERAS, FUSILES, CARABINAS, ESCOPETAS, REVOLVERES Y PISTOLAS. ARMAS LIGERAS DESTINADAS AL USO DE LAS FUERZAS DE DEFENSA, LA POLICIA, OTROS SERVICIOS ORGANIZADOS, CAZADORES Y DEPORTISTAS. ESCOPETAS Y PISTOLAS DE AIRE Y GAS COMPRIMIDO. ARMAS DE FUEGO QUE DISPARAN BALAS DE FOGUEO, PISTOLAS PARA LANZAR BENGALAS DE SEÑALES, PISTOLAS DE MATARIFE, PISTOLAS SIMILARES DE EMBOLO CAUTIVO Y OTRAS "ARMAS DE FUEGO". MUNICIONES PARA LAS ARMAS DESCRITAS ANTERIORMENTE Y MUNICIONES PROPULSADAS POR OTROS MEDIOS: BOMBAS, GRANADAS, TORPEDOS, MINAS, COHETES Y MUNICIONES SIMILARES DE GUERRA; PROYECTILES Y MISILES DE USO MILITAR.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: TANQUES Y OTROS VEHICULOS DE COMBATE, INCLUSO CARROS BLINDADOS, VEHICULOS PARA LA RECUPERACION DE TANQUES Y VEHICULOS BLINDADOS DE ABASTECIMIENTO. ARMAS PESADAS, PIEZAS DE ARTILLERIA, CA�ONES MOVILES, INCLUSO CA�ONES MONTADOS EN VAGONES DE FERROCARRIL; LANZAPROYECTILES Y LANZACOHETES; TUBOS LANZATORPEDOS, LANZADORES DE CARGAS DE PROFUNDIDAD, AMETRALLADORAS PESADAS. ARMAS PORTATILES, COMO AMETRALLADORAS LIGERAS, FUSILES, CARABINAS, ESCOPETAS, REVOLVERES Y PISTOLAS. ARMAS LIGERAS DESTINADAS AL USO DE LAS FUERZAS DE DEFENSA, LA POLICIA, OTROS SERVICIOS ORGANIZADOS, CAZADORES Y DEPORTISTAS. ESCOPETAS Y PISTOLAS DE AIRE Y GAS COMPRIMIDO. ARMAS DE FUEGO QUE DISPARAN BALAS DE FOGUEO, PISTOLAS PARA LANZAR BENGALAS DE SE�ALES, PISTOLAS DE MATARIFE, PISTOLAS SIMILARES DE EMBOLO CAUTIVO Y OTRAS "ARMAS DE FUEGO". MUNICIONES PARA LAS ARMAS DESCRITAS ANTERIORMENTE Y MUNICIONES PROPULSADAS POR OTROS MEDIOS: BOMBAS, GRANADAS, TORPEDOS, MINAS, COHETES Y MUNICIONES SIMILARES DE GUERRA; PROYECTILES Y MISILES DE USO MILITAR.</field>
         </record>
         <record id="activity_292901" model="economic.activity">
                 <field name="code">292901</field>
                 <field name="name">FABRICACION DE OTROS TIPOS DE MAQUINARIA DE USO ESPECIAL</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE MAQUINARIA Y EQUIPO DE USO ESPECIAL NO CLASIFICADO EN OTRA PARTE, TAL COMO: MAQUINAS PARA EXTRUIR, ESTIRAR, TEJER Y CORTAR FIBRAS, HILADOS Y OTROS MATERIALES TEXTILES DE ORIGEN ARTIFICIAL. MAQUINAS PARA LA ELABORACION DE CAUCHO Y DE PLASTICOS Y PARA LA FABRICACION DE PRODUCTOS DE ESOS MATERIALES MAQUINARIA PARA LAS INDUSTRIAS DE LA PASTA DE PAPEL, EL PAPEL Y EL CARTON, CORTADORAS, PULVERIZADORAS Y TRITURADORAS DESTINADAS A PREPARAR MADERA, BAMBU, ESPARTO, PAJA, TRAPOS, DESECHOS DE PAPEL, ETC. MAQUINARIA PARA LA PRODUCCION DE PAPEL DE TAMAÑOS Y FORMAS DETERMINADOS Y PARA LA PRODUCCION DE ARTICULOS TALES COMO SOBRES, BOLSAS DE PAPEL, CAJAS Y CAJONES DE CARTON. MAQUINARIAPARA LA FUNDICION DE CARACTERES DE IMPRENTA. MAQUINARIA PARA IMPRIMIR (POR EJEMPLO, PRENSAS CORRIENTES, DE PLATINA, DE CILINDROS Y ROTATIVAS, INCLUSO IMPRESORAS ESPECIALES, TALES COMO MAQUINAS PARA SERIGRAFIA Y PARA EL ESTAMPADO DE HILADOS, CORCHO, PRENDAS DE VESTIR Y OTROS ARTICULOS NO USUALES); MAQUINAS AUXILIARES DE LA IMPRESION (POR EJEMPLO, CARGADORAS, ALIMENTADORAS, PLEGADORAS, ENCOLADORAS, ENGRAPADORAS, ETC.). MAQUINAS PARA ENCUADERNACION, INCLUSO COSEDORAS DE LIBROS, ENCUADERNADORAS PARA EL MONTAJE DE LOMOS DE ESPIRAL PLASTICA Y METALICA Y FOLIADORAS</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE MAQUINARIA Y EQUIPO DE USO ESPECIAL NO CLASIFICADO EN OTRA PARTE, TAL COMO: MAQUINAS PARA EXTRUIR, ESTIRAR, TEJER Y CORTAR FIBRAS, HILADOS Y OTROS MATERIALES TEXTILES DE ORIGEN ARTIFICIAL. MAQUINAS PARA LA ELABORACION DE CAUCHO Y DE PLASTICOS Y PARA LA FABRICACION DE PRODUCTOS DE ESOS MATERIALES MAQUINARIA PARA LAS INDUSTRIAS DE LA PASTA DE PAPEL, EL PAPEL Y EL CARTON, CORTADORAS, PULVERIZADORAS Y TRITURADORAS DESTINADAS A PREPARAR MADERA, BAMBU, ESPARTO, PAJA, TRAPOS, DESECHOS DE PAPEL, ETC. MAQUINARIA PARA LA PRODUCCION DE PAPEL DE TAMA�OS Y FORMAS DETERMINADOS Y PARA LA PRODUCCION DE ARTICULOS TALES COMO SOBRES, BOLSAS DE PAPEL, CAJAS Y CAJONES DE CARTON. MAQUINARIAPARA LA FUNDICION DE CARACTERES DE IMPRENTA. MAQUINARIA PARA IMPRIMIR (POR EJEMPLO, PRENSAS CORRIENTES, DE PLATINA, DE CILINDROS Y ROTATIVAS, INCLUSO IMPRESORAS ESPECIALES, TALES COMO MAQUINAS PARA SERIGRAFIA Y PARA EL ESTAMPADO DE HILADOS, CORCHO, PRENDAS DE VESTIR Y OTROS ARTICULOS NO USUALES); MAQUINAS AUXILIARES DE LA IMPRESION (POR EJEMPLO, CARGADORAS, ALIMENTADORAS, PLEGADORAS, ENCOLADORAS, ENGRAPADORAS, ETC.). MAQUINAS PARA ENCUADERNACION, INCLUSO COSEDORAS DE LIBROS, ENCUADERNADORAS PARA EL MONTAJE DE LOMOS DE ESPIRAL PLASTICA Y METALICA Y FOLIADORAS</field>
         </record>
         <record id="activity_293001" model="economic.activity">
                 <field name="code">293001</field>
@@ -995,12 +994,12 @@
         <record id="activity_315001" model="economic.activity">
                 <field name="code">315001</field>
                 <field name="name">FABRICACION DE LAMPARAS ELECTRICAS Y EQUIPO DE ILUMINACION</field>
-                <field name="description">ESTA CLASE COMPRENDE LA FABRICACION DE BOMBILLAS Y TUBOS ELECTRICOS Y SUS PIEZAS Y COMPONENTES (EXCEPTO AMPOLLAS DE VIDRIO PARA BOMBILLAS) Y DE LAMPARAS ELECTRICAS Y SUS PIEZAS Y COMPONENTES (EXCEPTO DISPOSITIVOS DE CABLEADO PORTADORES DE CORRIENTE). SE INCLUYEN LAS SIGUIENTES ACTIVIDADES: FABRICACION DE LAMPARAS, TUBOS Y BOMBILLAS DE DESCARGA, INCANDESCENTES, FLUORESCENTES, DE RAYOS ULTRAVIOLETAS, DE RAYOS INFRARROJOS, ETCETERA, FABRICACION DE LAMPARAS DE TECHO, FABRICACION DE ARAÑAS COLGANTES, FABRICACION DE LAMPARAS DE MESA, FABRICACION DE JUEGOS DE BOMBILLAS PARA DECORAR ARBOLES DE NAVIDAD, FABRICACION DE TRONCOS ELECTRICOS PARA CHIMENEA, FABRICACION DE LAMPARAS DE DESTELLOS, FABRICACION DE LAMPARAS ELECTRTRICAS CONTRA INSECTOS, FABRICACION DE LINTERNAS (P. EJ., DE CARBURO, ELECTRICAS, DE GAS, DE GASOLINA DE QUEROSENO), FABRICACION DE PROYECTORES DE TEATRO, FABRICACION DE LAMPARAS PARA LA ILUMINACION DE LAS CALLES (EXCEPTO SEÑALES DE TRAFICO), FABRICACION DE EQUIPO DE ILUMINACION PARA EQUIPO DE TRANSPORTE, SE INCLUYEN TAMBIEN LAS SIGUIENTES ACTIVIDADES: FABRICACION DE EQUIPO DE ILUMINACION NO ELECTRICO</field>
+                <field name="description">ESTA CLASE COMPRENDE LA FABRICACION DE BOMBILLAS Y TUBOS ELECTRICOS Y SUS PIEZAS Y COMPONENTES (EXCEPTO AMPOLLAS DE VIDRIO PARA BOMBILLAS) Y DE LAMPARAS ELECTRICAS Y SUS PIEZAS Y COMPONENTES (EXCEPTO DISPOSITIVOS DE CABLEADO PORTADORES DE CORRIENTE). SE INCLUYEN LAS SIGUIENTES ACTIVIDADES: FABRICACION DE LAMPARAS, TUBOS Y BOMBILLAS DE DESCARGA, INCANDESCENTES, FLUORESCENTES, DE RAYOS ULTRAVIOLETAS, DE RAYOS INFRARROJOS, ETCETERA, FABRICACION DE LAMPARAS DE TECHO, FABRICACION DE ARA�AS COLGANTES, FABRICACION DE LAMPARAS DE MESA, FABRICACION DE JUEGOS DE BOMBILLAS PARA DECORAR ARBOLES DE NAVIDAD, FABRICACION DE TRONCOS ELECTRICOS PARA CHIMENEA, FABRICACION DE LAMPARAS DE DESTELLOS, FABRICACION DE LAMPARAS ELECTRTRICAS CONTRA INSECTOS, FABRICACION DE LINTERNAS (P. EJ., DE CARBURO, ELECTRICAS, DE GAS, DE GASOLINA DE QUEROSENO), FABRICACION DE PROYECTORES DE TEATRO, FABRICACION DE LAMPARAS PARA LA ILUMINACION DE LAS CALLES (EXCEPTO SE�ALES DE TRAFICO), FABRICACION DE EQUIPO DE ILUMINACION PARA EQUIPO DE TRANSPORTE, SE INCLUYEN TAMBIEN LAS SIGUIENTES ACTIVIDADES: FABRICACION DE EQUIPO DE ILUMINACION NO ELECTRICO</field>
         </record>
         <record id="activity_319001" model="economic.activity">
                 <field name="code">319001</field>
                 <field name="name">FABRICACION DE OTROS TIPOS DE EQUIPO ELECTRICO N.C.P.</field>
-                <field name="description">ESTA CLASE COMPRENDE LA FABRICACION DE DIVERSOS TIPOS DE EQUIPO ELECTRICO, EXCEPTO MOTORES, GENERADORES Y TRANSFORMADORES, PILAS, BATERIAS Y ACUMULADORES, CABLES Y DISPOSITIVOS DE CABLEADO, EQUIPO DE ILUMINACION O APARATOS DE USO DOMESTICO. SE INCLUYEN LAS SIGUIENTES ACTIVIDADES: FABRICACION DE CARGADORES DE PILAS DE ESTADO SOLIDO, FABRICACION DE DISPOSITIVOS ELECTRICOS DE APERTURA Y CIERRE DE PUERTAS, FABRICACION DE TIMBRES ELECTRICOS, FABRICACION DE LIMPIADORES ULTRASONICOS (EXCEPTO LOS DE USO ODONTOLOGICO Y DE LABORATORIO), FABRICACION DE CAMAS BRONCEADORAS, FABRICACION DE INVERTIDORES, RECTIFICADORES CELULAS ENERGETICAS, UNIDADDES DE SUMINISTRO DE POTENCIA REGULADA Y NO REGULADA DE ESTADO SOLIDO FABRICACION DE UNIDADES DE SUMINISTRO ININTERRUMPIDO DE ENERGIA, FABRICACION DE LIMITADORES DE SOBRETENSION (EXCEPTO PARA VOLTAJES DE DISTRIBUCION), FABRICACION DE CABLES PARA APARATOS, CABLES ALARGADORES, Y OTROS JUEGOS DE CABLES ELECTRICOS CON CABLE AISLADO Y ENCHUFE, FABRICACION DE ELECTRODOS Y CONTACTOS DE CARBONO Y GRAFITO Y OTROS PRODUCTOS ELECTRICOS DE CARBON Y GRAFITO, FABRICACION DE ACELERADORES DE PARTICULAS, FABRICACION DE CAPACITORES, RESISTORES, CONDENSADORES Y COMPONENTES ELECTRICOS SIMILARES, FABRICACION DE ELECTROIMANES, FABRICACION DE SIRENAS, FABRICACION DE MARCADORES ELECTRONICOS, FABRICACION DE SEÑALES ELECTRICAS, FABRICACION DE EQUIPO ELECTRICO DE SEÑALIZACION, COMO SEMAFOROS Y SEÑALES PEATONALES, FABRICACION DE AISLADORES ELECTRICOS (EXCEPTO LOS DE VIDRIO O PORCELANA), FABRICACION DE EQUIPO ELECTRICO DE SOLDADURA AUTOGENA Y DE SOLDADURA BLANDA, INCLUIDOS SOLDADORES MANUALES</field>
+                <field name="description">ESTA CLASE COMPRENDE LA FABRICACION DE DIVERSOS TIPOS DE EQUIPO ELECTRICO, EXCEPTO MOTORES, GENERADORES Y TRANSFORMADORES, PILAS, BATERIAS Y ACUMULADORES, CABLES Y DISPOSITIVOS DE CABLEADO, EQUIPO DE ILUMINACION O APARATOS DE USO DOMESTICO. SE INCLUYEN LAS SIGUIENTES ACTIVIDADES: FABRICACION DE CARGADORES DE PILAS DE ESTADO SOLIDO, FABRICACION DE DISPOSITIVOS ELECTRICOS DE APERTURA Y CIERRE DE PUERTAS, FABRICACION DE TIMBRES ELECTRICOS, FABRICACION DE LIMPIADORES ULTRASONICOS (EXCEPTO LOS DE USO ODONTOLOGICO Y DE LABORATORIO), FABRICACION DE CAMAS BRONCEADORAS, FABRICACION DE INVERTIDORES, RECTIFICADORES CELULAS ENERGETICAS, UNIDADDES DE SUMINISTRO DE POTENCIA REGULADA Y NO REGULADA DE ESTADO SOLIDO FABRICACION DE UNIDADES DE SUMINISTRO ININTERRUMPIDO DE ENERGIA, FABRICACION DE LIMITADORES DE SOBRETENSION (EXCEPTO PARA VOLTAJES DE DISTRIBUCION), FABRICACION DE CABLES PARA APARATOS, CABLES ALARGADORES, Y OTROS JUEGOS DE CABLES ELECTRICOS CON CABLE AISLADO Y ENCHUFE, FABRICACION DE ELECTRODOS Y CONTACTOS DE CARBONO Y GRAFITO Y OTROS PRODUCTOS ELECTRICOS DE CARBON Y GRAFITO, FABRICACION DE ACELERADORES DE PARTICULAS, FABRICACION DE CAPACITORES, RESISTORES, CONDENSADORES Y COMPONENTES ELECTRICOS SIMILARES, FABRICACION DE ELECTROIMANES, FABRICACION DE SIRENAS, FABRICACION DE MARCADORES ELECTRONICOS, FABRICACION DE SE�ALES ELECTRICAS, FABRICACION DE EQUIPO ELECTRICO DE SE�ALIZACION, COMO SEMAFOROS Y SE�ALES PEATONALES, FABRICACION DE AISLADORES ELECTRICOS (EXCEPTO LOS DE VIDRIO O PORCELANA), FABRICACION DE EQUIPO ELECTRICO DE SOLDADURA AUTOGENA Y DE SOLDADURA BLANDA, INCLUIDOS SOLDADORES MANUALES</field>
         </record>
         <record id="activity_321001" model="economic.activity">
                 <field name="code">321001</field>
@@ -1010,7 +1009,7 @@
         <record id="activity_321002" model="economic.activity">
                 <field name="code">321002</field>
                 <field name="name">DISEÑO DE COMPONENTES ELECTRONICOS</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE SOLAMENTE EL DISEÑO DE PARTES Y COMPONENTES ELECTRONICOS DE TODO TIPO.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE SOLAMENTE EL DISE�O DE PARTES Y COMPONENTES ELECTRONICOS DE TODO TIPO.</field>
         </record>
         <record id="activity_322001" model="economic.activity">
                 <field name="code">322001</field>
@@ -1035,7 +1034,7 @@
         <record id="activity_331201" model="economic.activity">
                 <field name="code">331201</field>
                 <field name="name">FABRICACION DE EQUIPOS PARA MEDIR, VERIFICAR, Y NAVEGAR Y DE EQUIPOS DE CONTROL</field>
-                <field name="description">ESTA CLASE COMPRENDE LA FABRICACION DE SISTEMAS E INSTRUMENTOS AERONAUTICOS Y NAUTICOS DE BUSQUEDA, DETECCION, NAVEGACION Y ORIENTACION; DISPOSITIVOS AUTOMATICOS DE CONTROL Y REGULACION PARA APARATOS DE USO DOMESTICO, COMO LOS DE CALEFACCION, ACONDICIONAMIENTO DE AIRE Y REFRIGERACION Y APARATOS SIMILARES; INSTRUMENTOS Y DISPOSITIVOS PARA MEDIR, MOSTRAR, INDICAR, REGISTRAR, TRANSMITIR Y CONTROLAR VARIABLES DE PROCESOS INDUSTRIALES, COMO LA TEMPERATURA, LA HUMEDAD, LA PRESION, EL VACIO, LA COMBUSTION, EL FLUJO, EL NIVEL, LA VISCOSIDAD, LA DENSIDAD, LA ACIDEZ, LA CONCENTRACION Y LA ROTACION; CONTADORES DE REGISTRO DE FLUIDOS; INSTRUMENTOS PARA MEDIR Y COMPROBARLAS CARACTERISTICAS DE LA ELECTRICIDAD Y LAS SEÑALES ELECTRICAS; INSTRUMENTOS Y SISTEMAS INSTRUMENTALES PARA EL ANALISIS EN LABORATORIO DE LA COMPOSICION QUIMICA O FISICA O LA CONCENTRACION DE MUESTRAS DE MATERIALES SOLIDOS, FLUIDOS, GASEOSOS O COMPUESTOS Y OTROS INSTRUMENTOS DE MEDICION Y DE PRUEBA Y PIEZAS DE ESOS INSTRUMENTOS. SE INCLUYE ASIMISMO LA FABRICACION DE EQUIPO NO ELECTRICO DE MEDICION, PRUEBA NAVEGACION Y CONTROL (EXCEPTO HERRAMIENTAS MECANICAS SENCILLAS)</field>
+                <field name="description">ESTA CLASE COMPRENDE LA FABRICACION DE SISTEMAS E INSTRUMENTOS AERONAUTICOS Y NAUTICOS DE BUSQUEDA, DETECCION, NAVEGACION Y ORIENTACION; DISPOSITIVOS AUTOMATICOS DE CONTROL Y REGULACION PARA APARATOS DE USO DOMESTICO, COMO LOS DE CALEFACCION, ACONDICIONAMIENTO DE AIRE Y REFRIGERACION Y APARATOS SIMILARES; INSTRUMENTOS Y DISPOSITIVOS PARA MEDIR, MOSTRAR, INDICAR, REGISTRAR, TRANSMITIR Y CONTROLAR VARIABLES DE PROCESOS INDUSTRIALES, COMO LA TEMPERATURA, LA HUMEDAD, LA PRESION, EL VACIO, LA COMBUSTION, EL FLUJO, EL NIVEL, LA VISCOSIDAD, LA DENSIDAD, LA ACIDEZ, LA CONCENTRACION Y LA ROTACION; CONTADORES DE REGISTRO DE FLUIDOS; INSTRUMENTOS PARA MEDIR Y COMPROBARLAS CARACTERISTICAS DE LA ELECTRICIDAD Y LAS SE�ALES ELECTRICAS; INSTRUMENTOS Y SISTEMAS INSTRUMENTALES PARA EL ANALISIS EN LABORATORIO DE LA COMPOSICION QUIMICA O FISICA O LA CONCENTRACION DE MUESTRAS DE MATERIALES SOLIDOS, FLUIDOS, GASEOSOS O COMPUESTOS Y OTROS INSTRUMENTOS DE MEDICION Y DE PRUEBA Y PIEZAS DE ESOS INSTRUMENTOS. SE INCLUYE ASIMISMO LA FABRICACION DE EQUIPO NO ELECTRICO DE MEDICION, PRUEBA NAVEGACION Y CONTROL (EXCEPTO HERRAMIENTAS MECANICAS SENCILLAS)</field>
         </record>
         <record id="activity_332001" model="economic.activity">
                 <field name="code">332001</field>
@@ -1050,7 +1049,7 @@
         <record id="activity_341001" model="economic.activity">
                 <field name="code">341001</field>
                 <field name="name">FABRICACION DE VEHICULOS AUTOMOTORES</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: AUTOMOVILES Y OTROS VEHICULOS AUTOMOTORES DISEÑADOS PRINCIPALMENTE PARA EL TRANSPORTE DE PERSONAS: AUTOMOVILES DE TURISMO, VEHICULOS AUTOMOTORES DE TRANSPORTE DE PASAJEROS DISEÑADOS PARA TRANSITAR POR TERRENOS IRREGULARES (TRINEOS MOTORIZADOS, CARRITOS AUTOPROPULSADOS PARA CAMPOS DE GOLF, VEHICULOS PARA TODO TERRENO, VEHICULOS ANFIBIOS) Y VEHICULOS AUTOMOTORES PARA EL TRANSPORTE PUBLICO DE PASAJEROS, A SABER, AUTOBUSES. VEHICULOS AUTOMOTORES PARA EL TRANSPORTE DE MERCANCIAS: CAMIONES Y CAMIONETAS COMUNES (DE CAJADESCUBIERTA, CON CAPOTA, CERRADOS, ETC.); CAMIONES CON DISPOSITIVOS DE DESCARGA AUTOMATICOS, CAMIONES CISTERNA, VOLQUETES, CAMIONES RECOLECTORES DE BASURA, ETC.; CAMIONES Y CAMIONETAS DE USO ESPECIAL (CAMIONES DE AUXILIO CARRETERO, CAMIONES BLINDADOS, CAMIONES DE BOMBEROS, CAMIONES BARREDORES, UNIDADES MEDICAS Y ODONTOLOGICAS MOVILES, BIBLIOTECAS MOVILES, ETC.) TRACTORES PARA SEMIRREMOLQUES DE CIRCULACION POR CARRETERA. CHASIS EQUIPADOS CON MOTORES PARA LOS VEHICULOS AUTOMOTORES DESCRITOS ANTERIORMENTE. MOTORES DE COMBUSTION INTERNA CON EMBOLOS DE MOVIMIENTO RECTILINEO O ROTATORIO Y DE ENCENDIDO POR CHISPA ELECTRICA O POR COMPRESION, DEL TIPO UTILIZADO PRINCIPALMENTE EN VEHICULOS AUTOMOTORES.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: AUTOMOVILES Y OTROS VEHICULOS AUTOMOTORES DISE�ADOS PRINCIPALMENTE PARA EL TRANSPORTE DE PERSONAS: AUTOMOVILES DE TURISMO, VEHICULOS AUTOMOTORES DE TRANSPORTE DE PASAJEROS DISE�ADOS PARA TRANSITAR POR TERRENOS IRREGULARES (TRINEOS MOTORIZADOS, CARRITOS AUTOPROPULSADOS PARA CAMPOS DE GOLF, VEHICULOS PARA TODO TERRENO, VEHICULOS ANFIBIOS) Y VEHICULOS AUTOMOTORES PARA EL TRANSPORTE PUBLICO DE PASAJEROS, A SABER, AUTOBUSES. VEHICULOS AUTOMOTORES PARA EL TRANSPORTE DE MERCANCIAS: CAMIONES Y CAMIONETAS COMUNES (DE CAJADESCUBIERTA, CON CAPOTA, CERRADOS, ETC.); CAMIONES CON DISPOSITIVOS DE DESCARGA AUTOMATICOS, CAMIONES CISTERNA, VOLQUETES, CAMIONES RECOLECTORES DE BASURA, ETC.; CAMIONES Y CAMIONETAS DE USO ESPECIAL (CAMIONES DE AUXILIO CARRETERO, CAMIONES BLINDADOS, CAMIONES DE BOMBEROS, CAMIONES BARREDORES, UNIDADES MEDICAS Y ODONTOLOGICAS MOVILES, BIBLIOTECAS MOVILES, ETC.) TRACTORES PARA SEMIRREMOLQUES DE CIRCULACION POR CARRETERA. CHASIS EQUIPADOS CON MOTORES PARA LOS VEHICULOS AUTOMOTORES DESCRITOS ANTERIORMENTE. MOTORES DE COMBUSTION INTERNA CON EMBOLOS DE MOVIMIENTO RECTILINEO O ROTATORIO Y DE ENCENDIDO POR CHISPA ELECTRICA O POR COMPRESION, DEL TIPO UTILIZADO PRINCIPALMENTE EN VEHICULOS AUTOMOTORES.</field>
         </record>
         <record id="activity_342001" model="economic.activity">
                 <field name="code">342001</field>
@@ -1085,12 +1084,12 @@
         <record id="activity_352001" model="economic.activity">
                 <field name="code">352001</field>
                 <field name="name">FABRICACION DE LOCOMOTORAS Y MATERIAL RODANTE PARA FERROCARRILES Y TRANVIAS</field>
-                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: LOCOMOTORAS DE FERROCARRIL: LOCOMOTORAS PROPULSADAS POR UNA FUENTE DE ENERGIA EXTERIOR Y POR ACUMULADORES ELECTRICOS; LOCOMOTORAS DIESEL ELECTRICAS; LOCOMOTORAS PROPULSADAS POR MOTORES DE ENCENDIDO PORCOMPRESION Y POR OTROS MEDIOS (POR EJEMPLO, TURBINAS DE GAS, MAQUINAS DE VAPORY MOTORES DE ENCENDIDO POR CHISPA ELECTRICA) TENDERES DE LOCOMOTORA. VAGONES DEPASAJEROS, FURGONES Y VAGONES DE PLATAFORMA AUTOPROPULSADOS DE TRANVIA Y DE FERROCARRIL, CUALQUIERA SEA LA FUERZA MOTRIZ, INCLUSO VEHICULOS AUTOPROPULSADOS DEMANTENIMIENTO Y DE SERVICIO PARA TRANVIAS Y FERROCARRILES (POR EJEMPLO, VAGONESTALLER, GRUAS Y VAGONES DE ENSAYOS). MATERIAL RODANTE NO AUTOPROPULSADO PARATRANVIAS Y FERROCARRILES: VAGONES DE PASAJEROS, FURGONES DE CARGA, VAGONES CISTERNA, FURGONES Y VAGONES DE VOLTEO, Y FURGONES TALLER, VAGONES GRUA, ETC. PARTESY PIEZAS ESPECIALES DE LOCOMOTORAS Y TRANVIAS Y DE SU MATERIAL RODANTE: BOGIES,EJES Y RUEDAS; FRENOS Y PIEZAS DE FRENOS; GANCHOS Y MECANISMOS DE ENGANCHE, TOPES Y PIEZAS DE TOPES; AMORTIGUADORES (EXCEPTO MUELLES); BASTIDORES DE VAGONES YLOCOMOTORAS; CARROCERIAS; PLATAFORMAS DE INTERCOMUNICACION, ETC. EQUIPO MECANICO (INCLUSO ELECTROMECANICO) DE SEÑALIZACION, SEGURIDAD Y REGULACION DEL TRAFICOPARA FERROCARRILES TRANVIAS, CARRETERAS, VIAS DE NAVEGACION INTERIORES, TRANVIAS, CARRETERAS, VIAS DE NAVEGACION INTERIORES, ESTACIONAMIENTO INSTALACIONES PORTUARIAS Y AEROPUERTOS. SE TRATA DE APARATOSCUYAS SEÑALES, ETC., SE PONEN EN FUNCIONAMIENTO DESDE UN CENTRO DE MANDO, QUE GENERALMENTE SE ENCUENTRA A CIERTA DISTANCIA, MEDIANTE MANIVELAS, PALANCAS, VARILLAS, ALAMBRES, CADENAS, ETC.; MEDIANTE DISPOSITIVOS HIDRONEUMATICOS; Y MEDIANTE MOTORES ELECTRICOS (POR EJEMPLO, EQUIPO DE CAJAS DE SEÑALES, APARATOS DE MANEJO DE LAS AGUJAS, FRENOS DE CARRIL, APARATOS AUTOMATICOS DE SEÑALES PARA NIEBLA Y MECANISMOS DE CONTROL DE PASOS A NIVEL).</field>
+                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: LOCOMOTORAS DE FERROCARRIL: LOCOMOTORAS PROPULSADAS POR UNA FUENTE DE ENERGIA EXTERIOR Y POR ACUMULADORES ELECTRICOS; LOCOMOTORAS DIESEL ELECTRICAS; LOCOMOTORAS PROPULSADAS POR MOTORES DE ENCENDIDO PORCOMPRESION Y POR OTROS MEDIOS (POR EJEMPLO, TURBINAS DE GAS, MAQUINAS DE VAPORY MOTORES DE ENCENDIDO POR CHISPA ELECTRICA) TENDERES DE LOCOMOTORA. VAGONES DEPASAJEROS, FURGONES Y VAGONES DE PLATAFORMA AUTOPROPULSADOS DE TRANVIA Y DE FERROCARRIL, CUALQUIERA SEA LA FUERZA MOTRIZ, INCLUSO VEHICULOS AUTOPROPULSADOS DEMANTENIMIENTO Y DE SERVICIO PARA TRANVIAS Y FERROCARRILES (POR EJEMPLO, VAGONESTALLER, GRUAS Y VAGONES DE ENSAYOS). MATERIAL RODANTE NO AUTOPROPULSADO PARATRANVIAS Y FERROCARRILES: VAGONES DE PASAJEROS, FURGONES DE CARGA, VAGONES CISTERNA, FURGONES Y VAGONES DE VOLTEO, Y FURGONES TALLER, VAGONES GRUA, ETC. PARTESY PIEZAS ESPECIALES DE LOCOMOTORAS Y TRANVIAS Y DE SU MATERIAL RODANTE: BOGIES,EJES Y RUEDAS; FRENOS Y PIEZAS DE FRENOS; GANCHOS Y MECANISMOS DE ENGANCHE, TOPES Y PIEZAS DE TOPES; AMORTIGUADORES (EXCEPTO MUELLES); BASTIDORES DE VAGONES YLOCOMOTORAS; CARROCERIAS; PLATAFORMAS DE INTERCOMUNICACION, ETC. EQUIPO MECANICO (INCLUSO ELECTROMECANICO) DE SE�ALIZACION, SEGURIDAD Y REGULACION DEL TRAFICOPARA FERROCARRILES TRANVIAS, CARRETERAS, VIAS DE NAVEGACION INTERIORES, TRANVIAS, CARRETERAS, VIAS DE NAVEGACION INTERIORES, ESTACIONAMIENTO INSTALACIONES PORTUARIAS Y AEROPUERTOS. SE TRATA DE APARATOSCUYAS SE�ALES, ETC., SE PONEN EN FUNCIONAMIENTO DESDE UN CENTRO DE MANDO, QUE GENERALMENTE SE ENCUENTRA A CIERTA DISTANCIA, MEDIANTE MANIVELAS, PALANCAS, VARILLAS, ALAMBRES, CADENAS, ETC.; MEDIANTE DISPOSITIVOS HIDRONEUMATICOS; Y MEDIANTE MOTORES ELECTRICOS (POR EJEMPLO, EQUIPO DE CAJAS DE SE�ALES, APARATOS DE MANEJO DE LAS AGUJAS, FRENOS DE CARRIL, APARATOS AUTOMATICOS DE SE�ALES PARA NIEBLA Y MECANISMOS DE CONTROL DE PASOS A NIVEL).</field>
         </record>
         <record id="activity_353001" model="economic.activity">
                 <field name="code">353001</field>
                 <field name="name">FABRICACION DE AERONAVES Y NAVES ESPACIALES Y MAQUINARIA CONEXA</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: AEROPLANOS, MOTORIZADOS O NO, APARATOS DE VOLAR MAS LIVIANOS QUE EL AIRE, GLOBOS, NAVES ESPACIALES Y VEHICULOS PARA EL LANZAMIENTO DE NAVES ESPACIALES. AEROPLANOS MOTORIZADOS DE ALA FIJA Y DEMANEJO POR TRIPULACIONES PARA EL TRANSPORTE DE MERCANCIAS Y PASAJEROS, PARA DEFENSA MILITAR, DEPORTE Y OTROS FINES. AERONAVES DE ALA GIRATORIA PARA TODO USO.PLANEADORES, ALAS DELTA Y OTRAS AERONAVES SIN MOTOR. DIRIGIBLES; GLOBOS UTILIZADOS EN AERONAUTICA Y METEOROLOGIA. NAVES ESPACIALES, EQUIPADAS O NO PARA USO HUMANO; VEHICULOS DE LANZAMIENTO DE NAVES ESPACIALES, EXCEPTO LOS VEHICULOS DE LANZAMIENTO MILITARES. ARTEFACTOS DE LANZAMIENTO DE AERONAVES; DISPOSITIVOS DE FRENADO SOBRE CUBIERTA Y DISPOSITIVOS SIMILARES, APARATOS DE ENTRENAMIENTO DE VUELOEN TIERRA. PARTES, PIEZAS Y ACCESORIOS DE LAS AERONAVES DE ESTA CLASE; ENSAMBLADURAS PRINCIPALES, COMO FUSELAJES, ALAS, PUERTAS, PANELES DE MANDO, TRENES DE ATERRIZAJE, INCLUSO FLOTADORES DE HIDROAVION, DEPOSITOS DE COMBUSTIBLE, GONDOLAS,ETC. PARTES ESPECIALES DE ENSAMBLADURAS PRINCIPALES ESPECIALMENTE DISEÑADAS PARA SU INSTALACION EN AERONAVES; PARTES DE GLOBOS Y DIRIGIBLES Y DE NAVES ESPACIALES Y VEHICULOS DE LANZAMIENTO. HELICES, ROTORES DE HELICOPTERO Y PALAS DE HELICE PROPULSADAS. MOTORES DEL TIPO UTILIZADO GENERALMENTE EN AERONAVES. MOTORES DE COMBUSTION INTERNA CON EMBOLOS DE MOVIMIENTO RECTILINEO O ROTATORIO Y DE ENCENDIDO POR CHISPA ELECTRICA PARA AERONAVES. TURBORREACTORES Y TURBOHELICES PARA AERONAVES. MOTORES DE REACCION: ESTATORREACTORES, PULSORREACTORES Y MOTORES DE COHETES. PARTES Y PIEZAS DE TURBORREACTORES Y DE TURBOHELICES. SE INCLUYEN EL MANTENIMIENTO Y LA REPARACION Y MODIFICACION DE AERONAVES Y MOTORES DE AERONAVES.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE: AEROPLANOS, MOTORIZADOS O NO, APARATOS DE VOLAR MAS LIVIANOS QUE EL AIRE, GLOBOS, NAVES ESPACIALES Y VEHICULOS PARA EL LANZAMIENTO DE NAVES ESPACIALES. AEROPLANOS MOTORIZADOS DE ALA FIJA Y DEMANEJO POR TRIPULACIONES PARA EL TRANSPORTE DE MERCANCIAS Y PASAJEROS, PARA DEFENSA MILITAR, DEPORTE Y OTROS FINES. AERONAVES DE ALA GIRATORIA PARA TODO USO.PLANEADORES, ALAS DELTA Y OTRAS AERONAVES SIN MOTOR. DIRIGIBLES; GLOBOS UTILIZADOS EN AERONAUTICA Y METEOROLOGIA. NAVES ESPACIALES, EQUIPADAS O NO PARA USO HUMANO; VEHICULOS DE LANZAMIENTO DE NAVES ESPACIALES, EXCEPTO LOS VEHICULOS DE LANZAMIENTO MILITARES. ARTEFACTOS DE LANZAMIENTO DE AERONAVES; DISPOSITIVOS DE FRENADO SOBRE CUBIERTA Y DISPOSITIVOS SIMILARES, APARATOS DE ENTRENAMIENTO DE VUELOEN TIERRA. PARTES, PIEZAS Y ACCESORIOS DE LAS AERONAVES DE ESTA CLASE; ENSAMBLADURAS PRINCIPALES, COMO FUSELAJES, ALAS, PUERTAS, PANELES DE MANDO, TRENES DE ATERRIZAJE, INCLUSO FLOTADORES DE HIDROAVION, DEPOSITOS DE COMBUSTIBLE, GONDOLAS,ETC. PARTES ESPECIALES DE ENSAMBLADURAS PRINCIPALES ESPECIALMENTE DISE�ADAS PARA SU INSTALACION EN AERONAVES; PARTES DE GLOBOS Y DIRIGIBLES Y DE NAVES ESPACIALES Y VEHICULOS DE LANZAMIENTO. HELICES, ROTORES DE HELICOPTERO Y PALAS DE HELICE PROPULSADAS. MOTORES DEL TIPO UTILIZADO GENERALMENTE EN AERONAVES. MOTORES DE COMBUSTION INTERNA CON EMBOLOS DE MOVIMIENTO RECTILINEO O ROTATORIO Y DE ENCENDIDO POR CHISPA ELECTRICA PARA AERONAVES. TURBORREACTORES Y TURBOHELICES PARA AERONAVES. MOTORES DE REACCION: ESTATORREACTORES, PULSORREACTORES Y MOTORES DE COHETES. PARTES Y PIEZAS DE TURBORREACTORES Y DE TURBOHELICES. SE INCLUYEN EL MANTENIMIENTO Y LA REPARACION Y MODIFICACION DE AERONAVES Y MOTORES DE AERONAVES.</field>
         </record>
         <record id="activity_359101" model="economic.activity">
                 <field name="code">359101</field>
@@ -1100,12 +1099,12 @@
         <record id="activity_359201" model="economic.activity">
                 <field name="code">359201</field>
                 <field name="name">FABRICACION DE BICICLETAS Y SILLAS DE RUEDAS, PARTES, PIEZAS Y SUS ACCESORIOS</field>
-                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: BICICLETAS NO MOTORIZADAS, A SABER, VELOCIPEDOS EQUIPADOS CON UNA O MAS RUEDAS; TRICICLOS DE REPARTO, BICICLETAS CON SIDECAR, TANDEMS, BICICLETAS DE CARRERA Y BICICLETAS PARA NIÑOS, EXCEPTO OTROS TIPOSDE VEHICULOS DE RUEDAS PARA NIÑOS. SILLONES DE RUEDAS PARA INVALIDOS, ESTEN ONO MOTORIZADOS Y SEAN O NO PROPULSADOS POR ALGUN MEDIO MECANICO. PARTES Y PIEZAS DE BICICLETAS (INCLUSO SILLINES) Y DE SILLONES DE RUEDAS PARA INVALIDOS.</field>
+                <field name="description">ESTA CLASE INCLUYE LA FABRICACION DE: BICICLETAS NO MOTORIZADAS, A SABER, VELOCIPEDOS EQUIPADOS CON UNA O MAS RUEDAS; TRICICLOS DE REPARTO, BICICLETAS CON SIDECAR, TANDEMS, BICICLETAS DE CARRERA Y BICICLETAS PARA NI�OS, EXCEPTO OTROS TIPOSDE VEHICULOS DE RUEDAS PARA NI�OS. SILLONES DE RUEDAS PARA INVALIDOS, ESTEN ONO MOTORIZADOS Y SEAN O NO PROPULSADOS POR ALGUN MEDIO MECANICO. PARTES Y PIEZAS DE BICICLETAS (INCLUSO SILLINES) Y DE SILLONES DE RUEDAS PARA INVALIDOS.</field>
         </record>
         <record id="activity_359901" model="economic.activity">
                 <field name="code">359901</field>
                 <field name="name">FABRICACION DE OTROS TIPOS DE EQUIPO DE TRANSPORTE N.C.P.</field>
-                <field name="description">ESTA CLASE ABARCA LA FABRICACION DE VEHICULOS NO CLASIFICADOS EN OTRA PARTE. VEHICULOS DE PROPULSION MANUAL: CARRETILLAS, CARRITOS PARA EQUIPAJE, TRINEOS, CARRITOS PARA SUPERMERCADOS, CARRETONCILLOS, CARROS Y PORTACARGAS DE VARIOS TIPOS, INCLUSO LOS DISEÑADOS ESPECIALMENTE PARA DETERMINADAS INDUSTRIAS. VEHICULOS DE TRACCION ANIMAL: CALESAS, CALESINES, CARROS PARA ROCIAR Y ESPOLVOREAR, CARROZAS FUNEBRES, ETC.</field>
+                <field name="description">ESTA CLASE ABARCA LA FABRICACION DE VEHICULOS NO CLASIFICADOS EN OTRA PARTE. VEHICULOS DE PROPULSION MANUAL: CARRETILLAS, CARRITOS PARA EQUIPAJE, TRINEOS, CARRITOS PARA SUPERMERCADOS, CARRETONCILLOS, CARROS Y PORTACARGAS DE VARIOS TIPOS, INCLUSO LOS DISE�ADOS ESPECIALMENTE PARA DETERMINADAS INDUSTRIAS. VEHICULOS DE TRACCION ANIMAL: CALESAS, CALESINES, CARROS PARA ROCIAR Y ESPOLVOREAR, CARROZAS FUNEBRES, ETC.</field>
         </record>
         <record id="activity_361001" model="economic.activity">
                 <field name="code">361001</field>
@@ -1140,7 +1139,7 @@
         <record id="activity_369401" model="economic.activity">
                 <field name="code">369401</field>
                 <field name="name">FABRICACION DE JUEGOS Y JUGUETES</field>
-                <field name="description">ESTA CLASE COMPRENDE LA FABRICACION DE MUÑECAS, JUGUETES Y JUEGOS (INCLUIDOS LOS JUEGOS ELECTRONICOS, EXCEPTO LAS CONSOLAS DE VIDEOJUEGOS), MODELOS A ESCALA Y VEHICULOS PARA NIÑOS (EXCEPTO BICICLETAS Y TRICICLOS DE METAL). ARTICULOS PARA FERIAS DE ATRACCIONES, JUEGOS DE MESA Y SALON. ROMPECABEZAS Y SIMILARES, ENTRE OTROS.</field>
+                <field name="description">ESTA CLASE COMPRENDE LA FABRICACION DE MU�ECAS, JUGUETES Y JUEGOS (INCLUIDOS LOS JUEGOS ELECTRONICOS, EXCEPTO LAS CONSOLAS DE VIDEOJUEGOS), MODELOS A ESCALA Y VEHICULOS PARA NI�OS (EXCEPTO BICICLETAS Y TRICICLOS DE METAL). ARTICULOS PARA FERIAS DE ATRACCIONES, JUEGOS DE MESA Y SALON. ROMPECABEZAS Y SIMILARES, ENTRE OTROS.</field>
         </record>
         <record id="activity_369901" model="economic.activity">
                 <field name="code">369901</field>
@@ -1155,7 +1154,7 @@
         <record id="activity_369903" model="economic.activity">
                 <field name="code">369903</field>
                 <field name="name">FABRICACION DE VELAS COLOREADAS, PERFUMADAS Y DECORADAS</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE VELAS O CANDELAS DECORADAS, PERFUMA- DAS Y COLOREADAS DE CUALQUIER TAMAÑO Y FORMA. LAS VELAS BLANCAS CORRIENTES SE INCLUYE EN LA CLASE 369902.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA FABRICACION DE VELAS O CANDELAS DECORADAS, PERFUMA- DAS Y COLOREADAS DE CUALQUIER TAMA�O Y FORMA. LAS VELAS BLANCAS CORRIENTES SE INCLUYE EN LA CLASE 369902.</field>
         </record>
         <record id="activity_369904" model="economic.activity">
                 <field name="code">369904</field>
@@ -1225,7 +1224,7 @@
         <record id="activity_452003" model="economic.activity">
                 <field name="code">452003</field>
                 <field name="name">MANTENIMIENTO, REPARACION Y AMPLIACIONES DE EDIFICIOS, APARTAMENTOS, CONDOMINIOS Y CASAS</field>
-                <field name="description">SE REFIERE A LOS SERVICIOS DE REPARACION, MEJORAS, REMODELACIONES DE EDIFICIOS, APTOS, CONDOMINIOS,CASAS LOCALES COMERC. ETC. EFECTUADAS POR ALBAÑILES, FONTANEROS, CARPINTEROS, PINTORES, EMPRESAS Y OTROS RELACIONADAS CON LA RAMA DE LA CONSTRUCCION. LOS SERVICIOS DE ELECTRICISTAS SE ENCUENTRAN EN LA CLASE 526005.</field>
+                <field name="description">SE REFIERE A LOS SERVICIOS DE REPARACION, MEJORAS, REMODELACIONES DE EDIFICIOS, APTOS, CONDOMINIOS,CASAS LOCALES COMERC. ETC. EFECTUADAS POR ALBA�ILES, FONTANEROS, CARPINTEROS, PINTORES, EMPRESAS Y OTROS RELACIONADAS CON LA RAMA DE LA CONSTRUCCION. LOS SERVICIOS DE ELECTRICISTAS SE ENCUENTRAN EN LA CLASE 526005.</field>
         </record>
         <record id="activity_452005" model="economic.activity">
                 <field name="code">452005</field>
@@ -1235,7 +1234,7 @@
         <record id="activity_452006" model="economic.activity">
                 <field name="code">452006</field>
                 <field name="name">ACTIVIDADES DE CONSTRUCCION ESPECIALES</field>
-                <field name="description">ESTA CLASE COMPRENDE LAS ACTIVIDADES DE CONSTRUCCION ESPECIALES COMPRENDEN LA PREPARACION Y CONSTRUCCION DE CIERTAS PARTES DE LAS OBRAS ANTES MENCIONADAS Y POR LO GENERAL SE CONCENTRAN EN UN ASPECTO COMUN A DIFERENTES ESTRUCTURAS Y REQUIEREN LA UTILIZACION DE TECNICAS Y EQUIPOS ESPECIALES. SE TRATA DE ACTIVIDADES TALES COMO LA HINCADURA DE PILOTES, LA CIMENTACION, LA PERFORACION DE POZOS DE AGUA, LA ERECCION DE ESTRUCTURAS DE EDIFICIOS, EL HORMIGONADO, LA COLOCACION DE MAMPUESTOS DE LADRILLO Y DE PIEDRA, LA INSTALACION DE ANDAMIOS, LA CONSTRUCCION DE TECHOS, ETC. TAMBIEN SE INCLUYE LA ERECCION DE ESTRUCTURAS DE ACERO, SIEMPRE QUE LOS COMPONENTES DE LA ESTRUCTURA NO SEAN FABRICADOS POR LA UNIDAD CONSTRUCTORA. LAS ACTIVIDADES DE CONSTRUCCION ESPECIALES SE REALIZAN PRINCIPALMENTE MEDIANTE SUBCONTRATOS, EN PARTICULAR EN EL CASO DE LOS TRABAJOS DE REPARACION QUE SE REALIZAN DIRECTAMENTE PARA EL DUEÑO DE LA PROPIEDAD.</field>
+                <field name="description">ESTA CLASE COMPRENDE LAS ACTIVIDADES DE CONSTRUCCION ESPECIALES COMPRENDEN LA PREPARACION Y CONSTRUCCION DE CIERTAS PARTES DE LAS OBRAS ANTES MENCIONADAS Y POR LO GENERAL SE CONCENTRAN EN UN ASPECTO COMUN A DIFERENTES ESTRUCTURAS Y REQUIEREN LA UTILIZACION DE TECNICAS Y EQUIPOS ESPECIALES. SE TRATA DE ACTIVIDADES TALES COMO LA HINCADURA DE PILOTES, LA CIMENTACION, LA PERFORACION DE POZOS DE AGUA, LA ERECCION DE ESTRUCTURAS DE EDIFICIOS, EL HORMIGONADO, LA COLOCACION DE MAMPUESTOS DE LADRILLO Y DE PIEDRA, LA INSTALACION DE ANDAMIOS, LA CONSTRUCCION DE TECHOS, ETC. TAMBIEN SE INCLUYE LA ERECCION DE ESTRUCTURAS DE ACERO, SIEMPRE QUE LOS COMPONENTES DE LA ESTRUCTURA NO SEAN FABRICADOS POR LA UNIDAD CONSTRUCTORA. LAS ACTIVIDADES DE CONSTRUCCION ESPECIALES SE REALIZAN PRINCIPALMENTE MEDIANTE SUBCONTRATOS, EN PARTICULAR EN EL CASO DE LOS TRABAJOS DE REPARACION QUE SE REALIZAN DIRECTAMENTE PARA EL DUE�O DE LA PROPIEDAD.</field>
         </record>
         <record id="activity_453001" model="economic.activity">
                 <field name="code">453001</field>
@@ -1303,22 +1302,22 @@
                 <field name="description">EN ESTA CLASE SE INCLUYE EL ALQUILER DE MAQUINARIA Y EQUIPO DE CONSTRUCCION YDEMOLICION, TALES COMO: CAMIONES, GRUAS, MEZCLADORAS DE MATERIALES DE CONSTRUC-CION, PULIDORAS DE PISOS, ASI COMO CUALQUIER OTRA MAQUINARIA Y EQUIPO RELACIONADA CON LA RAMA DE LA CONSTRUCCION INCLUYENDO LOS OPERARIOS.</field>
         </record>
         <record id="activity_50001" model="economic.activity">
-                <field name="code">050001</field>
+                <field name="code">50001</field>
                 <field name="name">PESCADORES ARTESANALES EN PEQ. ESCALA</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LOS PESCADORES ARTESANALES EN PEQUEÑA ESCALA</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LOS PESCADORES ARTESANALES EN PEQUE�A ESCALA</field>
         </record>
         <record id="activity_50002" model="economic.activity">
-                <field name="code">050002</field>
+                <field name="code">50002</field>
                 <field name="name">PESCADORES ARTESANALES MEDIOS</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LOS PESCADORES ARTESANALES DE MEDIANA ESCALA</field>
         </record>
         <record id="activity_50003" model="economic.activity">
-                <field name="code">050003</field>
+                <field name="code">50003</field>
                 <field name="name">CRIADERO DE PECES, CRUSTACEOS O MOLUSCOS. COMERCIALIZACION DE LARVAS DE ESPECIES MARINAS</field>
                 <field name="description">REPRODUCCION Y CRIA DE TODO TIPO DE PECES, CRUSTACEOS O MOLUSCOS. EXPLOTACION DE CRIADEROS DE LARVAS DE ESPECIES MARINAS COMO: OSTRAS, EMBRIONES DE MEJILLONES Y OTROS MOLUSCOS, CRIAS DE BOGAVANTES, CAMARONES EN ESTADO POSLARVAL Y OTROS EMBRIONES DE CRUSTACEOS, Y ALEVINES Y JARAMUGOS.</field>
         </record>
         <record id="activity_50005" model="economic.activity">
-                <field name="code">050005</field>
+                <field name="code">50005</field>
                 <field name="name">PESCADORES EN GRAN ESCALA</field>
                 <field name="description">SE REFIERE A LA PESCA DE ALTURA, COSTERA E INTERIOR, REALIZADA CON FINES COMER- CIALES, DE TODO TIPO DE PESCADO, CRUSTACEOS Y MOLUSCOS MARINOS, CUALQUIE OTRO TIPO DE ANIMALES ACUATICOS.</field>
         </record>
@@ -1420,7 +1419,7 @@
         <record id="activity_512201" model="economic.activity">
                 <field name="code">512201</field>
                 <field name="name">COMERCIO AL POR MAYOR DE ALIMENTOS, GRANOS BASICOS, CARNES Y DEMAS COMESTIBLES Y ARTICULOS DE LA CANASTA BASICA</field>
-                <field name="description">SE INCLUYE EL COMERCIO AL POR MAYOR DE AQUELLOS PRODUCTOS CONTEMPL ADOS EN EL ARTICULO 5 INCISO 1) Y SUBINCISO I DEL REGLAMENTO DE LA LEY DEL IMPUESTO SOBRE LAS VENTAS COMPONENTES DE LA CANASTA BASICA ALIMENTARIA CUANDO NO EXISTA UN CODIGO ESPECIFICO - REVISAR LOS DEMAS CODIGOS DE ESTA CATEGORIA BAJO ESTE CODIGO SE DEBEN CONSIDERAR: PRODUCTOS DE PANADERIA, GRANOS BASICOS, PASTAS SIN RELLENO, CARNES FRESCAS NO PREPARADAS Y EMBUTIDOS NO ENLATADOS O ENVASADAS, HUEVOS DE GALLINA, ACEITES Y GRASAS, SAL Y AZUCAR, MIELES NATURALES Y DEMAS ARTICULOS DE CUIDADDO PERSONAL: TALES COMO: PAÑALES, TOALLAS SANITARIAS, CIERTOS JABONES, PAPEL HIGIENICO, DENTRIFICOS(PASTAS DENTALES), CEPILLOS DENTALES, EN-TRE OTROS.</field>
+                <field name="description">SE INCLUYE EL COMERCIO AL POR MAYOR DE AQUELLOS PRODUCTOS CONTEMPL ADOS EN EL ARTICULO 5 INCISO 1) Y SUBINCISO I DEL REGLAMENTO DE LA LEY DEL IMPUESTO SOBRE LAS VENTAS COMPONENTES DE LA CANASTA BASICA ALIMENTARIA CUANDO NO EXISTA UN CODIGO ESPECIFICO - REVISAR LOS DEMAS CODIGOS DE ESTA CATEGORIA BAJO ESTE CODIGO SE DEBEN CONSIDERAR: PRODUCTOS DE PANADERIA, GRANOS BASICOS, PASTAS SIN RELLENO, CARNES FRESCAS NO PREPARADAS Y EMBUTIDOS NO ENLATADOS O ENVASADAS, HUEVOS DE GALLINA, ACEITES Y GRASAS, SAL Y AZUCAR, MIELES NATURALES Y DEMAS ARTICULOS DE CUIDADDO PERSONAL: TALES COMO: PA�ALES, TOALLAS SANITARIAS, CIERTOS JABONES, PAPEL HIGIENICO, DENTRIFICOS(PASTAS DENTALES), CEPILLOS DENTALES, EN-TRE OTROS.</field>
         </record>
         <record id="activity_512202" model="economic.activity">
                 <field name="code">512202</field>
@@ -1554,8 +1553,8 @@
         </record>
         <record id="activity_514101" model="economic.activity">
                 <field name="code">514101</field>
-                <field name="name">VENTA AL POR MAYOR DE COMBUSTIBLES SOLIDOS (LEÑA Y SIMILARES)</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA VENTA AL POR MAYOR DE COMBUSTIBLES SOLIDOS TALES COMO: LEÑA, TURBA, LIGNITO, ANTRACITA, ENTRE OTROS. LA VENTA DEL CARBON SE ENCUENTRA CONTEMPLADA EN LA ACT 514103, AFECTA AL IMPUESTO DE VENTAS.</field>
+                <field name="name">VENTA AL POR MAYOR DE COMBUSTIBLES SOLIDOS (LE�A Y SIMILARES)</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA VENTA AL POR MAYOR DE COMBUSTIBLES SOLIDOS TALES COMO: LE�A, TURBA, LIGNITO, ANTRACITA, ENTRE OTROS. LA VENTA DEL CARBON SE ENCUENTRA CONTEMPLADA EN LA ACT 514103, AFECTA AL IMPUESTO DE VENTAS.</field>
         </record>
         <record id="activity_514103" model="economic.activity">
                 <field name="code">514103</field>
@@ -1910,7 +1909,7 @@
         <record id="activity_523601" model="economic.activity">
                 <field name="code">523601</field>
                 <field name="name">COMERCIO AL POR MENOR DE COMPUTADORAS, ACCESORIOS, MICROCOMPONENTES Y PAQUETES DE COMPUTO</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE EL COMERCIO AL POR MENOR DE COMPUTADORAS, MICROCOMPONENTES Y ACCESORIOS DE COMPUTO, ADEMAS PAQUETES DE COMPUTO DISEÑADOS PARA LA COMERCIALIZACION INCLUYENDO LA LICENCIA DE USO.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE EL COMERCIO AL POR MENOR DE COMPUTADORAS, MICROCOMPONENTES Y ACCESORIOS DE COMPUTO, ADEMAS PAQUETES DE COMPUTO DISE�ADOS PARA LA COMERCIALIZACION INCLUYENDO LA LICENCIA DE USO.</field>
         </record>
         <record id="activity_523701" model="economic.activity">
                 <field name="code">523701</field>
@@ -2009,8 +2008,8 @@
         </record>
         <record id="activity_523911" model="economic.activity">
                 <field name="code">523911</field>
-                <field name="name">VENTA AL POR MENOR DE PAÑALES DESECHABLES, ARTICULOS DE LIMPIEZA Y OTROS (PAÑALERA)</field>
-                <field name="description">SE REFIERE A LA VENTA DE PAÑALES DESECHABLES JUNTO CON OTROS ARTICULOS COMO POR EJEMPLO DE LIMPIEZA, DE TOCADOR, DE FIESTAS ETC. LOS CUALES SI ESTAN AFECTOS AL IMPUESTO SOBRE LAS VENTAS.</field>
+                <field name="name">VENTA AL POR MENOR DE PA�ALES DESECHABLES, ARTICULOS DE LIMPIEZA Y OTROS (PA�ALERA)</field>
+                <field name="description">SE REFIERE A LA VENTA DE PA�ALES DESECHABLES JUNTO CON OTROS ARTICULOS COMO POR EJEMPLO DE LIMPIEZA, DE TOCADOR, DE FIESTAS ETC. LOS CUALES SI ESTAN AFECTOS AL IMPUESTO SOBRE LAS VENTAS.</field>
         </record>
         <record id="activity_523912" model="economic.activity">
                 <field name="code">523912</field>
@@ -2099,7 +2098,7 @@
         </record>
         <record id="activity_524002" model="economic.activity">
                 <field name="code">524002</field>
-                <field name="name">CASA DE EMPEÑO Y AFIN</field>
+                <field name="name">CASA DE EMPE�O Y AFIN</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA PRESTACION DE DINERO A CAMBIO DE BIENES CONSIGNADOS COMO GARANTIA. ASI COMO TAMBIEN LA VENTA DE LOS MISMOS VENCIDO EL PLAZO Y LOS PAGOS ACORDADOS. SOLO PODRAN INSCRIBIRSE LAS PERSONAS FISICAS SEGUN LO ESTABLECE LA LEY PARA GARANTIZAR AL PAIS MAYOR SEGURIDAD Y ORDEN, DEL 17/11/1977, EN SUCARTICULO 19.</field>
         </record>
         <record id="activity_524004" model="economic.activity">
@@ -2270,7 +2269,7 @@
         <record id="activity_602102" model="economic.activity">
                 <field name="code">602102</field>
                 <field name="name">SERVICIO DE TRANSPORTE REGULAR DE PERSONAS POR VIA TERRESTRE</field>
-                <field name="description">ESTA CLASE COMPRENDE EL TRANSPORTE TERRESTRE DE PASAJEROS POR SISTEMAS DE TRANSPORTE URBANOS Y SUBURBANOS, QUE PUEDEN ABARCAR LINEAS DE AUTOBUS, TRANVIA, ETC. EL TRANSPORTE SE REALIZA POR RUTAS ESTABLECIDAS SIGUIENDO NORMALMENTE UN HORARIO FIJO Y ENTRAÑA LA RECOGIDA Y DEPOSICION DE LOS PASAJEROS EN PARADAS FIJAS.</field>
+                <field name="description">ESTA CLASE COMPRENDE EL TRANSPORTE TERRESTRE DE PASAJEROS POR SISTEMAS DE TRANSPORTE URBANOS Y SUBURBANOS, QUE PUEDEN ABARCAR LINEAS DE AUTOBUS, TRANVIA, ETC. EL TRANSPORTE SE REALIZA POR RUTAS ESTABLECIDAS SIGUIENDO NORMALMENTE UN HORARIO FIJO Y ENTRA�A LA RECOGIDA Y DEPOSICION DE LOS PASAJEROS EN PARADAS FIJAS.</field>
         </record>
         <record id="activity_602201" model="economic.activity">
                 <field name="code">602201</field>
@@ -2465,7 +2464,7 @@
         <record id="activity_659101" model="economic.activity">
                 <field name="code">659101</field>
                 <field name="name">ARRENDAMIENTO OPERATIVO EN FUNCION FINANCIERA CON OPCION DECOMPRA O RENOVACION (LEASING OPERATIVO)</field>
-                <field name="description">SE CONSIDERARA PARA EFECTOS TRIBUTARIOS, DENTRO DE LA CATEGORIA DE CONTRATOS DE ARRENDAMIENTO OPERATIVO, AQUELLOS EN LOS QUE LOS ARRENDANTES SON ENTIDADES FINANCIERAS O EMPRESAS DEDICADAS HABITUALEMENTE AL NEGOCIO DE ARRENDAMIENTO DE ACTIVOS CON OPCION DE COMPRA O RENOVACION. AFECTO AL IMPUESTO SOBRE LAS VENTAS SEG UN DECRETO NÑ 32876-H DEL DEL 09 DE FEBRERO DE 2006 GACETA 29.</field>
+                <field name="description">SE CONSIDERARA PARA EFECTOS TRIBUTARIOS, DENTRO DE LA CATEGORIA DE CONTRATOS DE ARRENDAMIENTO OPERATIVO, AQUELLOS EN LOS QUE LOS ARRENDANTES SON ENTIDADES FINANCIERAS O EMPRESAS DEDICADAS HABITUALEMENTE AL NEGOCIO DE ARRENDAMIENTO DE ACTIVOS CON OPCION DE COMPRA O RENOVACION. AFECTO AL IMPUESTO SOBRE LAS VENTAS SEG UN DECRETO N� 32876-H DEL DEL 09 DE FEBRERO DE 2006 GACETA 29.</field>
         </record>
         <record id="activity_659201" model="economic.activity">
                 <field name="code">659201</field>
@@ -2495,7 +2494,7 @@
         <record id="activity_659904" model="economic.activity">
                 <field name="code">659904</field>
                 <field name="name">SERVICIO RECUPERACION DE DEUDAS (FACTORE0)</field>
-                <field name="description">ESTA CLASE SE REFIERE A LAS EMPRESAS O COMPAÑIAS QUE COMPRAN CUENTAS POR COBRAR CON EL OBJETIVO DE RECUPERAR LA DEUDA.</field>
+                <field name="description">ESTA CLASE SE REFIERE A LAS EMPRESAS O COMPA�IAS QUE COMPRAN CUENTAS POR COBRAR CON EL OBJETIVO DE RECUPERAR LA DEUDA.</field>
         </record>
         <record id="activity_659905" model="economic.activity">
                 <field name="code">659905</field>
@@ -2745,7 +2744,7 @@
         <record id="activity_713053" model="economic.activity">
                 <field name="code">713053</field>
                 <field name="name">ALQUILER DE ANIMALES (CABALLOS, SERPIENTES, ETC)</field>
-                <field name="description">SE REFIERE AL ALQUILER DE ANIMALES DOMESTICOS TALES COMO LOS CABALLOS PARA MONTAR, Y OTROS COMO ALQUILER DE SERPIENETS PARA EXHIBICIÑN.</field>
+                <field name="description">SE REFIERE AL ALQUILER DE ANIMALES DOMESTICOS TALES COMO LOS CABALLOS PARA MONTAR, Y OTROS COMO ALQUILER DE SERPIENETS PARA EXHIBICI�N.</field>
         </record>
         <record id="activity_721001" model="economic.activity">
                 <field name="code">721001</field>
@@ -2754,8 +2753,8 @@
         </record>
         <record id="activity_722003" model="economic.activity">
                 <field name="code">722003</field>
-                <field name="name">DISEÑADOR GRAFICO, DE SOFWARE Y PAGINAS WEB</field>
-                <field name="description">EN ESTA CLASE SE INCLUYEN LAS ACTIVIDADES RELACIONADAS CON EL ANALISIS, EL DISEÑO Y LA PROGRAMACION DE SISTEMAS LISTOS PARA SER UTILIZADOS. ESTA ACTIVIDADES COMPRENDE TAMBIEN LA FORMULACION, LA PRODUCCION Y EL SUMINISTRO DE PROGRAMAS ENCARGADOS POR LOS USUARIOS, INCLUIDA LA DOCUMENTACION PERTINENTE, Y DE PROGRAMAS LISTOS PARA SER UTILIZADOS (PROGRAMAS COMERCIALES) O DE FACIL CONFECCION</field>
+                <field name="name">DISE�ADOR GRAFICO, DE SOFWARE Y PAGINAS WEB</field>
+                <field name="description">EN ESTA CLASE SE INCLUYEN LAS ACTIVIDADES RELACIONADAS CON EL ANALISIS, EL DISE�O Y LA PROGRAMACION DE SISTEMAS LISTOS PARA SER UTILIZADOS. ESTA ACTIVIDADES COMPRENDE TAMBIEN LA FORMULACION, LA PRODUCCION Y EL SUMINISTRO DE PROGRAMAS ENCARGADOS POR LOS USUARIOS, INCLUIDA LA DOCUMENTACION PERTINENTE, Y DE PROGRAMAS LISTOS PARA SER UTILIZADOS (PROGRAMAS COMERCIALES) O DE FACIL CONFECCION</field>
         </record>
         <record id="activity_723001" model="economic.activity">
                 <field name="code">723001</field>
@@ -2805,7 +2804,7 @@
         <record id="activity_732001" model="economic.activity">
                 <field name="code">732001</field>
                 <field name="name">INVESTIGACIONES Y DESARROLLO EXPERIMENTAL EN EL CAMPO DE LAS CIENCIAS SOCIALES Y LAS HUMANIDADES</field>
-                <field name="description">ESTA CLASE ABARCA LOS TRABAJOS SISTEMATICOS DE NATURALEZA CREATIVA QUE FORMA PARTE DE LOS TRES TIPOS DE ACTIVIDADES DE INVESTIGACION Y DESARROLLO DESCRITOS MAS ARRIBA Y SE REALIZAN EN EL CAMPO E LAS CIENCIAS SOCIALES (ECONOMIA, PSICOLOGIA, SOCIOLOGIA, DERECHO, ETC.) Y LAS HUMANIDADES (POR EJEMPLO, LINGÑISTICA, IDIOMAS Y ARTE). SU OBJETIVO ES AMPLIAR EL CAUDAL DE CONOCIMIENTOS Y DESCUBRIR NUEVAS APLICACIONES.</field>
+                <field name="description">ESTA CLASE ABARCA LOS TRABAJOS SISTEMATICOS DE NATURALEZA CREATIVA QUE FORMA PARTE DE LOS TRES TIPOS DE ACTIVIDADES DE INVESTIGACION Y DESARROLLO DESCRITOS MAS ARRIBA Y SE REALIZAN EN EL CAMPO E LAS CIENCIAS SOCIALES (ECONOMIA, PSICOLOGIA, SOCIOLOGIA, DERECHO, ETC.) Y LAS HUMANIDADES (POR EJEMPLO, LING�ISTICA, IDIOMAS Y ARTE). SU OBJETIVO ES AMPLIAR EL CAUDAL DE CONOCIMIENTOS Y DESCUBRIR NUEVAS APLICACIONES.</field>
         </record>
         <record id="activity_741101" model="economic.activity">
                 <field name="code">741101</field>
@@ -2969,7 +2968,7 @@
         </record>
         <record id="activity_749904" model="economic.activity">
                 <field name="code">749904</field>
-                <field name="name">SERVICIO DE DISEÑO O DECORACION DE INTERIORES (POR CUENTA PROPIA).</field>
+                <field name="name">SERVICIO DE DISE�O O DECORACION DE INTERIORES (POR CUENTA PROPIA).</field>
                 <field name="description">INCLUYE LOS SERVICIOS DE DECORACION DE EVENTOS ESPECIALES, SERVICIOS BRINDADOS POR DECORADORES INDEPENDIENTES</field>
         </record>
         <record id="activity_749905" model="economic.activity">
@@ -3025,7 +3024,7 @@
         <record id="activity_751201" model="economic.activity">
                 <field name="code">751201</field>
                 <field name="name">JUNTAS DE EDUCACION, COMEDORES ESCOLARES, PATRONATOS, COOPERATIVAS ESCOLARES, COLEGIALES, VOCACIONALES</field>
-                <field name="description">INCLUYE LOS PROGRAMAS QUE PRESTAN LOS SERVICIOS EDUCATIVOS PUBLICOS DE ENSEÑANZAPRIMARIA, SECUNDARIA Y UNIVERSITARIA, ASI COMO DE PROGRAMAS DE EDUCACION PROFES IONAL. SEGUN EL ARTICULO 6 DEL REGLAMENTO A LA LEY DEL IMPUESTO SOBRE LA RENTA, DEBEN REGISTRARSE COMO DECLARANTES DE DICHO IMPUESTO.</field>
+                <field name="description">INCLUYE LOS PROGRAMAS QUE PRESTAN LOS SERVICIOS EDUCATIVOS PUBLICOS DE ENSE�ANZAPRIMARIA, SECUNDARIA Y UNIVERSITARIA, ASI COMO DE PROGRAMAS DE EDUCACION PROFES IONAL. SEGUN EL ARTICULO 6 DEL REGLAMENTO A LA LEY DEL IMPUESTO SOBRE LA RENTA, DEBEN REGISTRARSE COMO DECLARANTES DE DICHO IMPUESTO.</field>
         </record>
         <record id="activity_751202" model="economic.activity">
                 <field name="code">751202</field>
@@ -3074,22 +3073,22 @@
         </record>
         <record id="activity_801001" model="economic.activity">
                 <field name="code">801001</field>
-                <field name="name">ENSEÑANZA PREESCOLAR Y PRIMARIA PRIVADA</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LAS ESCUELAS PRIVADAS DE ENSEÑANZA PREESCOLAR Y PRIVADA</field>
+                <field name="name">ENSE�ANZA PREESCOLAR Y PRIMARIA PRIVADA</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LAS ESCUELAS PRIVADAS DE ENSE�ANZA PREESCOLAR Y PRIVADA</field>
         </record>
         <record id="activity_802101" model="economic.activity">
                 <field name="code">802101</field>
-                <field name="name">ENSEÑANZA SECUNDARIA PRIVADA</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA ENSEÑANZA SECUNDARIA PRIVADA DE FORMACION GENERAL.</field>
+                <field name="name">ENSE�ANZA SECUNDARIA PRIVADA</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA ENSE�ANZA SECUNDARIA PRIVADA DE FORMACION GENERAL.</field>
         </record>
         <record id="activity_802201" model="economic.activity">
                 <field name="code">802201</field>
-                <field name="name">ENSEÑANZA SECUNDARIA DE FORMACION TECNICA Y PROFESIONAL</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE TODA LA ENSEÑANZA TECNICA Y PROFESIONAL DE NIVEL INFERIOR AL UNIVERSITARIO. POR LO GENERAL EN LOS PROGRAMAS DE ESTE NIVEL SE HACE HINCAPIE EN UNA DETERMINADA ESPECIALIZACION Y SE IMPARTEN CONOCIMIENTOS TEORICOS Y PRACTICOS QUE SUELEN TENER POR OBJETO MEJORAR LAS POSIBILIDADES ACTUALES O FUTURAS DE EMPLEO. LOS OBJETIVOS DE LOS PROGRAMAS PUEDEN VARIAR DESDE LA PREPARACION PARA UNA ESFERA GENERAL DE EMPLEO HASTA LA PREPARACION PARA UNA OCUPACION CONCRETA. EN ESTE NIVEL TAMBIEN SE INCLUYE LA ENSEÑANZA TECNICA Y PROFESIONAL DE TIPO ACADEMICO PARA ESTUDIANTES INCAPACITADOS.</field>
+                <field name="name">ENSE�ANZA SECUNDARIA DE FORMACION TECNICA Y PROFESIONAL</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE TODA LA ENSE�ANZA TECNICA Y PROFESIONAL DE NIVEL INFERIOR AL UNIVERSITARIO. POR LO GENERAL EN LOS PROGRAMAS DE ESTE NIVEL SE HACE HINCAPIE EN UNA DETERMINADA ESPECIALIZACION Y SE IMPARTEN CONOCIMIENTOS TEORICOS Y PRACTICOS QUE SUELEN TENER POR OBJETO MEJORAR LAS POSIBILIDADES ACTUALES O FUTURAS DE EMPLEO. LOS OBJETIVOS DE LOS PROGRAMAS PUEDEN VARIAR DESDE LA PREPARACION PARA UNA ESFERA GENERAL DE EMPLEO HASTA LA PREPARACION PARA UNA OCUPACION CONCRETA. EN ESTE NIVEL TAMBIEN SE INCLUYE LA ENSE�ANZA TECNICA Y PROFESIONAL DE TIPO ACADEMICO PARA ESTUDIANTES INCAPACITADOS.</field>
         </record>
         <record id="activity_803002" model="economic.activity">
                 <field name="code">803002</field>
-                <field name="name">ENSEÑANZA SUPERIOR PRIVADA (UNIVERSIDADES)</field>
+                <field name="name">ENSE�ANZA SUPERIOR PRIVADA (UNIVERSIDADES)</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LAS UNIVERSIDADES PRIVADAS</field>
         </record>
         <record id="activity_803003" model="economic.activity">
@@ -3100,21 +3099,21 @@
         <record id="activity_809001" model="economic.activity">
                 <field name="code">809001</field>
                 <field name="name">ESCUELAS COMERCIALES (NO ESTATALES)</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LA ENSEÑANZA DE ACTIVIDADES NO ABARCADAS POR LOS SISTEMAS ORDINARIOS DE ENSEÑANZA PRIMARIA, SECUNDARIA O UNIVERSITARIA. EJEMPLO: ESCUELAS DE MANEJO, MUSICA, ACADEMIAS DE BELLEZA, INSTITUTOS DE IDIOMAS, ETC.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LA ENSE�ANZA DE ACTIVIDADES NO ABARCADAS POR LOS SISTEMAS ORDINARIOS DE ENSE�ANZA PRIMARIA, SECUNDARIA O UNIVERSITARIA. EJEMPLO: ESCUELAS DE MANEJO, MUSICA, ACADEMIAS DE BELLEZA, INSTITUTOS DE IDIOMAS, ETC.</field>
         </record>
         <record id="activity_809004" model="economic.activity">
                 <field name="code">809004</field>
                 <field name="name">PROFESOR POR CUENTA PROPIA</field>
-                <field name="description">INCLUYE LOS PROFESORES DE TODO TIPO DE ENSEÑANZA PRIMARIA, SECUNDARIA, UNIVERSITARIA, ENTRE OTROS. INCLUYE ADEMAS LA INSTRUCCION IMPARTIDA MEDIANTE PROGRAMAS DE TELEVISION, RADIO Y CORRESPONDENCIA, ASI COMO CUALQUIER OTRA ACTIVIDAD RELACIONADA COMO EL CUIDO DE EXAMENES ENTRE OTRAS.</field>
+                <field name="description">INCLUYE LOS PROFESORES DE TODO TIPO DE ENSE�ANZA PRIMARIA, SECUNDARIA, UNIVERSITARIA, ENTRE OTROS. INCLUYE ADEMAS LA INSTRUCCION IMPARTIDA MEDIANTE PROGRAMAS DE TELEVISION, RADIO Y CORRESPONDENCIA, ASI COMO CUALQUIER OTRA ACTIVIDAD RELACIONADA COMO EL CUIDO DE EXAMENES ENTRE OTRAS.</field>
         </record>
         <record id="activity_809005" model="economic.activity">
                 <field name="code">809005</field>
-                <field name="name">ENSEÑANZA CULTURAL</field>
+                <field name="name">ENSE�ANZA CULTURAL</field>
                 <field name="description">EN ESTA CLASE COMPRENDE LAS ACTVIDADES DE FORMACION ARTISTICA, TEATRAL Y MUSICAL. LAS UNIDADES QUE IMPARTEN ESTE TIPO DE FORMACION PUEDEN DENOMINARSE ESCUELAS, ESTUDIOS, ACADEMIAS, CLASES, ETC. OFRECEN FORMACION ESTRUCTURADA, PRINCIPALMENTE PARA FINES RECREATIVOS, DE AFICION O DE DESARROLLO PERSONAL, PERO ESA FORMACION NO CONDUCE A LA OBTENCION DE UN DIPLOMA PROFESIONAL NI DE UN TITULO DE LICENCIADO O GRADUADO. INCLUYE: CLASES DE PIANO Y OTRAS ACTIVIDADES DE FORMACION MUSICAL. FORMACION ARTISTICA. ESCUELAS Y ACADEMIAS DE BAILE. ESCUELAS DE TEATRO, BELLAS ARTES,ARTES INTERPRETATIVAS,FOTOGRAFIA (EXCEPTO LAS ACADEMICAS)</field>
         </record>
         <record id="activity_809006" model="economic.activity">
                 <field name="code">809006</field>
-                <field name="name">ENSEÑANZA DE LA DE SEGURIDAD PRIVADA</field>
+                <field name="name">ENSE�ANZA DE LA DE SEGURIDAD PRIVADA</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LAS ACADEMIAS O ESCUELAS DONDE CAPACITEN A PERSONAS PARA BRINDAR EL SERVICIO DE SEGURIDAD PRIVADA. DICHO SERVICIO, SE ENCUENTRA EN EL CODIGO 749201.</field>
         </record>
         <record id="activity_809007" model="economic.activity">
@@ -3230,12 +3229,12 @@
         <record id="activity_851912" model="economic.activity">
                 <field name="code">851912</field>
                 <field name="name">NUTRICIONISTA</field>
-                <field name="description">ESTA CLASE INCLUYE AL PROFESIONAL QUE JUNTO AL EQUIPO MEDICO COLABORA PARA PROVEER UN CUIDADO SEVERO AL PACIENTE PARA QUE MANTENGA SU ESTADO DE SALUD O LA PROMUEVA. ES EL QUE DISEÑA MENUS, ESTABLECE POLITICAS SEGURAS DE MANEJOS DE ALIMENTOS, PROVEE EDUCACION EN SALUD O ENFERMEDAD, SUPERVISA Y ADMINISTRA SERVICIOS DE ALIMENTOS Y NUTRICION, PARTICIPA EN PROCESOS DE INVESTIGACION PARA BRINDAR CUIDADO NUTRICIONAL ATEMPERADO A LAS REALIDADES DE CADA MOMENTO, ENTRE OTROS.</field>
+                <field name="description">ESTA CLASE INCLUYE AL PROFESIONAL QUE JUNTO AL EQUIPO MEDICO COLABORA PARA PROVEER UN CUIDADO SEVERO AL PACIENTE PARA QUE MANTENGA SU ESTADO DE SALUD O LA PROMUEVA. ES EL QUE DISE�A MENUS, ESTABLECE POLITICAS SEGURAS DE MANEJOS DE ALIMENTOS, PROVEE EDUCACION EN SALUD O ENFERMEDAD, SUPERVISA Y ADMINISTRA SERVICIOS DE ALIMENTOS Y NUTRICION, PARTICIPA EN PROCESOS DE INVESTIGACION PARA BRINDAR CUIDADO NUTRICIONAL ATEMPERADO A LAS REALIDADES DE CADA MOMENTO, ENTRE OTROS.</field>
         </record>
         <record id="activity_851913" model="economic.activity">
                 <field name="code">851913</field>
                 <field name="name">PROFESIONALES EN EDUCACION ESPECIAL</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LOS PROFESIONALES DE ENSEÑANZA ESPECIAL TALES COMO PSICOPEDAGOGOS, FONOAUDIOLOGOS (TERAPIA DE LENGUAJE), TRABAJADORES SOCIALES, ETC.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LOS PROFESIONALES DE ENSE�ANZA ESPECIAL TALES COMO PSICOPEDAGOGOS, FONOAUDIOLOGOS (TERAPIA DE LENGUAJE), TRABAJADORES SOCIALES, ETC.</field>
         </record>
         <record id="activity_851914" model="economic.activity">
                 <field name="code">851914</field>
@@ -3280,7 +3279,7 @@
         <record id="activity_853201" model="economic.activity">
                 <field name="code">853201</field>
                 <field name="name">GUARDERIAS/CENTROS INFANTILES Y SERVICIOS SOCIALES</field>
-                <field name="description">ESTA ACTIVIDAD ABARCA SERVICIOS DE GUARDERIAS, ACTIVIDADES DE ATENCION Y CUIDO DE PERSONAS INCAPACITADAS, ORIENTACION DE NIÑOS, ADOPCION, ASISTENCIA SOCIAL, PERSONAS CON DERECHO A RECIBIR, FONDOS, ASESORAMIENTO SOBRE EL PRESUPUESTO FAMILIAR Y ORIENTACION ACERCA DEL MATRIMONIO Y LA FAMILIA ENTRE OTROS QUE PUEDEN SER PRESTADOS A PARTICULARES Y A FAMILIAS EN SUS HOGARES Y EN OTROS LUGARES. ESTA ACTIVIDAD PUEDE SER REALIZADA POR DEPENDENCIAS PUBLICAS Y POR ORGANIZACIONES PRIVADAS (INCLUYE PERSONAS FISICAS), ORGANIZACIONES DE BIENESTAR SOCIAL RELACIONADAS CON IGLESIAS, ORGANIZACIONES PARA SOCORRO EN CASOS DE DESASTRE Y ORGANIZACIONES NACIONALES O LOCALES DE AUTOAYUDA. INCLUYE LA RED NACIONAL DE CUIDO Y DESARROLLO INFANTIL.</field>
+                <field name="description">ESTA ACTIVIDAD ABARCA SERVICIOS DE GUARDERIAS, ACTIVIDADES DE ATENCION Y CUIDO DE PERSONAS INCAPACITADAS, ORIENTACION DE NI�OS, ADOPCION, ASISTENCIA SOCIAL, PERSONAS CON DERECHO A RECIBIR, FONDOS, ASESORAMIENTO SOBRE EL PRESUPUESTO FAMILIAR Y ORIENTACION ACERCA DEL MATRIMONIO Y LA FAMILIA ENTRE OTROS QUE PUEDEN SER PRESTADOS A PARTICULARES Y A FAMILIAS EN SUS HOGARES Y EN OTROS LUGARES. ESTA ACTIVIDAD PUEDE SER REALIZADA POR DEPENDENCIAS PUBLICAS Y POR ORGANIZACIONES PRIVADAS (INCLUYE PERSONAS FISICAS), ORGANIZACIONES DE BIENESTAR SOCIAL RELACIONADAS CON IGLESIAS, ORGANIZACIONES PARA SOCORRO EN CASOS DE DESASTRE Y ORGANIZACIONES NACIONALES O LOCALES DE AUTOAYUDA. INCLUYE LA RED NACIONAL DE CUIDO Y DESARROLLO INFANTIL.</field>
         </record>
         <record id="activity_853301" model="economic.activity">
                 <field name="code">853301</field>
@@ -3350,7 +3349,7 @@
         <record id="activity_919905" model="economic.activity">
                 <field name="code">919905</field>
                 <field name="name">ASOCIACION PROAYUDA A PERSONAS ADICTAS A DROGAS E INDIGENTES</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LAS ASOCIACIONES PROAYUDA A NIÑOS Y ADULTOS, ADICTOS A DROGAS O PERSONAS EN CONDICION INDIGENTE.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LAS ASOCIACIONES PROAYUDA A NI�OS Y ADULTOS, ADICTOS A DROGAS O PERSONAS EN CONDICION INDIGENTE.</field>
         </record>
         <record id="activity_921101" model="economic.activity">
                 <field name="code">921101</field>
@@ -3439,7 +3438,7 @@
         </record>
         <record id="activity_924102" model="economic.activity">
                 <field name="code">924102</field>
-                <field name="name">EXPLOTACION DE PISCINAS O ALBERCAS DE BAÑO</field>
+                <field name="name">EXPLOTACION DE PISCINAS O ALBERCAS DE BA�O</field>
                 <field name="description">EN ESTA CLASE SE INCLUYE LA EXPLOTACION DE PISCINAS</field>
         </record>
         <record id="activity_924103" model="economic.activity">
@@ -3519,8 +3518,8 @@
         </record>
         <record id="activity_930102" model="economic.activity">
                 <field name="code">930102</field>
-                <field name="name">SERVICIO DE TEÑIDO DE PRENDAS DE VESTIR</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE EL SERVICIO DE TEÑIDO DE PRENDAS DE VESTIR.</field>
+                <field name="name">SERVICIO DE TE�IDO DE PRENDAS DE VESTIR</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE EL SERVICIO DE TE�IDO DE PRENDAS DE VESTIR.</field>
         </record>
         <record id="activity_930103" model="economic.activity">
                 <field name="code">930103</field>
@@ -3530,7 +3529,7 @@
         <record id="activity_930202" model="economic.activity">
                 <field name="code">930202</field>
                 <field name="name">SALONES DE BELLEZA, PELUQUERIA Y BARBERIA</field>
-                <field name="description">EN ESTA CLASE SE INCLUYEN LAS ACTIVIDADES DE LAVADO, CORTE, PEINADO, TEÑIDO, COLORACION, ONDULACION Y ALISADO DEL CABELLO TANTO, PARA HOMBRES COMO PARA MUJERES. ADEMAS SE INCLUYE EL AFEITADO Y EL RECORTE DE LA BARBA, MASAJES FACIALES, ARREGLOS DE MANOS Y PIES, MAQUILALJE Y OTROS TRATAMIENTOS DE BELLEZA.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYEN LAS ACTIVIDADES DE LAVADO, CORTE, PEINADO, TE�IDO, COLORACION, ONDULACION Y ALISADO DEL CABELLO TANTO, PARA HOMBRES COMO PARA MUJERES. ADEMAS SE INCLUYE EL AFEITADO Y EL RECORTE DE LA BARBA, MASAJES FACIALES, ARREGLOS DE MANOS Y PIES, MAQUILALJE Y OTROS TRATAMIENTOS DE BELLEZA.</field>
         </record>
         <record id="activity_930301" model="economic.activity">
                 <field name="code">930301</field>
@@ -3550,7 +3549,7 @@
         <record id="activity_930901" model="economic.activity">
                 <field name="code">930901</field>
                 <field name="name">SALAS DE MASAJES</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LAS SALAS DE MASAJES TERAPEUTICOS , BAÑOS TURCOS, VAPOR, SAUNA Y OTROS SERVICIOS RELACIONADOS CON EL BIENESTAR Y LOZANIA FISICAS.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LAS SALAS DE MASAJES TERAPEUTICOS , BA�OS TURCOS, VAPOR, SAUNA Y OTROS SERVICIOS RELACIONADOS CON EL BIENESTAR Y LOZANIA FISICAS.</field>
         </record>
         <record id="activity_930903" model="economic.activity">
                 <field name="code">930903</field>
@@ -3565,7 +3564,7 @@
         <record id="activity_930905" model="economic.activity">
                 <field name="code">930905</field>
                 <field name="name">PELUQUERIA Y SALA DE ESTETICA PARA ANIMALES</field>
-                <field name="description">EN ESTA CLASE SE INCLUYE LOS SERVICIOS BRINDADOS DE LAVADO, CORTE, RECORTE, PEINADO, CORTE DE UÑAS Y SIMILARES PARA TODO TIPO DE MASCOTAS.</field>
+                <field name="description">EN ESTA CLASE SE INCLUYE LOS SERVICIOS BRINDADOS DE LAVADO, CORTE, RECORTE, PEINADO, CORTE DE U�AS Y SIMILARES PARA TODO TIPO DE MASCOTAS.</field>
         </record>
         <record id="activity_930906" model="economic.activity">
                 <field name="code">930906</field>
@@ -3590,7 +3589,7 @@
         <record id="activity_950001" model="economic.activity">
                 <field name="code">950001</field>
                 <field name="name">HOGARES PRIVADOS CON SERVICIO DOMESTICO</field>
-                <field name="description">ESTA CLASE ABARCA LAS ACTIVIDADES DE HOGARES PRIVADOS QUE EMPLEAN PERSONAL DOMESTICO DE TODO TIPO, COMO SIRVIENTES, COCINEROS, CAMAREROS, AYUDAS DE CAMARA, MAYORDOMOS, LAVANDEROS, JARDINEROS, PORTEROS, MOZOS DE CUADRA, CHOFERES, CONSERJES, INSTITUTRICES, NIÑERAS, PRECEPTORES, SECRETARIOS, ETC.</field>
+                <field name="description">ESTA CLASE ABARCA LAS ACTIVIDADES DE HOGARES PRIVADOS QUE EMPLEAN PERSONAL DOMESTICO DE TODO TIPO, COMO SIRVIENTES, COCINEROS, CAMAREROS, AYUDAS DE CAMARA, MAYORDOMOS, LAVANDEROS, JARDINEROS, PORTEROS, MOZOS DE CUADRA, CHOFERES, CONSERJES, INSTITUTRICES, NI�ERAS, PRECEPTORES, SECRETARIOS, ETC.</field>
         </record>
         <record id="activity_960104" model="economic.activity">
                 <field name="code">960104</field>

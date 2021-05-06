@@ -101,21 +101,20 @@
                 model="ir.actions.act_window">
             <field name="name">Cantones</field>
             <field name="res_model">res.country.county</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
+
         <record id="action_res_country_district"
                 model="ir.actions.act_window">
             <field name="name">Distritos</field>
             <field name="res_model">res.country.district</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
+
         <record id="action_res_country_neighborhood"
                 model="ir.actions.act_window">
             <field name="name">Barrios</field>
             <field name="res_model">res.country.neighborhood</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
 

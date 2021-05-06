@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from . import account_journal
-from . import account_invoice
+from . import account_move
 from . import account_payment
 from . import api_facturae
 from . import code_type_product
@@ -19,4 +19,3 @@ from . import uom
 from . import aut_ex
 from . import account_tax
 from . import economic_activity
-from . import account_invoice_import_wizard

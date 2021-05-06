@@ -4,7 +4,6 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import phonenumbers
 import logging
-from datetime import datetime, timedelta, date
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -14,10 +13,6 @@ class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
     commercial_name = fields.Char(string="Commercial Name", required=False, )
-    state_id = fields.Many2one("res.country.state", string="Province", required=False, )
-    district_id = fields.Many2one("res.country.district", string="District", required=False, )
-    county_id = fields.Many2one("res.country.county", string="Canton", required=False, )
-    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Neighborhood", required=False, )
     identification_id = fields.Many2one("identification.type", string="Id Type",required=False, )
     payment_methods_id = fields.Many2one("payment.methods", string="Payment Method", required=False, )
     has_exoneration = fields.Boolean(string="Has Exoneration?", required=False)
@@ -26,11 +21,8 @@ class PartnerElectronic(models.Model):
     institution_name = fields.Char(string="Exoneration Issuer", required=False, )
     date_issue = fields.Date(string="Issue Date", required=False, )
     date_expiration = fields.Date(string="Expiration Date", required=False, )
-    date_notification = fields.Date(string="Last notification date", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", required=False, context={'active_test': False} )
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False},relation='economic_activity_res_partner_rel',
-                                       column1='res_partner_id',
-                                       column2='economic_activity_id',)
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False})
     export = fields.Boolean(string="It's export", default=False)
 
     @api.onchange('phone')
@@ -95,7 +87,6 @@ class PartnerElectronic(models.Model):
                         raise UserError(
                             'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
 
-    @api.multi
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
@@ -125,13 +116,3 @@ class PartnerElectronic(models.Model):
                 'message': _('Company VAT is invalid')
             }
             return {'value': {'vat': ''}, 'warning': alert}
-    
-    @api.multi
-    def check_exonerations(self):
-        clients = self.env["res.partner"].search([("has_exoneration", "=", True), ("date_expiration", "<", datetime.today())])
-        for client in clients:
-            if client.date_notification == False or (client.date_notification + timedelta(days=8)) < date.today():
-                email_template = client.env.ref("cr_electronic_invoice.email_template_client_exoneration_expired")
-                if email_template:
-                    email_template.send_mail(client.id)
-                    client.date_notification = date.today()

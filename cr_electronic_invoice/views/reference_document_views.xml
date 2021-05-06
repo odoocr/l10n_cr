@@ -52,7 +52,6 @@
             model="ir.actions.act_window">
             <field name="name">Documentos de referencia</field>
             <field name="res_model">reference.document</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
 
@@ -60,7 +59,6 @@
             model="ir.actions.act_window">
             <field name="name">Código de Referencia</field>
             <field name="res_model">reference.code</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
     </data>

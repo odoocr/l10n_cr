@@ -28,7 +28,6 @@
         <record id="action_payment_methods" model="ir.actions.act_window">
             <field name="name">Métodos de pago</field>
             <field name="res_model">payment.methods</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <!--<field name="search_view_id" ref="view_account_invoice_filter"/>-->
         </record>

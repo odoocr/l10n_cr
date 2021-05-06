@@ -2,7 +2,7 @@
 
 {
     'name': 'Facturación electrónica Costa Rica',
-    'version': '12.0.2.0.5',
+    'version': '13.0.1.0.0',
     'author': 'Odoo CR Community',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
@@ -19,7 +19,6 @@
         'sales_team',
         'account',
         'l10n_cr_country_codes',
-        'account_cancel',
         'res_currency_cr_adapter',
         ],
     'data': [
@@ -40,8 +39,9 @@
         'data/sequence.xml',
         'data/res.currency.xml',
         'data/decimal_precision.xml',
+        #'data/account_journal.xml',
         'views/uom_views.xml',
-        'views/account_invoice_views.xml',
+        'views/account_move_views.xml',
         'views/account_journal_views.xml',
         'views/account_payment_views.xml',
         'views/code_type_product_views.xml',
@@ -54,17 +54,18 @@
         'views/resolution_views.xml',
         'views/sale_condition_views.xml',
         'views/account_tax_views.xml',
-        'views/account_invoice_import_wizard_view.xml',
         'views/economic_activity_views.xml',
         'views/menu_views.xml',
+        'views/account_move_reversal_views.xml',
         'security/ir.model.access.csv',
     ],
     'external_dependencies': {
         "python": [
             'xmlsig',
             'OpenSSL',
+            'phonenumbers',
+            'jsonschema',
         ],
     },
-    'post_init_hook': 'post_init_check',
     'installable': True,
 }

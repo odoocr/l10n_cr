@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_account_move_reversal_form_inherit" model="ir.ui.view">
+            <field name="name">account.move.reversal.form.inherit</field>
+            <field name="model">account.move.reversal</field>
+            <field name="inherit_id" ref="account.view_account_move_reversal"/>
+             <field name="arch" type="xml">
+                 <field name="reason" position="before">
+                    <field name="reference_code_id" string="Código Referencia"/>
+                    <field name="reference_document_id" String="Documento Referencia"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

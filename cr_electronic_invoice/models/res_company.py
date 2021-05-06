@@ -32,9 +32,6 @@ class CompanyElectronic(models.Model):
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
-    district_id = fields.Many2one("res.country.district", string="District", required=False)
-    county_id = fields.Many2one("res.country.county", string="Canton", required=False)
-    neighborhood_id = fields.Many2one("res.country.neighborhood", string="Neighborhood", required=False)
     frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
     frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
 
@@ -107,7 +104,7 @@ class CompanyElectronic(models.Model):
             if not valid:
                 alert = {
                     'title': 'Atención',
-                    'message': _('Número de teléfono inválido')
+                    'message': 'Número de teléfono inválido'
                 }
                 return {'value': {'phone': ''}, 'warning': alert}
 
@@ -155,7 +152,6 @@ class CompanyElectronic(models.Model):
         if to_write:
             self.write(to_write)
 
-    @api.multi
     def test_get_token(self):
         token_m_h = api_facturae.get_token_hacienda(
             self.env.user, self.frm_ws_ambiente)
@@ -163,7 +159,6 @@ class CompanyElectronic(models.Model):
            _logger.info('E-INV CR - I got the token')
         return 
 
-    @api.multi
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)

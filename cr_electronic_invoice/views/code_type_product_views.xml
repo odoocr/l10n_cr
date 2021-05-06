@@ -30,7 +30,6 @@
         <record id="action_code_type_product" model="ir.actions.act_window">
             <field name="name">Tipos de códigos</field>
             <field name="res_model">code.type.product</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
     </data>

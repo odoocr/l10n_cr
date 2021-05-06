@@ -35,7 +35,6 @@
         <record id="action_sale_conditions" model="ir.actions.act_window">
             <field name="name">Condiciones de Venta</field>
             <field name="res_model">sale.conditions</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
     </data>

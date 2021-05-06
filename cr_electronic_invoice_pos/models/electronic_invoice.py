@@ -12,7 +12,7 @@ def stacktrace(func):
         # Get all but last line returned by traceback.format_stack()
         # which is the line below.
         callstack = '\n'.join([INDENT+line.strip() for line in traceback.format_stack()][:-1])
-        _logger.error('MAB - {}() called:'.format(func.__name__))
+        _logger.error('E-INV CR - {}() called:'.format(func.__name__))
         _logger.error(callstack)
         return func(*args, **kwds)
 
@@ -37,7 +37,6 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     #@stacktrace
-    @api.model
     def create(self, vals):
         return super(StockPicking, self).create(vals)
 
@@ -65,7 +64,6 @@ class PosOrder(models.Model):
     _name = "pos.order"
     _inherit = ["pos.order", "mail.thread"]
 
-    @api.multi
     def action_invoice_sent(self):
         email_template = self.env.ref(
             'cr_electronic_invoice_pos.email_template_pos_invoice', False)
@@ -86,7 +84,6 @@ class PosOrder(models.Model):
              force_send=True)  # default_type='binary'
         email_template.attachment_ids = [(5)]
 
-    @api.model
     def sequence_number_sync(self, vals):
         tipo_documento = vals.get('tipo_documento', False)
         sequence = vals.get('sequence', False)
@@ -98,7 +95,6 @@ class PosOrder(models.Model):
             elif tipo_documento == 'TE' and sequence >= session.config_id.TE_sequence_id.number_next_actual:
                     session.config_id.TE_sequence_id.number_next_actual = sequence + 1
 
-    @api.model
     def _order_fields(self, ui_order):
         vals = super(PosOrder, self)._order_fields(ui_order)
         vals['tipo_documento'] = ui_order.get('tipo_documento')
@@ -106,7 +102,6 @@ class PosOrder(models.Model):
         vals['number_electronic'] = ui_order.get('number_electronic')
         return vals
 
-    @api.model
     def create(self, vals):
         number_electronic = vals.get('number_electronic', False)
         if vals.get('pos_order_id', False):
@@ -154,7 +149,7 @@ class PosOrder(models.Model):
         selection=[('FE', 'Electronic Invoice'),
                    ('TE', 'Electronic Ticket'),
                    ('NC', 'Electronic Credit Note')],
-        string="Document Type",
+        string="Receipt Type",
         required=False, default='FE',
         help='Show document type in concordance with '
              'Ministerio de Hacienda classification')
@@ -168,7 +163,6 @@ class PosOrder(models.Model):
          "La clave de comprobante debe ser única"),
     ]
 
-    @api.multi
     def action_pos_order_paid(self):
         for order in self:
             if not order.pos_order_id:
@@ -183,7 +177,6 @@ class PosOrder(models.Model):
             order.sequence = order.number_electronic[21:41]
         return super(PosOrder, self).action_pos_order_paid()
 
-    @api.multi
     def refund(self):
         """Create a copy of order  for refund order"""
         PosOrder = self.env['pos.order']
@@ -244,21 +237,20 @@ class PosOrder(models.Model):
             'target': 'current',
         }
 
-    @api.model
     def _consultahacienda_pos(self, max_orders=10):  # cron
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
-                                                   ('number_electronic', '!=', False),
+                                                   ('number_electronic',
+                                                    '!=', False),
                                                    ('state_tributacion', 'in', ('recibido', 'procesando'))],
                                                   limit=max_orders)
         total_orders = len(pos_orders)
         current_order = 0
         _logger.info(
-            'MAB - Consulta Hacienda - POS Orders to check: %s', total_orders)
+            'E-INV CR - Consulta Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.error(
-                'MAB - Consulta Hacienda - POS Order %s / %s number: %s', current_order, total_orders, doc.name)
-
+            _logger.info(
+                'E-INV CR - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
             token_m_h = api_facturae.get_token_hacienda(
                 doc, doc.company_id.frm_ws_ambiente)
             if doc.number_electronic and len(doc.number_electronic) == 50:
@@ -271,45 +263,39 @@ class PosOrder(models.Model):
                 elif status == 400:
                     estado_m_h = response_json.get('ind-estado')
                     _logger.error(
-                        'MAB - Error: %s Documento:%s no encontrado en Hacienda', estado_m_h, doc.number_electronic)
+                        'E-INV CR - Error: %s Documento:%s no encontrado en Hacienda', estado_m_h, doc.number_electronic)
                 else:
                     _logger.error(
-                        'MAB - Error inesperado en Consulta Hacienda - Abortando')
+                        'E-INV CR - Error inesperado en Consulta Hacienda - Abortando')
                     return
                 if estado_m_h == 'aceptado':
                     doc.state_tributacion = estado_m_h
                     doc.fname_xml_respuesta_tributacion = 'AHC_' + doc.number_electronic + '.xml'
-                    doc.xml_respuesta_tributacion = response_json.get(
-                        'respuesta-xml')
-                    if doc.partner_id and doc.partner_id.email:  # and not doc.partner_id.opt_out:
-                        try:
-                            email_template = self.env.ref(
-                                'cr_electronic_invoice_pos.email_template_pos_invoice', False)
-                            attachment = self.env['ir.attachment'].search(
-                                [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
-                                ('res_field', '=', 'xml_comprobante')], limit=1)
-                            attachment.name = doc.fname_xml_comprobante
-                            attachment.datas_fname = doc.fname_xml_comprobante
-
-                            attachment_resp = self.env['ir.attachment'].search(
-                                [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
-                                ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
-                            attachment_resp.name = doc.fname_xml_respuesta_tributacion
-                            attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
-
-                            email_template.attachment_ids = [
-                                (6, 0, [attachment.id, attachment_resp.id])]
-                            email_template.with_context(type='binary', default_type='binary').send_mail(doc.id,
-                                                                                                        raise_exception=False,
-                                                                                                        force_send=True)  # default_type='binary'
-                            email_template.attachment_ids = [(5)]
-                            doc.state_email = 'sent'
-                        except:
-                            doc.state_email = 'fe_error'
+                    doc.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+                    if doc.partner_id and doc.partner_id.email:
+                        email_template = self.env.ref('cr_electronic_invoice_pos.email_template_pos_invoice', False)
+                        attachment = self.env['ir.attachment'].search(
+                            [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
+                             ('res_field', '=', 'xml_comprobante')], limit=1)
+                        attachment.name = doc.fname_xml_comprobante
+                        attachment.datas_fname = doc.fname_xml_comprobante
+                        attachment.mimetype = 'text/xml'
+                        attachment_resp = self.env['ir.attachment'].search(
+                            [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
+                             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+                        attachment_resp.name = doc.fname_xml_respuesta_tributacion
+                        attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
+                        attachment_resp.mimetype = 'text/xml'
+                        email_template.attachment_ids = [
+                            (6, 0, [attachment.id, attachment_resp.id])]
+                        email_template.with_context(type='binary', default_type='binary').send_mail(doc.id,
+                                                                                                    raise_exception=False,
+                                                                                                    force_send=True)  # default_type='binary'
+                        email_template.attachment_ids = [(5,0,0)]
+                        doc.state_email = 'sent'
                     else:
                         doc.state_email = 'no_email'
-                        _logger.info('MAB - Email no enviado - Cliente no definido')
-
+                        _logger.info('E-INV CR - Email no enviado - cliente no definido')
                 elif estado_m_h in ('firma_invalida'):
                     if doc.error_count > 10:
                         doc.state_tributacion = estado_m_h
@@ -317,7 +303,7 @@ class PosOrder(models.Model):
                         doc.xml_respuesta_tributacion = response_json.get(
                             'respuesta-xml')
                         doc.state_email = 'fe_error'
-                        _logger.error('MAB - Email no enviado - Factura rechazada')
+                        _logger.error('E-INV CR - Email no enviado - factura rechazada')
                     else:
                         doc.error_count += 1
                         doc.state_tributacion = 'procesando'
@@ -327,7 +313,7 @@ class PosOrder(models.Model):
                     doc.xml_respuesta_tributacion = response_json.get(
                         'respuesta-xml')
                     doc.state_email = 'fe_error'
-                    _logger.error('MAB - Email no enviado - Factura rechazada')
+                    _logger.error('E-INV CR - Email no enviado - factura rechazada')
                 elif estado_m_h == 'error':
                     doc.state_tributacion = estado_m_h
                     doc.state_email = 'fe_error'
@@ -341,14 +327,13 @@ class PosOrder(models.Model):
                         doc.error_count += 1
                         doc.state_tributacion = ''
                     _logger.error(
-                        'MAB - Consulta Hacienda - POS Order %s in state "%s" - Error count: %s', doc.number_electronic, estado_m_h, doc.error_count)
+                        'E-INV CR - Consulta Hacienda - POS Order no encontrada: %s', doc.number_electronic)
             else:
                 doc.state_tributacion = 'error'
                 _logger.error(
-                    'MAB - POS Order %s - x Number Electronic: %s formato incorrecto', doc.name, doc.number_electronic)
-        _logger.info('MAB - Consulta Hacienda POS - Finalizad Exitosamente')
+                    'E-INV CR - POS Order %s - x Number Electronic: %s formato incorrecto', doc.name, doc.number_electronic)
+        _logger.info('E-INV CR - Consulta Hacienda POS - Finalizad Exitosamente')
 
-    @api.model
     def _reenviacorreos_pos(self, max_orders=1):  # cron
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    ('date_order', '>=',
@@ -362,17 +347,17 @@ class PosOrder(models.Model):
         total_orders = len(pos_orders)
         current_order = 0
         _logger.info(
-            'MAB - Reenvia Correos- POS Orders to send: %s', total_orders)
+            'E-INV CR - Reenvia Correos- POS Orders to send: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.info('MAB - Reenvia Correos- POS Order %s - %s / %s',
+            _logger.info('E-INV CR - Reenvia Correos- POS Order %s - %s / %s',
                           doc.name, current_order, total_orders)
             if doc.partner_id.email and not doc.partner_id.opt_out and doc.state_tributacion == 'aceptado':
                 comprobante = self.env['ir.attachment'].search(
                     [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
                      ('res_field', '=', 'xml_comprobante')], limit=1)
                 if not comprobante:
-                    _logger.error('MAB - Email no enviado - Tiquete sin xml')
+                    _logger.error('E-INV CR - Email no enviado - tiquete sin xml')
                     continue
                 try:
                     comprobante.name = doc.fname_xml_comprobante
@@ -394,13 +379,12 @@ class PosOrder(models.Model):
                 doc.state_email = 'sent'
             elif doc.state_tributacion in ('rechazado', 'rejected'):
                 doc.state_email = 'fe_error'
-                _logger.error('MAB - Email no enviado - factura rechazada')
+                _logger.error('E-INV CR - Email no enviado - factura rechazada')
             else:
                 doc.state_email = 'no_email'
-                _logger.info('MAB - Email no enviado - Cuenta no definida')
-        _logger.info('MAB - Reenvia Correos - Finalizado')
+                _logger.info('E-INV CR - Email no enviado - cuenta no definida')
+        _logger.info('E-INV CR - Reenvia Correos - Finalizado')
 
-    @api.model
     def _validahacienda_pos(self, max_orders=10, no_partner=True):  # cron
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    '|', (no_partner, '=', True), 
@@ -412,15 +396,15 @@ class PosOrder(models.Model):
         total_orders = len(pos_orders)
         current_order = 0
         _logger.info(
-            'MAB - Valida Hacienda - POS Orders to check: %s', total_orders)
+            'E-INV CR - Valida Hacienda - POS Orders to check: %s', total_orders)
         for doc in pos_orders:
             current_order += 1
-            _logger.info('MAB - Valida Hacienda - POS Order: "%s"  -  %s / %s',
+            _logger.info('E-INV CR - Valida Hacienda - POS Order: "%s"  -  %s / %s',
                           doc.number_electronic, current_order, total_orders)
             docName = doc.number_electronic
             if not docName or not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
                 _logger.error(
-                    'MAB - Valida Hacienda - skipped Invoice %s', docName)
+                    'E-INV CR - Valida Hacienda - skipped Invoice %s', docName)
                 doc.state_tributacion = 'no_aplica'
                 continue
             now_utc = datetime.datetime.now(pytz.timezone('UTC'))
@@ -437,16 +421,18 @@ class PosOrder(models.Model):
                 razon_referencia = False
                 invoice_comments = False
                 tipo_documento_referencia = False
+                _no_CABYS_code = False
+
                 if not doc.pos_order_id:   #.number_electronic:
                     if doc.amount_total < 0:
                         doc.state_tributacion = 'error'
                         _logger.error(
-                            'MAB - Error documento %s tiene monto negativo pero no tiene documento referencia', doc.number_electronic)
+                            'E-INV CR - Error documento %s tiene monto negativo pero no tiene documento referencia', doc.number_electronic)
                         continue
                 else:
                     if doc.amount_total >= 0:
                         _logger.error(
-                            'MAB - Valida Hacienda - skipped Invoice %s', docName)
+                            'E-INV CR - Valida Hacienda - skipped Invoice %s', docName)
                         doc.state_tributacion = 'no_aplica'
                         continue
                         doc.tipo_documento = 'ND'
@@ -478,7 +464,6 @@ class PosOrder(models.Model):
                 base_subtotal = 0.0
                 total_otros_cargos = 0.0
                 total_iva_devuelto = 0.0
-                _no_CABYS_code = False
                 for line in doc.lines:
                     line_number += 1
                     price = line.price_unit * (1 - line.discount / 100.0)
@@ -512,7 +497,7 @@ class PosOrder(models.Model):
                     elif line.product_id.categ_id and line.product_id.categ_id.cabys_code:
                         dline["codigoCabys"] = line.product_id.categ_id.cabys_code
                     else:
-                        _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % line.product_id.name
+                        _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % line.product_id.name
                         continue
 
                     if line.discount:
@@ -548,8 +533,6 @@ class PosOrder(models.Model):
                                 }
                     dline["impuesto"] = taxes
                     dline["impuestoNeto"] = _line_tax
-
-                    # Si no hay product_id se asume como mercaderia
                     if line.product_id and line.product_id.type == 'service':
                         if taxes:
                             total_servicio_gravado += base_line
@@ -565,12 +548,13 @@ class PosOrder(models.Model):
                     base_subtotal += subtotal_line
                     dline["montoTotalLinea"] = round(subtotal_line + _line_tax, 5)
                     lines[line_number] = dline
-
-                if _no_CABYS_code and doc.tipo_documento != 'NC':  # CAByS is not required for financial NCs
+                if _no_CABYS_code and doc.tipo_documento != 'NC': #CAByS is not required for financial NCs
+                    doc.state_tributacion = 'error'
                     doc.message_post(
                         subject='Error',
                         body=_no_CABYS_code)
                     continue
+
                 if total_otros_cargos:
                     total_otros_cargos = round( total_otros_cargos, 5)
                     otros_cargos_id = 1
@@ -596,7 +580,7 @@ class PosOrder(models.Model):
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
                 doc.fname_xml_comprobante = doc.tipo_documento + '_' + docName + '.xml'
                 doc.xml_comprobante = base64.encodestring(xml_firmado)
-                _logger.info('MAB - SIGNED XML:%s', doc.fname_xml_comprobante)
+                _logger.info('E-INV CR - SIGNED XML:%s', doc.fname_xml_comprobante)
 
             else:
                 xml_firmado = doc.xml_comprobante
@@ -617,12 +601,12 @@ class PosOrder(models.Model):
                 elif doc.error_count > 10:
                     doc.message_post(subject='Error', body=response_text)
                     doc.state_tributacion = 'error'
-                    _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
+                    _logger.error('E-INV CR - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
                                   response_status, response_text)
                 else:
                     doc.error_count += 1
                     doc.state_tributacion = 'procesando'
                     doc.message_post(subject='Error', body=response_text)
-                    _logger.error('MAB - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
+                    _logger.error('E-INV CR - Invoice: %s  Status: %s Error sending XML: %s', doc.name,
                                   response_status, response_text)
-        _logger.info('MAB 014 - Valida Hacienda POS- Finalizado Exitosamente')
+        _logger.info('E-INV CR 014 - Valida Hacienda POS- Finalizado Exitosamente')

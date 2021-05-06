@@ -31,7 +31,6 @@
         <record id="action_identification_type" model="ir.actions.act_window">
             <field name="name">Tipo de identificación</field>
             <field name="res_model">identification.type</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
     </data>

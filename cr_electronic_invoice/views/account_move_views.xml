@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_move_form_inherit" model="ir.ui.view">
+            <field name="name">account.move.form.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='button_draft']" position="after">
+                    <button name="action_check_hacienda" type="object" string="Consultar Hacienda" 
+                            attrs="{'invisible':[('state_tributacion','=', False)]}"/>
+                    <button name="action_send_mrs_to_hacienda" type="object" string="Enviar Mensaje Receptor" 
+                            attrs="{'invisible':['|', '|', ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','==','FEC'),('state_tributacion','!=', False), ('state_tributacion','!=','rechazado'),('state_tributacion','!=','error')]}"/>
+                    <button name="action_create_fec" type="object" string="Enviar FEC" 
+                            attrs="{'invisible':['|', ('tipo_documento','!=','FEC'), ('state_tributacion','not in', (False,'rechazado', 'error'))]}"/>
+                </xpath>
+
+                <field name="narration" position="before">
+                    <field name="invoice_amount_text"/>
+                </field>
+                <field name="partner_id" position="after">
+                    <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": [("type","in", ("in_invoice", "in_refund"))]}'/>
+                    <field name="economic_activity_id" attrs="{'required':['|', ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC')]}" domain="[('id', 'in', economic_activities_ids),]"
+                           options='{"no_open": True, "no_create": True, "active_test": [("type","in", ("in_invoice", "in_refund"))]}'/>
+                    <field name="number_electronic" readonly="1"/>
+                    <field name="sequence" readonly="1"/>
+                </field>
+
+                <field name="invoice_date" position="attributes">
+                    <attribute name="readonly">-4</attribute>
+                </field>
+
+                <field name="invoice_date" position="after">
+                    <field name="date_issuance" readonly="-2"/>
+                </field>
+
+                <field name="date_issuance" position="after">
+                    <field name="tipo_documento" attrs="{'readonly':[('state','!=','draft')], 'required':[('type','in', ('out_invoice', 'out_refund'))]}"/>
+                    <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                </field>
+
+                <!--<field name="invoice_payment_term_id" position="after">
+                 </field>-->
+                <field name="fiscal_position_id" position="after">
+
+
+                    <!--<field name="electronic_invoice_return_message" readonly="1"/>-->
+                </field>
+                <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+                    <field name="categ_name" invisible="1" readonly="1"/>
+                    <field name="product_code" invisible="1" readonly="1"/>
+                    <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
+                    <field name="discount_note"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_invoice_sent']" position="attributes">
+                    <attribute name="invisible">False</attribute>
+                </xpath>
+
+                <xpath expr="(//field[@name='amount_total'])[last()]" position="after">
+                    <field name="amount_tax_electronic_invoice" attrs="{'invisible':[('type','in', ('out_invoice', 'out_refund'))]}"/>
+                    <field name="amount_total_electronic_invoice" attrs="{'invisible':[('type','in', ('out_invoice', 'out_refund'))]}"/>
+                </xpath>
+
+                <xpath expr="//page[2]" position="after">
+                    <page name="fe_invoice_data" string="Información Electrónica" >
+                        <group id="fe_tab_group" col="2" >
+                            <group string="Aceptación Electrónica" name="fe_in_info_group" colspan="2" col="5" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('type','in', ('out_invoice', 'out_refund'))]}">
+                                <field name="fname_xml_supplier_approval" invisible="1" colspan="5" />
+                                <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" colspan="4"
+                                   attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('type','in', ('out_invoice', 'out_refund'))]}"/>
+                                <button name="load_xml_data" type="object" string="Cargar datos del XML" colspan="1"
+                                    attrs="{'invisible':['|', '|', '|', ('xml_supplier_approval', '=', False), ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC'), ('state','!=','draft')]}"/>
+                               <field name="state_invoice_partner" colspan="5" attrs="{'invisible':['|', ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC')]}"/>
+                            </group>
+                            <group string="Referencia Electrónica" name="eref_info_group" colspan="2">
+                                <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
+                                <field name="xml_comprobante" filename="fname_xml_comprobante"/>
+                                <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
+                                <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion"/>
+                                <field name="state_tributacion" readonly="1"/>
+                                <field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="reference_document_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                            
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_move_tree_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.tree.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="arch" type="xml">
+                <tree position="attributes">
+                    <attribute name="decoration-danger">
+                        state_tributacion == 'rechazado'
+                    </attribute>
+                </tree>
+                <field name="state" position="before">
+                    <field name="tipo_documento" string="Doc Elect."/>
+                    <field name="sequence" string="Consecutivo"/>
+                    <field name="type" invisible="1" readonly="1"/>
+                    <field name="state_tributacion" string="Estado FE" />
+                </field>
+            </field>
+        </record>
+
+<!-- 
+        <record id="view_account_move_reverse_inherit" model="ir.ui.view">
+            <field name="name">account.move.reverse.form.inherit</field>
+            <field name="model">account.move.reverse</field>
+            <field name="inherit_id" ref="account.view_account_invoice_refund"/>
+            <field name="arch" type="xml">
+                <field name="description" position="after">
+                    <field name="reference_code_id"/>
+                    <field name="reference_document_id"/>
+                    <field name="invoice_id" readonly="1"/>
+                </field>
+            </field>
+        </record> -->
+
+        <record id="view_tax_form_inherit" model="ir.ui.view">
+            <field name="name">account.tax.form.inherit</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="tax_code"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_account_invoice_filter" model="ir.ui.view">
+            <field name="name">account.invoice.select.inherited</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                <field name="name" string="Invoice" filter_domain="['|', '|', '|' , '|', '|', ('name', 'ilike', self), ('invoice_origin', 'ilike', self), ('ref', 'ilike', self), ('invoice_payment_ref', 'ilike', self), ('partner_id', 'child_of', self), ('reference', 'ilike', self)]"/>
+            </field>
+        </record>
+    </data>
+</odoo>
