@@ -81,20 +81,20 @@ def get_mr_sequencevalue(inv):
         tipo = 1
         tipo_documento = fe_enums.TipoDocumento['CCE']
         sequence = inv.env['ir.sequence'].next_by_code(
-            'sequece.electronic.doc.confirmation')
+            'sequence.electronic.doc.confirmation')
 
     elif inv.state_invoice_partner == '2':
         detalle_mensaje = 'Aceptado parcial'
         tipo = 2
         tipo_documento = fe_enums.TipoDocumento['CPCE']
         sequence = inv.env['ir.sequence'].next_by_code(
-            'sequece.electronic.doc.partial.confirmation')
+            'sequence.electronic.doc.partial.confirmation')
     else:
         detalle_mensaje = 'Rechazado'
         tipo = 3
         tipo_documento = fe_enums.TipoDocumento['RCE']
         sequence = inv.env['ir.sequence'].next_by_code(
-            'sequece.electronic.doc.reject')
+            'sequence.electronic.doc.reject')
 
     return {'detalle_mensaje': detalle_mensaje, 'tipo': tipo, 'tipo_documento': tipo_documento, 'sequence': sequence}
 
