@@ -203,15 +203,13 @@ class AccountInvoiceElectronic(models.Model):
     consecutive_number_receiver = fields.Char(string="Número Consecutivo Receptor", required=False, copy=False, readonly=True, index=True)
 
     state_send_invoice = fields.Selection([('aceptado', 'Aceptado'),
-                                          ('rechazado', 'Rechazado'),
-                                          ('error', 'Error'),
-                                          ('na', 'No Aplica'),
-                                          ('ne', 'No Encontrado')],
-                                          ('firma_invalida', 'Firma Inválida'),
-                                          ('procesando', 'Procesando'),
-                                         'Estado FE Proveedor',
-                                         copy=False)
-
+                                           ('rechazado', 'Rechazado'),
+                                           ('error', 'Error'),
+                                           ('na', 'No Aplica'),
+                                           ('ne', 'No Encontrado'),
+                                           ('firma_invalida', 'Firma Inválida'),
+                                           ('procesando', 'Procesando')],
+                                         'Estado FE Proveedor')
 
     state_tributacion = fields.Selection([('aceptado', 'Aceptado'),
                                           ('rechazado', 'Rechazado'),
@@ -221,8 +219,7 @@ class AccountInvoiceElectronic(models.Model):
                                           ('procesando', 'Procesando'),
                                           ('na', 'No Aplica'),
                                           ('ne', 'No Encontrado')],
-                                         'Estado FE',
-                                         copy=False)
+                                         'Estado FE')
 
     state_invoice_partner = fields.Selection(
         [('1', 'Aceptado'), 
