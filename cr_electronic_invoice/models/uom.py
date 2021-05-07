@@ -7,8 +7,8 @@ class UoM(models.Model):
     code = fields.Char(string="Code", required=False, )
 
 
-class UoMCategory(models.Model):
-    _inherit = "uom.category"
-    measure_type = fields.Selection(selection_add=[('area', 'Area'), 
-                                                   ('services', 'Services'), 
-                                                   ('rent', 'Rent'), ])
+#class UoMCategory(models.Model):
+#    _inherit = "uom.category"
+#    measure_type = fields.Selection(selection_add=[('area', 'Area'), 
+#                                                   ('services', 'Services'), 
+#                                                   ('rent', 'Rent'), ])
