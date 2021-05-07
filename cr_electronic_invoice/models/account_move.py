@@ -192,11 +192,11 @@ class InvoiceLineElectronic(models.Model):
 			 ('non_tax_deductible', '=', True),
 			 ('active', '=', True)],
 			 limit=1)
-		    if new_tax:
-			    taxes.append((3, tax.id))
-			    taxes.append((4, new_tax.id))
-		    else:
-			    raise UserError(_('There is no "Non tax deductible" tax with the tax percentage of this product'))
+                    if new_tax:
+                            taxes.append((3, tax.id))
+                            taxes.append((4, new_tax.id))
+                    else:
+                            raise UserError(_('There is no "Non tax deductible" tax with the tax percentage of this product'))
             self.invoice_line_tax_ids = taxes
         else:
             self.non_tax_deductible = False
@@ -1020,6 +1020,7 @@ class AccountInvoiceElectronic(models.Model):
                 total_impuestos = 0.0
                 base_subtotal = 0.0
                 _old_rate_exoneration = False
+                _no_CABYS_code = False
 
                 for inv_line in inv.invoice_line_ids:
                     if inv_line.display_type:  # skip sections and notes
@@ -1088,6 +1089,12 @@ class AccountInvoiceElectronic(models.Model):
                                 line["codigoCabys"] = inv_line.product_id.cabys_code
                             elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
                                 line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
+                            else:
+                                _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                                continue
+                        else:
+                                _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                                continue
 
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
@@ -1206,6 +1213,16 @@ class AccountInvoiceElectronic(models.Model):
                 # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
                 if not inv.origin:
                     inv.origin = inv.invoice_id.display_name
+
+
+                if _no_CABYS_code and inv.tipo_documento != 'NC':  # CAByS is not required for financial NCs
+                    inv.message_post(
+                                subject='Error',
+                                body=_no_CABYS_code)
+                    if inv.tipo_documento == 'FEC':
+                                raise UserError(_no_CABYS_code)
+                    continue
+
 
                 if _old_rate_exoneration:
                     inv.state_tributacion = 'error'
@@ -1411,13 +1428,23 @@ class AccountInvoiceElectronic(models.Model):
 
             super(AccountInvoiceElectronic, inv).action_post()
             if not inv.number_electronic:
-                response_json = api_facturae.get_clave_hacienda(inv,
+                   # if journal doesn't have sucursal use default from company
+                   sucursal_id = inv.journal_id.sucursal
+                   if not sucursal_id:
+                           sucursal_id = self.env.user.company_id.sucursal_MR
+
+                   # if journal doesn't have terminal use default from company
+                   terminal_id = inv.journal_id.terminal
+                   if not terminal_id:
+                           sucursal_id = self.env.user.company_id.terminal_MR
+
+                   response_json = api_facturae.get_clave_hacienda(inv,
                                                             inv.tipo_documento,
                                                             sequence,
-                                                            inv.journal_id.sucursal,
-                                                            inv.journal_id.terminal)
-                inv.number_electronic = response_json.get('clave')
-                inv.sequence = response_json.get('consecutivo')
+                                                            sucursal_id,
+                                                            terminal_id)
+                   inv.number_electronic = response_json.get('clave')
+                   inv.sequence = response_json.get('consecutivo')
             inv.name = inv.sequence
             inv.state_tributacion = False
             inv.invoice_amount_text = ''
