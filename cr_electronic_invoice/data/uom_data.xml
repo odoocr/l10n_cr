@@ -7,17 +7,14 @@
         -->
         <record id="product_uom_categ_area" model="uom.category">
             <field name="name">Area</field>
-            <field name="measure_type">area</field>
         </record>
 
         <record id="product_uom_categ_service" model="uom.category">
             <field name="name">Services</field>
-            <field name="measure_type">services</field>
         </record>
 
         <record id="product_uom_categ_rent" model="uom.category">
             <field name="name">Rent</field>
-            <field name="measure_type">rent</field>
         </record>
 
         <!--
