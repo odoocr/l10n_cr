@@ -287,7 +287,7 @@ class AccountInvoiceElectronic(models.Model):
     state_email = fields.Selection([('no_email', 'Sin cuenta de correo'), (
         'sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
 
-    invoice_amount_text = fields.Char(string='Monto en Letras', readonly=True, required=False, copy=False)
+    invoice_amount_text = fields.Char(string='Monto en Letras', required=False, copy=False)
 
     ignore_total_difference = fields.Boolean(string="Ingorar Diferencia en Totales", required=False, default=False)
 
