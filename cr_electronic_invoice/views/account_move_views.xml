@@ -17,7 +17,7 @@
                 </xpath>
 
                 <field name="narration" position="before">
-                    <field name="invoice_amount_text"/>
+                    <field name="invoice_amount_text" readonly="1"/>
                 </field>
                 <field name="partner_id" position="after">
                     <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": [("type","in", ("in_invoice", "in_refund"))]}'/>
