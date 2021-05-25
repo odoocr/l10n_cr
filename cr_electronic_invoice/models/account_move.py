@@ -311,6 +311,8 @@ class AccountInvoiceElectronic(models.Model):
     @api.onchange('partner_id', 'company_id')
     def _get_economic_activities(self):
         for inv in self:
+            inv.economic_activity_id = False
+            inv.economic_activities_ids = []
             if inv.type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
                     inv.economic_activities_ids = inv.partner_id.economic_activities_ids
