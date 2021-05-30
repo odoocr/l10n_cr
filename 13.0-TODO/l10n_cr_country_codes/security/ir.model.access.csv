@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_ResCountryCounty,res.country.county,model_res_country_county,account.group_account_invoice,1,0,0,0
-access_ResCountryDistrict,res.country.district,model_res_country_district,account.group_account_invoice,1,0,0,0
-access_ResCountryNeighborhood,res.country.neighborhood,model_res_country_neighborhood,account.group_account_invoice,1,0,0,0
-access_ResCountryCountyAll,res.country.county.all,model_res_country_county,,1,0,0,0
-access_ResCountryDistrictAll,res.country.district.all,model_res_country_district,,1,0,0,0
-access_ResCountryNeighborhoodAll,res.country.neighborhood.all,model_res_country_neighborhood,,1,0,0,0
