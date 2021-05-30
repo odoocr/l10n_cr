@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
 
         <!-- Account Tax Group -->
         <record id="tax_group_IVA0" model="account.tax.group">
@@ -360,7 +360,7 @@
             <field name="sequence">10</field>
             <field name="iva_tax_desc">Transitorio 8%</field>
             <field name="iva_tax_code">07</field>
-        </record>
+        </record>z
 
         <record id="iva_tax_14_ND" model="account.tax">
             <field name="tax_code">01</field>

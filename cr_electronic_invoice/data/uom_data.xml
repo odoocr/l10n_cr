@@ -171,7 +171,7 @@
             <field name="uom_type">smaller</field>
         </record>
 
-        <record id="product_uom_i" model="uom.uom">
+        <record id="product_uom_int" model="uom.uom">
             <field name="category_id" ref="uom.product_uom_categ_unit"/>
             <field name="name">Intereses</field>
             <field name="code">I</field>

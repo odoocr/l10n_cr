@@ -948,8 +948,8 @@ class AccountInvoiceElectronic(models.Model):
         for inv in invoices:
             current_invoice += 1
 
-            if not inv.sequence or not inv.sequence.isdigit():  # or (len(inv.number) == 10):
-                inv.state_tributacion = 'na'
+            if not inv.sequence or not inv.sequence.isdigit() or inv.company_id.frm_ws_ambiente == 'disabled' or \
+                    inv.company_id.date_expiration_sign < datetime.datetime.now():  # or (len(inv.number) == 10):
                 _logger.info('E-INV CR - Ignored invoice:%s', inv.number)
                 continue
 
@@ -1344,9 +1344,6 @@ class AccountInvoiceElectronic(models.Model):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 inv.tipo_documento = None
                 continue
-
-            if inv.partner_id.has_exoneration and inv.partner_id.date_expiration and (inv.partner_id.date_expiration < datetime.date.today()):
-                raise UserError('La exoneración de este cliente se encuentra vencida')
 
             currency = inv.currency_id
             sequence = False

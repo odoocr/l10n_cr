@@ -31,6 +31,7 @@ class CompanyElectronic(models.Model):
     commercial_name = fields.Char(string="Commercial Name", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
+    date_expiration_sign = fields.Datetime(string="Fecha de Vencimiento",)
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     district_id = fields.Many2one("res.country.district", string="District", required=False)
     county_id = fields.Many2one("res.country.county", string="Canton", required=False)
@@ -157,11 +158,26 @@ class CompanyElectronic(models.Model):
 
     @api.multi
     def test_get_token(self):
+        self.get_expiration_date()
         token_m_h = api_facturae.get_token_hacienda(
             self.env.user, self.frm_ws_ambiente)
         if token_m_h:
-           _logger.info('E-INV CR - I got the token')
-        return 
+            self.message_post(
+                subject='Info',
+                body="Token Correcto")
+        else:
+            self.message_post(
+                subject='Error',
+                body="Datos Incorrectos")
+        return
+
+    def get_expiration_date(self):
+        if self.signature and self.frm_pin:
+            self.date_expiration_sign = api_facturae.p12_expiration_date(self.signature, self.frm_pin)
+        else:
+            self.message_post(
+                subject='Error',
+                body="Signature requerido")
 
     @api.multi
     def action_get_economic_activities(self):

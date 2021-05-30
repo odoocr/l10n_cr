@@ -77,6 +77,7 @@
                                 <field name="frm_ws_identificador"/>
                                 <field name="frm_ws_password" password="True"/>
                                 <field name="frm_pin" password="True"/>
+                                <field name="date_expiration_sign"/>
                             </group>
                             <group cols="2">
                                 <button name="test_get_token" type="object" string="Test get token" colspan="2" />
