@@ -125,7 +125,7 @@ class PartnerElectronic(models.Model):
                 'message': _('Company VAT is invalid')
             }
             return {'value': {'vat': ''}, 'warning': alert}
-    
+
     @api.multi
     def check_exonerations(self):
         clients = self.env["res.partner"].search([("has_exoneration", "=", True), ("date_expiration", "<", datetime.today())])
