@@ -1,0 +1,19 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<!-- Copyright 2018 Carlos Wong, Akurey S.A.
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_currency_rate_tree_inherit_extension" model="ir.ui.view">
+        <field name="name">res.currency.rate.tree.inherit.extension</field>
+        <field name="model">res.currency.rate</field>
+        <field name="inherit_id" ref="base.view_currency_rate_tree"/>
+        <field name="arch" type="xml">
+            <tree>
+                <field name='original_rate'/>
+                <field name='rate_2'/>
+                <field name='original_rate_2'/>
+                <field name='write_date'/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

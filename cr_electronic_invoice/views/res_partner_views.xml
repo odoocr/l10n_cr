@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="view_res_partner_inherit" 
+            model="ir.ui.view">
+            <field name="name">res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <data>
+                     <field name="property_payment_term_id" 
+                        position="after">
+                        <field name="payment_methods_id" 
+                            groups="account.group_account_invoice"/>
+                    </field>
+
+                    <field name="vat" position="after">
+                        <field name="identification_id"/>
+                        <field name="supplier_rank" invisible="1" readonly="1"/>
+                    </field>
+
+                    <xpath expr="//form/sheet/notebook" position="before">
+                        <group col="7">
+                            <separator colspan="7"/>
+                            <field name="activity_id" domain="[('id', 'in', economic_activities_ids)]" options="{&quot;no_create&quot;: True, &quot;active_test&quot;: False}" colspan="5" />
+                            <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" colspan="2" /> 
+                            <field name="economic_activities_ids" readonly="0"  widget="section_and_note_one2many" mode="tree" context="{'partner_id': id}" colspan="7" >
+                                <tree editable="bottom" >
+                                <field name="code" />
+                                <field name="name"/>
+                                <field name="sale_type"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </xpath>
+
+                    <field name="category_id" position="after">
+                        
+                        <field name="has_exoneration" attrs="{'invisible': [('supplier_rank', '>', 0)]}" />
+                        <field name="export" attrs="{'invisible': [('supplier_rank', '>', 0)]}" />
+                    </field>
+                </data>
+                <xpath expr="//page[3]" position="after">
+                    <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">
+                        <group col="2">
+                            <field name="exoneration_number"/>
+                            <field name="type_exoneration"/>
+                            <field name="institution_name"/>
+                            <field name="date_issue"/>
+                            <field name="date_expiration"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

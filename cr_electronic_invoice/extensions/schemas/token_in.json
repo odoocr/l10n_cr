@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Esquema Respuesta Token Hacienda",
+  "type": "object",
+  "properties": {
+    "resp": {
+      "type": "object",
+      "properties": {
+        "acces_token": {"type": "string"},
+        "expires_in": {"type": "number"},
+        "refresh_expires_in": {"type": "number"},
+        "refresh_token": {"type": "string"},
+        "token type": {"type": "string"},
+        "id_token": {"type": "string"},
+        "not-before-policy": {"type": "number"},
+        "session_state": {"type": "string"}
+      },
+      "required": ["access_token", "refresh_token", "id_token"]
+    }
+  },
+  "additionalProperties": false,
+  "required": ["resp"]
+}

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="invoice_form_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.form.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="comment" position="before">
+                    <field name="invoice_amount_text"/>
+                </field>
+                <field name="partner_id" position="before">
+                    <field name="economic_activity_id" required="1" domain="[('active', '=', True)]" options='{"no_open": True, "no_create": True}' />
+                    <field name="number_electronic" readonly="1"/>
+                    <field name="sequence" readonly="1"/>
+                </field>
+                <field name="payment_term_id" position="before">
+                    <field name="tipo_documento" required="1" domain="[('id', 'in', ('FE','FEE','TE')),]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                </field>
+                <field name="payment_term_id" position="after">
+                    <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <!--field name="sale_conditions_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/-->
+                </field>
+                <field name="date_invoice" position="attributes">
+                    <attribute name="readonly">1</attribute>
+                </field>
+                <field name="date_invoice" position="after">
+                    <field name="date_issuance" readonly="1"/>
+                </field>
+                <field name="fiscal_position_id" position="after">
+                    <field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="reference_document_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="not_loaded_invoice" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="not_loaded_invoice_date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="state_tributacion" readonly="1"/>
+                    <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
+                    <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion"/>
+                    <field name="state_invoice_partner" invisible="1"/>
+                    <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
+                    <field name="xml_comprobante" filename="fname_xml_comprobante"/>
+                    <field name="electronic_invoice_return_message" readonly="1"/>
+                    
+                    <!--<field name="electronic_invoice_return_message" readonly="1"/>-->
+                </field>
+                <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+                    <field name="categ_name" invisible="1" readonly="1" />
+                    <field name="product_code" invisible="1" readonly="1" />
+                    <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
+                    <field name="discount_note"/>
+                </xpath>
+                <xpath expr="//button[@name='action_invoice_draft']" position="after">
+                    <button name="load_xml_data" type="object" string="Cargar datos desde XMLs" colspan="2" attrs="{'invisible':['|', ('state_tributacion','!=', False), '|', ('xml_comprobante', '=', False), ('xml_respuesta_tributacion', '=', False)]}" />
+                    <button name="action_check_hacienda" type="object" string="Consultar Hacienda" colspan="2" attrs="{'invisible':[('state_tributacion','=', False)]}"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_invoice_sent']" position="attributes">
+                    <attribute name="invisible">False</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="invoice_supplier_form_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.supplier.form.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_invoice_draft']" position="after">
+                    <button name="action_send_mrs_to_hacienda" type="object" string="Enviar Mensaje Receptor" colspan="2" attrs="{'invisible':['|', ('tipo_documento','==','FEC'),('state_tributacion','!=', False), ('state_tributacion','!=','rechazado'),('state_tributacion','!=','error')]}"/>
+                    <button name="action_create_fec" type="object" string="Enviar FEC" colspan="2" attrs="{'invisible':['|', ('tipo_documento','!=','FEC'), ('state_tributacion','not in', (False,'rechazado', 'error'))]}"/>
+                    <button name="action_check_hacienda" type="object" string="Consultar Hacienda" colspan="2" />
+                </xpath>
+
+                <xpath expr="//group[1]" position="after">
+                    <group string="Facturación Electrónica" col="2">
+                        <group colspan="2" col="5">
+                            <field name='tipo_documento' colspan="5" />
+                            <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], }" colspan="5" />
+                            <field name="fname_xml_supplier_approval" invisible="1" colspan="5"/>
+                            <field name="xml_supplier_approval" filename="fname_xml_supplier_approval" colspan="4" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}" />
+                            <button name="load_xml_data" type="object" string="Cargar datos desde XML" colspan="1" attrs="{'invisible':['|', '|', ('xml_supplier_approval', '=', False), ('tipo_documento','=', 'FEC'), ('state','!=','draft')]}" />
+                        </group>
+                        <group colspan="2">
+                            <field name="state_invoice_partner" attrs="{'invisible':[('tipo_documento','=', 'FEC')]}"/>
+                            <field name="date_issuance" readonly="1"/>
+                            <field name="number_electronic" attrs="{'readonly':[('state','!=','draft')]}" />
+                            <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
+                            <field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
+                            <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
+                            <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
+                            <field name="state_tributacion" readonly="1"/>
+                        </group>
+                    </group>
+                </xpath>
+                <xpath expr="(//field[@name='amount_total'])[last()]" position="after">
+                    <field name="amount_tax_electronic_invoice"/>
+                    <field name="amount_total_electronic_invoice"/>
+                </xpath>
+                <xpath expr="(//field[@name='reference'])" position="after">
+                    <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": False}' />
+                    <field name="economic_activity_id" attrs="{'required':[('tipo_documento','=', 'FEC')]}" domain="[('id', 'in', economic_activities_ids),]" options='{"no_open": True, "no_create": True, "active_test": False}' />
+                </xpath>
+                
+            </field>
+        </record>
+
+        <record id="invoice_tree_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.tree.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                <tree position="attributes">
+                    <attribute name="decoration-danger">
+                         state_tributacion == 'rechazado'
+                    </attribute>
+                </tree>
+                <field name="state" position="before">
+                    <field name="tipo_documento" string="Doc Elect."/>
+                    <field name="sequence" string="Consecutivo"/>
+                    <field name="state_tributacion"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="invoice_supplier_tree_tree_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.tree.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_tree"/>
+            <field name="arch" type="xml">
+                <tree position="attributes">
+                    <attribute name="decoration-danger">
+                         state_tributacion == 'rechazado'
+                    </attribute>
+                </tree>
+                <field name="state" position="before">
+                    <field name="state_tributacion" string="Estado FE"/>
+                </field>
+            </field>
+        </record>
+
+        <!--record id="view_invoice_line_form_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.line.form.inherit</field>
+            <field name="model">account.invoice.line</field>
+            <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+                <field name="invoice_line_tax_ids" position="after">
+                    <field name="total_amount" invisible="1"/>
+                    <field name="total_discount" invisible="1"/>
+                    <field name="discount_note" invisible="1"/>
+                    <field name="total_tax" invisible="1"/>
+                </field>
+            </field>
+        </record-->
+
+        <record id="view_account_invoice_refund_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.refund.form.inherit</field>
+            <field name="model">account.invoice.refund</field>
+            <field name="inherit_id" ref="account.view_account_invoice_refund"/>
+            <field name="arch" type="xml">
+                <field name="description" position="after">
+                    <field name="reference_code_id"/>
+                    <field name="reference_document_id"/>
+                    <field name="invoice_id" readonly="1"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_tax_form_inherit" model="ir.ui.view">
+            <field name="name">account.tax.form.inherit</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="tax_code"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_account_invoice_filter_inherited" model="ir.ui.view">
+            <field name="name">account.invoice.select.inherited</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                <field name="number" string="Invoice" filter_domain="['|','|','|', ('number','ilike',self), ('origin','ilike',self), ('reference', 'ilike', self), ('partner_id', 'child_of', self)]"/>
+            </field>
+        </record>
+    </data>
+</odoo>

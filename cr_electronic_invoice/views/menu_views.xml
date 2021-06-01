@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_electronic_invoice" name="Facturación electrónica" parent="account.menu_finance_configuration"
+                  sequence="1"/>
+        <menuitem id="menu_payment_methods" name="Métodos de pago" parent="menu_electronic_invoice"
+                  sequence="1" action="action_payment_methods"/>
+        <menuitem id="menu_sale_conditions" name="Condiciones de Venta" parent="menu_electronic_invoice"
+                  sequence="2" action="action_sale_conditions"/>
+        <menuitem id="menu_reference_document" name="Documentos de referencia" parent="menu_electronic_invoice"
+                  sequence="3" action="action_reference_document"/>
+        <menuitem id="menu_reference_code" name="Código de referencia" parent="menu_electronic_invoice"
+                  sequence="4" action="action_reference_code"/>
+        <menuitem id="menu_resolution" name="Resoluciones" parent="menu_electronic_invoice"
+                  sequence="5" action="action_resolution"/>
+        <menuitem id="menu_code_type_product" name="Tipos de códigos(Productos)" parent="menu_electronic_invoice"
+                  sequence="6" action="action_code_type_product"/>
+        <menuitem id="menu_identification_type" name="Tipo de identificación" parent="menu_electronic_invoice"
+                  sequence="7" action="action_identification_type"/>
+        <menuitem id="menu_economic_activity" name="Actividad Económica" parent="menu_electronic_invoice"
+                  sequence="8" action="action_economic_activity"/>
+
+    </data>
+</odoo>

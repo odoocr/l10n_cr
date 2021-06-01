@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- reference documents -->
+        <record id="cr_electronic_invoice.ReferenceDocument_1" model="reference.document">
+            <field name="code">01</field>
+            <field name="name">Factura Electrónica</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_2" model="reference.document">
+            <field name="code">02</field>
+            <field name="name">Nota de Débito Electrónica</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_3" model="reference.document">
+            <field name="code">03</field>
+            <field name="name">Nota de Crédito Electrónica</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_4" model="reference.document">
+            <field name="code">04</field>
+            <field name="name">Tiquete Electrónico</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_5" model="reference.document">
+            <field name="code">05</field>
+            <field name="name">Nota de Despacho</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_6" model="reference.document">
+            <field name="code">06</field>
+            <field name="name">Contrato</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_7" model="reference.document">
+            <field name="code">07</field>
+            <field name="name">Procedimiento</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_8" model="reference.document">
+            <field name="code">08</field>
+            <field name="name">Comprobante emitido en contingencia</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_9" model="reference.document">
+            <field name="code">09</field>
+            <field name="name">Devolución mercadería</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_10" model="reference.document">
+            <field name="code">10</field>
+            <field name="name">Sustituye factura rechazada por el Ministerio de Hacienda</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_11" model="reference.document">
+            <field name="code">11</field>
+            <field name="name">Sustituye factura rechazada por el Receptor del comprobante</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_12" model="reference.document">
+            <field name="code">12</field>
+            <field name="name">Sustituye Factura de exportación</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_13" model="reference.document">
+            <field name="code">13</field>
+            <field name="name">*Facturación mes vencido</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_14" model="reference.document">
+            <field name="code">14</field>
+            <field name="name">Comprobante aportado por contribuyente del Regimen Simplificado</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_15" model="reference.document">
+            <field name="code">15</field>
+            <field name="name">Sustituye una Factura Electronica de Compra</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceDocument_99" model="reference.document">
+            <field name="code">99</field>
+            <field name="name">Otros</field>
+            <field name="active">true</field>
+        </record>
+
+    </data>
+</odoo>
