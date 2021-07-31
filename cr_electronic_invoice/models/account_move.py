@@ -1106,6 +1106,9 @@ class AccountInvoiceElectronic(models.Model):
                             for i in inv_line.tax_ids:
                                 if i.has_exoneration:
                                     _tax_exoneration = i.has_exoneration
+                                    _tax_rate = i.tax_root.amount
+                                    _tax_exoneration_rate = min(i.percentage_exoneration, _tax_rate)
+                                    _percentage_exoneration = _tax_exoneration_rate / _tax_rate
                                     taxes_lookup[i.id] = {'tax_code': i.tax_root.tax_code,
                                                           'tarifa': i.tax_root.amount,
                                                           'iva_tax_desc': i.tax_root.iva_tax_desc,
@@ -1145,7 +1148,7 @@ class AccountInvoiceElectronic(models.Model):
                                             _tax_amount_exoneration = tax_amount
 
                                         _line_tax -= _tax_amount_exoneration
-                                        _percentage_exoneration = taxes_lookup[i['id']]['exoneration_percentage']/100.0 #int(taxes_lookup[i['id']]['exoneration_percentage']) / 100
+
                                         tax["exoneracion"] = {
                                             "montoImpuesto": _tax_amount_exoneration,
                                             "porcentajeCompra": int(
