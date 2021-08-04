@@ -859,21 +859,19 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
 
     # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
     # se carga el xml devuelto por Hacienda
-    last_state = False
+    last_state = inv.state_tributacion
+    inv.state_tributacion = estado_m_h
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
-        last_state = inv.state_tributacion
-        inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
         if xml_firmado:
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-        inv.state_tributacion = estado_m_h
+        
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
@@ -885,11 +883,9 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     if inv.tipo_documento != 'FEC' and estado_m_h == 'aceptado' and (last_state is False or last_state == 'procesando'):
         # if not inv.partner_id.opt_out:
         if inv.type == 'in_invoice' or inv.type == 'in_refund':
-            email_template = self.env.ref(
-                'cr_electronic_invoice.email_template_invoice_vendor', False)
+            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
         else:
-            email_template = self.env.ref(
-                'account.email_template_edi_invoice', False)
+            email_template = self.env.ref('account.email_template_edi_invoice', False)
 
         attachments = []
 
@@ -1098,8 +1094,21 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                     if tax:
                         total_tax += float(tax_node.xpath("inv:Monto", namespaces=namespaces)[0].text)
 
-                        # TODO: Add exonerations
-                        taxes.append((4, tax.id))
+                        exonerations = tax_node.xpath("inv:Exoneracion", namespaces=namespaces)
+                        if exonerations:
+                            for exoneration_node in exonerations:
+                                exoneration_percentage = float(exoneration_node.xpath("inv:PorcentajeExoneracion", namespaces=namespaces)[0].text)
+                                tax = invoice.env['account.tax'].search(
+                                [('percentage_exoneration', '=', exoneration_percentage),
+                                ('type_tax_use', '=', 'purchase'),
+                                ('non_tax_deductible', '=', False),
+                                ('has_exoneration', '=', True),
+                                ('active', '=', True)],
+                                limit=1)
+                                taxes.append((4, tax.id))
+                        else:
+                            taxes.append((4, tax.id))
+
                     else:
                         if product_id and product_id.non_tax_deductible:
                             raise UserError(_('Tax code %s and percentage %s as non-tax deductible is not registered in the system' % (tax_code, tax_amount)))

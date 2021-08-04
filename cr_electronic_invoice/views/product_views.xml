@@ -10,12 +10,13 @@
                     <field name="code_type_id" required="0"/>
                     <field name="commercial_measurement" required="0"/>
                     <field name="cabys_code" />
-                </field>
-                <field name="type" position="after">
                     <field name="economic_activity_id" 
                         domain="[('active', '=', True)]" 
                         options='{"no_open": True, "no_create": True}'/>
                     <field name="non_tax_deductible" default="0" groups="" />
+                </field>
+                <field name="uom_po_id" position="after">
+                    <field name="commercial_measurement" required="0"/>
                 </field>
             </field>
         </record>
@@ -28,6 +29,7 @@
                     <field name="economic_activity_id" 
                         domain="[('active', '=', True)]" 
                         options='{"no_open": True, "no_create": True}'/>
+                    <field name="cabys_code" />
                 </field>
             </field>
         </record>

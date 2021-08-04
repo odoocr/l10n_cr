@@ -23,12 +23,12 @@ class ResCurrencyRate(models.Model):
 
     # Change decimal presicion to work with CRC where 1 USD is more de 555 CRC
     rate = fields.Float(string='Selling Rate',
-                        digits=dp.get_precision('Currency Rate Precision'))
+                        digits='Currency Rate Precision')
 
     # Costa Rica uses two exchange rates:
     #   - Buying exchange rate - used when a financial institutions buy USD from you (rate)
     #   - Selling exchange rate - used when financial institutions sell USD to you (rate_2)
-    rate_2 = fields.Float(string='Buying Rate', digits=dp.get_precision('Currency Rate Precision'),
+    rate_2 = fields.Float(string='Buying Rate', digits='Currency Rate Precision',
                           help='The buying rate of the currency to the currency of rate 1.')
 
     # Rate as it is get
