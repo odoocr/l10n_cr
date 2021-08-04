@@ -81,20 +81,20 @@ def get_mr_sequencevalue(inv):
         tipo = 1
         tipo_documento = fe_enums.TipoDocumento['CCE']
         sequence = inv.env['ir.sequence'].next_by_code(
-            'sequece.electronic.doc.confirmation')
+            'sequence.electronic.doc.confirmation')
 
     elif inv.state_invoice_partner == '2':
         detalle_mensaje = 'Aceptado parcial'
         tipo = 2
         tipo_documento = fe_enums.TipoDocumento['CPCE']
         sequence = inv.env['ir.sequence'].next_by_code(
-            'sequece.electronic.doc.partial.confirmation')
+            'sequence.electronic.doc.partial.confirmation')
     else:
         detalle_mensaje = 'Rechazado'
         tipo = 3
         tipo_documento = fe_enums.TipoDocumento['RCE']
         sequence = inv.env['ir.sequence'].next_by_code(
-            'sequece.electronic.doc.reject')
+            'sequence.electronic.doc.reject')
 
     return {'detalle_mensaje': detalle_mensaje, 'tipo': tipo, 'tipo_documento': tipo_documento, 'sequence': sequence}
 
@@ -229,7 +229,7 @@ def get_token_hacienda(inv, tipo_ambiente):
                 last_tokens_refresh[inv.company_id.id] = response_json.get(
                     'refresh_expires_in')
             else:
-                _logger.error('MAB - token_hacienda failed.  error: %s' % (response.status_code))
+                _logger.error('E-INV CR - token_hacienda failed.  error: %s' % (response.status_code))
 
         except requests.exceptions.RequestException as e:
             raise Warning(_('Error Obteniendo el Token desde MH. Excepcion %s' % (e)))
@@ -366,9 +366,8 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
     if inv._name == 'pos.order':
         plazo_credito = '0'
-        inv_statement_length = len(inv.statement_ids)
-        for statement_counter in range(inv_statement_length):
-            if inv.statement_ids[statement_counter].statement_id.journal_id.type == 'cash':
+        for payment in inv.payment_ids:
+            if payment.payment_method_id.is_cash_count:
                 payment_methods_id.append('01')
             else:
                 payment_methods_id.append('02')
@@ -506,7 +505,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
         if v.get('codigoCabys'):
             sb.Append('<Codigo>' + (v['codigoCabys']) + '</Codigo>')
-        
+
         if v.get('codigo'):
             sb.Append('<CodigoComercial>')
             sb.Append('<Tipo>04</Tipo>')
@@ -682,7 +681,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             error_caused_by = response.headers.get(
                 'X-Error-Cause') if 'X-Error-Cause' in response.headers else ''
             error_caused_by += response.headers.get('validation-exception', '')
-            _logger.info('Status: {}, Text {}'.format(
+            _logger.error('Status: {}, Text {}'.format(
                 response.status_code, error_caused_by))
 
             return {'status': response.status_code, 'text': error_caused_by}
@@ -789,7 +788,7 @@ def consulta_clave(clave, token, tipo_ambiente):
         'Content-Type': 'application/x-www-form-urlencoded',
     }
 
-    _logger.debug('MAB - consulta_clave - url: %s' % endpoint)
+    _logger.debug('E-INV CR - consulta_clave - url: %s' % endpoint)
 
     try:
         # response = requests.request("GET", url, headers=headers)
@@ -806,11 +805,11 @@ def consulta_clave(clave, token, tipo_ambiente):
             'respuesta-xml': response.json().get('respuesta-xml')
         }
     elif 400 <= response.status_code <= 499:
-        _logger.error('MAB - 400 - consulta_clave failed.  error: %s reason: %s',
+        _logger.error('E-INV CR - 400 - consulta_clave failed.  error: %s reason: %s',
                       response.status_code, response.reason)
         response_json = {'status': 400, 'ind-estado': 'error'}
     else:
-        _logger.error('MAB - consulta_clave failed.  error: %s',
+        _logger.error('E-INV CR - consulta_clave failed.  error: %s',
                       response.status_code)
         response_json = {'status': response.status_code,
                          'text': 'token_hacienda failed: %s' % response.reason}
@@ -832,7 +831,7 @@ def get_economic_activities(company):
         return {'status': -1, 'text': 'Excepcion %s' % e}
 
     if 200 <= response.status_code <= 299:
-        _logger.debug('MAB - get_economic_activities response: %s' % (response.json()))
+        _logger.debug('E-INV CR - get_economic_activities response: %s' % (response.json()))
         response_json = {
             'status': 200,
             'activities': response.json().get('actividades'),
@@ -841,7 +840,7 @@ def get_economic_activities(company):
     #elif 400 <= response.status_code <= 499:
     #    response_json = {'status': 400, 'ind-estado': 'error'}
     else:
-        _logger.error('MAB - get_economic_activities failed.  error: %s',
+        _logger.error('E-INV CR - get_economic_activities failed.  error: %s',
                       response.status_code)
         response_json = {'status': response.status_code,
                          'text': 'get_economic_activities failed: %s' % response.reason}
@@ -916,7 +915,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
                                                                                             raise_exception=False,
                                                                                             force_send=True)  # default_type='binary'
             except:
-                _logger.error('MAB - consulta documento error al enviar correo: %s',
+                _logger.error('E-INV CR - consulta documento error al enviar correo: %s',
                              inv.number_electronic)
 
             # limpia el template de los attachments
@@ -955,7 +954,7 @@ def send_message(inv, date_cr, xml, token, env):
         # raise Exception(e)
 
     if not (200 <= response.status_code <= 299):
-        _logger.error('MAB - ERROR SEND MESSAGE - RESPONSE:%s' %
+        _logger.error('E-INV CR - ERROR SEND MESSAGE - RESPONSE:%s' %
                       response.headers.get('X-Error-Cause', 'Unknown'))
         return {'status': response.status_code, 'text': response.headers.get('X-Error-Cause', 'Unknown')}
     else:
@@ -1027,7 +1026,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             invoice.payment_methods_id = partner.payment_methods_id
 
 
-        _logger.debug('MAB - load_lines: %s - account: %s' %
+        _logger.debug('E-INV CR - load_lines: %s - account: %s' %
                       (load_lines, account_id))
         
         product = False
@@ -1072,8 +1071,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 for tax_node in tax_nodes:
                     tax_code = re.sub(r"[^0-9]+", "", tax_node.xpath("inv:Codigo", namespaces=namespaces)[0].text)
                     tax_amount = float(tax_node.xpath("inv:Tarifa", namespaces=namespaces)[0].text)
-                    _logger.debug('MAB - tax_code: %s', tax_code)
-                    _logger.debug('MAB - tax_amount: %s', tax_amount)
+                    _logger.debug('E-INV CR - tax_code: %s', tax_code)
+                    _logger.debug('E-INV CR - tax_amount: %s', tax_amount)
 
                     if product_id and product_id.non_tax_deductible:
                         tax = invoice.env['account.tax'].search(
@@ -1116,7 +1115,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                         else:
                             raise UserError(_('Tax code %s and percentage %s is not registered in the system' % (tax_code, tax_amount)))
 
-                _logger.debug('MAB - impuestos de linea: %s' % (taxes))
+                _logger.debug('E-INV CR - impuestos de linea: %s' % (taxes))
                 columns = {
                     'name': line.xpath("inv:Detalle", namespaces=namespaces)[0].text,
                     'move_id': invoice.id,

@@ -7,7 +7,8 @@
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
                 <field name="type" position="after">
-                    <field name="code_type_id" required="1"/>
+                    <field name="code_type_id" required="0"/>
+                    <field name="commercial_measurement" required="0"/>
                     <field name="cabys_code" />
                     <field name="economic_activity_id" 
                         domain="[('active', '=', True)]" 

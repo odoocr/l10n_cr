@@ -81,7 +81,7 @@
                 <field name="date_order" position="after">
                     <field name="date_issuance" readonly="1"/>
                 </field>
-		<!--                <field name="account_move" position="after">
+		<field name="pos_reference" position="after">
                     <field name="reference_code_id" attrs="{'required':[('pos_order_id','!=',False)]}"/>
                     <field name="pos_order_id"/>
                     <field name="state_tributacion" readonly="1"/>
@@ -89,12 +89,15 @@
                     <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
                     <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
                     <field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
-		</field>-->
+		</field>
                 <xpath expr="//sheet[1]" position="after">
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
                         <field name="message_ids" widget="mail_thread"/>
                     </div>
+                </xpath>
+                <xpath expr="//button[@name='refund']" position="after">
+                    <button name="action_invoice_sent" type="object" string="Re-send mail" attrs="{'invisible':[('state_tributacion','!=','aceptado')]}"/>
                 </xpath>
             </field>
         </record>
@@ -195,12 +198,12 @@
                                 <tr t-foreach="o.lines" t-as="line">
                                     <td><span t-field="line.product_id"/></td>
                                     <td class="text-right">
-                                        <t t-if="o.state != 'cancel' and o.statement_ids">
+                                        <t t-if="o.state != 'cancel' and o.payment_ids">
                                             <span t-field="line.qty"/>
                                         </t>
                                     </td>
                                     <td class="text-right">
-                                        <t t-if="o.state != 'cancel' and o.statement_ids">
+                                        <t t-if="o.state != 'cancel' and o.payment_ids">
                                             <span t-esc="line.price_subtotal_incl"/>
                                         </t>
                                         <t t-if="line.discount != 0.0">
@@ -231,9 +234,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr t-foreach="o.statement_ids" t-as="d">
+                                <tr t-foreach="o.payment_ids" t-as="d">
                                     <td>
-                                        <span t-esc="d.statement_id.journal_id.name"/>
+                                        <span t-esc="d.payment_method_id.name"/>
                                     </td>
                                     <td>
                                         <span t-esc="d.amount"/>
