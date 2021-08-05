@@ -68,7 +68,8 @@ class AccountInvoiceRefund(models.TransientModel):
                                'reference_code_id': self.reference_code_id.id,
                                'reference_document_id': self.reference_document_id.id,
                                'economic_activity_id': self.invoice_id.economic_activity_id.id,
-                               'payment_methods_id': self.invoice_id.payment_methods_id.id}
+                               'payment_methods_id': self.invoice_id.payment_methods_id.id,
+                               'state_tributacion': False}
 
                 values = {**default_values, **fe_values}
 
