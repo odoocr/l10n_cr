@@ -36,123 +36,108 @@ class AccountInvoiceRefund(models.TransientModel):
 
     def reverse_moves(self, mode='refund'):
         if self.env.user.company_id.frm_ws_ambiente == 'disabled':
-            result = super(AccountInvoiceRefund, self).reverse_moves()
-            return result
+            return super(AccountInvoiceRefund, self).reverse_moves(mode)
         else:
-            inv_obj = self.env['account.move']
-            inv_tax_obj = self.env['account.tax']
-            inv_line_obj = self.env['account.move.line']
-            context = dict(self._context or {})
-            xml_id = False
+            moves = self.env['account.move'].browse(self.env.context['active_ids']) if self.env.context.get('active_model') == 'account.move' else self.move_id
 
-            for form in self:
-                created_inv = []
-                for inv in inv_obj.browse(context.get('active_ids')):
-                    #if  inv.type in ('in_invoice', 'in_refund')
-                    #    result = super(AccountInvoiceRefund, self).compute_refund()
-                    #    return result
-                    if inv.state in ['draft', 'proforma2', 'cancel']:
-                        raise UserError(_('Cannot refund draft/proforma/cancelled invoice.'))
-                    if inv.has_reconciled_entries:
-                        raise UserError(_(
-                            'Cannot refund invoice which is already reconciled, invoice should be unreconciled first. You can only refund this invoice.'))
-                    #if inv.reconciled and mode in ('cancel', 'modify'):
+            # Create default values.
+            default_values_list = []
+            for move in moves:
+                default_values = self._prepare_default_reversal(move)
 
-                    date = form.date or False
-                    description = inv.tipo_documento + ": " + inv.name + " " + form.reason
+                # ---------------------------------------------------------------------------------------------
+                # Added for electronic invoice 
+                # ---------------------------------------------------------------------------------------------
 
-                    if inv.tipo_documento in ('FE', 'TE') and inv.state_tributacion == 'rechazado':
-                        tipo_refund = 'out_invoice'
-                        tipo_doc = inv.tipo_documento
-                    elif inv.type == 'out_invoice':
-                        tipo_refund = 'out_refund'
-                        tipo_doc = 'NC'
-                    elif inv.type == 'in_invoice':
-                        tipo_refund = 'in_refund'
-                        tipo_doc = 'NC'
-                    else:
-                        tipo_doc = 'ND'
-                        tipo_refund = 'in_invoice'
+                if move.tipo_documento in ('FE', 'TE') and move.state_tributacion == 'rechazado':
+                    tipo_refund = 'out_invoice'
+                    tipo_doc = move.tipo_documento
+                elif move.type == 'out_invoice':
+                    tipo_refund = 'out_refund'
+                    tipo_doc = 'NC'
+                elif move.type == 'in_invoice':
+                    tipo_refund = 'in_refund'
+                    tipo_doc = 'NC'
+                else:
+                    tipo_doc = 'ND'
+                    tipo_refund = 'in_invoice'
 
-                    refund = inv.refund(form.invoice_id.date, date, description,
-                                        inv.journal_id.id, form.invoice_id.id,
-                                        form.reference_code_id.id, form.reference_document_id.id, tipo_refund, tipo_doc)
+                fe_values = {'invoice_id': self.invoice_id.id,
+                               'type': tipo_refund,
+                               'tipo_documento': tipo_doc,
+                               'reference_code_id': self.reference_code_id.id,
+                               'reference_document_id': self.reference_document_id.id,
+                               'economic_activity_id': self.invoice_id.economic_activity_id.id,
+                               'payment_methods_id': self.invoice_id.payment_methods_id.id}
 
-                    created_inv.append(refund.id)
+                values = {**default_values, **fe_values}
 
-                    if mode in ('cancel', 'modify'):
-                        movelines = inv.move_id.line_ids
-                        to_reconcile_ids = {}
-                        to_reconcile_lines = self.env['account.move.line']
-                        for line in movelines:
-                            if line.account_id.id == inv.account_id.id:
-                                to_reconcile_lines += line
-                                to_reconcile_ids.setdefault(
-                                    line.account_id.id, []).append(line.id)
-                            if line.reconciled:
-                                line.remove_move_reconcile()
+                default_values_list.append(values)
+                # --------------------------------------------------------------------------------------------
 
-                        refund.invoice_payment_term_id = inv.invoice_payment_term_id
-                        refund.action_post()
-                        for tmpline in refund.move_id.line_ids:
-                            if tmpline.account_id.id == inv.account_id.id:
-                                to_reconcile_lines += tmpline
-                        to_reconcile_lines.filtered(
-                            lambda l: l.reconciled is False).reconcile()
-                        if mode == 'modify':
-                            invoice = inv.read(
-                                inv_obj._get_refund_modify_read_fields())
-                            invoice = invoice[0]
-                            del invoice['id']
-                            invoice_lines = inv_line_obj.browse(
-                                invoice['invoice_line_ids'])
-                            invoice_lines = inv_obj.with_context(
-                                mode='modify')._refund_cleanup_lines(
-                                invoice_lines)
-                            tax_lines = inv_tax_obj.browse(
-                                invoice['tax_line_ids'])
-                            tax_lines = inv_obj._refund_cleanup_lines(
-                                tax_lines)
-                            invoice.update({
-                                'type': inv.type,
-                                'invoice_date': form.invoice_date,
-                                'state': 'draft',
-                                'number': False,
-                                'invoice_line_ids': invoice_lines,
-                                'tax_line_ids': tax_lines,
-                                'date': date,
-                                'origin': inv.origin,
-                                'fiscal_position_id': inv.fiscal_position_id.id,
-                                'invoice_id': inv.id,  # agregado
-                                'reference_code_id': form.reference_code_id.id,
-                                # agregado
-                            })
-                            for field in inv_obj._get_refund_common_fields():
-                                if inv_obj._fields[field].type == 'many2one':
-                                    invoice[field] = invoice[field] and invoice[field][0]
-                                else:
-                                    invoice[field] = invoice[field] or False
-                            inv_refund = inv_obj.create(invoice)
-                            if inv_refund.invoice_payment_term_id.id:
-                                inv_refund._onchange_payment_term_date_invoice()
-                            created_inv.append(inv_refund.id)
+            batches = [
+                [self.env['account.move'], [], True],   # Moves to be cancelled by the reverses.
+                [self.env['account.move'], [], False],  # Others.
+            ]
+            for move, default_vals in zip(moves, default_values_list):
+                is_auto_post = bool(default_vals.get('auto_post'))
+                is_cancel_needed = not is_auto_post and self.refund_method in ('cancel', 'modify')
+                batch_index = 0 if is_cancel_needed else 1
+                batches[batch_index][0] |= move
+                batches[batch_index][1].append(default_vals)
 
-                    xml_id = inv.type == 'out_invoice' and 'action_invoice_out_refund' or \
-                             inv.type == 'out_refund' and 'action_invoice_tree1' or \
-                             inv.type == 'in_invoice' and 'action_invoice_in_refund' or \
-                             inv.type == 'in_refund' and 'action_invoice_tree2'
+            # Handle reverse method.
+            moves_to_redirect = self.env['account.move']
+            for moves, default_values_list, is_cancel_needed in batches:
+                new_moves = moves._reverse_moves(default_values_list, cancel=is_cancel_needed)
 
-                    # Put the reason in the chatter
-                    subject = _("Invoice refund")
-                    body = description
-                    refund.message_post(body=body, subject=subject)
-            if xml_id:
-                result = self.env.ref('account.%s' % (xml_id)).read()[0]
-                invoice_domain = safe_eval(result['domain'])
-                invoice_domain.append(('id', 'in', created_inv))
-                result['domain'] = invoice_domain
-                return result
-            return True
+                if self.refund_method == 'modify':
+                    moves_vals_list = []
+                    for move in moves.with_context(include_business_fields=True):
+                        moves_vals_list.append(move.copy_data({'date': self.date or move.date})[0])
+                    new_moves = self.env['account.move'].create(moves_vals_list)
+
+                moves_to_redirect |= new_moves
+
+                for new_move in new_moves:
+                    if not new_move.number_electronic:
+                        # if journal doesn't have sucursal use default from company
+                        sucursal_id = new_move.journal_id.sucursal
+                        if not sucursal_id:
+                            sucursal_id = self.env.user.company_id.sucursal_MR
+
+                        # if journal doesn't have terminal use default from company
+                        terminal_id = new_move.journal_id.terminal
+                        if not terminal_id:
+                            sucursal_id = self.env.user.company_id.terminal_MR
+
+                        response_json = api_facturae.get_clave_hacienda(new_move,
+                                                                    new_move.tipo_documento,
+                                                                    new_move.name,
+                                                                    sucursal_id,
+                                                                    terminal_id)
+
+                        new_move.number_electronic = response_json.get('clave')
+                        new_move.sequence = response_json.get('consecutivo')
+                        new_move.name = new_move.sequence
+
+        # Create action.
+        action = {
+            'name': _('Reverse Moves'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+        }
+        if len(moves_to_redirect) == 1:
+            action.update({
+                'view_mode': 'form',
+                'res_id': moves_to_redirect.id,
+            })
+        else:
+            action.update({
+                'view_mode': 'tree,form',
+                'domain': [('id', 'in', moves_to_redirect.ids)],
+            })
+        return action
 
 
 class InvoiceLineElectronic(models.Model):
@@ -703,38 +688,6 @@ class AccountInvoiceElectronic(models.Model):
                                             'E-INV CR - Error inesperado en Send Acceptance File - Abortando')
                                         return
 
-    @api.returns('self')
-    def refund(self, invoice_date=None, date=None, description=None,
-               journal_id=None, invoice_id=None,
-               reference_code_id=None, reference_document_id=None, 
-               invoice_type=None, doc_type=None):
-
-        if self.env.user.company_id.frm_ws_ambiente == 'disabled':
-            new_invoices = super(AccountInvoiceElectronic, self)._reverse_moves(cancel=True)
-            return new_invoices
-        else:
-            new_invoices = self.browse()
-            for invoice in self:
-                # create the new invoice                
-                values = [{'invoice_id': invoice_id,
-                               'type': invoice_type,
-                               'tipo_documento': doc_type,
-                               'reference_code_id': reference_code_id,
-                               'reference_document_id': reference_document_id,
-                               'economic_activity_id': invoice.economic_activity_id.id,
-                               'payment_methods_id': invoice.payment_methods_id.id}]
-                refund_invoice = self._reverse_moves(values)
-                doc_type = {
-                    'out_invoice': ('customer invoices refund'),
-                    'in_invoice': ('vendor bill refund'),
-                    'out_refund': ('customer refund refund'),
-                    'in_refund': ('vendor refund refund')
-                }
-                message = _("This %s has been created from: <a href=# data-oe-model=account.move data-oe-id=%d>%s</a>") % (doc_type[invoice.type], invoice.id, invoice.name)
-                refund_invoice.message_post(body=message)
-                new_invoices += refund_invoice
-            return new_invoices
-
     @api.onchange('partner_id', 'company_id')
     def _onchange_partner_id(self):
         super(AccountInvoiceElectronic, self)._onchange_partner_id()
@@ -1094,9 +1047,6 @@ class AccountInvoiceElectronic(models.Model):
                             else:
                                 _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
                                 continue
-                        else:
-                                _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
-                                continue
 
                             if inv_line.product_id.cabys_code:
                                 line["codigoCabys"] = inv_line.product_id.cabys_code
@@ -1220,11 +1170,6 @@ class AccountInvoiceElectronic(models.Model):
                         'Detalle': escape('Servicio salon 10%'),
                         'MontoCargo': total_servicio_salon
                     }
-
-                # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
-                if not inv.origin:
-                    inv.origin = inv.invoice_id.display_name
-
 
                 if _no_CABYS_code and inv.tipo_documento != 'NC':  # CAByS is not required for financial NCs
                     inv.message_post(
