@@ -1195,7 +1195,7 @@ class AccountInvoiceElectronic(models.Model):
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     product_amount = round(i['base'] * quantity)
-                                    tax_amount = round(product_amount * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                    tax_amount = round((product_amount - descuento) * taxes_lookup[i['id']]['tarifa'] / 100, 5)
                                     _line_tax += tax_amount
                                     tax = {
                                         'codigo': taxes_lookup[i['id']]['tax_code'],
