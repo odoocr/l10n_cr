@@ -23,10 +23,8 @@ function httpGet(theUrl)
 }
 
 function obtener_nombre(vat) {
-        document.getElementsByName("vat")[0].value = vat
-        var host = window.location.host
-        var end_point = "http://" + host + "/cedula/" + vat
-        httpGet(end_point)
+        var end_point = window.location.origin + '/cedula/' + vat;
+        httpGet(end_point);
         }
 
 
