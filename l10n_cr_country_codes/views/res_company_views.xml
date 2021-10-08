@@ -6,18 +6,13 @@
             <field name="model">res.company</field>
             <field name="inherit_id" ref="base.view_company_form"/>
             <field name="arch" type="xml">
-                <field name="city" position="attributes">
-                    <attribute name="attrs">{'invisible':
-                        [('country_id','=',%(base.cr)d)]}
-                    </attribute>
-                </field>
+                <xpath expr="//field[@name='city']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('country_id','=',%(base.cr)d)]}</attribute>
+                </xpath>
 
-                <field name="zip" position="attributes">
-                    position="attributes">
-                    <attribute name="attrs">{'invisible':
-                        [('country_id','=',%(base.cr)d)]}
-                    </attribute>
-                </field>
+                <xpath expr="//field[@name='zip']" position="replace">
+                    <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                </xpath>
 
                 <field name="state_id" position="after">
                     <field name="county_id" class="o_address_state"

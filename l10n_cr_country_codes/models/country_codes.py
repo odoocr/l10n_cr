@@ -12,9 +12,9 @@ class ResCountryCounty(models.Model):
     _description = "Country State County Subdivision"
     _order = 'name'
 
-    code = fields.Char(string="Código", required=True, )
-    state_id = fields.Many2one("res.country.state", string="Provincia", required=True)
-    name = fields.Char(string="Nombre", required=True, )
+    code = fields.Char(string="Code", required=True, )
+    state_id = fields.Many2one("res.country.state", string="Province", required=True)
+    name = fields.Char(string="Name", required=True, )
 
 
 class ResCountryDistrict(models.Model):
@@ -22,9 +22,9 @@ class ResCountryDistrict(models.Model):
     _description = "Country State County District Subdivision"
     _order = 'name'
 
-    code = fields.Char(string="Código", required=True, )
-    county_id = fields.Many2one("res.country.county", string="Cantón", required=True)
-    name = fields.Char(string="Nombre", required=True, )
+    code = fields.Char(string="Code", required=True, )
+    county_id = fields.Many2one("res.country.county", string="Canton", required=True)
+    name = fields.Char(string="Name", required=True, )
 
 
 class ResCountryNeighborhood(models.Model):
@@ -32,11 +32,12 @@ class ResCountryNeighborhood(models.Model):
     _description = "Country State County District Neighborhood Subdivision"
     _order = 'name'
 
-    code = fields.Char(string="Código", required=True, )
-    district_id = fields.Many2one("res.country.district", string="Distrito", required=True)
-    name = fields.Char(string="Nombre", required=True, )
+    code = fields.Char(string="Code", required=True, )
+    district_id = fields.Many2one("res.country.district", string="District", required=True)
+    name = fields.Char(string="Name", required=True, )
 
 
+# TODO: Esto Realmente se necesita ¿? 08/10/2021: Norlan Ruiz
 class ResCountryState(models.Model):
     _inherit = 'res.country.state'
 
