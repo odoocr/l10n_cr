@@ -1,5 +1,9 @@
 function httpGet(theUrl)
 {
+
+    var nombre;
+    var identificacion;
+    var activity;
     if (window.XMLHttpRequest)
     {// code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp=new XMLHttpRequest();
@@ -14,20 +18,19 @@ function httpGet(theUrl)
         {
             //alert(xmlhttp.responseText)
             var obj = JSON.parse(xmlhttp.responseText);
-            document.getElementsByName("name")[0].value = obj.nombre
-            document.getElementsByName("identification_id")[0].value = parseInt(obj.identification_id)
+            document.getElementsByName("name")[0].value = obj.nombre;
+            activity = obj.activity;
+            nombre = obj.nombre;
+            identificacion = parseInt(obj.identification_id);
+
         }
     }
     xmlhttp.open("GET", theUrl, false);
-    xmlhttp.send();    
+    xmlhttp.send();
+    var result = {'nombre': nombre, 'identificacion': identificacion, 'activity': activity};
+
+    return result
+
 }
-
-function obtener_nombre(vat) {
-        document.getElementsByName("vat")[0].value = vat
-        var host = window.location.host
-        var end_point = "http://" + host + "/cedula/" + vat
-        httpGet(end_point)
-        }
-
 
       
