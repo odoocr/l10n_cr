@@ -24,7 +24,7 @@ class ImportInvoiceImportWizardCR(models.TransientModel):
         if self.static_product_id and self.static_product_id.property_account_expense_id:
             self.account_id = self.static_product_id.property_account_expense_id
 
-    @api.multi
+    
     def _create_invoice_from_file(self, attachment):
 
         try:
