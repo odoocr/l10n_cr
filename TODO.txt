@@ -1,0 +1,33 @@
+[LOG] 2021-10-09 12:25 a.m.
+
+This version is for testing only, it is still under development, use it at your own risk, neither Odoocr and the developers who make modifications to this version of code are responsible for the errors it generates.
+
+*****DONE:
+*l10n_cr_country_codes
+*l10n_cr_hacienda_info_query
+*res_currency_cr_adapter
+
+
+*****PROGRESS:
+    cr_electronic_invoice
+
+        Testes:
+            * Electronic Invoice
+            * Electronic Credit Note
+            * Electronic Credit Note
+            * Electronic Ticket
+        ADD:
+            * Odoo original format in documents
+                * Consider if migrating cr_electronic_invoice_qweb_fe. is required ?
+
+*****TO-DO:
+    *cr_electronic_invoice
+        - Exoneration documents
+        - FEE
+        - FEC
+        - Accept or reject supplier documents
+        - Import Documents (account.invoice.import.wizard)
+
+
+    *cr_electronic_invoice_pos
+        - ALL
