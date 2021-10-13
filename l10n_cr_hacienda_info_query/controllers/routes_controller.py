@@ -38,14 +38,23 @@ class actualizar_pos_api(http.Controller):
             #Respuesta de la API
             if peticion.status_code in (200,202) and len(peticion._content) > 0:
                 contenido = json.loads(str(peticion._content,'utf-8'))
-                http.request.env.cr.execute("UPDATE res_company SET ultima_respuesta='%s' WHERE id=%s" % (ultimo_mensaje,company_id.id))
+
+                request.env.company.ultima_respuesta = ultimo_mensaje 
 
                 if 'nombre' in contenido:
 
                     identification_id = ''
                     res_partner = http.request.env['res.partner']
 
-                    if 'identification_id' in res_partner:
+                    if 'activity_id' in res_partner._fields:
+                        actividades = contenido.get('actividades')
+                        act = []
+                        for actividad in actividades:
+                            activity = http.request.env['economic.activity'].sudo().search([('code', '=', actividad.get('codigo')), ('active', 'in', [False, True])])
+                            acti = {'id': activity.id, 'name': activity.name}
+                            act.insert(len(act), acti)
+
+                    if 'identification_id' in res_partner._fields:
 
                         id_type = http.request.env['identification.type']
 
@@ -63,9 +72,11 @@ class actualizar_pos_api(http.Controller):
                                     identification_id = id_type.search([('code', '=', '05')], limit=1).id
                     if contenido.get('nombre') != None:
                         name = contenido.get('nombre')
-                        retorno = {"nombre":str(name),"identification_id":str(identification_id)}
+                        if 'activity_id' in res_partner._fields:
+                            retorno = {"nombre":str(name),"identification_id":str(identification_id), "activity": act}
+                        else:
+                            retorno = {"nombre":str(name)}
                         return '%s' % str(retorno).replace("'","\"")
 
-            #Si la petición arroja error se almacena en el campo ultima_respuesta de res_company. Nota: se usa execute ya que el metodo por objeto no funciono
             else:
-                http.request.env.cr.execute("UPDATE  res_company SET ultima_respuesta='%s' WHERE id=%s" % (ultimo_mensaje,self.company_id.id))
+                request.env.company.ultima_respuesta = ultimo_mensaje  

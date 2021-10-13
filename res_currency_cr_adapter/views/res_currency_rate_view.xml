@@ -9,11 +9,33 @@
         <field name="arch" type="xml">
             <tree>
                 <field name='original_rate'/>
-                <field name='rate_2'/>
+                <field name='rate_2' digits="[12,12]"/>
                 <field name='original_rate_2'/>
                 <field name='write_date'/>
                 <field name="company_id" groups="base.group_multi_company"/>
             </tree>
+        </field>
+    </record>
+    <!-- A preview of the last 25 exchange rates is added -->
+    
+    <record id="view_currency_form" model="ir.ui.view">
+        <field name="name">res.currency.form</field>
+        <field name="model">res.currency</field>
+        <field name="inherit_id" ref="base.view_currency_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <field string="Rates" name="rate_ids" widget="one2many">
+                    <tree string="Rates" editable="top" limit="25">
+                        <field name="name"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="rate" digits="[12,12]" optional="hide"/>
+                        <field name="original_rate" optional="show"/>
+                        <field name="rate_2" digits="[12,12]" optional="hide"/>
+                        <field name="original_rate_2" optional="show"/>
+                        <field name="write_date" optional="show"/>
+                    </tree>
+                </field>
+            </xpath>
         </field>
     </record>
 </odoo>

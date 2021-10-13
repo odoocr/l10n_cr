@@ -2,7 +2,7 @@
 
 {
     'name': 'Facturación electrónica Costa Rica',
-    'version': '13.0.1.0.0',
+    'version': '14.0.1.0.0',
     'author': 'Odoo CR Community',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
@@ -57,6 +57,7 @@
         'views/economic_activity_views.xml',
         'views/menu_views.xml',
         'views/account_move_reversal_views.xml',
+        'views/report_invoice_document.xml',
         'security/ir.model.access.csv',
     ],
     'external_dependencies': {
