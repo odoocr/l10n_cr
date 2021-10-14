@@ -1195,7 +1195,7 @@ class AccountInvoiceElectronic(models.Model):
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     product_amount = round(i['base'] * quantity)
-                                    tax_amount = round(product_amount * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                    tax_amount = round((product_amount - descuento) * taxes_lookup[i['id']]['tarifa'] / 100, 5)
                                     _line_tax += tax_amount
                                     tax = {
                                         'codigo': taxes_lookup[i['id']]['tax_code'],
@@ -1523,3 +1523,31 @@ class AccountInvoiceElectronic(models.Model):
     def update_text_amount(self):
         for inv in self:
             inv.invoice_amount_text = extensions.text_converter.number_to_text_es(inv.amount_total)
+
+class AccountInvoiceInherit(models.Model):
+    _inherit = "account.invoice"
+    @api.multi
+    def get_taxes_values(self):
+        tax_grouped = {}
+        round_curr = self.currency_id.round
+        for line in self.invoice_line_ids:
+            if not line.account_id or line.display_type:
+                continue
+            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+            taxes = line.invoice_line_tax_ids.compute_all(price_unit, self.currency_id, line.quantity, line.product_id, self.partner_id)['taxes']
+            for tax in taxes:
+                try:
+                   if line.invoice_line_tax_ids.has_exoneration:
+                       tax['amount'] = 0
+                except  ValueError:
+                   _logger.warning('This feature is not compatible with purchase invoices')
+                val = self._prepare_tax_line_vals(line, tax)
+                key = self.env['account.tax'].browse(tax['id']).get_grouping_key(val)
+
+                if key not in tax_grouped:
+                    tax_grouped[key] = val
+                    tax_grouped[key]['base'] = round_curr(val['base'])
+                else:
+                    tax_grouped[key]['amount'] += val['amount']
+                    tax_grouped[key]['base'] += round_curr(val['base'])
+        return tax_grouped
