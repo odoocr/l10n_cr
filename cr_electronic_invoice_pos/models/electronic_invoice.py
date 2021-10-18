@@ -402,6 +402,7 @@ class PosOrder(models.Model):
 
     @api.model
     def _validahacienda_pos(self, max_orders=10, no_partner=True):  # cron
+            
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    '|', (no_partner, '=', True), 
                                                         '&', ('partner_id', '!=', False), ('partner_id.vat', '!=', False),
@@ -409,12 +410,39 @@ class PosOrder(models.Model):
                                                    ('state_tributacion', '=', False)],
                                                   order="date_order",
                                                   limit=max_orders)
+
+        days_left = self.env.user.company_id.get_days_left()
+        message = self.env.user.company_id.get_message_to_send()
+        
+        if days_left < 0:
+            for pos in pos_orders:
+                pos.message_post(
+                    body=message,
+                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    message_type='notification',
+                    subtype=None,
+                    parent_id=False,
+                )
+
+            return
+
         total_orders = len(pos_orders)
         current_order = 0
         _logger.info(
             'MAB - Valida Hacienda - POS Orders to check: %s', total_orders)
+        
         for doc in pos_orders:
             current_order += 1
+
+            if days_left <= self.env.user.company_id.range_days:
+                doc.message_post(
+                    body=message,
+                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    message_type='notification',
+                    subtype=None,
+                    parent_id=False,
+                )
+
             _logger.info('MAB - Valida Hacienda - POS Order: "%s"  -  %s / %s',
                           doc.number_electronic, current_order, total_orders)
             docName = doc.number_electronic
