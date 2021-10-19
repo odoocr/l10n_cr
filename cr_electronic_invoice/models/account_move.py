@@ -212,7 +212,8 @@ class AccountInvoiceElectronic(models.Model):
                                            ('ne', 'No Encontrado'),
                                            ('firma_invalida', 'Firma Inválida'),
                                            ('procesando', 'Procesando')],
-                                         'Estado FE Proveedor')
+                                         'Estado FE Proveedor',
+                                         copy=False )
 
     state_tributacion = fields.Selection([('aceptado', 'Aceptado'),
                                           ('rechazado', 'Rechazado'),
@@ -222,7 +223,8 @@ class AccountInvoiceElectronic(models.Model):
                                           ('procesando', 'Procesando'),
                                           ('na', 'No Aplica'),
                                           ('ne', 'No Encontrado')],
-                                         'Estado FE')
+                                         'Estado FE',
+                                         copy=False )
 
     state_invoice_partner = fields.Selection(
         [('1', 'Aceptado'), 
@@ -240,7 +242,7 @@ class AccountInvoiceElectronic(models.Model):
 
     xml_respuesta_tributacion = fields.Binary( string="Respuesta Tributación XML", required=False, copy=False, attachment=True)
 
-    electronic_invoice_return_message = fields.Char(string='Respuesta Hacienda', readonly=True, )
+    electronic_invoice_return_message = fields.Char(string='Respuesta Hacienda', readonly=True, copy=False)
 
     fname_xml_respuesta_tributacion = fields.Char(
         string="Nombre de archivo XML Respuesta Tributación", required=False,
@@ -775,7 +777,7 @@ class AccountInvoiceElectronic(models.Model):
                 i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
                 i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
                 if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
-                    #email_template = self.env.ref('account.email_template_edi_invoice', False)
+                    email_template = self.env.ref('account.email_template_edi_invoice', False)
                     attachment = self.env['ir.attachment'].search(
                         [('res_model', '=', 'account.move'),
                          ('res_id', '=', i.id),
@@ -793,16 +795,16 @@ class AccountInvoiceElectronic(models.Model):
                     attachment_resp.datas_fname = i.fname_xml_respuesta_tributacion
                     attachment_resp.mimetype = 'text/xml'
 
-                    #email_template.attachment_ids = [
-                    #    (6, 0, [attachment.id, attachment_resp.id])]
+                    email_template.attachment_ids = [
+                       (6, 0, [attachment.id, attachment_resp.id])]
 
-                    #email_template.with_context(type='binary',
-                    #                            default_type='binary').send_mail(
-                    #    i.id,
-                    #    raise_exception=False,
-                    #    force_send=True)  # default_type='binary'
+                    email_template.with_context(type='binary',
+                                               default_type='binary').send_mail(
+                       i.id,
+                       raise_exception=False,
+                       force_send=True)  # default_type='binary'
 
-                    #email_template.attachment_ids = [(5,0,0)]
+                    email_template.attachment_ids = [(5,0,0)]
 
             elif estado_m_h in ('firma_invalida'):
                 if i.error_count > 10:
