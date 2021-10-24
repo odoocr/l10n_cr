@@ -19,3 +19,5 @@ from . import uom
 from . import aut_ex
 from . import account_tax
 from . import economic_activity
+from . import qr_generator
+from . import invoice_qr_fields

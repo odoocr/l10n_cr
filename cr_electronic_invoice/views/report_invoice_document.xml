@@ -245,6 +245,12 @@
                       <span>Autorizada mediante resolución N° DGT-R-033-2019 del 20 de junio de 2019.</span>
                     </p>
 
+                    <div style="width:700px; height:110px;">
+                        <div style="width:100px;height:100px;float:left;">
+                            <span t-field="o.qr_image" t-options='{"widget": "image"}' />
+                        </div>
+                    </div>
+
                     <div id="exoneration" t-if="o.partner_id.has_exoneration">
                         <table class="table table-sm o_main_table" name="invoice_line_table">
                             <thead>

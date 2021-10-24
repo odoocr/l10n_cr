@@ -58,6 +58,8 @@
         'views/menu_views.xml',
         'views/account_move_reversal_views.xml',
         'views/report_invoice_document.xml',
+        'views/qr_code_invoice_view.xml',
+        'views/account_portal_templates.xml',
         'security/ir.model.access.csv',
     ],
     'external_dependencies': {

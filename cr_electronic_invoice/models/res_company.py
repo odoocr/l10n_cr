@@ -5,7 +5,7 @@ import logging
 import re
 import phonenumbers
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _ 
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
@@ -89,6 +89,14 @@ class CompanyElectronic(models.Model):
         string='Secuencia de Facturas Electrónicas de Compra',
         readonly=False, copy=False,
     )
+
+    invoice_qr_type = fields.Selection([('by_url','Invoice Url'),('by_info','Invoice Text Information')],default='by_url',required=True)
+    invoice_field_ids = fields.One2many('invoice.qr.fields','company_id',string="Invoice Field's")
+
+    @api.constrains('invoice_qr_type','invoice_field_ids')    
+    def check_invoice_field_ids(self):
+        if self.invoice_qr_type == 'by_info' and not self.invoice_field_ids:
+            raise UserError(_("Please Add Invoice Field's"))
 
     @api.onchange('mobile')
     def _onchange_mobile(self):

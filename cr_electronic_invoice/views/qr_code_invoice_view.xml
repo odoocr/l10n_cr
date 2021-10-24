@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <record id="account_invoice_form_view" model="ir.ui.view">
+        <field name="name">account.invoice.form.view</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <h1 class="mt0" position="inside">
+            <div class="float-right">
+                <field  name="qr_image" widget="image" width="100" height="100" attrs="{'invisible': [('move_type', '=', 'entry')]}"/>
+            </div>
+            </h1>
+        </field>
+    </record>
+</odoo>
