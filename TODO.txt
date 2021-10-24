@@ -11,23 +11,13 @@ This version is for testing only, it is still under development, use it at your 
 *****PROGRESS:
     cr_electronic_invoice
 
-        Testes:
-            * Electronic Invoice
-            * Electronic Credit Note
-            * Electronic Credit Note
-            * Electronic Ticket
-        ADD:
-            * Odoo original format in documents
-                * Consider if migrating cr_electronic_invoice_qweb_fe. is required ?
+**********TO-DO:
+        *cr_electronic_invoice
+            - Exoneration documents
+            - FEE
+            - FEC
+            - Accept or reject supplier documents
+            - Import Documents (account.invoice.import.wizard)
 
-*****TO-DO:
-    *cr_electronic_invoice
-        - Exoneration documents
-        - FEE
-        - FEC
-        - Accept or reject supplier documents
-        - Import Documents (account.invoice.import.wizard)
-
-
-    *cr_electronic_invoice_pos
-        - ALL
+        *cr_electronic_invoice_pos
+            - ALL

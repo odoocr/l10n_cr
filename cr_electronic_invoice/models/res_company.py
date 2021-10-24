@@ -32,10 +32,10 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Commercial Name", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
-    signature = fields.Binary(string="Llave Criptográfica", )
-    date_expiration_sign = fields.Datetime(string="Fecha de Vencimiento")
-    range_days = fields.Integer(string='Rango de días', default=5)
-    send_user_ids = fields.Many2many('res.users', 'res_company_res_sendusers_rel', string='Usuarios')
+    signature = fields.Binary(string="Cryptographic Key", )
+    date_expiration_sign = fields.Datetime(string="Due date")
+    range_days = fields.Integer(string='Days range', default=5)
+    send_user_ids = fields.Many2many('res.users', 'res_company_res_sendusers_rel', string='Users')
 
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)

@@ -29,6 +29,6 @@ class ProductElectronic(models.Model):
 class ProductCategory(models.Model):
     _inherit = "product.category"
 
-    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", help='Economic activity code from Ministerio de Hacienda')
+    economic_activity_id = fields.Many2one("economic.activity", string="Economic activities", help='Economic activity code from Ministerio de Hacienda')
 
     cabys_code = fields.Char(string="CAByS Code", help='CAByS code from Ministerio de Hacienda')

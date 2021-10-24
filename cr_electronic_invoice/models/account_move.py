@@ -11,6 +11,7 @@ from lxml import etree
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
+from odoo.tools.misc import get_lang
 
 from . import api_facturae
 from .. import extensions
@@ -26,15 +27,12 @@ class InvoiceLineElectronic(models.Model):
         for line in self:
             line.economic_activity_id = line.product_id and line.product_id.categ_id and line.product_id.categ_id.economic_activity_id and line.product_id.categ_id.economic_activity_id.id
 
-    discount_note = fields.Char(string="Nota de descuento", required=False, )
-    total_tax = fields.Float(string="Total impuesto", required=False, )
+    discount_note = fields.Char(string="Discount note", required=False)
+    total_tax = fields.Float(string="Total tax", required=False)
 
-    third_party_id = fields.Many2one("res.partner",
-                                     string="Tercero otros cargos",)
+    third_party_id = fields.Many2one("res.partner", string="Third - other charges")
 
-    tariff_head = fields.Char(string="Partida arancelaria para factura"
-                                     " de exportación",
-                              required=False, )
+    tariff_head = fields.Char(string="Tariff item for export invoice", required=False)
 
     categ_name = fields.Char(
         related='product_id.categ_id.name',
@@ -42,7 +40,7 @@ class InvoiceLineElectronic(models.Model):
     product_code = fields.Char(
         related='product_id.default_code',
     )
-    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica",
+    economic_activity_id = fields.Many2one("economic.activity", string="Economic activity",
                                            required=False, store=True,
                                            context={'active_test': False},
                                            # default=_get_default_activity_id)
@@ -85,9 +83,9 @@ class InvoiceLineElectronic(models.Model):
 class AccountInvoiceElectronic(models.Model):
     _inherit = "account.move"
 
-    number_electronic = fields.Char(string="Número electrónico", required=False, copy=False, index=True)
-    date_issuance = fields.Char(string="Fecha de emisión", required=False, copy=False)
-    consecutive_number_receiver = fields.Char(string="Número Consecutivo Receptor", required=False, copy=False, readonly=True, index=True)
+    number_electronic = fields.Char(string="Electronic number", required=False, copy=False, index=True)
+    date_issuance = fields.Char(string="Date of issue", required=False, copy=False)
+    consecutive_number_receiver = fields.Char(string="Consecutive Receiver Number", required=False, copy=False, readonly=True, index=True)
     state_send_invoice = fields.Selection([('aceptado', 'Aceptado'),
                                             ('rechazado', 'Rechazado'),
                                             ('error', 'Error'),
@@ -114,34 +112,34 @@ class AccountInvoiceElectronic(models.Model):
             ('3', 'Rechazado')], 
             'Respuesta del Cliente')
 
-    reference_code_id = fields.Many2one("reference.code", string="Código de referencia", required=False, )
+    reference_code_id = fields.Many2one("reference.code", string="Reference code", required=False, )
 
-    reference_document_id = fields.Many2one("reference.document", string="Tipo Documento de referencia", required=False, )
+    reference_document_id = fields.Many2one("reference.document", string="Reference Document Type", required=False, )
 
-    payment_methods_id = fields.Many2one("payment.methods", string="Métodos de Pago", required=False, )
+    payment_methods_id = fields.Many2one("payment.methods", string="Payment methods", required=False, )
 
-    invoice_id = fields.Many2one("account.move", string="Documento de referencia", required=False, copy=False)
+    invoice_id = fields.Many2one("account.move", string="Reference document", required=False, copy=False)
 
-    xml_respuesta_tributacion = fields.Binary( string="Respuesta Tributación XML", required=False, copy=False, attachment=True)
+    xml_respuesta_tributacion = fields.Binary( string="XML Tributación Response", required=False, copy=False, attachment=True)
 
     electronic_invoice_return_message = fields.Char(
-        string='Respuesta Hacienda', readonly=True, )
+        string='Hacienda answer', readonly=True, )
 
     fname_xml_respuesta_tributacion = fields.Char(
-        string="Nombre de archivo XML Respuesta Tributación", required=False,
+        string="XML File Name Tributación Response", required=False,
         copy=False)
     xml_comprobante = fields.Binary(
-        string="Comprobante XML", required=False, copy=False, attachment=True)
+        string="XML voucher", required=False, copy=False, attachment=True)
     fname_xml_comprobante = fields.Char(
-        string="Nombre de archivo Comprobante XML", required=False, copy=False,
+        string="File name XML voucher", required=False, copy=False,
         attachment=True)
     xml_supplier_approval = fields.Binary(
-        string="XML Proveedor", required=False, copy=False, attachment=True)
+        string="Vendor XML", required=False, copy=False, attachment=True)
     fname_xml_supplier_approval = fields.Char(
-        string="Nombre de archivo Comprobante XML proveedor", required=False,
+        string="Vendor XML voucher file name", required=False,
         copy=False, attachment=True)
     amount_tax_electronic_invoice = fields.Monetary(
-        string='Total de impuestos FE', readonly=True, )
+        string='Total FE taxes', readonly=True, )
     amount_total_electronic_invoice = fields.Monetary(
         string='Total FE', readonly=True, )
     tipo_documento = fields.Selection(
@@ -154,29 +152,28 @@ class AccountInvoiceElectronic(models.Model):
                     ('CPCE', 'MR Aceptación Parcial'),
                     ('RCE', 'MR Rechazo'),
                     ('FEC', 'Factura Electrónica de Compra')],
-        string="Tipo Comprobante",
+        string="Voucher Type",
         required=False, default='FE',
-        help='Indica el tipo de documento de acuerdo a la '
-                'clasificación del Ministerio de Hacienda')
+        help='Indicates the type of document according to the classification of the Ministerio de Hacienda')
 
-    sequence = fields.Char(string='Consecutivo', readonly=True, copy=False)
+    sequence = fields.Char(string='Consecutive', readonly=True, copy=False)
 
     state_email = fields.Selection([('no_email', 'Sin cuenta de correo'), (
         'sent', 'Enviado'), ('fe_error', 'Error FE')], 'Estado email', copy=False)
 
-    invoice_amount_text = fields.Char(string='Monto en Letras', readonly=True, required=False, )
+    invoice_amount_text = fields.Char(string='Amount in Letters', readonly=True, required=False, )
 
-    ignore_total_difference = fields.Boolean(string="Ingorar Diferencia en Totales", required=False, default=False)
+    ignore_total_difference = fields.Boolean(string="Ignore Difference in Totals", required=False, default=False)
 
-    error_count = fields.Integer(string="Cantidad de errores", required=False, default="0")
+    error_count = fields.Integer(string="Number of errors", required=False, default="0")
 
-    economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, context={'active_test': False}, )
+    economic_activity_id = fields.Many2one("economic.activity", string="Economic Activity", required=False, context={'active_test': False}, )
 
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities', context={'active_test': False})
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic activities', compute='_get_economic_activities', context={'active_test': False})
 
-    not_loaded_invoice = fields.Char(string='Numero Factura Original no cargada', readonly=True, )
+    not_loaded_invoice = fields.Char(string='Original Invoice Number not loaded', readonly=True, )
 
-    not_loaded_invoice_date = fields.Date(string='Fecha Factura Original no cargada', readonly=True, )
+    not_loaded_invoice_date = fields.Date(string='Original Invoice Date not loaded', readonly=True, )
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
@@ -212,78 +209,70 @@ class AccountInvoiceElectronic(models.Model):
         self.ensure_one()
 
         if self.invoice_id.move_type == 'in_invoice' or self.invoice_id.move_type == 'in_refund':
-            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', False)
+            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', raise_if_not_found=False)
         else:
-            email_template = self.env.ref('account.email_template_edi_invoice', False)
+            email_template = self.env.ref('account.email_template_edi_invoice', raise_if_not_found=False)
 
-        email_template.attachment_ids = [(5)]
+        email_template.attachment_ids = [(5, 0, 0)]
+
+        lang = False
+        if email_template:
+            lang = email_template._render_lang(self.ids)[self.id]
+        if not lang:
+            lang = get_lang(self.env).code
 
         if self.env.user.company_id.frm_ws_ambiente == 'disabled':
-            email_template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
+            pass
+            #email_template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
         elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
 
-            attachment = self.env['ir.attachment'].search(
-                [('res_model', '=', 'account.move'),
-                    ('res_id', '=', self.id),
-                    ('res_field', '=', 'xml_comprobante')], limit=1)
+            domain = [('res_model', '=', 'account.move'), ('res_id', '=', self.id), ('name', 'like', self.tipo_documento + '_'+ self.number_electronic)]
+            attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
 
             if attachment:
                 attachment.name = self.fname_xml_comprobante
-                attachment.datas_fname = self.fname_xml_comprobante
 
-                attachment_resp = self.env['ir.attachment'].search(
-                    [('res_model', '=', 'account.move'),
-                        ('res_id', '=', self.id),
-                        ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+                domain_resp = [('res_model', '=', 'account.move'), ('res_id', '=', self.id),
+                               ('name', 'like', 'AHC_' + self.number_electronic)]
+                attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
                 if attachment_resp:
                     attachment_resp.name = self.fname_xml_respuesta_tributacion
-                    attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
 
                     email_template.attachment_ids = [
                         (6, 0, [attachment.id, attachment_resp.id])]
-                    """
-                    email_template.with_context(type='binary',
-                                                default_type='binary').send_mail(
-                        self.id,
-                        raise_exception=False,
-                        force_send=True)  # default_type='binary'
-
-                    email_template.attachment_ids = [(5)]
-
-                    self.write({
-                        'invoice_mailed': True,
-                        'sent': True,
-                    })
-                    """
-                    compose_form = self.env.ref('account.account_invoice_send_wizard_form', False)
-                    ctx = dict(
-                        default_model='account.move',
-                        default_res_id=self.id,
-                        default_use_template=bool(email_template),
-                        default_template_id=email_template and email_template.id or False,
-                        default_composition_mode='comment',
-                        mark_invoice_as_sent=True,
-                        custom_layout="mail.mail_notification_paynow",
-                        force_email=True
-                    )
-                    return {
-                        'name': _('Send Invoice'),
-                        'move_type': 'ir.actions.act_window',
-                        'view_type': 'form',
-                        'view_mode': 'form',
-                        'res_model': 'account.move.send',
-                        'views': [(compose_form.id, 'form')],
-                        'view_id': compose_form.id,
-                        'target': 'new',
-                        'context': ctx,
-                    }
                 else:
                     raise UserError(_('Response XML from Hacienda has not been received'))
             else:
-                raise UserError(_('Invoice XML has not been generated'))
+                raise UserError(_('Invoice XML has not been generated for id:' + str(self.id)))
+
         else:
             raise UserError(_('Partner is not assigne to this invoice'))
+
+        compose_form = self.env.ref('account.account_invoice_send_wizard_form', raise_if_not_found=False).sudo()
+        ctx = dict(
+            default_model='account.move',
+            default_res_id=self.id,
+            default_res_model='account.move',
+            default_use_template=bool(email_template),
+            default_template_id=email_template and email_template.id or False,
+            default_composition_mode='comment',
+            mark_invoice_as_sent=True,
+            custom_layout="mail.mail_notification_paynow",
+            model_description=self.with_context(lang=lang).type_name,
+            force_email=True
+        )
+        return {
+            'name': _('Send Invoice'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'account.invoice.send',
+            'views': [(compose_form.id, 'form')],
+            'view_id': compose_form.id,
+            'target': 'new',
+            'context': ctx,
+        }
 
     @api.onchange('xml_supplier_approval')
     def _onchange_xml_supplier_approval(self):
