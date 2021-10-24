@@ -775,6 +775,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
+        days_left = self.env.user.company_id.get_days_left()
         _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
         invoices = self.env['account.move'].search([('move_type', 'in', ['out_invoice', 'out_refund']),
                                                         ('state', '=', 'posted'),
@@ -782,7 +783,19 @@ class AccountInvoiceElectronic(models.Model):
                                                         ('invoice_date', '>=', '2019-07-01'),
                                                         '|', ('state_tributacion', '=', False), ('state_tributacion', '=', 'ne')],
                                                         order='id asc', limit=max_invoices)
-        self.generate_and_send_invoices(invoices)
+
+        if days_left >= 0:
+            self.generate_and_send_invoices(invoices)
+        else:
+            message = self.env.user.company_id.get_message_to_send()
+            for inv in invoices:
+                inv.message_post(
+                    body=message,
+                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    message_type='notification',
+                    subtype=None,
+                    parent_id=False,
+                )
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
     
@@ -790,8 +803,21 @@ class AccountInvoiceElectronic(models.Model):
         total_invoices = len(invoices)
         current_invoice = 0
 
+        days_left = self.env.user.company_id.get_days_left()
+        message = self.env.user.company_id.get_message_to_send()
+
         for inv in invoices:
             current_invoice += 1
+
+            if days_left <= self.env.user.company_id.range_days:
+                inv.message_post(
+                    body=message,
+                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    message_type='notification',
+                    subtype=None,
+                    parent_id=False,
+                )
+
 
             if not inv.sequence or not inv.sequence.isdigit():  # or (len(inv.number) == 10):
                 inv.state_tributacion = 'na'
