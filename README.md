@@ -12,7 +12,7 @@ Para ayuda y soporte la comunidad de Odoo CR cuenta con un grupo en Telegram: ht
 
 #### Debe hacer clone del branch con la versión de Odoo que desea utilizar. 
 
-##### Odoo V12
+##### Odoo V14
 BRANCH='14.0'
 
 git clone --branch ${BRANCH} --depth 1 --single-branch https://github.com/odoocr/l10n_cr
