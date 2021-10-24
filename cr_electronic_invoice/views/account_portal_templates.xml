@@ -1,5 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <template id="account.portal_my_invoices" name="My Invoices and Payments">
+      <t t-call="portal.portal_layout">
+        <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+        <t t-call="portal.portal_searchbar">
+            <t t-set="title">Invoices</t>
+        </t>
+        <t t-if="not invoices">
+            <p>There are currently no invoices and payments for your account.</p>
+        </t>
+        <t t-if="invoices" t-call="portal.portal_table">
+            <thead>
+                <tr class="active">
+                    <th>Invoice #</th>
+                    <th>Invoice Date</th>
+                    <th class='d-none d-md-table-cell'>Due Date</th>
+                    <th/>
+                    <th class="text-right">Doc. Elect.</th>
+                    <th class="text-right">Estado Tributación</th>
+                    <th class="text-right">Amount Due</th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="invoices" t-as="invoice">
+                    <tr>
+                        <td>
+                            <a t-att-href="invoice.get_portal_url()" t-att-title="invoice.name">
+                                <t t-esc="invoice.name" t-if="invoice.name != '/'"/>
+                                <em t-else="">Draft Invoice</em>
+                            </a>
+                        </td>
+                        <td><span t-field="invoice.invoice_date"/></td>
+                        <td class='d-none d-md-table-cell'><span t-field="invoice.invoice_date_due"/></td>
+                        <td class="tx_status">
+                            <t t-if="invoice.state == 'posted' and invoice.payment_state not in ('in_payment', 'paid', 'reversed')">
+                                <span class="badge badge-pill badge-info"><i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img"></i><span class="d-none d-md-inline"> Waiting for Payment</span></span>
+                            </t>
+                            <t t-if="invoice.state == 'posted' and invoice.payment_state in ('paid', 'in_payment')">
+                                <span class="badge badge-pill badge-success"><i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img"></i><span class="d-none d-md-inline"> Paid</span></span>
+                            </t>
+                            <t t-if="invoice.state == 'posted' and invoice.payment_state == 'reversed'">
+                                <span class="badge badge-pill badge-success"><i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img"></i><span class="d-none d-md-inline"> Reversed</span></span>
+                            </t>
+                            <t t-if="invoice.state == 'cancel'">
+                                <span class="badge badge-pill badge-warning"><i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img"></i><span class="d-none d-md-inline"> Cancelled</span></span>
+                            </t>
+                        </td>
+                        <td class="text-right"><span t-field="invoice.tipo_documento"/></td>
+                        <td class="text-right"><span t-field="invoice.state_tributacion"/></td>
+                        <td class="text-right"><span t-esc="-invoice.amount_residual if invoice.move_type == 'out_refund' else invoice.amount_residual" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></td>
+                    </tr>
+                </t>
+            </tbody>
+        </t>
+      </t>
+    </template>
+    
      <template id="account.portal_invoice_page" name="Invoice Portal Template" inherit_id="portal.portal_sidebar" primary="True">
         <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
             <t t-set="o_portal_fullwidth_alert" groups="sales_team.group_sale_salesman,account.group_account_invoice,account.group_account_readonly">
