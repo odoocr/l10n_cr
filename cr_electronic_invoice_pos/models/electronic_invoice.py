@@ -227,7 +227,6 @@ class PosOrder(models.Model):
         return order
 
     def action_pos_order_paid(self):
-        _logger.info(self)
         
         for order in self:
 
