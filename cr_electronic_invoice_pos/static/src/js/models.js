@@ -26,6 +26,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
     var core = require('web.core');
     var models = require('point_of_sale.models');
     var exports = {};
+    var rpc = require('web.rpc');
 
     var _sequence_next = function(seq){
         var idict = {
@@ -53,8 +54,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
         var num = seq.number_next_actual;
         var prefix = format(seq.prefix, idict);
         var suffix = format(seq.suffix, idict);
-        seq.number_next_actual += seq.number_increment;
-        debugger;
+        seq.number_next_actual += seq.number_increment;        
         return prefix + pad(num, seq.padding) + suffix;
     };
 
@@ -66,54 +66,158 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             self.models.push({
                 model: 'ir.sequence',
                 fields: [],
-                ids:    function(self){ return [self.config.FE_sequence_id[0],self.config.TE_sequence_id[0]]; },
-                loaded: function(self, sequence){ self.FE_sequence = sequence[0];self.TE_sequence = sequence[1]; },
+                ids:    function(self){ 
+                    return [
+                        self.config.FE_sequence_id[0],
+                        self.config.TE_sequence_id[0]
+                    ]; 
+                },
+                loaded: function(self, sequence){
+                    self.FE_sequence = sequence[0];
+                    self.TE_sequence = sequence[1]; 
+                },
             });
-            //debugger;
-            return PosModelParent.load_server_data.apply(this, arguments);
-        },
-        push_order: function(order, opts) {
-            //debugger;
-            if (order !== undefined) {
-                // revisar si es normal o devolucion . Pendiente !!!
-                if (order.get('client') && order.get('client').vat) {
-                    order.set({'sequence': this.FE_sequence.number_next_actual});
-                    order.set({'number_electronic': _sequence_next(this.FE_sequence)});
-                    order.set({'tipo_documento': 'FE'});
-                }
-                else{
-                    order.set({'sequence': this.TE_sequence.number_next_actual});
-                    order.set({'number_electronic': _sequence_next(this.TE_sequence)});
-                    order.set({'tipo_documento': 'TE'});
-                }
-            };
-            //debugger;
-            //return PosModelParent.push_order.call(order,opts);
-            return PosModelParent.push_order.apply(this, arguments);
+            return PosModelParent.load_server_data.call(this, arguments);
         }
     });
 
-    var OrderParent = models.Order.prototype;
+    var OrderParent = models.Order;
     models.Order = models.Order.extend({
+        /* initialize: function
+         * Declare
+         * sequence: Stores the last electronic sequence
+         * number_electronic: Stores the last number electronic
+         * tipo_documento: Stores the doc type
+         */
+        initialize: function(attr,options){
+            OrderParent.prototype.initialize.call(this, attr, options);
+
+            // Initialize the variables
+            this.sequence;
+            this.number_electronic;
+            this.tipo_documento;
+        },
         export_for_printing: function(attributes){
-            var order = OrderParent.export_for_printing.apply(this, arguments);
-            order['number_electronic'] = this.get('number_electronic');
-            order['sequence'] = this.get('sequence');
-            order['tipo_documento'] = this.get('tipo_documento');
-            //debugger;
+            var self = this;
+            var order = OrderParent.prototype.export_for_printing.call(this);
+
+            if(this.get_client()){
+                if(this.get_client().vat){
+                    var model = 'ir.sequence';
+                    var domain = [['id', '=', this.pos.config.FE_sequence_id[0]]];
+                    var fields = [];
+                    // Get the last FE POS sequence
+                    rpc.query({
+                        model: model,
+                        method: 'search_read',
+                        args: [domain, fields],
+                    }).then(function (data) {
+                        self.sequence = data[0].number_next_actual;
+                        self.number_electronic = _sequence_next(data[0]);
+                        self.tipo_documento = 'FE'
+                    });
+                }
+                else{
+                    var model = 'ir.sequence';
+                    var domain = [['id', '=', this.pos.config.TE_sequence_id[0]]];
+                    var fields = [];
+                    // Get the last TE POS sequence
+                    rpc.query({
+                        model: model,
+                        method: 'search_read',
+                        args: [domain, fields],
+                    }).then(function (data) {
+                        self.sequence = data[0].number_next_actual;
+                        self.number_electronic = _sequence_next(data[0]);
+                        self.tipo_documento = 'TE'
+                    });
+                }
+            }
+            // If the partner is not set, the information will be for tickets
+            else{
+                var model = 'ir.sequence';
+                var domain = [['id', '=', self.pos.config.TE_sequence_id[0]]];
+                var fields = [];
+                // Get the last TE POS sequence
+                rpc.query({
+                    model: model,
+                    method: 'search_read',
+                    args: [domain, fields],
+                }).then(function (data) {
+                    self.sequence = data[0].number_next_actual;
+                    self.number_electronic = _sequence_next(data[0]);
+                    self.tipo_documento = 'TE'
+                });
+            }
+            
+            // Set the "global" information updated with RPC
+            order['sequence'] = self.sequence;
+            order['number_electronic'] = self.number_electronic;
+            order['tipo_documento'] = self.tipo_documento;
+
             return order;
         },
         export_as_JSON: function() {
-            var order = OrderParent.export_as_JSON.apply(this, arguments);
-            order['number_electronic'] = this.get('number_electronic');
-            order['sequence'] = this.get('sequence');
-            order['tipo_documento'] = this.get('tipo_documento');
-            //debugger;
+            var self = this;
+            var order = OrderParent.prototype.export_as_JSON.call(this);
+
+            if(this.get_client()){
+                if(this.get_client().vat){
+                    var model = 'ir.sequence';
+                    var domain = [['id', '=', this.pos.config.FE_sequence_id[0]]];
+                    var fields = [];
+                    // Get the last FE POS sequence
+                    rpc.query({
+                        model: model,
+                        method: 'search_read',
+                        args: [domain, fields],
+                    }).then(function (data) {
+                        self.sequence = data[0].number_next_actual;
+                        self.number_electronic = _sequence_next(data[0]);
+                        self.tipo_documento = 'FE'
+                    });
+                }
+                else{
+                    var model = 'ir.sequence';
+                    var domain = [['id', '=', this.pos.config.TE_sequence_id[0]]];
+                    var fields = [];
+                    // Get the last TE POS sequence
+                    rpc.query({
+                        model: model,
+                        method: 'search_read',
+                        args: [domain, fields],
+                    }).then(function (data) {
+                        self.sequence = data[0].number_next_actual;
+                        self.number_electronic = _sequence_next(data[0]);
+                        self.tipo_documento = 'TE'
+                    });
+                }
+            }
+            // If the partner is not set, the information will be for tickets
+            else{
+                var model = 'ir.sequence';
+                var domain = [['id', '=', self.pos.config.TE_sequence_id[0]]];
+                var fields = [];
+                // Get the last TE POS sequence
+                rpc.query({
+                    model: model,
+                    method: 'search_read',
+                    args: [domain, fields],
+                }).then(function (data) {
+                    self.sequence = data[0].number_next_actual;
+                    self.number_electronic = _sequence_next(data[0]);
+                    self.tipo_documento = 'TE'
+                });
+            }
+            
+            // Set the "global" information updated with RPC
+            order['sequence'] = self.sequence;
+            order['number_electronic'] = self.number_electronic;
+            order['tipo_documento'] = self.tipo_documento;
+
             return order;
         }
     });
-
-    //models.load_fields('res.company', ['street', 'city', 'state_id', 'zip']);
 
     return exports;
 });

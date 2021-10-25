@@ -1,23 +1,3 @@
-"""
-from __future__ import print_function
-import functools
-import traceback
-import sys
-
-INDENT = 4*' '
-
-def stacktrace(func):
-    @functools.wraps(func)
-    def wrapped(*args, **kwds):
-        # Get all but last line returned by traceback.format_stack()
-        # which is the line below.
-        callstack = '\n'.join([INDENT+line.strip() for line in traceback.format_stack()][:-1])
-        _logger.error('E-INV CR - {}() called:'.format(func.__name__))
-        _logger.error(callstack)
-        return func(*args, **kwds)
-
-    return wrapped
-"""
 import base64
 import json
 import requests
@@ -60,6 +40,87 @@ class PosConfig(models.Model):
     TE_sequence_id = fields.Many2one("ir.sequence",
                                      string="Electronic Ticket Sequence",
                                      required=False)
+
+
+    def create_sequences(self):
+        if self.journal_id:
+            if self.journal_id.sucursal:
+                self.sucursal = self.journal_id.sucursal
+            else:
+                self.sucursal = 1
+            if self.journal_id.terminal:
+                self.terminal = self.journal_id.terminal
+            else:
+                self.terminal = 1
+
+            # Check if FE_sequence_id exists
+            if self.journal_id.FE_sequence_id:
+                self.FE_sequence_id = self.journal_id.FE_sequence_id.id
+            
+            # Else create a new sequence for the journal
+            else:
+                inv_cedula = self.journal_id.company_id.vat
+                inv_cedula = str(inv_cedula).zfill(12)
+                sucursal = str(self.sucursal).zfill(3)
+                terminal = str(self.terminal).zfill(5)
+                tipo_doc = '01'
+
+                FE_sequence_id = self.env['ir.sequence'].sudo().create({
+                    'name': 'Secuencia de Factura Electrónica POS: ' + self.name,
+                    'code': 'sequence.pos.FE.'+ str(self.id),
+                    'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
+                    'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
+                    'padding': 10,
+                })
+
+                self.FE_sequence_id = FE_sequence_id.id
+                self.journal_id.FE_sequence_id = FE_sequence_id.id
+            # Check if NC_sequence_id exists
+            if self.journal_id.NC_sequence_id:
+                self.NC_sequence_id = self.journal_id.NC_sequence_id.id
+            # Else create a new sequence for the journal
+            else:
+                inv_cedula = self.journal_id.company_id.vat
+                inv_cedula = str(inv_cedula).zfill(12)
+                sucursal = str(self.sucursal).zfill(3)
+                terminal = str(self.terminal).zfill(5)
+                tipo_doc = '03'
+
+                NC_sequence_id = self.env['ir.sequence'].sudo().create({
+                    'name': 'Secuencia de Nota Crédito Electrónica POS: ' + self.name,
+                    'code': 'sequence.pos.NC.'+ str(self.id),
+                    'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
+                    'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
+                    'padding': 10,
+                })
+                
+                self.NC_sequence_id = NC_sequence_id.id
+                self.journal_id.NC_sequence_id = NC_sequence_id.id
+            # Check if TE_sequence_id exists
+            if self.journal_id.TE_sequence_id:
+                self.TE_sequence_id = self.journal_id.TE_sequence_id.id
+            # Else create a new sequence for the journal
+            else:
+                inv_cedula = self.journal_id.company_id.vat
+                inv_cedula = str(inv_cedula).zfill(12)
+                sucursal = str(self.sucursal).zfill(3)
+                terminal = str(self.terminal).zfill(5)
+                tipo_doc = '04'
+
+                TE_sequence_id = self.env['ir.sequence'].sudo().create({
+                    'name': 'Secuencia de Tiquete Electrónico POS: ' + self.name,
+                    'code': 'sequence.pos.TE.'+ str(self.id),
+                    'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
+                    'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
+                    'padding': 10,
+                })
+                
+                self.TE_sequence_id = TE_sequence_id.id
+                self.journal_id.TE_sequence_id = TE_sequence_id.id
+            
+
+
+
 class PosOrder(models.Model):
     _name = "pos.order"
     _inherit = ["pos.order", "mail.thread"]
@@ -71,12 +132,12 @@ class PosOrder(models.Model):
             [('res_model', '=', 'pos.order'), ('res_id', '=', self.id),
              ('res_field', '=', 'xml_comprobante')], limit=1)
         attachment.name = self.fname_xml_comprobante
-        attachment.datas_fname = self.fname_xml_comprobante
+        #attachment.datas_fname = self.fname_xml_comprobante
         attachment_resp = self.env['ir.attachment'].search(
             [('res_model', '=', 'pos.order'), ('res_id', '=', self.id),
              ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
         attachment_resp.name = self.fname_xml_respuesta_tributacion
-        attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
+        #attachment_resp.datas_fname = self.fname_xml_respuesta_tributacion
         email_template.attachment_ids = [
             (6, 0, [attachment.id, attachment_resp.id])]
         email_template.with_context(type='binary', default_type='binary').send_mail(self.id,
@@ -90,10 +151,10 @@ class PosOrder(models.Model):
         sequence = int(sequence) if sequence else False
         if vals.get('session_id') and sequence:
             session = self.env['pos.session'].sudo().browse(vals['session_id'])
-            if tipo_documento == 'FE' and sequence >= session.config_id.FE_sequence_id.number_next_actual:
-                    session.config_id.FE_sequence_id.number_next_actual = sequence + 1
-            elif tipo_documento == 'TE' and sequence >= session.config_id.TE_sequence_id.number_next_actual:
-                    session.config_id.TE_sequence_id.number_next_actual = sequence + 1
+            if tipo_documento == 'FE' and sequence >= session.config_id.journal_id.FE_sequence_id.number_next_actual:
+                    session.config_id.journal_id.FE_sequence_id.number_next_actual = sequence + 1
+            elif tipo_documento == 'TE' and sequence >= session.config_id.journal_id.TE_sequence_id.number_next_actual:
+                    session.config_id.journal_id.TE_sequence_id.number_next_actual = sequence + 1
 
     def _order_fields(self, ui_order):
         vals = super(PosOrder, self)._order_fields(ui_order)
@@ -101,18 +162,6 @@ class PosOrder(models.Model):
         vals['sequence'] = ui_order.get('sequence')
         vals['number_electronic'] = ui_order.get('number_electronic')
         return vals
-
-    def create(self, vals):
-        number_electronic = vals.get('number_electronic', False)
-        if vals.get('pos_order_id', False):
-            vals['number_electronic'] = '/'
-        elif number_electronic:
-            self.sequence_number_sync(vals)
-            if self.env['pos.order'].search([('number_electronic', 'like', number_electronic[21:41])]):
-                vals['number_electronic'] = self.env['ir.sequence'].next_by_code(
-                    'pos.order.recovery')
-        order = super(PosOrder, self).create(vals)
-        return order
 
     number_electronic = fields.Char(
         string="Electronic Number", required=False, copy=False, index=True)
@@ -163,18 +212,36 @@ class PosOrder(models.Model):
          "La clave de comprobante debe ser única"),
     ]
 
+    @api.model
+    def create(self, vals):
+        _logger.info(vals)
+        number_electronic = vals.get('number_electronic', False)
+        if vals.get('pos_order_id', False):
+            vals['number_electronic'] = '/'
+        elif number_electronic:
+            self.sequence_number_sync(vals)
+            if self.env['pos.order'].search([('number_electronic', 'like', number_electronic[21:41])]):
+                vals['number_electronic'] = self.env['ir.sequence'].next_by_code(
+                    'pos.order.recovery')
+        order = super(PosOrder, self).create(vals)
+        return order
+
     def action_pos_order_paid(self):
+        _logger.info(self)
+        
         for order in self:
+
             if not order.pos_order_id:
                 continue
             if order.tipo_documento == 'FE':
-                order.number_electronic = order.session_id.config_id.FE_sequence_id._next()
+                order.number_electronic = order.session_id.config_id.FE_sequence_id.next_by_id()
             elif order.tipo_documento == 'TE':
-                order.number_electronic = order.session_id.config_id.TE_sequence_id._next()
+                order.number_electronic = order.session_id.config_id.TE_sequence_id.next_by_id()
             else:
                 order.tipo_documento = 'NC'
-                order.number_electronic = order.session_id.config_id.NC_sequence_id._next()
+                order.number_electronic = order.session_id.config_id.NC_sequence_id.next_by_id()
             order.sequence = order.number_electronic[21:41]
+        
         return super(PosOrder, self).action_pos_order_paid()
 
     def refund(self):
@@ -278,13 +345,13 @@ class PosOrder(models.Model):
                             [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
                              ('res_field', '=', 'xml_comprobante')], limit=1)
                         attachment.name = doc.fname_xml_comprobante
-                        attachment.datas_fname = doc.fname_xml_comprobante
+                        #attachment.datas_fname = doc.fname_xml_comprobante
                         attachment.mimetype = 'text/xml'
                         attachment_resp = self.env['ir.attachment'].search(
                             [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
                              ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
                         attachment_resp.name = doc.fname_xml_respuesta_tributacion
-                        attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
+                        #attachment_resp.datas_fname = doc.fname_xml_respuesta_tributacion
                         attachment_resp.mimetype = 'text/xml'
                         email_template.attachment_ids = [
                             (6, 0, [attachment.id, attachment_resp.id])]
@@ -363,12 +430,12 @@ class PosOrder(models.Model):
                     comprobante.name = doc.fname_xml_comprobante
                 except:
                     comprobante.name = 'FE_'+doc.number_electronic+'.xml'
-                comprobante.datas_fname = comprobante.name
+                #comprobante.datas_fname = comprobante.name
                 respuesta = self.env['ir.attachment'].search(
                     [('res_model', '=', 'pos.order'), ('res_id', '=', doc.id),
                      ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
                 respuesta.name = doc.fname_xml_respuesta_tributacion
-                respuesta.datas_fname = doc.fname_xml_respuesta_tributacion
+                #respuesta.datas_fname = doc.fname_xml_respuesta_tributacion
                 email_template = self.env.ref(
                     'cr_electronic_invoice_pos.email_template_pos_invoice', False)
                 email_template.attachment_ids = [

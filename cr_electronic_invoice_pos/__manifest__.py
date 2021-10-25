@@ -15,6 +15,8 @@
 	'data': [
 		'views/electronic_invoice_views.xml',
 		'data/data.xml',
+		'data/payment_methods_data.xml',
+		'views/pos_payment_method.xml',
 		'views/pos_templates.xml',
 		#'views/pos_views.xml',
 	],
