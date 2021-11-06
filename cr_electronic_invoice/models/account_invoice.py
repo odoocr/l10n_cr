@@ -958,24 +958,49 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
+        days_left = self.env.user.company_id.get_days_left()
         _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
         invoices = self.env['account.invoice'].search([('type', 'in', ('out_invoice', 'out_refund')),
-                                                       ('state', 'in', ('open', 'paid')),
-                                                       ('number_electronic', '!=', False),
-                                                       ('date_invoice', '>=', '2019-07-01'),
-                                                       '|', ('state_tributacion', '=', False),
-                                                       ('state_tributacion', '=', 'ne')],
-                                                      order='id asc', limit=max_invoices)
-        self.generate_and_send_invoices(invoices)
+                                                    ('state', 'in', ('open', 'paid')),
+                                                    ('number_electronic', '!=', False),
+                                                    ('date_invoice', '>=', '2019-07-01'),
+                                                    '|', ('state_tributacion', '=', False),
+                                                    ('state_tributacion', '=', 'ne')],
+                                                    order='id asc', limit=max_invoices)
+        if days_left >= 0:
+            self.generate_and_send_invoices(invoices)
+        else:
+            message = self.env.user.company_id.get_message_to_send()
+            for inv in invoices:
+                inv.message_post(
+                    body=message,
+                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    message_type='notification',
+                    subtype=None,
+                    parent_id=False,
+                )
+            
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
+
 
     @api.multi
     def generate_and_send_invoices(self, invoices):
         total_invoices = len(invoices)
         current_invoice = 0
 
+        days_left = self.env.user.company_id.get_days_left()
+        message = self.env.user.company_id.get_message_to_send()
         for inv in invoices:
             current_invoice += 1
+
+            if days_left <= self.env.user.company_id.range_days:
+                inv.message_post(
+                    body=message,
+                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    message_type='notification',
+                    subtype=None,
+                    parent_id=False,
+                )
 
             if not inv.sequence or not inv.sequence.isdigit():  # or (len(inv.number) == 10):
                 inv.state_tributacion = 'na'
@@ -1195,7 +1220,7 @@ class AccountInvoiceElectronic(models.Model):
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     product_amount = round(i['base'] * quantity)
-                                    tax_amount = round((product_amount - descuento) * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                    tax_amount = round(product_amount * taxes_lookup[i['id']]['tarifa'] / 100, 5)
                                     _line_tax += tax_amount
                                     tax = {
                                         'codigo': taxes_lookup[i['id']]['tax_code'],
@@ -1523,31 +1548,3 @@ class AccountInvoiceElectronic(models.Model):
     def update_text_amount(self):
         for inv in self:
             inv.invoice_amount_text = extensions.text_converter.number_to_text_es(inv.amount_total)
-
-class AccountInvoiceInherit(models.Model):
-    _inherit = "account.invoice"
-    @api.multi
-    def get_taxes_values(self):
-        tax_grouped = {}
-        round_curr = self.currency_id.round
-        for line in self.invoice_line_ids:
-            if not line.account_id or line.display_type:
-                continue
-            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.invoice_line_tax_ids.compute_all(price_unit, self.currency_id, line.quantity, line.product_id, self.partner_id)['taxes']
-            for tax in taxes:
-                try:
-                   if line.invoice_line_tax_ids.has_exoneration:
-                       tax['amount'] = 0
-                except  ValueError:
-                   _logger.warning('This feature is not compatible with purchase invoices')
-                val = self._prepare_tax_line_vals(line, tax)
-                key = self.env['account.tax'].browse(tax['id']).get_grouping_key(val)
-
-                if key not in tax_grouped:
-                    tax_grouped[key] = val
-                    tax_grouped[key]['base'] = round_curr(val['base'])
-                else:
-                    tax_grouped[key]['amount'] += val['amount']
-                    tax_grouped[key]['base'] += round_curr(val['base'])
-        return tax_grouped
