@@ -36,6 +36,7 @@ class CompanyElectronic(models.Model):
     date_expiration_sign = fields.Datetime(string="Fecha de Vencimiento")
     range_days = fields.Integer(string='Rango de días', default=5)
     send_user_ids = fields.Many2many('res.users', 'res_company_res_sendusers_rel', string='Usuarios')
+    to_emails = fields.Char(string='Email')
 
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     district_id = fields.Many2one("res.country.district", string="District", required=False)
@@ -176,8 +177,9 @@ class CompanyElectronic(models.Model):
 
     def _cron_send_email_notifications(self):
         today = datetime.now()
-        date_due = self.env.user.company_id.date_expiration_sign
-        range_day = self.env.user.company_id.range_days
+        user = self.env.user
+        date_due = user.company_id.date_expiration_sign
+        range_day = user.company_id.range_days
 
         range_date = date_due - timedelta(days=range_day)
         if today >= range_date:
@@ -193,9 +195,16 @@ class CompanyElectronic(models.Model):
 
             template.write(template_values)
 
-            for user in self.env.user.company_id.send_user_ids:
-                if user.email:
-                    template.with_context(lang=user.lang).send_mail(user.id, force_send=True, raise_exception=True)
+            emails_to = user.company_id.send_user_ids.mapped('email') or []
+            if user.company_id.to_emails:
+                emails = user.company_id.to_emails.split(',')
+                emails_to.extend(emails)
+
+            for email in emails_to:
+                emails_to = {'email_to': email}
+
+                template.with_context(lang=user.lang).\
+                    send_mail(res_id=user.id, force_send=True, raise_exception=True, email_values=emails_to)
 
     def try_create_configuration_sequences(self):
         """ Try to automatically add the Comprobante Confirmation sequence to the company.

@@ -80,6 +80,7 @@
                                 <field name="date_expiration_sign" readonly="True" force_save="True"/>
                                 <field name="range_days"/>
                                 <field name="send_user_ids" widget="many2many_tags"/>
+                                <field name="to_emails"/>
                             </group>
                             <group cols="2">
                                 <button name="test_get_token" type="object" string="Test get token" colspan="2" />
