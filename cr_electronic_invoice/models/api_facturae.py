@@ -367,10 +367,12 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     if inv._name == 'pos.order':
         plazo_credito = '0'
         for payment in inv.payment_ids:
-            if payment.payment_method_id.is_cash_count:
+            # En caso que no tenga código definido se colocará el de efectivo para evitar rechazos de documentos
+            if payment.payment_method_id.sequence == False:
                 payment_methods_id.append('01')
             else:
-                payment_methods_id.append('02')
+                # Se agrega el campo code en los métodos de pago de Odoo POS
+                payment_methods_id.append(str(payment.payment_method_id.sequence))
         cod_moneda = str(inv.company_id.currency_id.name)
     else:
         payment_methods_id.append(str(inv.payment_methods_id.sequence))

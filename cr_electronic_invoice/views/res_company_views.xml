@@ -7,6 +7,19 @@
             <field name="inherit_id" ref="base.view_company_form"/>
             <field name="arch" type="xml">
 
+                <xpath expr="//sheet" position="inside">
+                    <group>
+                        <field name="invoice_qr_type"/>
+                        <field name="invoice_field_ids" 
+                            attrs="{'required':[('invoice_qr_type','=','by_info')],'invisible':[('invoice_qr_type','!=','by_info')]}">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle" />
+                                <field name="field_id"  />
+                            </tree>
+                        </field>
+                    </group>
+                </xpath>
+
                 <xpath expr="//sheet[1]" position="after">
                     <div class="oe_chatter">
                         <field name="message_follower_ids"
@@ -41,6 +54,9 @@
                                 <field name="frm_ws_identificador"/>
                                 <field name="frm_ws_password" password="True"/>
                                 <field name="frm_pin" password="True"/>
+                                <field name="date_expiration_sign" force_save="True"/>
+                                <field name="range_days"/>
+                                <field name="send_user_ids" widget="many2many_tags"/>
                             </group>
                             <group cols="2">
                                 <button name="test_get_token" type="object" string="Test get token" colspan="2" />

@@ -1,41 +1,179 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# * res_currency_cr_adapter
+# 	* res_currency_cr_adapter
 #
-# Translators:
-# Akurey <odoo@akurey.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 11.0\n"
+"Project-Id-Version: Odoo Server 14.0-20210913\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-01 08:00+0000\n"
-"PO-Revision-Date: 2018-08-01 08:00+0000\n"
-"Last-Translator: Akurey <odoo@akurey.com>, 2018\n"
-"Language-Team: Spanish \n"
-"Language: es\n"
+"POT-Creation-Date: 2021-10-09 00:24+0000\n"
+"PO-Revision-Date: 2021-10-09 00:24+0000\n"
+"Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-
-#. module: res_currency_cr_adapter
-#: model:ir.model.fields,field_description:res_currency_rate_original_rate.field_res_currency_rate_original_rate
-msgid "Original selling exchange rate from BCCR"
-msgstr "Valor original para el tipo de cambio de venta obtenido desde el BCCR"
+"Plural-Forms: \n"
 
 #. module: res_currency_cr_adapter
-#: model:ir.model.fields,field_description:res_currency_rate_currency_rate_rate_2.field_res_currency_rate_rate_2
+#: model:ir.model.fields.selection,name:res_currency_cr_adapter.selection__res_config_settings__exchange_source__bccr
+msgid "BCCR (recommended)"
+msgstr "BCCR (recomendado)"
+
+#. module: res_currency_cr_adapter
+#: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
+msgid "BCCR Token"
+msgstr "Token para BCCR"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings__bccr_username
+msgid "BCCR username"
+msgstr "Nombre de Usuario para BCCR"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__rate_2
 msgid "Buying Rate"
-msgstr "Tipo de cambio de venta"
+msgstr "Tipo de cambio Compra"
 
 #. module: res_currency_cr_adapter
-#: model:ir.model.fields,field_description:res_currency_rate_original_rate_2.field_res_currency_rate_original_rate_2
-msgid "Original buying exchange rate from BCCR"
-msgstr "alor original para el tipo de cambio de compra obtenido desde el BCCR"
-
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__original_rate_2
+msgid "Buying Rate in Costa Rica"
+msgstr "Tipo de Cambio Compra en Costa Rica"
 
 #. module: res_currency_cr_adapter
-#: model:ir.model,name:res_currency_rate.model_res_currency_rate
-msgid "Employee adaptation for Costa Rica laws"
-msgstr "Empleado adaptado para Costa Rica"
+#: model:ir.model,name:res_currency_cr_adapter.model_res_config_settings
+msgid "Config Settings"
+msgstr "Opciones de configuración"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model,name:res_currency_cr_adapter.model_res_currency
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: res_currency_cr_adapter
+#: model:ir.actions.server,name:res_currency_cr_adapter.currency_crc_rate_cron_ir_actions_server
+#: model:ir.cron,cron_name:res_currency_cr_adapter.currency_crc_rate_cron
+#: model:ir.cron,name:res_currency_cr_adapter.currency_crc_rate_cron
+msgid "Currency CRC Rate Update"
+msgstr "Actualización de tipo de cambio de moneda CRC"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model,name:res_currency_cr_adapter.model_res_currency_rate
+msgid "Currency Rate"
+msgstr "Tasa monetaria"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency__rate
+msgid "Current Rate"
+msgstr "Tasa"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields.selection,name:res_currency_cr_adapter.selection__res_config_settings__exchange_source__disabled
+msgid "Disabled"
+msgstr "Desactivado"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency__display_name
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__display_name
+msgid "Display Name"
+msgstr "Nombre mostrado"
+
+#. module: res_currency_cr_adapter
+#: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
+msgid "Email registered in the BCCR"
+msgstr "Correo electrónico registrado en el BCCR"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings__exchange_source
+msgid "Exchange Source"
+msgstr "Origen del tipo de Cambio"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields.selection,name:res_currency_cr_adapter.selection__res_config_settings__exchange_source__hacienda
+msgid "Hacienda"
+msgstr ""
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings__id
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency__id
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__id
+msgid "ID"
+msgstr ""
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings____last_update
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency____last_update
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate____last_update
+msgid "Last Modified on"
+msgstr "Última modificación el"
+
+#. module: res_currency_cr_adapter
+#: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
+msgid "Origen del tipo de cambio"
+msgstr ""
+
+#. module: res_currency_cr_adapter
+#: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.view_currency_form
+msgid "Rates"
+msgstr "Tarifas"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__rate
+msgid "Selling Rate"
+msgstr "Tipo de cambio Venta"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__original_rate
+msgid "Selling Rate in Costa Rica"
+msgstr "Tipo de cambio Venta en Costa Rica"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,help:res_currency_cr_adapter.field_res_currency_rate__original_rate_2
+msgid "The buying exchange rate from CRC to USD as it is send from BCCR"
+msgstr "El tipo de cambio de compra de CRC a USD tal como se envía desde BCCR"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,help:res_currency_cr_adapter.field_res_currency_rate__rate_2
+msgid "The buying rate of the currency to the currency of rate 1."
+msgstr "El tipo de cambio de compra de la moneda a la moneda de tipo 1."
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,help:res_currency_cr_adapter.field_res_currency_rate__rate
+msgid "The rate of the currency to the currency of rate 1"
+msgstr "La tasa de cambio de la moneda respecto a la moneda de tasa 1"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,help:res_currency_cr_adapter.field_res_currency__rate
+msgid "The rate of the currency to the currency of rate 1."
+msgstr "La tasa de cambio de la moneda respecto a la moneda de tasa 1"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,help:res_currency_cr_adapter.field_res_currency_rate__original_rate
+msgid "The selling exchange rate from CRC to USD as it is send from BCCR"
+msgstr "El tipo de cambio de venta de CRC a USD tal como se envía desde BCCR"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings__bccr_token
+msgid "Token to use in the BCCR"
+msgstr "Token para usar en el BCCR"
+
+#. module: res_currency_cr_adapter
+#: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
+msgid "User name registered in the BCCR"
+msgstr "Nombre de usuario registrado en el BCCR"
+
+#. module: res_currency_cr_adapter
+#: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
+msgid "Username registered in the BCCR"
+msgstr "Nombre de usuario registrado en el BCCR"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings__bccr_email
+msgid "e-mail registered in the BCCR"
+msgstr "Correo electrónico registrado en el BCCR"
+
+#. module: res_currency_cr_adapter
+#: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
+msgid "email registered in the BCCR"
+msgstr "Correo electrónico registrado en el BCCR"

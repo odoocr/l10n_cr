@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, date, timedelta
 import logging
+import re
 import phonenumbers
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _ 
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
@@ -30,7 +32,11 @@ class CompanyElectronic(models.Model):
 
     commercial_name = fields.Char(string="Commercial Name", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
-    signature = fields.Binary(string="Llave Criptográfica", )
+    signature = fields.Binary(string="Cryptographic Key", )
+    date_expiration_sign = fields.Datetime(string="Due date")
+    range_days = fields.Integer(string='Days range', default=5)
+    send_user_ids = fields.Many2many('res.users', 'res_company_res_sendusers_rel', string='Users')
+
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
     frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
@@ -83,6 +89,14 @@ class CompanyElectronic(models.Model):
         string='Secuencia de Facturas Electrónicas de Compra',
         readonly=False, copy=False,
     )
+
+    invoice_qr_type = fields.Selection([('by_url','Invoice Url'),('by_info','Invoice Text Information')],default='by_url',required=True)
+    invoice_field_ids = fields.One2many('invoice.qr.fields','company_id',string="Invoice Field's")
+
+    @api.constrains('invoice_qr_type','invoice_field_ids')    
+    def check_invoice_field_ids(self):
+        if self.invoice_qr_type == 'by_info' and not self.invoice_field_ids:
+            raise UserError(_("Please Add Invoice Field's"))
 
     @api.onchange('mobile')
     def _onchange_mobile(self):
@@ -193,3 +207,68 @@ class CompanyElectronic(models.Model):
                 'message': _('Company VAT is invalid')
             }
             return {'value': {'vat': ''}, 'warning': alert}
+    
+    def write(self, vals):
+        if vals.get('date_expiration_sign') or vals.get('range_days'):
+            cron = self.env.ref('cr_electronic_invoice.ir_cron_send_expiration_notice', False)
+
+            if not self.range_days:
+                return super(CompanyElectronic, self).write(vals)
+
+            date_expiration_sign = vals.get('date_expiration_sign') and vals['date_expiration_sign'] or self.date_expiration_sign
+            # date_expiration_sign = vals.get('date_expiration_sign') and \
+            #     datetime.strptime(vals['date_expiration_sign'], '%Y-%m-%d %H:%M:%S') or self.date_expiration_sign
+            if date_expiration_sign:
+                if isinstance(date_expiration_sign, str):
+                    date_expiration_sign = datetime.strptime(date_expiration_sign, '%Y-%m-%d %H:%M:%S')
+
+            range_days = vals.get('range_days') or self.range_days
+            next_call = date_expiration_sign - timedelta(days=range_days)
+            new_values = {
+                'nextcall': next_call
+            }
+
+            cron.write(new_values)
+
+        return super(CompanyElectronic, self).write(vals)
+
+    def get_days_left(self):
+        today = datetime.today()
+        date_due = self.date_expiration_sign
+        range_days = date_due - today
+
+        return range_days.days
+
+    def get_message_to_send(self):
+        days_left = self.get_days_left()
+
+        message = ''
+        if days_left >= 0:
+            message = f'Su llave criptográfica está a punto de expirar, le quedan {days_left} día(s)'
+        else:
+            message = f'No podrá validar porque su llave criptográfica expiró hace {abs(days_left)} día(s)'
+
+        return message
+
+    def _cron_send_email_notifications(self):
+        today = datetime.now()
+        date_due = self.env.user.company_id.date_expiration_sign
+        range_day = self.env.user.company_id.range_days
+
+        range_date = date_due - timedelta(days=range_day)
+        if today >= range_date:
+            template = self.env.ref('cr_electronic_invoice.email_template_edi_expiration_notice', False)
+
+            template_values = {
+                'email_to': '${object.email|safe}',
+                'email_cc': False,
+                'auto_delete': True,
+                'partner_to': False,
+                'scheduled_date': False,
+            }
+
+            template.write(template_values)
+
+            for user in self.env.user.company_id.send_user_ids:
+                if user.email:
+                    template.with_context(lang=user.lang).send_mail(user.id, force_send=True, raise_exception=True)
