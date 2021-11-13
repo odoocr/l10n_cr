@@ -501,79 +501,80 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     payment_method_length = len(payment_methods_id)
     for payment_method_counter in range(payment_method_length):
         sb.Append('<MedioPago>' + payment_methods_id[payment_method_counter] + '</MedioPago>')
+    sb.Append('<DetalleServicio>')
 
-    if lines:
-        sb.Append('<DetalleServicio>')
+    detalle_factura = lines
+    response_json = json.loads(detalle_factura)
 
-        for (k, v) in lines.items():
-            numero_linea = numero_linea + 1
+    for (k, v) in response_json.items():
+        numero_linea = numero_linea + 1
 
-            sb.Append('<LineaDetalle>')
-            sb.Append('<NumeroLinea>' + str(numero_linea) + '</NumeroLinea>')
+        sb.Append('<LineaDetalle>')
+        sb.Append('<NumeroLinea>' + str(numero_linea) + '</NumeroLinea>')
 
-            if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
-                sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
+        if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
+            sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
 
-            if v.get('codigoCabys'):
-                sb.Append('<Codigo>' + (v['codigoCabys']) + '</Codigo>')
+        if v.get('codigoCabys'):
+            sb.Append('<Codigo>' + (v['codigoCabys']) + '</Codigo>')
 
-            if v.get('codigo'):
-                sb.Append('<CodigoComercial>')
-                sb.Append('<Tipo>04</Tipo>')
-                sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
-                sb.Append('</CodigoComercial>')
+        if v.get('codigo'):
+            sb.Append('<CodigoComercial>')
+            sb.Append('<Tipo>04</Tipo>')
+            sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
+            sb.Append('</CodigoComercial>')
 
-            sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
-            sb.Append('<UnidadMedida>' +
-                    str(v['unidadMedida']) + '</UnidadMedida>')
-            sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
-            sb.Append('<PrecioUnitario>' +
-                    str(v['precioUnitario']) + '</PrecioUnitario>')
-            sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
-            if v.get('montoDescuento'):
-                sb.Append('<Descuento>')
-                sb.Append('<MontoDescuento>' +
-                        str(v['montoDescuento']) + '</MontoDescuento>')
-                if v.get('naturalezaDescuento'):
-                    sb.Append('<NaturalezaDescuento>' +
-                            str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
-                sb.Append('</Descuento>')
+        sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
+        sb.Append('<UnidadMedida>' +
+                  str(v['unidadMedida']) + '</UnidadMedida>')
+        sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
+        sb.Append('<PrecioUnitario>' +
+                  str(v['precioUnitario']) + '</PrecioUnitario>')
+        sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
+        if v.get('montoDescuento'):
+            sb.Append('<Descuento>')
+            sb.Append('<MontoDescuento>' +
+                      str(v['montoDescuento']) + '</MontoDescuento>')
+            if v.get('naturalezaDescuento'):
+                sb.Append('<NaturalezaDescuento>' +
+                          str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
+            sb.Append('</Descuento>')
 
-            sb.Append('<SubTotal>' + str(v['subtotal']) + '</SubTotal>')
+        sb.Append('<SubTotal>' + str(v['subtotal']) + '</SubTotal>')
 
-            # TODO: ¿qué es base imponible? ¿porqué podría ser diferente del subtotal?
-            # if inv.tipo_documento != 'FEE':
-            #   sb.Append('<BaseImponible>' + str(v['subtotal']) + '</BaseImponible>')
+        # TODO: ¿qué es base imponible? ¿porqué podría ser diferente del subtotal?
+        # if inv.tipo_documento != 'FEE':
+        #   sb.Append('<BaseImponible>' + str(v['subtotal']) + '</BaseImponible>')
 
-            if v.get('impuesto'):
-                for (a, b) in v['impuesto'].items():
-                    tax_code = str(b['iva_tax_code'])
-                    sb.Append('<Impuesto>')
-                    sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
-                    if tax_code.isdigit():
-                        sb.Append('<CodigoTarifa>' + tax_code + '</CodigoTarifa>')
-                    sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
-                    sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
+        if v.get('impuesto'):
+            for (a, b) in v['impuesto'].items():
+                tax_code = str(b['iva_tax_code'])
+                sb.Append('<Impuesto>')
+                sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
+                if tax_code.isdigit():
+                    sb.Append('<CodigoTarifa>' + tax_code + '</CodigoTarifa>')
+                sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
+                sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
 
-                    if inv.tipo_documento != 'FEE':
-                        if b.get('exoneracion'):
-                            sb.Append('<Exoneracion>')
-                            sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
-                            sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
-                            sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
-                            sb.Append(
-                                '<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
-                            sb.Append('<PorcentajeExoneracion>' + str(
-                                b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
-                            sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
-                            sb.Append('</Exoneracion>')
-                    sb.Append('</Impuesto>')
+                if inv.tipo_documento != 'FEE':
+                    if b.get('exoneracion'):
+                        sb.Append('<Exoneracion>')
+                        sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
+                        sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
+                        sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
+                        sb.Append(
+                            '<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                        sb.Append('<PorcentajeExoneracion>' + str(
+                            b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                        sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
+                        sb.Append('</Exoneracion>')
+                sb.Append('</Impuesto>')
 
-                sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
+            sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
 
-            sb.Append('<MontoTotalLinea>' + str(v['montoTotalLinea']) + '</MontoTotalLinea>')
-            sb.Append('</LineaDetalle>')
-        sb.Append('</DetalleServicio>')
+        sb.Append('<MontoTotalLinea>' + str(v['montoTotalLinea']) + '</MontoTotalLinea>')
+        sb.Append('</LineaDetalle>')
+    sb.Append('</DetalleServicio>')
 
     if otrosCargos:
         sb.Append('<OtrosCargos>')
