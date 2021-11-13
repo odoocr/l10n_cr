@@ -93,6 +93,12 @@ class CompanyElectronic(models.Model):
     invoice_qr_type = fields.Selection([('by_url','Invoice Url'),('by_info','Invoice Text Information')],default='by_url',required=True)
     invoice_field_ids = fields.One2many('invoice.qr.fields','company_id',string="Invoice Field's")
 
+    # Se agrega campos para consultar información de exoneraciones
+    ultima_respuesta_exo = fields.Text(string="Last API EXONET Response",
+                                         help="Last API EXONET Response, this allows debugging errors if they exist")
+    url_base_exo = fields.Char(string="URL Base EXONET", required=False, help="URL Base ENDPOINT EXONET",
+                                 default="https://api.hacienda.go.cr/fe/ex?")
+
     @api.constrains('invoice_qr_type','invoice_field_ids')    
     def check_invoice_field_ids(self):
         if self.invoice_qr_type == 'by_info' and not self.invoice_field_ids:
