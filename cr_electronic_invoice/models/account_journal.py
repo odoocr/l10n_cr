@@ -13,22 +13,22 @@ class AccountJournalInherit(models.Model):
     terminal = fields.Integer(string="Terminal", required=False, default="1")
 
     FE_sequence_id = fields.Many2one("ir.sequence",
-                                     string="Secuencia de Facturas Electrónicas",
+                                     string="Electronic Invoice Sequence",
                                      required=False)
 
     TE_sequence_id = fields.Many2one("ir.sequence",
-                                     string="Secuencia de Tiquetes Electrónicos",
+                                     string="Electronic Ticket Sequence",
                                      required=False)
 
     FEE_sequence_id = fields.Many2one("ir.sequence",
-                                      string="Secuencia de Facturas Electrónicas de Exportación",
+                                      string="Sequence of Electronic Export Invoices",
                                       required=False)
 
     NC_sequence_id = fields.Many2one("ir.sequence",
-                                     string="Secuencia de Notas de Crédito Electrónicas",
+                                     string="Electronic Credit Notes Sequence",
                                      required=False)
 
     ND_sequence_id = fields.Many2one("ir.sequence",
-                                     string="Secuencia de Notas de Débito Electrónicas",
+                                     string="Electronic Debit Notes Sequence",
                                      required=False)
 

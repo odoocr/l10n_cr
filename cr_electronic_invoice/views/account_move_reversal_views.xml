@@ -6,10 +6,20 @@
             <field name="model">account.move.reversal</field>
             <field name="inherit_id" ref="account.view_account_move_reversal"/>
              <field name="arch" type="xml">
-                 <field name="reason" position="before">
-                    <field name="reference_code_id" string="Código Referencia"/>
-                    <field name="reference_document_id" String="Documento Referencia"/>
-                </field>
+
+                 <xpath expr="//field[@name='reason']" position="before">
+                    <field name="reference_code_id" string="Código Referencia" attrs="{'invisible':[('move_type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))],'required':[('move_type','in', ('out_refund', 'in_refund'))]}"/>
+                    <field name="reference_document_id" string="Documento Referencia" attrs="{'invisible':[('move_type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))],'required':[('move_type','in', ('out_refund', 'in_refund'))]}"/>
+                 </xpath>
+
+                 <xpath expr="//field[@name='reason']" position="replace">
+                     <field name="reason" attrs="{'invisible':[('move_type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))],'required':[('move_type','in', ('out_refund', 'in_refund'))]}"/>
+                 </xpath>
+
+                 <xpath expr="//field[@name='journal_id']" position="attributes">
+                     <attribute name="required">1</attribute>
+                 </xpath>
+
             </field>
         </record>
     </data>

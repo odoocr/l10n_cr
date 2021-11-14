@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'Codigos Pais para Facturación electrónica Costa Rica',
-    'version': '13.0.1.0.0',
+    'name': 'Códigos País para Facturación electrónica Costa Rica',
+    'version': '14.0.1.0.0',
     'author': 'Odoo CR',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
     'category': 'Account',
-    'description': '''Codigos Pais para Facturación electronica Costa Rica.''',
-    'depends': ['base', 'account', 'product', ],
+    'description': '''Códigos País para Facturación electrónica Costa Rica.''',
+    'depends': [
+        'base',
+
+        # Se ocupan realmente estas dependencias ¿? 08/10/2021: Norlan Ruiz
+        'account', 
+        'product', ],
     'data': [
-             'data/res.country.state.csv',
+             'data/res_country_state.xml',
              'data/res.country.county.csv',
              'data/res.country.district.csv',
              'data/res.country.neighborhood.csv',

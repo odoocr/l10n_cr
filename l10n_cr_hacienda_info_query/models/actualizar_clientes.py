@@ -12,8 +12,8 @@ class res_company(models.Model):
     _name = 'res.company'
     _inherit = ['res.company']
 
-    ultima_respuesta = fields.Text(string="Última Respuesta de API", help="Última Respuesta de API, esto permite depurar errores en caso de existir")
-    url_base = fields.Char(string="URL Base", required=False, help="URL Base del END POINT", default="https://api.hacienda.go.cr/fe/ae?")
+    ultima_respuesta = fields.Text(string="Latest API response", help="Last API Response, this allows debugging errors if they exist")
+    url_base = fields.Char(string="URL Base", required=False, help="URL Base of the END POINT", default="https://api.hacienda.go.cr/fe/ae?")
 
 class res_partner(models.Model):
     _name = 'res.partner'
@@ -44,7 +44,6 @@ class res_partner(models.Model):
 
             if peticion.status_code in (200,202) and len(peticion._content) > 0:
                 contenido = json.loads(str(peticion._content,'utf-8'))
-                actividades = contenido.get('actividades')
 #                _logger.info(contenido)
                 self.env.company.ultima_respuesta = ultimo_mensaje
 
@@ -66,11 +65,12 @@ class res_partner(models.Model):
                     if contenido.get('nombre') != None:
                        name = contenido.get('nombre')
                        self.name = name
-                       for act in actividades:
-                          if act.get('estado') == 'A':
-                                  self.activity_id = self.env['economic.activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
-            else:
-                self.activity_id = self.env['economic.activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
+                    if 'actividades' in contenido:
+                        actividades = contenido.get('actividades')
+                        for act in actividades:
+                            if act.get('estado') == 'A':
+                                if 'activity_id' in self._fields:
+                                    self.activity_id = self.env['economic.activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
 
     @api.onchange('vat')
     def onchange_vat(self):

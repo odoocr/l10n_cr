@@ -367,10 +367,12 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     if inv._name == 'pos.order':
         plazo_credito = '0'
         for payment in inv.payment_ids:
-            if payment.payment_method_id.is_cash_count:
+            # En caso que no tenga código definido se colocará el de efectivo para evitar rechazos de documentos
+            if payment.payment_method_id.sequence == False:
                 payment_methods_id.append('01')
             else:
-                payment_methods_id.append('02')
+                # Se agrega el campo code en los métodos de pago de Odoo POS
+                payment_methods_id.append(str(payment.payment_method_id.sequence))
         cod_moneda = str(inv.company_id.currency_id.name)
     else:
         payment_methods_id.append(str(inv.payment_methods_id.sequence))
@@ -848,7 +850,7 @@ def get_economic_activities(company):
 
 
 def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
-    if (inv.type == 'in_invoice' or inv.type == 'in_refund') and (inv.tipo_documento != 'FEC'):
+    if (inv.move_type == 'in_invoice' or inv.move_type == 'in_refund') and (inv.tipo_documento != 'FEC'):
         clave = inv.number_electronic + "-" + inv.consecutive_number_receiver
     else:
         clave = inv.number_electronic
@@ -860,7 +862,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
     # se carga el xml devuelto por Hacienda
     last_state = False
-    if inv.type == 'out_invoice' or inv.type == 'out_refund':
+    if inv.move_type == 'out_invoice' or inv.move_type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
         last_state = inv.state_tributacion
         inv.state_tributacion = estado_m_h
@@ -868,7 +870,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         if xml_firmado:
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-    elif inv.type == 'in_invoice' or inv.type == 'in_refund':
+    elif inv.move_type == 'in_invoice' or inv.move_type == 'in_refund':
         last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
@@ -877,14 +879,14 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
-            inv.type == 'out_invoice' or inv.type == 'out_refund'):
+            inv.move_type == 'out_invoice' or inv.move_type == 'out_refund'):
         inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
         inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
     if inv.tipo_documento != 'FEC' and estado_m_h == 'aceptado' and (last_state is False or last_state == 'procesando'):
         # if not inv.partner_id.opt_out:
-        if inv.type == 'in_invoice' or inv.type == 'in_refund':
+        if inv.move_type == 'in_invoice' or inv.move_type == 'in_refund':
             email_template = self.env.ref(
                 'cr_electronic_invoice.email_template_invoice_vendor', False)
         else:
