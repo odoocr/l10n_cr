@@ -637,7 +637,7 @@ class PosOrder(models.Model):
                     round(total_servicio_exento, 5), total_servicio_exonerado,
                     round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5),
                     total_mercaderia_exonerado, total_otros_cargos, total_iva_devuelto, base_subtotal,
-                    total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
+                    total_impuestos, total_descuento, lines,
                     otros_cargos, currency_rate, invoice_comments,
                     tipo_documento_referencia, numero_documento_referencia,
                     fecha_emision_referencia, codigo_referencia, razon_referencia)

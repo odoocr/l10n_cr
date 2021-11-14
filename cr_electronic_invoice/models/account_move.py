@@ -1055,7 +1055,7 @@ class AccountInvoiceElectronic(models.Model):
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     product_amount = round(i['base']*quantity)
-                                    tax_amount = round(product_amount * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                    tax_amount = round((product_amount - descuento) * taxes_lookup[i['id']]['tarifa'] / 100, 5)
                                     _line_tax += tax_amount
                                     tax = {
                                         'codigo': taxes_lookup[i['id']]['tax_code'],
@@ -1171,7 +1171,7 @@ class AccountInvoiceElectronic(models.Model):
                     total_servicio_exento, total_servicio_exonerado,
                     total_mercaderia_gravado, total_mercaderia_exento,
                     total_mercaderia_exonerado, total_otros_cargos, total_iva_devuelto, base_subtotal,
-                    total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
+                    total_impuestos, total_descuento, lines,
                     otros_cargos, currency_rate, invoice_comments,
                     tipo_documento_referencia, numero_documento_referencia,
                     fecha_emision_referencia, codigo_referencia, razon_referencia)
