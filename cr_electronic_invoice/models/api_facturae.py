@@ -1033,6 +1033,11 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
     invoice.tipo_documento = False
 
     emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+    tipo_emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Tipo", namespaces=namespaces)[0].text
+    nombre_emisor = invoice_xml.xpath("inv:Emisor/inv:Nombre", namespaces=namespaces)[0].text
+    pais_emisor = invoice.env['res.country'].search([('name', '=', 'Costa Rica')], limit=1).id
+    telefono_emisor = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)[0].text    otrassenas_emisor = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:OtrasSenas", namespaces=namespaces)[0].text
+    correo_emisor = invoice_xml.xpath("inv:Emisor/inv:CorreoElectronico", namespaces=namespaces)[0].text
 
     receptor_node = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)
     if receptor_node:
@@ -1061,7 +1066,26 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
     if partner:
         invoice.partner_id = partner
     else:
-        raise UserError(_('The provider in the invoice does not exists. Please review it.'))
+        new_partner = invoice.env['res.partner'].create({
+                                                        'name': nombre_emisor,
+                                                        'vat': emisor,
+                                                        'identification_id': tipo_emisor,
+                                                        'type':'contact',
+                                                        'country_id': pais_emisor,
+                                                        'phone': telefono_emisor,
+                                                        'email': correo_emisor,
+                                                        'street': otrassenas_emisor,
+                                                        'supplier': 'True'})
+        partner = invoice.env['res.partner'].search([('vat', '=', emisor),
+                                                 ('supplier', '=', True),
+                                                 '|',
+                                                 ('company_id', '=', invoice.company_id.id),
+                                                 ('company_id', '=', False)],
+                                                limit=1)
+        if partner:
+            invoice.partner_id = partner
+        else:
+            raise UserError(_('The provider in the invoice does not exists. I tried to created without success. Please review it.'))
 
     invoice.account_id = partner.property_account_payable_id
     invoice.payment_term_id = partner.property_supplier_payment_term_id
