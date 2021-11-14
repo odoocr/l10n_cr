@@ -44,14 +44,8 @@ class PosConfig(models.Model):
 
     def create_sequences(self):
         if self.journal_id:
-            if self.journal_id.sucursal:
-                self.sucursal = self.journal_id.sucursal
-            else:
-                self.sucursal = 1
-            if self.journal_id.terminal:
-                self.terminal = self.journal_id.terminal
-            else:
-                self.terminal = 1
+            self.journal_id.sucursal = self.sucursal
+            self.journal_id.terminal = self.terminal
 
             # Check if FE_sequence_id exists
             if self.journal_id.FE_sequence_id:
