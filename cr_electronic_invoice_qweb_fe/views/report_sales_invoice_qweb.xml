@@ -12,7 +12,7 @@
             <table style="width:100%">
             <tr>
                 <td width="25%">
-                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" class="img" style="margin:50px 0 0 0; max-height:100px;"/>
+                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="margin:110px 0 0 0; max-height:150px;"/>
                 </td>
                 <td width="45%">
                     <strong><t t-esc="o.company_id.commercial_name"/></strong><br/>
