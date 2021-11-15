@@ -217,11 +217,16 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.onchange('partner_id', 'company_id')
     def _get_economic_activities(self):
+        #TODO ESTO SE DEBE VALIDAR
         for inv in self:
             if inv.move_type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
-                    inv.economic_activities_ids = inv.partner_id.economic_activities_ids
-                    inv.economic_activities_id = inv.partner_id.activity_id
+                    if inv.partner_id.economic_activities_ids:
+                        inv.economic_activities_ids = inv.partner_id.economic_activities_ids
+                    else:
+                        inv.economic_activities_ids = self.env['economic.activity'].search([])
+                else:
+                    inv.economic_activities_ids = self.env['economic.activity'].search([])
             else:
                 inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
 
@@ -1432,3 +1437,58 @@ class AccountInvoiceElectronic(models.Model):
                     (line + counterpart_lines).with_context(move_reverse_cancel=cancel).reconcile()
 
         return reverse_moves
+
+    def create_partner_from_xml(self):
+
+        if not self.partner_id and self.xml_supplier_approval:
+            info = {}
+
+            invoice_xml = etree.fromstring(base64.b64decode(self.xml_supplier_approval))
+            namespaces = invoice_xml.nsmap
+            inv_xmlns = namespaces.pop(None)
+            namespaces['inv'] = inv_xmlns
+
+            info['vat'] = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+
+            partner = self.env['res.partner'].search([('vat', '=', info['vat']), ('type', '=', 'contact')], limit=1)
+            if len(partner) > 0:
+                self.partner_id = partner.id
+            else:
+                info['name'] = invoice_xml.xpath("inv:Emisor/inv:Nombre", namespaces=namespaces)[0].text
+                info['phone'] = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)[0].text or False
+                info['email'] = invoice_xml.xpath("inv:Emisor/inv:CorreoElectronico", namespaces=namespaces)[0].text or False
+                info['lang'] = 'es_CR'
+
+                # Se agrega manualmente la información ya que no se puede obtener del XML
+                info['property_payment_term_id'] = 1
+                info['payment_methods_id'] = 1
+                info['property_product_pricelist'] = 1
+                info['property_supplier_payment_term_id'] = 1
+
+                # Ubicacion
+
+                # País
+                info['country_id'] = self.env['res.country'].search([('code', '=', 'CR')], limit=1).id
+
+                # Provincia
+                provincia = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:Provincia", namespaces=namespaces)[0].text
+                state_id = self.env['res.country.state'].search([('code', '=', provincia)], limit=1).id
+                info['state_id'] = state_id
+
+                # Cantón
+                canton = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:Canton", namespaces=namespaces)[0].text
+                county_id = self.env['res.country.county'].search([('code', '=', canton), ('state_id', '=', state_id)], limit=1).id
+                info['county_id'] = county_id
+
+                # Distrito
+                distrito = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:Distrito", namespaces=namespaces)[0].text
+                district_id = self.env['res.country.district'].search([('code', '=', distrito), ('county_id', '=', county_id)], limit=1).id
+                info['district_id'] = district_id
+
+
+                actividad_economica = invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)[0].text
+                info['activity_id'] = self.env['economic.activity'].search([('code', '=', actividad_economica)], limit=1).id
+
+                cliente = self.env['res.partner'].create(info)
+                cliente.onchange_vat()
+                self.partner_id = cliente.id

@@ -13,6 +13,7 @@
                         attrs="{'invisible':['|', ('move_type','not in', ('in_invoice', 'in_refund')), ('tipo_documento','==','FEC')]}"/>
                 <button name="action_create_fec" type="object" string="Enviar FEC"
                         attrs="{'invisible':['|', ('tipo_documento','!=','FEC'), ('state_tributacion','not in', (False,'rechazado', 'error'))]}"/>
+                <button name="create_partner_from_xml" class="oe_highlight" type="object" string="Crear Proveedor" attrs="{'invisible':['|','|',('move_type','in',('entry', 'out_invoice', 'out_refund')),('partner_id','!=', False),('xml_supplier_approval','=', False)]}"/>
             </xpath>
 
             <field name="narration" position="before">

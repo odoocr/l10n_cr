@@ -41,7 +41,7 @@ class ImportInvoiceImportWizardCR(models.TransientModel):
         invoice_form = Form(self.env['account.invoice'], view='account.invoice_supplier_form')
         invoice = invoice_form.save()
 
-        invoice.fname_xml_supplier_approval = attachment.datas_fname
+        invoice.fname_xml_supplier_approval = attachment.name
         invoice.xml_supplier_approval = attachment.datas
         api_facturae.load_xml_data(invoice, True, self.account_id, self.static_product_id, self.account_analytic_id)
         attachment.write({'res_model': 'account.invoice', 'res_id': invoice.id})
