@@ -501,17 +501,30 @@ class AccountInvoiceElectronic(models.Model):
         product = False
         load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
 
-        default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
+        purchase_journal = self.env['account.journal'].search([('type', '=', 'purchase')], limit=1)
+        default_account_id = purchase_journal.expense_account_id.id
         if default_account_id:
             account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
+        else:
+            default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
+            if default_account_id:
+                account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
 
-        analytic_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_analytic_account_id')
+        analytic_account_id = purchase_journal.expense_analytic_account_id.id
         if analytic_account_id:
             analytic_account = self.env['account.analytic.account'].search([('id', '=', analytic_account_id)], limit=1)
+        else:
+            analytic_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_analytic_account_id')
+            if analytic_account_id:
+                analytic_account = self.env['account.analytic.account'].search([('id', '=', analytic_account_id)], limit=1)
 
-        product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
+        product_id = purchase_journal.expense_product_id.id
         if product_id:
             product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
+        else:
+            product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
+            if product_id:
+                product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
 
         api_facturae.load_xml_data(self, load_lines, account, product, analytic_account)
 
