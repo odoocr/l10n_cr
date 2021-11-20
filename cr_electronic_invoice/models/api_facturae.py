@@ -1007,15 +1007,32 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         receptor = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
         invoice.tipo_documento= False
 
+        emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+        tipo_emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Tipo", namespaces=namespaces)[0].text
+        nombre_emisor = invoice_xml.xpath("inv:Emisor/inv:Nombre", namespaces=namespaces)[0].text
+        pais_emisor = invoice.env['res.country'].search([('name', '=', 'Costa Rica')], limit=1).id
+        telefono_emisor = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)[0].text
+        otrassenas_emisor = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:OtrasSenas", namespaces=namespaces)[0].text
+        correo_emisor = invoice_xml.xpath("inv:Emisor/inv:CorreoElectronico", namespaces=namespaces)[0].text
+
+        receptor_node = invoice_xml.xpath("inv:Receptor/inv:Identificacion/inv:Numero", namespaces=namespaces)
+
+        if receptor_node:
+            receptor = receptor_node[0].text
+        else:
+            raise UserError('El receptor no está definido en el xml')  # noqa
+
         if receptor != invoice.company_id.vat:
             raise UserError('El receptor no corresponde con la compañía actual con identificación ' +
-                             receptor + '. Por favor active la compañía correcta.')  # noqa
+                            receptor + '. Por favor active la compañía correcta.')  # noqa
 
         currency_node = invoice_xml.xpath("inv:ResumenFactura/inv:CodigoTipoMoneda/inv:CodigoMoneda", namespaces=namespaces)
+
         if currency_node:
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', currency_node[0].text)], limit=1).id
         else:
             invoice.currency_id = invoice.env['res.currency'].search([('name', '=', 'CRC')], limit=1).id
+
 
         partner = invoice.env['res.partner'].search([('vat', '=', emisor),
                                                     '|',
@@ -1029,6 +1046,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             raise UserError(_('The provider in the invoice does not exists. Please review it.'))
         #TO DO : Validar
         #invoice.account_id = partner.property_account_payable_id
+        
         invoice.invoice_payment_term_id = partner.property_supplier_payment_term_id
 
         payment_method_node = invoice_xml.xpath("inv:MedioPago", namespaces=namespaces)
