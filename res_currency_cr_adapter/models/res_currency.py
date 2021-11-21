@@ -5,6 +5,7 @@ from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 from zeep import Client
 import datetime
+from datetime import timedelta
 import xml.etree.ElementTree
 import logging
 import requests
@@ -16,6 +17,37 @@ class ResCurrencyRate(models.Model):
     _inherit = 'res.currency'
 
     rate = fields.Float(digits=dp.get_precision('Currency Rate Precision'))
+
+    def _cron_create_missing_exchange_rates(self):
+        for currency in self.env['res.currency'].\
+            search([('id', '!=', self.env.user.company_id.currency_id.id)]):
+
+            currency.action_create_missing_exchange_rates()
+
+    def action_create_missing_exchange_rates(self):
+        currency_rate_obj = self.env['res.currency.rate']
+
+        # last_day = currency_rate_obj.search([
+        #     ('company_id', '=', self.env.user.company_id.id),
+        #     ('currency_id', '=', self.id)
+        # ], limit=1, order='name desc')
+        last_day = datetime.datetime.now().date()
+
+        first_day = currency_rate_obj.search([
+            ('company_id', '=', self.env.user.company_id.id),
+            ('currency_id', '=', self.id)
+        ], limit=1, order='name asc')
+
+        # range_day = last_day.name - first_day.name
+        range_day = last_day - first_day.name
+        date = first_day.name
+        for day in range(range_day.days):
+            if self.id == self.env.ref('base.USD').id:
+                if not currency_rate_obj.search([('name', '=', date)], limit=1):
+                    currency_rate_obj._cron_update(date,date)
+            else:
+                currency_rate_obj._create_the_latest_exchange_rate_to_date(self, date)
+            date = date + timedelta(days=1)
 
 
 class ResCurrencyRate(models.Model):
@@ -136,35 +168,90 @@ class ResCurrencyRate(models.Model):
         if exchange_source == 'hacienda':
             _logger.debug("Getting exchange rates from HACIENDA")
 
-            try:
-                url = 'https://api.hacienda.go.cr/indicadores/tc'
-                response = requests.get(url, timeout=5, verify=False)
+            # Get current date to get exchange rate for today
+            if first_date:
+                initial_date = first_date.strftime('%Y-%m-%d')
+                end_date = last_date.strftime('%Y-%m-%d')
 
-            except requests.exceptions.RequestException as e:
-                _logger.error('RequestException %s' % e)
-                return False
+                try:
+                    url = 'https://api.hacienda.go.cr/indicadores/tc/dolar/historico/?d='+initial_date+'&h='+end_date
+                    response = requests.get(url, timeout=5, verify=False)
 
-            if response.status_code in (200,):
-                # Save the exchange rate in database
-                today = datetime.datetime.now().strftime('%Y-%m-%d')
-                data = response.json()
+                except requests.exceptions.RequestException as e:
+                    _logger.error('RequestException %s' % e)
+                    return False
+                if response.status_code in (200,):
+                    data = response.json()
 
-                vals = {}
-                vals['original_rate'] = data['dolar']['venta']['valor']
-                # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                vals['rate'] =  1 / vals['original_rate']
-                vals['original_rate_2'] = data['dolar']['compra']['valor']
-                vals['rate_2'] = 1 / vals['original_rate_2']
-                vals['currency_id'] = self.env.ref('base.USD').id
+                    for rate_line in data:
+                        today = datetime.datetime.strptime(rate_line['fecha'], '%Y-%m-%d %H:%M:%S')
+                        vals = {}
+                        vals['original_rate'] = rate_line['venta']
+                        # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
+                        vals['rate'] =  1 / vals['original_rate']
+                        vals['original_rate_2'] = rate_line['compra']
+                        vals['rate_2'] = 1 / vals['original_rate_2']
+                        vals['currency_id'] = self.env.ref('base.USD').id
 
-                rate_id = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
+                        rate_id = self.env['res.currency.rate'].search([('name', '=', today.date())], limit=1)
 
-                if rate_id:
-                    rate_id.write(vals)
-                else:
-                    vals['name'] = today
-                    self.create(vals)
+                        if rate_id:
+                            rate_id.write(vals)
+                        else:
+                            vals['name'] = today.date()
+                            self.create(vals)
+            else:
+            
+                try:
+                    url = 'https://api.hacienda.go.cr/indicadores/tc'
+                    response = requests.get(url, timeout=5, verify=False)
 
-            _logger.debug(vals)
+                except requests.exceptions.RequestException as e:
+                    _logger.error('RequestException %s' % e)
+                    return False
+
+                if response.status_code in (200,):
+                    # Save the exchange rate in database
+                    today = datetime.datetime.now().strftime('%Y-%m-%d')
+                    data = response.json()
+
+                    vals = {}
+                    vals['original_rate'] = data['dolar']['venta']['valor']
+                    # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
+                    vals['rate'] =  1 / vals['original_rate']
+                    vals['original_rate_2'] = data['dolar']['compra']['valor']
+                    vals['rate_2'] = 1 / vals['original_rate_2']
+                    vals['currency_id'] = self.env.ref('base.USD').id
+
+                    rate_id = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
+
+                    if rate_id:
+                        rate_id.write(vals)
+                    else:
+                        vals['name'] = today
+                        self.create(vals)
+
+                _logger.debug(vals)
 
         _logger.debug("=========================================================")
+
+    def _create_the_latest_exchange_rate_to_date(self, currency, date=None):
+        name = date or datetime.datetime.now()
+        currency_rate_obj = self.env['res.currency.rate'].search([
+            ('company_id', '=', self.env.user.company_id.id),
+            ('currency_id', '=', currency.id),
+            ('name', '<=', name),
+        ], limit=1, order='name desc')
+
+        if currency_rate_obj.name == name:
+            return
+
+        self.create({
+            'name': name,
+            'rate': currency_rate_obj.rate,
+            'original_rate': currency_rate_obj.original_rate,
+            'rate_2': currency_rate_obj.rate_2,
+            'original_rate_2': currency_rate_obj.original_rate_2,
+            'currency_id': currency_rate_obj.currency_id.id,
+            'company_id': currency_rate_obj.company_id.id,
+        })

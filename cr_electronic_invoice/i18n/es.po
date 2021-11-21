@@ -265,7 +265,7 @@ msgstr "Tipo de Autorización"
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__sucursal
 msgid "Branch"
-msgstr "Rama"
+msgstr "Sucursal"
 
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_category__cabys_code

@@ -1,19 +1,20 @@
-[LOG] 2021-10-24 10:48 p.m.
+[LOG] 2021-11-20 03:36 p.m.
 
 This version is for testing only, it is still under development, use it at your own risk, neither Odoocr and the developers who make modifications to this version of code are responsible for the errors it generates.
 
 *****DONE:
-*l10n_cr_country_codes
-*l10n_cr_hacienda_info_query
-*res_currency_cr_adapter
-*cr_electronic_invoice_pos
+    *l10n_cr_country_codes
+    *l10n_cr_hacienda_info_query
+    *res_currency_cr_adapter
+    *cr_electronic_invoice_qweb_fe
+    *cr_electronic_invoice
+    *Import Documents (account.invoice.import.wizard) --> Replaced in 14.0 in account_journal.py method: create_invoice_from_attachment
 
 *****PROGRESS:
-    cr_electronic_invoice    
+    cr_electronic_invoice_pos
+        *Remove backend dependency for document sequences
 
 **********TO-DO TESTS:
-        *cr_electronic_invoice
-            - Exoneration documents
-            - FEC
-            - Accept or reject supplier documents
-            - Import Documents (account.invoice.import.wizard)
+    *cr_electronic_invoice
+        - FEC
+        - Accept or reject supplier documents

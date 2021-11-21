@@ -33,7 +33,7 @@ class CompanyElectronic(models.Model):
     commercial_name = fields.Char(string="Commercial Name", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Cryptographic Key", )
-    date_expiration_sign = fields.Datetime(string="Due date")
+    date_expiration_sign = fields.Datetime(string="Due date", default='1985-08-28 00:00:00')
     range_days = fields.Integer(string='Days range', default=5)
     send_user_ids = fields.Many2many('res.users', 'res_company_res_sendusers_rel', string='Users')
 
@@ -92,6 +92,12 @@ class CompanyElectronic(models.Model):
 
     invoice_qr_type = fields.Selection([('by_url','Invoice Url'),('by_info','Invoice Text Information')],default='by_url',required=True)
     invoice_field_ids = fields.One2many('invoice.qr.fields','company_id',string="Invoice Field's")
+
+    # Se agrega campos para consultar información de exoneraciones
+    ultima_respuesta_exo = fields.Text(string="Last API EXONET Response",
+                                         help="Last API EXONET Response, this allows debugging errors if they exist")
+    url_base_exo = fields.Char(string="URL Base EXONET", required=False, help="URL Base ENDPOINT EXONET",
+                                 default="https://api.hacienda.go.cr/fe/ex?")
 
     @api.constrains('invoice_qr_type','invoice_field_ids')    
     def check_invoice_field_ids(self):
@@ -167,11 +173,20 @@ class CompanyElectronic(models.Model):
             self.write(to_write)
 
     def test_get_token(self):
+        self.get_expiration_date()
         token_m_h = api_facturae.get_token_hacienda(
             self.env.user, self.frm_ws_ambiente)
         if token_m_h:
            _logger.info('E-INV CR - I got the token')
         return 
+    
+    def get_expiration_date(self):
+        if self.signature and self.frm_pin:
+            self.date_expiration_sign = api_facturae.p12_expiration_date(self.signature, self.frm_pin)
+        else:
+            self.message_post(
+                subject='Error',
+                body="Signature requerido")
 
     def action_get_economic_activities(self):
         if self.vat:

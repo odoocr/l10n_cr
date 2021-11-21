@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
 <data>
 <template id="sale.report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
 </template>
 
 <template id="sale_stock.sale_stock_report_invoice_document" inherit_id="account.report_invoice_document">
 </template>
-
-<template id="account.report_invoice_document_with_payments" inherit_id="account.report_invoice_document">
-</template>
-
 <template id="account.report_invoice_document">
     <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
         <div class="header">
@@ -34,25 +30,25 @@
                 </td>
                 <td width="30%">
                 <div class="text-center">
-                    <t t-if="o.type == 'in_invoice'">
+                    <t t-if="o.move_type == 'in_invoice'">
                         <span style="font-weight:bolder" t-if="not o.number_electronic">FACTURA</span>
                         <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='FE'">FACTURA ELECTRONICA</span>
                         <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='FEC'">FACTURA ELECTRONICA COMPRA</span>
                         <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='TE'">TIQUETE ELECTRONICO</span>
                     </t>
-                    <t t-if="o.type == 'out_invoice'">
+                    <t t-if="o.move_type == 'out_invoice'">
                         <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='FE'">FACTURA ELECTRONICA</span>
                         <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='TE'">TIQUETE ELECTRONICO</span>
                         <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='FEE'">FACTURA ELECTRONICA DE EXPORTACION</span>
                         <span style="font-weight:bolder" t-if="o.number_electronic and o.tipo_documento=='ND'">NOTA DEBITO ELECTRONICA</span>
                         <span style="font-weight:bolder" t-if="not o.number_electronic">FACTURA</span>
                     </t>
-                    <t t-if="o.type == 'out_refund' or o.type == 'in_refund'">
+                    <t t-if="o.move_type == 'out_refund' or o.move_type == 'in_refund'">
                         <span style="font-weight:bolder" t-if="o.number_electronic">NOTA DE CRÉDITO ELECTRONICA</span><br/>
                         <span style="font-weight:bolder" t-if="not o.number_electronic">NOTA DE CRÉDITO</span><br/>
                     </t>
-                    <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'" t-esc="o.reference"/>
-                    <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.name"/>
+                    <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'" t-esc="o.reference"/>
+                    <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'" t-esc="o.number_electronic and o.number_electronic[21:41] or o.name"/>
                 </div>
                 <div class="text-center">
                     <table t-if="o.date_issuance" style="width:100%;" class="dtheader rounded2">
@@ -270,10 +266,10 @@
                 <tbody>
                     <tr style="border:1px solid black;">
                         <td>
-                            <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
+                            <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'">
                                 <strong>PROVEEDOR:</strong>
                             </span>
-                            <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
+                            <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'">
                                 <strong>CLIENTE:</strong>
                             </span>
                         </td>
@@ -329,18 +325,18 @@
                     </tr>
                     <tr style="border:1px solid black;">
                         <td>
-                            <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
+                            <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'">
                                 <strong>FACTURA INTERNA:</strong><br/>
                             </span>
-                            <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
+                            <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'">
                                 <strong>ORDEN DE COMPRA:</strong><br/>
                             </span>
                         </td>
                         <td>
-                            <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
+                            <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'">
                                 <span t-field="o.sequence"/>-<span t-field="o.invoice_origin"/><br/>
                             </span>
-                            <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
+                            <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'">
                                 <span t-field="o.name"/>-<span t-field="o.invoice_origin"/><br/>
                             </span>
                         </td>
@@ -353,10 +349,10 @@
                     </tr>
                     <tr style="border:1px solid black;">
                         <td>
-                            <span t-if="o.type == 'in_invoice' or o.type == 'in_refund'">
+                            <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'">
                                 <strong>USUARIO:</strong>
                             </span>
-                            <span t-if="o.type == 'out_invoice' or o.type == 'out_refund'">
+                            <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'">
                                 <strong>VENDEDOR:</strong>
                             </span>
                         </td>
@@ -491,8 +487,8 @@
                     </td>
                 </tr>
             </table>
-            <!--t t-if="o.type == 'in_invoice' or o.type == 'in_refund'"-->
-            <t t-if="o.type != 'out_invoice'">
+            <!--t t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'"-->
+            <t t-if="o.move_type != 'out_invoice'">
                 <div class="rounded2">
                     <table width="100%;" cellpadding="0" cellspacing="0">
                         <tr class="text-center">
@@ -509,8 +505,8 @@
                 </div>
             </t>
 
-            <!--t t-if="o.type == 'out_invoice' or o.type == 'out_refund'"-->
-            <t t-if="o.type == 'out_invoice'">
+            <!--t t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'"-->
+            <t t-if="o.move_type == 'out_invoice'">
                 <div class="rounded2">
                     <p style="font-size:14px;padding:2px;text-align:justify;">
                         Este documento constituye factura comercial con titulo ejecutivo de acuerdo al art. 460 del Código de Comercio
@@ -619,7 +615,7 @@
 </template-->
 
 </data>
-</openerp>
+</odoo>
 
 
 

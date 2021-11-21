@@ -44,14 +44,8 @@ class PosConfig(models.Model):
 
     def create_sequences(self):
         if self.journal_id:
-            if self.journal_id.sucursal:
-                self.sucursal = self.journal_id.sucursal
-            else:
-                self.sucursal = 1
-            if self.journal_id.terminal:
-                self.terminal = self.journal_id.terminal
-            else:
-                self.terminal = 1
+            self.journal_id.sucursal = self.sucursal
+            self.journal_id.terminal = self.terminal
 
             # Check if FE_sequence_id exists
             if self.journal_id.FE_sequence_id:
@@ -637,7 +631,7 @@ class PosOrder(models.Model):
                     round(total_servicio_exento, 5), total_servicio_exonerado,
                     round(total_mercaderia_gravado, 5), round(total_mercaderia_exento, 5),
                     total_mercaderia_exonerado, total_otros_cargos, total_iva_devuelto, base_subtotal,
-                    total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
+                    total_impuestos, total_descuento, lines,
                     otros_cargos, currency_rate, invoice_comments,
                     tipo_documento_referencia, numero_documento_referencia,
                     fecha_emision_referencia, codigo_referencia, razon_referencia)

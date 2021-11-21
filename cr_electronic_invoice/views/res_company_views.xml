@@ -45,6 +45,21 @@
                         [('country_id','=',%(base.cr)d)]}
                     </attribute>
                 </field> -->
+                <!-- Página para consultar información de EXONET-->
+                <xpath expr="//page[1]" position="after">
+                    <page string="EXONET">
+                        <separator string="URL Base"/>
+                        <group col="4" colspan="2">
+                            <group col="2">
+                                <field name="url_base_exo" nolabel="1"/>
+                            </group>
+                            <group col="2"/>
+                        </group>
+                        <group col="4">
+                            <field attrs="{'invisible' : [('ultima_respuesta_exo', 'in', (False,''))], 'readonly' : [('ultima_respuesta_exo', '!=', False)]}" colspan="4" name="ultima_respuesta_exo"/>
+                        </group>
+                    </page>
+                </xpath>
 
                 <xpath expr="//page[1]" position="after">
                     <page string="Facturación Electrónica">
