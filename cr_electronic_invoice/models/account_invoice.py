@@ -499,14 +499,15 @@ class AccountInvoiceElectronic(models.Model):
         account = False
         analytic_account = False
         product = False
-        load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
 
         purchase_journal = self.env['account.journal'].search([('type', '=', 'purchase')], limit=1)
         default_account_id = purchase_journal.expense_account_id.id
         if default_account_id:
             account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
+            load_lines = purchase_journal.load_lines
         else:
             default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
+            load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
             if default_account_id:
                 account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
 
