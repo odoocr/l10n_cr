@@ -6,11 +6,27 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
 
+            <xpath expr="//div[@name='button_box']" position="after">
+                
+                    <div class="alert alert-danger" role="alert" attrs="{'invisible':[('move_type','not in', ('in_invoice', 'in_refund', 'entry')), '|', ('state_tributacion','not in', (False)), ('state', 'in', ('draft', 'cancel'))]}">
+                        El documento no se ha emitido, en caso de requerir enviarlo manualmente precione
+                        <button class="btn btn-primary" name="generate_and_send_invoice" type="object" string="Emitir Documento"/>
+                    </div>
+                    <div class="alert alert-warning" role="alert" attrs="{'invisible':[('move_type','not in', ('entry')), '|', ('state_tributacion','not in', ('procesando')), ('state', 'in', ('draft', 'cancel'))]}">
+                        El documento se emitio con éxito, en caso de requerir consultarlo manualmente precione
+                        <button class="btn btn-primary" name="action_check_hacienda" type="object" string="Consultar Documento"/>
+                    </div>
+            </xpath>
+
             <xpath expr="//button[@name='button_draft']" position="after">
+
+            <!--
+                Se oculta el botón para utilizar nueva sección para emitir y consultar manualmente
                 <button name="action_check_hacienda" type="object" string="Consultar Hacienda"
                         attrs="{'invisible':['|',('move_type','=','entry'),('state_tributacion','in', ('aceptado', 'rechazado', 'error', 'firma_invalida', 'na', 'ne','',False))]}"/>
+            -->
                 <button name="action_send_mrs_to_hacienda" type="object" string="Enviar Mensaje Receptor"
-                        attrs="{'invisible':['|', ('move_type','not in', ('in_invoice', 'in_refund')), ('tipo_documento','==','FEC')]}"/>
+                        attrs="{'invisible':['|', ('move_type','not in', ('in_invoice', 'in_refund', 'entry')), ('tipo_documento','==','FEC')]}"/>
                 <button name="action_create_fec" type="object" string="Enviar FEC"
                         attrs="{'invisible':['|', ('tipo_documento','!=','FEC'), ('state_tributacion','not in', (False,'rechazado', 'error'))]}"/>
                 <button name="create_partner_from_xml" class="oe_highlight" type="object" string="Crear Proveedor" attrs="{'invisible':['|','|',('move_type','in',('entry', 'out_invoice', 'out_refund')),('partner_id','!=', False),('xml_supplier_approval','=', False)]}"/>
