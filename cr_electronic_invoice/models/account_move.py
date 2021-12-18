@@ -243,7 +243,56 @@ class AccountInvoiceElectronic(models.Model):
                 else:
                     raise UserError(_('Partner does not have a default payment method'))
 
-    
+    def action_invoice_sent_mass(self):
+
+        if self.invoice_id.move_type == 'in_invoice' or self.invoice_id.move_type == 'in_refund':
+            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', raise_if_not_found=False)
+        else:
+            email_template = self.env.ref('account.email_template_edi_invoice', raise_if_not_found=False)
+
+        email_template.attachment_ids = [(5, 0, 0)]
+
+        lang = False
+        if email_template:
+            lang = email_template._render_lang(self.ids)[self.id]
+        if not lang:
+            lang = get_lang(self.env).code
+
+        if self.env.user.company_id.frm_ws_ambiente == 'disabled':
+            pass
+            #email_template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
+        elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
+
+            domain = [('res_model', '=', 'account.move'), ('res_id', '=', self.id), ('name', 'like', self.tipo_documento + '_'+ self.number_electronic)]
+            attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
+
+            if attachment:
+                attachment.name = self.fname_xml_comprobante
+
+                domain_resp = [('res_model', '=', 'account.move'), ('res_id', '=', self.id),
+                               ('name', 'like', 'AHC_' + self.number_electronic)]
+                attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
+
+                if attachment_resp:
+                    attachment_resp.name = self.fname_xml_respuesta_tributacion
+
+                    email_template.attachment_ids = [
+                        (6, 0, [attachment.id, attachment_resp.id])]
+                    email_template.with_context(type='binary',
+                                                default_type='binary').send_mail(
+                        self.id,
+                        raise_exception=False,
+                        force_send=True)
+
+                    email_template.attachment_ids = [(5)]
+                else:
+                    raise UserError(_('Response XML from Hacienda has not been received'))
+            else:
+                raise UserError(_('Invoice XML has not been generated for id:' + str(self.id)))
+
+        else:
+            raise UserError(_('Partner is not assigne to this invoice'))
+
     def action_invoice_sent(self):
         self.ensure_one()
 
@@ -716,7 +765,7 @@ class AccountInvoiceElectronic(models.Model):
                 if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
                     email_template = self.env.ref(
                         'account.email_template_edi_invoice', False)
-                    self.env['ir.attachment'].create(
+                    attachment = self.env['ir.attachment'].create(
                         {'name': i.fname_xml_comprobante,
                          'type': 'binary',
                          'datas': i.xml_comprobante,
@@ -724,7 +773,7 @@ class AccountInvoiceElectronic(models.Model):
                          'mimetype': 'text/xml',
                          'res_id': i.id
                          })
-                    self.env['ir.attachment'].create(
+                    attachment_resp = self.env['ir.attachment'].create(
                         {'name': i.fname_xml_respuesta_tributacion,
                          'type': 'binary',
                          'datas': i.xml_respuesta_tributacion,
@@ -733,13 +782,6 @@ class AccountInvoiceElectronic(models.Model):
                          'res_id': i.id
                          })
 
-                    attachment = self.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.move'), ('name', '=', i.fname_xml_comprobante),
-                         ('res_id', '=', i.id)], limit=1)
-
-                    attachment_resp = self.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.move'), ('name', '=', i.fname_xml_respuesta_tributacion),
-                         ('res_id', '=', i.id)], limit=1)
 
                     email_template.attachment_ids = [
                         (6, 0, [attachment.id, attachment_resp.id])]
@@ -844,7 +886,22 @@ class AccountInvoiceElectronic(models.Model):
                 )
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
-    
+    def generate_and_send_invoice(self):
+        days_left = self.env.user.company_id.get_days_left()
+        if days_left >= 0:
+            self.generate_and_send_invoices(self)
+        else:
+            message = self.env.user.company_id.get_message_to_send()
+            self.message_post(
+                    body=message,
+                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    message_type='notification',
+                    subtype=None,
+                    parent_id=False,
+                )
+        _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
+
+
     def generate_and_send_invoices(self, invoices):
         total_invoices = len(invoices)
         current_invoice = 0

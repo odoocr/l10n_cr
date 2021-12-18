@@ -723,23 +723,24 @@ def schema_validator(xml_file, xsd_file) -> bool:
 def get_invoice_attachments(invoice, record_id):
 
     attachments = []
+    
 
     attachment = invoice.env['ir.attachment'].search(
-        [('res_model', '=', 'account.move'), ('res_id', '=', record_id),
-         ('res_field', '=', 'xml_comprobante')], limit=1)
+                        [('res_model', '=', 'account.move'), ('name', '=', invoice.fname_xml_comprobante),
+                         ('res_id', '=', record_id)], limit=1)
 
     if attachment.id:
         attachment.name = invoice.fname_xml_comprobante
-        attachment.datas_fname = invoice.fname_xml_comprobante
+        #attachment.datas_fname = invoice.fname_xml_comprobante
         attachments.append(attachment.id)
 
     attachment_resp = invoice.env['ir.attachment'].search(
-        [('res_model', '=', 'account.move'), ('res_id', '=', record_id),
-         ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
+        [('res_model', '=', 'account.move'), ('name', '=', invoice.fname_xml_respuesta_tributacion),
+            ('res_id', '=',record_id)], limit=1)
 
     if attachment_resp.id:
         attachment_resp.name = invoice.fname_xml_respuesta_tributacion
-        attachment_resp.datas_fname = invoice.fname_xml_respuesta_tributacion
+        #attachment_resp.datas_fname = invoice.fname_xml_respuesta_tributacion
         attachments.append(attachment_resp.id)
 
     return attachments
@@ -886,7 +887,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
             inv.move_type == 'out_invoice' or inv.move_type == 'out_refund'):
-        inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
+        inv.fname_xml_respuesta_tributacion = 'AHC_' + inv.number_electronic + '.xml'
         inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
@@ -898,26 +899,25 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         else:
             email_template = self.env.ref(
                 'account.email_template_edi_invoice', False)
+        
+        self.env['ir.attachment'].create(
+                        {'name': inv.fname_xml_comprobante,
+                         'type': 'binary',
+                         'datas': inv.xml_comprobante,
+                         'res_model': self._name,
+                         'mimetype': 'text/xml',
+                         'res_id': inv.id
+                         })
+        self.env['ir.attachment'].create(
+            {'name': inv.fname_xml_respuesta_tributacion,
+                'type': 'binary',
+                'datas': inv.xml_respuesta_tributacion,
+                'res_model': self._name,
+                'mimetype': 'text/xml',
+                'res_id': inv.id
+                })
 
-        attachments = []
-
-        attachment = self.env['ir.attachment'].search(
-            [('res_model', '=', 'account.move'), ('res_id', '=', inv.id),
-             ('res_field', '=', 'xml_comprobante')], limit=1)
-
-        if attachment.id:
-            attachment.name = inv.fname_xml_comprobante
-            attachment.datas_fname = inv.fname_xml_comprobante
-            attachments.append(attachment.id)
-
-        attachment_resp = self.env['ir.attachment'].search(
-            [('res_model', '=', 'account.move'), ('res_id', '=', inv.id),
-             ('res_field', '=', 'xml_respuesta_tributacion')], limit=1)
-
-        if attachment_resp.id:
-            attachment_resp.name = inv.fname_xml_respuesta_tributacion
-            attachment_resp.datas_fname = inv.fname_xml_respuesta_tributacion
-            attachments.append(attachment_resp.id)
+        attachments = get_invoice_attachments(inv, inv.id)
 
         if len(attachments) == 2:
             email_template.attachment_ids = [(6, 0, attachments)]
