@@ -528,6 +528,7 @@ class PosOrder(models.Model):
                     line_number += 1
                     price = line.price_unit * (1 - line.discount / 100.0)
                     qty = abs(line.qty)
+                    descuento = 0.0
                     if not qty:
                         continue
                     fpos = line.order_id.fiscal_position_id
@@ -582,7 +583,8 @@ class PosOrder(models.Model):
                                 total_otros_cargos += round(abs(i['amount'] * qty), 5)
                             elif taxes_lookup[i['id']]['tax_code'] != '00':
                                 tax_index += 1
-                                tax_amount = round(abs(i['amount'] * qty), 5)
+                                product_amount = round(i['base']*qty)
+                                tax_amount = round((product_amount - descuento) * taxes_lookup[i['id']]['tarifa']  / 100, 5)
                                 _line_tax += tax_amount
                                 taxes[tax_index] = {
                                     'codigo': taxes_lookup[i['id']]['tax_code'],
