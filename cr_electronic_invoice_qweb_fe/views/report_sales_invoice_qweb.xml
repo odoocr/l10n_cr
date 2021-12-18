@@ -378,6 +378,7 @@
                 <thead class="tble-header">
                         <tr>
                             <th>Producto</th>
+                            <!--Source Document solo está disponible en la factura y no en la linea -->
                             <!--th class="hidden">Source Document</th-->
                             <th class="text-right">Cant.</th>
                             <th width="15%" class="text-right">Precio</th>
@@ -389,6 +390,7 @@
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l" style="height:25px;font-size:16px">
                             <td><span t-field="l.name"/></td>
+                            <!--Source Document solo está disponible en la factura y no en la linea -->
                             <!--td class="hidden"><span t-field="l.invoice_origin"/></td-->
                             <td class="text-right">
                                 <span t-field="l.quantity"/>
