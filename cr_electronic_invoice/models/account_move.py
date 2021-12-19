@@ -217,18 +217,18 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.onchange('partner_id', 'company_id')
     def _get_economic_activities(self):
-        #TODO ESTO SE DEBE VALIDAR
         for inv in self:
             if inv.move_type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
                     if inv.partner_id.economic_activities_ids:
                         inv.economic_activities_ids = inv.partner_id.economic_activities_ids
+                        inv.economic_activity_id = inv.partner_id.activity_id
                     else:
-                        inv.economic_activities_ids = self.env['economic.activity'].search([])
+                        raise UserError(_('The partner %s has no defined economic activity, please validate the information in the business partner before placing it!') % inv.partner_id.name)
                 else:
                     inv.economic_activities_ids = self.env['economic.activity'].search([])
             else:
-                inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
+                inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', True)])
 
     
     @api.onchange('partner_id')
