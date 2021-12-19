@@ -326,18 +326,18 @@
                     <tr style="border:1px solid black;">
                         <td>
                             <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'">
-                                <strong>FACTURA INTERNA:</strong><br/>
+                                <strong>ORDEN DE COMPRA:</strong><br/>
                             </span>
                             <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'">
-                                <strong>ORDEN DE COMPRA:</strong><br/>
+                                <strong>ORDEN DE VENTA:</strong><br/>
                             </span>
                         </td>
                         <td>
                             <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'">
-                                <span t-field="o.sequence"/>-<span t-field="o.invoice_origin"/><br/>
+                                <span t-field="o.invoice_origin"/><br/>
                             </span>
                             <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'">
-                                <span t-field="o.name"/>-<span t-field="o.invoice_origin"/><br/>
+                                <span t-field="o.invoice_origin"/><br/>
                             </span>
                         </td>
                         <td>
@@ -363,7 +363,7 @@
                             <strong>TIPO CAMBIO:</strong>
                         </td>
                         <td>
-                            <span t-esc="abs(o.amount_total / o.amount_total_signed)"/>
+                            <span t-esc="round(o.amount_total_signed / o.amount_total, 5)"/>
                         </td>
                     </tr>
                 </tbody>
