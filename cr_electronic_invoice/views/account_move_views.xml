@@ -7,15 +7,18 @@
         <field name="arch" type="xml">
 
             <xpath expr="//div[@name='button_box']" position="after">
-                
-                    <div class="alert alert-danger" role="alert" attrs="{'invisible':[('move_type','not in', ('in_invoice', 'in_refund', 'entry')), '|', ('state_tributacion','not in', (False)), ('state', 'in', ('draft', 'cancel'))]}">
+                <group  attrs="{'invisible':[('move_type','in', ('in_invoice', 'in_refund', 'entry'))]}">
+                    <div class="alert alert-danger" role="alert" attrs="{'invisible':['|', ('state_tributacion','not in', (False)), ('state', 'in', ('draft', 'cancel'))]}">
                         El documento no se ha emitido, en caso de requerir enviarlo manualmente precione
                         <button class="btn btn-primary" name="generate_and_send_invoice" type="object" string="Emitir Documento"/>
                     </div>
-                    <div class="alert alert-warning" role="alert" attrs="{'invisible':[('move_type','not in', ('entry')), '|', ('state_tributacion','not in', ('procesando')), ('state', 'in', ('draft', 'cancel'))]}">
+                </group>
+                <group attrs="{'invisible':[('move_type','=', 'entry')]}">
+                    <div class="alert alert-warning" role="alert" attrs="{'invisible':['|', ('state_tributacion','not in', ('procesando')), ('state', 'in', ('draft', 'cancel'))]}">
                         El documento se emitio con éxito, en caso de requerir consultarlo manualmente precione
                         <button class="btn btn-primary" name="action_check_hacienda" type="object" string="Consultar Documento"/>
                     </div>
+                </group>
             </xpath>
 
             <xpath expr="//button[@name='button_draft']" position="after">
