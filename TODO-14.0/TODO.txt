@@ -1,0 +1,26 @@
+[LOG] 2021-12-19 12:01 a.m
+
+This version is for testing only, it is still under development, use it at your own risk, neither Odoocr and the developers who make modifications to this version of code are responsible for the errors it generates.
+
+*****DONE:
+    *l10n_cr_country_codes
+    *l10n_cr_hacienda_info_query
+    *res_currency_cr_adapter
+    *cr_electronic_invoice_qweb_fe
+    *cr_electronic_invoice
+    *cr_electronic_invoice_pos
+
+*****SUMMARY: 
+    Currently the modules work by performing the normal flow, from issuing an electronic document, making a reversal, importing a supplier invoice from XML, issuing a document with exoneration.
+
+*****CHANGES:
+* Among the improvements that were made is that the dependency of the cr_electronic_invoice_qweb_fe module is removed, since in the cr_electronic_invoice module an adjustment was made to the PDF by default and shows the fields related to Electronic Invoicing. However, in the same way than the other modules, the cr_electronic_invoice_qweb_fe module was migrated to 14.0
+* Problems when calculating the tax with prices with decimals and a large number of units are corrected in the billing module and in the POS.
+* Added a function that generates a QR code, which allows the invoice to be viewed from the web portal (it does not require the website module) and allows the XML to be downloaded for easy customer access. (If this is not useful, the change can be reversed). This works if the cr_electronic_invoice_qweb_fe module is not installed.
+
+*****TESTS:
+*Please, if you test this version, I would appreciate if you create an ISSUE in github to be able to identify the problems that are presented in this version and to be able to stabilize it, if you consider necessary, you can add the list in this file in the TO-DO section
+
+*****TODO:
+    cr_electronic_invoice_pos
+        *Remove backend dependency for document sequences: The current operation requires that the POS always have a connection to the backend, since it consults the last electronic consecutive available through RPC 
