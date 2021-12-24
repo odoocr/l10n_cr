@@ -1063,7 +1063,7 @@ class AccountInvoiceElectronic(models.Model):
                 tipo_documento_referencia = False
                 razon_referencia = False
                 currency = inv.currency_id
-                invoice_comments = inv.comment
+                invoice_comments = escape(inv.comment)
 
                 if (inv.invoice_id or inv.not_loaded_invoice) and inv.reference_code_id and inv.reference_document_id:
                     if inv.invoice_id:
