@@ -1351,11 +1351,8 @@ class AccountInvoiceElectronic(models.Model):
                     sequence = inv.journal_id.TE_sequence_id.next_by_id()
                 elif inv.tipo_documento == 'FEE':
                     sequence = inv.journal_id.FEE_sequence_id.next_by_id()
-
-            # Credit Note
-            elif inv.move_type == 'out_refund':
-                inv.tipo_documento = 'NC'
-                sequence = inv.journal_id.NC_sequence_id.next_by_id()
+                elif inv.tipo_documento == 'ND':
+                    sequence = inv.journal_id.ND_sequence_id.next_by_id()
 
             # Digital Supplier Invoice
             elif inv.move_type == 'in_invoice' and inv.partner_id.country_id and \

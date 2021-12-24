@@ -282,6 +282,14 @@
                     </tr>
                     <tr style="border:1px solid black;">
                         <td>
+                            <strong>CORREO:</strong>
+                        </td>
+                        <td>
+                            <strong><span t-field="o.partner_id.email"/></strong>
+                        </td>
+                    </tr>
+                    <tr style="border:1px solid black;">
+                        <td>
                             <strong>CÉDULA JURÍDICA:</strong>
                         </td>
                         <td>
