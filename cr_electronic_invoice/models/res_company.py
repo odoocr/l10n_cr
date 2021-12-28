@@ -173,6 +173,113 @@ class CompanyElectronic(models.Model):
         if token_m_h:
            _logger.info('E-INV CR - I got the token')
         return
+    def get_expiration_date(self):
+        if self.signature and self.frm_pin:
+            self.date_expiration_sign = api_facturae.p12_expiration_date(self.signature, self.frm_pin)
+        else:
+            self.message_post(
+                subject='Error',
+                body="Signature requerido")
+
+    def action_get_economic_activities(self):
+        if self.vat:
+            json_response = api_facturae.get_economic_activities(self)
+
+            self.env.cr.execute('update economic_activity set active=False')
+
+            self.message_post(subject='Actividades Económicas',
+                            body='Aviso!.\n Cargando actividades económicas desde Hacienda')
+
+            if json_response["status"] == 200:
+                activities = json_response["activities"]
+                activities_codes = list()
+                for activity in activities:
+                    if activity["estado"] == "A":
+                        activities_codes.append(activity["codigo"])
+
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
+
+                for activity in economic_activities:
+                    activity.active = True
+
+                self.name = json_response["name"]
+            else:
+                alert = {
+                    'title': json_response["status"],
+                    'message': json_response["text"]
+                }
+                return {'value': {'vat': ''}, 'warning': alert}
+        else:
+            alert = {
+                'title': 'Atención',
+                'message': _('Company VAT is invalid')
+            }
+            return {'value': {'vat': ''}, 'warning': alert}
+    
+    def write(self, vals):
+        if vals.get('date_expiration_sign') or vals.get('range_days'):
+            cron = self.env.ref('cr_electronic_invoice.ir_cron_send_expiration_notice', False)
+
+            if not self.range_days:
+                return super(CompanyElectronic, self).write(vals)
+
+            date_expiration_sign = vals.get('date_expiration_sign') and vals['date_expiration_sign'] or self.date_expiration_sign
+            # date_expiration_sign = vals.get('date_expiration_sign') and \
+            #     datetime.strptime(vals['date_expiration_sign'], '%Y-%m-%d %H:%M:%S') or self.date_expiration_sign
+            if date_expiration_sign:
+                if isinstance(date_expiration_sign, str):
+                    date_expiration_sign = datetime.strptime(date_expiration_sign, '%Y-%m-%d %H:%M:%S')
+
+            range_days = vals.get('range_days') or self.range_days
+            next_call = date_expiration_sign - timedelta(days=range_days)
+            new_values = {
+                'nextcall': next_call
+            }
+
+            cron.write(new_values)
+
+        return super(CompanyElectronic, self).write(vals)
+
+    def get_days_left(self):
+        today = datetime.today()
+        date_due = self.date_expiration_sign
+        range_days = date_due - today
+
+        return range_days.days
+
+    def get_message_to_send(self):
+        days_left = self.get_days_left()
+
+        message = ''
+        if days_left >= 0:
+            message = f'Su llave criptográfica está a punto de expirar, le quedan {days_left} día(s)'
+        else:
+            message = f'No podrá validar porque su llave criptográfica expiró hace {abs(days_left)} día(s)'
+
+        return message
+
+    def _cron_send_email_notifications(self):
+        today = datetime.now()
+        date_due = self.env.user.company_id.date_expiration_sign
+        range_day = self.env.user.company_id.range_days
+
+        range_date = date_due - timedelta(days=range_day)
+        if today >= range_date:
+            template = self.env.ref('cr_electronic_invoice.email_template_edi_expiration_notice', False)
+
+            template_values = {
+                'email_to': '${object.email|safe}',
+                'email_cc': False,
+                'auto_delete': True,
+                'partner_to': False,
+                'scheduled_date': False,
+            }
+
+            template.write(template_values)
+
+            for user in self.env.user.company_id.send_user_ids:
+                if user.email:
+                    template.with_context(lang=user.lang).send_mail(user.id, force_send=True, raise_exception=True)
 
     def get_expiration_date(self):
         if self.signature and self.frm_pin:
