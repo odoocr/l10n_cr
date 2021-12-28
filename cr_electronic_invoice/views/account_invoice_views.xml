@@ -60,6 +60,9 @@
                 <xpath expr="//button[@name='action_invoice_sent']" position="attributes">
                     <attribute name="invisible">False</attribute>
                 </xpath>
+                <field name="amount_tax" position="after">
+                    <field name="amount_total_iva_devuelto" attrs="{'invisible': [('amount_total_iva_devuelto', '=', 0)]}"/>   
+                </field>
 
             </field>
         </record>
