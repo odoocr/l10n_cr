@@ -182,24 +182,27 @@ class ResCurrencyRate(models.Model):
                     return False
                 if response.status_code in (200,):
                     data = response.json()
+                    companies = self.env['res.company'].search([])
+                    for company in companies:
+                        _logger.error(company.id)
 
-                    for rate_line in data:
-                        today = datetime.datetime.strptime(rate_line['fecha'], '%Y-%m-%d %H:%M:%S')
-                        vals = {}
-                        vals['original_rate'] = rate_line['venta']
-                        # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                        vals['rate'] =  1 / vals['original_rate']
-                        vals['original_rate_2'] = rate_line['compra']
-                        vals['rate_2'] = 1 / vals['original_rate_2']
-                        vals['currency_id'] = self.env.ref('base.USD').id
+                        for rate_line in data:
+                            today = datetime.datetime.strptime(rate_line['fecha'], '%Y-%m-%d %H:%M:%S')
+                            vals = {}
+                            vals['original_rate'] = rate_line['venta']
+                            # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
+                            vals['rate'] =  1 / vals['original_rate']
+                            vals['original_rate_2'] = rate_line['compra']
+                            vals['rate_2'] = 1 / vals['original_rate_2']
+                            vals['currency_id'] = self.env.ref('base.USD').id
 
-                        rate_id = self.env['res.currency.rate'].search([('name', '=', today.date())], limit=1)
+                            rate_id = self.env['res.currency.rate'].search([('name', '=', today.date())], limit=1)
 
-                        if rate_id:
-                            rate_id.write(vals)
-                        else:
-                            vals['name'] = today.date()
-                            self.create(vals)
+                            if rate_id:
+                                rate_id.write(vals)
+                            else:
+                                vals['name'] = today.date()
+                                self.create(vals)
             else:
             
                 try:
@@ -214,22 +217,24 @@ class ResCurrencyRate(models.Model):
                     # Save the exchange rate in database
                     today = datetime.datetime.now().strftime('%Y-%m-%d')
                     data = response.json()
+                    companies = self.env['res.company'].search([])
+                    for company in companies:
+                        _logger.error(company.id)
+                        vals = {}
+                        vals['original_rate'] = data['dolar']['venta']['valor']
+                        # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
+                        vals['rate'] =  1 / vals['original_rate']
+                        vals['original_rate_2'] = data['dolar']['compra']['valor']
+                        vals['rate_2'] = 1 / vals['original_rate_2']
+                        vals['currency_id'] = self.env.ref('base.USD').id
 
-                    vals = {}
-                    vals['original_rate'] = data['dolar']['venta']['valor']
-                    # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                    vals['rate'] =  1 / vals['original_rate']
-                    vals['original_rate_2'] = data['dolar']['compra']['valor']
-                    vals['rate_2'] = 1 / vals['original_rate_2']
-                    vals['currency_id'] = self.env.ref('base.USD').id
+                        rate_id = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
 
-                    rate_id = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
-
-                    if rate_id:
-                        rate_id.write(vals)
-                    else:
-                        vals['name'] = today
-                        self.create(vals)
+                        if rate_id:
+                            rate_id.write(vals)
+                        else:
+                            vals['name'] = today
+                            self.create(vals)
 
                 _logger.debug(vals)
 

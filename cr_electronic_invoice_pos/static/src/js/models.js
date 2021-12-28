@@ -19,7 +19,7 @@
  *
  ******************************************************************************/
 
-odoo.define('cr_electronic_invoice_pos.models', function (require) {
+ odoo.define('cr_electronic_invoice_pos.models', function (require) {
     "use strict";
 
     var ajax = require('web.ajax');
@@ -216,6 +216,12 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             order['tipo_documento'] = self.tipo_documento;
 
             return order;
+        },
+        init_from_JSON: function(json){
+            OrderParent.prototype.init_from_JSON.call(this, arguments);
+            this.number_electronic = json.number_electronic;
+            this.sequence = json.sequence;
+            this.tipo_documento = json.tipo_documento;
         }
     });
 

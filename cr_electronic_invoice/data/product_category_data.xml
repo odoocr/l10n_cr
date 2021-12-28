@@ -4,5 +4,8 @@
         <record id="product_category_otros_cargos" model="product.category">
             <field name="name">Otros Cargos</field>
         </record>
+        <record id="product_category_servicios_salud" model="product.category">
+            <field name="name">Servicios de Salud</field>
+        </record>
     </data>
 </odoo>

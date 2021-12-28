@@ -526,8 +526,9 @@ class PosOrder(models.Model):
                 total_iva_devuelto = 0.0
                 for line in doc.lines:
                     line_number += 1
-                    price = line.price_unit * (1 - line.discount / 100.0)
+                    price = line.price_unit #* (1 - line.discount / 100.0)
                     qty = abs(line.qty)
+
                     if not qty:
                         continue
                     fpos = line.order_id.fiscal_position_id
@@ -536,11 +537,11 @@ class PosOrder(models.Model):
                     line_taxes = tax_ids.compute_all(
                         price, line.order_id.pricelist_id.currency_id, 1, product=line.product_id, partner=line.order_id.partner_id)
                     if line.discount != 100:
-                        price_unit = round(
-                            line_taxes['total_excluded'] / (1 - line.discount / 100.0), 5)
+                        price_unit = round(line_taxes['total_excluded'], 5)
                     else:
                         price_unit = 0
                     base_line = abs(round(price_unit * qty, 5))
+                    descuento = line.discount and round(price_unit * qty * line.discount / 100.0, 5) or 0.0
                     subtotal_line = abs(
                         round(price_unit * qty * (1 - line.discount / 100.0), 5))
                     dline = {
@@ -560,8 +561,7 @@ class PosOrder(models.Model):
                         _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % line.product_id.name
                         continue
 
-                    if line.discount:
-                        descuento = abs(round(base_line - subtotal_line, 5))
+                    if line.discount and price_unit > 0:
                         total_descuento += descuento
                         dline["montoDescuento"] = descuento
                         dline["naturalezaDescuento"] = 'Descuento Comercial'
@@ -582,7 +582,8 @@ class PosOrder(models.Model):
                                 total_otros_cargos += round(abs(i['amount'] * qty), 5)
                             elif taxes_lookup[i['id']]['tax_code'] != '00':
                                 tax_index += 1
-                                tax_amount = round(abs(i['amount'] * qty), 5)
+                                product_amount = round(i['base']*qty)
+                                tax_amount = round((product_amount - descuento) * taxes_lookup[i['id']]['tarifa']  / 100, 5)
                                 _line_tax += tax_amount
                                 taxes[tax_index] = {
                                     'codigo': taxes_lookup[i['id']]['tax_code'],

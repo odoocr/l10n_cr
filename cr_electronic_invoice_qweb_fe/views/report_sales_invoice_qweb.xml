@@ -282,6 +282,14 @@
                     </tr>
                     <tr style="border:1px solid black;">
                         <td>
+                            <strong>CORREO:</strong>
+                        </td>
+                        <td>
+                            <strong><span t-field="o.partner_id.email"/></strong>
+                        </td>
+                    </tr>
+                    <tr style="border:1px solid black;">
+                        <td>
                             <strong>CÉDULA JURÍDICA:</strong>
                         </td>
                         <td>
@@ -326,18 +334,18 @@
                     <tr style="border:1px solid black;">
                         <td>
                             <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'">
-                                <strong>FACTURA INTERNA:</strong><br/>
+                                <strong>ORDEN DE COMPRA:</strong><br/>
                             </span>
                             <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'">
-                                <strong>ORDEN DE COMPRA:</strong><br/>
+                                <strong>ORDEN DE VENTA:</strong><br/>
                             </span>
                         </td>
                         <td>
                             <span t-if="o.move_type == 'in_invoice' or o.move_type == 'in_refund'">
-                                <span t-field="o.sequence"/>-<span t-field="o.invoice_origin"/><br/>
+                                <span t-field="o.invoice_origin"/><br/>
                             </span>
                             <span t-if="o.move_type == 'out_invoice' or o.move_type == 'out_refund'">
-                                <span t-field="o.name"/>-<span t-field="o.invoice_origin"/><br/>
+                                <span t-field="o.invoice_origin"/><br/>
                             </span>
                         </td>
                         <td>
@@ -363,7 +371,7 @@
                             <strong>TIPO CAMBIO:</strong>
                         </td>
                         <td>
-                            <span t-esc="abs(o.amount_total / o.amount_total_signed)"/>
+                            <span t-esc="round(o.amount_total_signed / o.amount_total, 5)"/>
                         </td>
                     </tr>
                 </tbody>
@@ -378,6 +386,7 @@
                 <thead class="tble-header">
                         <tr>
                             <th>Producto</th>
+                            <!--Source Document solo está disponible en la factura y no en la linea -->
                             <!--th class="hidden">Source Document</th-->
                             <th class="text-right">Cant.</th>
                             <th width="15%" class="text-right">Precio</th>
@@ -389,6 +398,7 @@
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l" style="height:25px;font-size:16px">
                             <td><span t-field="l.name"/></td>
+                            <!--Source Document solo está disponible en la factura y no en la linea -->
                             <!--td class="hidden"><span t-field="l.invoice_origin"/></td-->
                             <td class="text-right">
                                 <span t-field="l.quantity"/>
@@ -474,6 +484,20 @@
                                                 </td>
                                                 <td class="text-right o_price_total">
                                                     <span t-esc="amount_by_group[3]"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <tr>
+                                            <td>Total Impuestos</td>
+                                            <td class="text-right">
+                                                <span t-field="o.amount_tax" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                        <t t-if="o.amount_total_iva_devuelto">
+                                            <tr>
+                                                <td>IVA Devuelto</td>
+                                                <td class="text-right">
+                                                    <span t-field="o.amount_total_iva_devuelto" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                                                 </td>
                                             </tr>
                                         </t>

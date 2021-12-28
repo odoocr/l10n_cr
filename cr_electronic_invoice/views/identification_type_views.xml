@@ -5,8 +5,8 @@
             <field name="name">identification.type.form</field>
             <field name="model">identification.type</field>
             <field name="arch" type="xml">
-                <form string="Tipo de identificación">
-                    <sheet string="Tipo de identificación">
+                <form string="Identification type">
+                    <sheet string="Identification type">
                         <group col="4">
                             <field name="code"/>
                             <field name="name"/>
@@ -20,7 +20,7 @@
             <field name="name">identification.type.tree</field>
             <field name="model">identification.type</field>
             <field name="arch" type="xml">
-                <tree string="Tipo de identificación" editable="bottom">
+                <tree string="Identification type" editable="bottom">
                     <field name="code"/>
                     <field name="name"/>
                     <field name="notes"/>
@@ -29,7 +29,7 @@
         </record>
 
         <record id="action_identification_type" model="ir.actions.act_window">
-            <field name="name">Tipo de identificación</field>
+            <field name="name">Identification type</field>
             <field name="res_model">identification.type</field>
             <field name="view_mode">tree,form</field>
         </record>

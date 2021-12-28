@@ -91,14 +91,14 @@
                             </li>
                             <li class="list-group-item flex-grow-1">
                                 <div class="small mb-1"><strong class="text-muted">
-                                    XML voucher
+                                    XML Document Issued
                                 </strong></div>
                                 <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
                                     <t t-if="xml_documento">
                                         <div class="btn-group flex-grow-1 mb-1">
                                             <a t-attf-href="/web/content/#{xml_documento.id}?download=true" target="_blank">
                                                 <div class='oe_attachment_embedded o_image' t-att-title="xml_documento.name" t-att-data-mimetype="xml_documento.mimetype" t-attf-data-src="/web/image/#{xml_documento.id}/50x50"/>
-                                                <span>Documento.xml</span>
+                                                <span>DOC_</span><span t-field="invoice.name"/><span>.xml</span>
                                             </a>
                                         </div>
                                     </t>
@@ -106,14 +106,14 @@
                             </li>
                             <li class="list-group-item flex-grow-1">
                                 <div class="small mb-1"><strong class="text-muted">
-                                    XML Tributación Response
+                                    XML Response MH
                                 </strong></div>
                                 <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
                                     <t t-if="xml_AHC">
                                         <div class="btn-group flex-grow-1 mb-1">
                                             <a t-attf-href="/web/content/#{xml_AHC.id}?download=true" target="_blank">
                                                 <div class='oe_attachment_embedded o_image' t-att-title="xml_AHC.name" t-att-data-mimetype="xml_AHC.mimetype" t-attf-data-src="/web/image/#{xml_AHC.id}/50x50"/>
-                                                <span>Respuesta.xml</span>
+                                                <span>AHC_</span><span t-field="invoice.name"/><span>.xml</span>
                                             </a>
                                         </div>
                                     </t>
