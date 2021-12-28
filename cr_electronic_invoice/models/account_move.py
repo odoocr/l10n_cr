@@ -144,6 +144,8 @@ class AccountInvoiceElectronic(models.Model):
         copy=False, attachment=True)
     amount_tax_electronic_invoice = fields.Monetary(
         string='Total FE taxes', readonly=True, )
+    amount_total_iva_devuelto = fields.Monetary(
+        string='IVA Devuelto', copy=False, readonly=True, )
     amount_total_electronic_invoice = fields.Monetary(
         string='Total FE', readonly=True, )
     tipo_documento = fields.Selection(
@@ -220,10 +222,15 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             if inv.move_type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
-                    inv.economic_activities_ids = inv.partner_id.economic_activities_ids
-                    inv.economic_activities_id = inv.partner_id.activity_id
+                    if inv.partner_id.economic_activities_ids:
+                        inv.economic_activities_ids = inv.partner_id.economic_activities_ids
+                        inv.economic_activity_id = inv.partner_id.activity_id
+                    else:
+                        raise UserError(_('The partner %s has no defined economic activity, please validate the information in the business partner before placing it!') % inv.partner_id.name)
+                else:
+                    inv.economic_activities_ids = self.env['economic.activity'].search([])
             else:
-                inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
+                inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', True)])
 
     
     @api.onchange('partner_id')
@@ -238,7 +245,56 @@ class AccountInvoiceElectronic(models.Model):
                 else:
                     raise UserError(_('Partner does not have a default payment method'))
 
-    
+    def action_invoice_sent_mass(self):
+
+        if self.invoice_id.move_type == 'in_invoice' or self.invoice_id.move_type == 'in_refund':
+            email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor', raise_if_not_found=False)
+        else:
+            email_template = self.env.ref('account.email_template_edi_invoice', raise_if_not_found=False)
+
+        email_template.attachment_ids = [(5, 0, 0)]
+
+        lang = False
+        if email_template:
+            lang = email_template._render_lang(self.ids)[self.id]
+        if not lang:
+            lang = get_lang(self.env).code
+
+        if self.env.user.company_id.frm_ws_ambiente == 'disabled':
+            pass
+            #email_template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False, force_send=True)  # default_type='binary'
+        elif self.partner_id and self.partner_id.email:  # and not i.partner_id.opt_out:
+
+            domain = [('res_model', '=', 'account.move'), ('res_id', '=', self.id), ('name', 'like', self.tipo_documento + '_'+ self.number_electronic)]
+            attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
+
+            if attachment:
+                attachment.name = self.fname_xml_comprobante
+
+                domain_resp = [('res_model', '=', 'account.move'), ('res_id', '=', self.id),
+                               ('name', 'like', 'AHC_' + self.number_electronic)]
+                attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
+
+                if attachment_resp:
+                    attachment_resp.name = self.fname_xml_respuesta_tributacion
+
+                    email_template.attachment_ids = [
+                        (6, 0, [attachment.id, attachment_resp.id])]
+                    email_template.with_context(type='binary',
+                                                default_type='binary').send_mail(
+                        self.id,
+                        raise_exception=False,
+                        force_send=True)
+
+                    email_template.attachment_ids = [(5)]
+                else:
+                    raise UserError(_('Response XML from Hacienda has not been received'))
+            else:
+                raise UserError(_('Invoice XML has not been generated for id:' + str(self.id)))
+
+        else:
+            raise UserError(_('Partner is not assigne to this invoice'))
+
     def action_invoice_sent(self):
         self.ensure_one()
 
@@ -367,20 +423,38 @@ class AccountInvoiceElectronic(models.Model):
     def load_xml_data(self):
         account = False
         analytic_account = False
-        product = False
-        load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
+        product = False        
 
-        default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
+        purchase_journal = self.env['account.journal'].search([('type', '=', 'purchase')], limit=1)
+        default_account_id = purchase_journal.expense_account_id.id
+
+        load_lines = purchase_journal.load_lines
+
         if default_account_id:
             account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
+        else:
+            default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
+            if default_account_id:
+                account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
 
-        analytic_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_analytic_account_id')
+        analytic_account_id = purchase_journal.expense_analytic_account_id.id
+
+
         if analytic_account_id:
             analytic_account = self.env['account.analytic.account'].search([('id', '=', analytic_account_id)], limit=1)
+        else:
+            analytic_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_analytic_account_id')
+            if analytic_account_id:
+                analytic_account = self.env['account.analytic.account'].search([('id', '=', analytic_account_id)], limit=1)
             
-        product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
+        product_id = purchase_journal.expense_product_id.id
+
         if product_id:
             product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
+        else:
+            product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
+            if product_id:
+                product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
             
         api_facturae.load_xml_data(self, load_lines, account, product, analytic_account)
 
@@ -693,7 +767,7 @@ class AccountInvoiceElectronic(models.Model):
                 if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:  # and not i.partner_id.opt_out:
                     email_template = self.env.ref(
                         'account.email_template_edi_invoice', False)
-                    self.env['ir.attachment'].create(
+                    attachment = self.env['ir.attachment'].create(
                         {'name': i.fname_xml_comprobante,
                          'type': 'binary',
                          'datas': i.xml_comprobante,
@@ -701,7 +775,7 @@ class AccountInvoiceElectronic(models.Model):
                          'mimetype': 'text/xml',
                          'res_id': i.id
                          })
-                    self.env['ir.attachment'].create(
+                    attachment_resp = self.env['ir.attachment'].create(
                         {'name': i.fname_xml_respuesta_tributacion,
                          'type': 'binary',
                          'datas': i.xml_respuesta_tributacion,
@@ -710,13 +784,6 @@ class AccountInvoiceElectronic(models.Model):
                          'res_id': i.id
                          })
 
-                    attachment = self.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.move'), ('name', '=', i.fname_xml_comprobante),
-                         ('res_id', '=', i.id)], limit=1)
-
-                    attachment_resp = self.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.move'), ('name', '=', i.fname_xml_respuesta_tributacion),
-                         ('res_id', '=', i.id)], limit=1)
 
                     email_template.attachment_ids = [
                         (6, 0, [attachment.id, attachment_resp.id])]
@@ -821,7 +888,22 @@ class AccountInvoiceElectronic(models.Model):
                 )
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
-    
+    def generate_and_send_invoice(self):
+        days_left = self.env.user.company_id.get_days_left()
+        if days_left >= 0:
+            self.generate_and_send_invoices(self)
+        else:
+            message = self.env.user.company_id.get_message_to_send()
+            self.message_post(
+                    body=message,
+                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    message_type='notification',
+                    subtype=None,
+                    parent_id=False,
+                )
+        _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
+
+
     def generate_and_send_invoices(self, invoices):
         total_invoices = len(invoices)
         current_invoice = 0
@@ -888,7 +970,7 @@ class AccountInvoiceElectronic(models.Model):
                 tipo_documento_referencia = False
                 razon_referencia = False
                 currency = inv.currency_id
-                invoice_comments = inv.narration
+                invoice_comments = escape(inv.narration)
 
                 if (inv.invoice_id or inv.not_loaded_invoice) and inv.reference_code_id and inv.reference_document_id:
                     if inv.invoice_id:
@@ -923,7 +1005,6 @@ class AccountInvoiceElectronic(models.Model):
                 otros_cargos_id = 0
                 line_number = 0
                 total_otros_cargos = 0.0
-                total_iva_devuelto = 0.0
                 total_servicio_salon = 0.0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
@@ -936,7 +1017,14 @@ class AccountInvoiceElectronic(models.Model):
                 base_subtotal = 0.0
                 _old_rate_exoneration = False
                 _no_CABYS_code = False
-                
+
+                # Revisamos si existe IVA Devuelto
+                if inv.amount_total_iva_devuelto:
+                    total_iva_devuelto = inv.amount_total_iva_devuelto
+                    inv.amount_total -= inv.amount_total_iva_devuelto
+                else:
+                    total_iva_devuelto = 0.0
+
                 for inv_line in inv.invoice_line_ids:
                     # Revisamos si está línea es de Otros Cargos
                     if inv_line.product_id and inv_line.product_id.id == self.env.ref('cr_electronic_invoice.product_iva_devuelto').id:
@@ -1055,7 +1143,7 @@ class AccountInvoiceElectronic(models.Model):
                                 elif taxes_lookup[i['id']]['tax_code'] != '00':
                                     tax_index += 1
                                     product_amount = round(i['base']*quantity)
-                                    tax_amount = round(product_amount * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                    tax_amount = round((product_amount - descuento) * taxes_lookup[i['id']]['tarifa'] / 100, 5)
                                     _line_tax += tax_amount
                                     tax = {
                                         'codigo': taxes_lookup[i['id']]['tax_code'],
@@ -1171,7 +1259,7 @@ class AccountInvoiceElectronic(models.Model):
                     total_servicio_exento, total_servicio_exonerado,
                     total_mercaderia_gravado, total_mercaderia_exento,
                     total_mercaderia_exonerado, total_otros_cargos, total_iva_devuelto, base_subtotal,
-                    total_impuestos, total_descuento, json.dumps(lines, ensure_ascii=False),
+                    total_impuestos, total_descuento, lines,
                     otros_cargos, currency_rate, invoice_comments,
                     tipo_documento_referencia, numero_documento_referencia,
                     fecha_emision_referencia, codigo_referencia, razon_referencia)
@@ -1271,11 +1359,8 @@ class AccountInvoiceElectronic(models.Model):
                     sequence = inv.journal_id.TE_sequence_id.next_by_id()
                 elif inv.tipo_documento == 'FEE':
                     sequence = inv.journal_id.FEE_sequence_id.next_by_id()
-
-            # Credit Note
-            elif inv.move_type == 'out_refund':
-                inv.tipo_documento = 'NC'
-                sequence = inv.journal_id.NC_sequence_id.next_by_id()
+                elif inv.tipo_documento == 'ND':
+                    sequence = inv.journal_id.ND_sequence_id.next_by_id()
 
             # Digital Supplier Invoice
             elif inv.move_type == 'in_invoice' and inv.partner_id.country_id and \
@@ -1320,24 +1405,15 @@ class AccountInvoiceElectronic(models.Model):
             if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not (len(currency.rate_ids) > 0)):
                 raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
 
-            # actividad_clinica = self.env.ref('cr_electronic_invoice.activity_851101')
-            # if actividad_clinica.id == inv.economic_activity_id.id and inv.payment_methods_id.sequence == '02':
-            if inv.economic_activity_id.name == 'CLINICA, CENTROS MEDICOS, HOSPITALES PRIVADOS Y OTROS' and inv.payment_methods_id.sequence == '02':
-                iva_devuelto = 0
-                for i in inv.invoice_line_ids:
-                    for t in i.tax_ids:
-                        if t.tax_code == '01' and t.iva_tax_code == '04':
-                            iva_devuelto += i.price_total - i.price_subtotal
-                if iva_devuelto:
-                    prod_iva_devuelto = self.env.ref('cr_electronic_invoice.product_iva_devuelto')
-                    inv_line_iva_devuelto = self.env['account.move.line'].create({
-                        'name': 'IVA Devuelto',
-                        'move_id': inv.id,
-                        'product_id': prod_iva_devuelto.id,
-                        'account_id': prod_iva_devuelto.property_account_income_id.id,
-                        'price_unit': -iva_devuelto,
-                        'quantity': 1,
-                    })
+            #Devolucion del IVA   
+            # Inicializamos las variables que controlan los montos de cada impuesto
+            inv.amount_total_iva_devuelto =  0.0
+
+            for i in inv.invoice_line_ids:
+                # Revisamos si aplica para la devolucion del IVA: Servicio de Salud Privado, Pago con medio electronico e IVA Reducido 4%
+                if api_facturae.has_iva_devuelto(inv, i):
+                    inv.amount_total_iva_devuelto += round(i.price_tax, 5)
+                    #inv.amount_total = inv.amount_total - inv.amount_total_iva_devuelto   
 
             super(AccountInvoiceElectronic, inv).action_post()
             if not inv.number_electronic:
@@ -1432,3 +1508,58 @@ class AccountInvoiceElectronic(models.Model):
                     (line + counterpart_lines).with_context(move_reverse_cancel=cancel).reconcile()
 
         return reverse_moves
+
+    def create_partner_from_xml(self):
+
+        if not self.partner_id and self.xml_supplier_approval:
+            info = {}
+
+            invoice_xml = etree.fromstring(base64.b64decode(self.xml_supplier_approval))
+            namespaces = invoice_xml.nsmap
+            inv_xmlns = namespaces.pop(None)
+            namespaces['inv'] = inv_xmlns
+
+            info['vat'] = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
+
+            partner = self.env['res.partner'].search([('vat', '=', info['vat']), ('type', '=', 'contact')], limit=1)
+            if len(partner) > 0:
+                self.partner_id = partner.id
+            else:
+                info['name'] = invoice_xml.xpath("inv:Emisor/inv:Nombre", namespaces=namespaces)[0].text
+                info['phone'] = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)[0].text or False
+                info['email'] = invoice_xml.xpath("inv:Emisor/inv:CorreoElectronico", namespaces=namespaces)[0].text or False
+                info['lang'] = 'es_CR'
+
+                # Se agrega manualmente la información ya que no se puede obtener del XML
+                info['property_payment_term_id'] = 1
+                info['payment_methods_id'] = 1
+                info['property_product_pricelist'] = 1
+                info['property_supplier_payment_term_id'] = 1
+
+                # Ubicacion
+
+                # País
+                info['country_id'] = self.env['res.country'].search([('code', '=', 'CR')], limit=1).id
+
+                # Provincia
+                provincia = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:Provincia", namespaces=namespaces)[0].text
+                state_id = self.env['res.country.state'].search([('code', '=', provincia)], limit=1).id
+                info['state_id'] = state_id
+
+                # Cantón
+                canton = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:Canton", namespaces=namespaces)[0].text
+                county_id = self.env['res.country.county'].search([('code', '=', canton), ('state_id', '=', state_id)], limit=1).id
+                info['county_id'] = county_id
+
+                # Distrito
+                distrito = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:Distrito", namespaces=namespaces)[0].text
+                district_id = self.env['res.country.district'].search([('code', '=', distrito), ('county_id', '=', county_id)], limit=1).id
+                info['district_id'] = district_id
+
+
+                actividad_economica = invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)[0].text
+                info['activity_id'] = self.env['economic.activity'].search([('code', '=', actividad_economica)], limit=1).id
+
+                cliente = self.env['res.partner'].create(info)
+                cliente.onchange_vat()
+                self.partner_id = cliente.id

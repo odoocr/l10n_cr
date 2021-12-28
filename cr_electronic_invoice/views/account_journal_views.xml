@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="account.view_account_journal_form"/>
             <field name="arch" type="xml">
                <xpath expr="//page[1]" position="after">
-                    <page string="Facturación Electrónica" attrs="{'invisible':[('type','!=','sale')]}">
+                    <page string="Electronic Invoice" attrs="{'invisible':[('type','!=','sale')]}">
                         <group cols="2">
                             <group cols="2">
                                 <field name="FE_sequence_id"/>
@@ -24,12 +24,18 @@
                             </group>
                         </group>
                     </page>
+                    <page string="Electronic Invoice" attrs="{'invisible':[('type','!=','purchase')]}">
+                        <group cols="2">
+                            <group cols="2">
+                                <field name="expense_product_id" string="Default product for expenses when importing electronic invoice" />
+                                <field name="expense_account_id" string="Default account for expenses when importing electronic invoice" />
+                                <field name="expense_analytic_account_id" string="Default analytic account for expenses when importing electronic invoice"/>
+                                <div class="o_form_label" >Load invoice lines?</div>
+                                <field name="load_lines" />
+                            </group>
+                        </group>
+                    </page>
                 </xpath>
-                <!--xpath expr="//field[@name='type']" position="after">
-					<field name="terminal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
-					<field name="sucursal" attrs="{'invisible':[('type','!=','sale')],'required':[('type','=','sale')]}"/>
-				</xpath-->
-
             </field>
         </record>
     </data>
