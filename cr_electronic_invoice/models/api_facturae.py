@@ -1137,16 +1137,3 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
             invoice.amount_tax_electronic_invoice = tax_node[0].text
         
         invoice._compute_amount()
-
-def p12_expiration_date(p12file, password):
-    try:
-        pkcs12 = crypto.load_pkcs12(base64.b64decode(p12file), password)
-        data = crypto.dump_certificate(crypto.FILETYPE_PEM, pkcs12.get_certificate())
-        cert = x509.load_pem_x509_certificate(data, default_backend())
-        return cert.not_valid_after
-    except crypto.Error as crypte:
-        exc_str = str(crypte)
-        if exc_str.find('mac verify failure'):
-            raise
-        else:
-            raise
