@@ -76,7 +76,7 @@
                 <attribute name="invisible">False</attribute>
             </xpath>
 
-            <xpath expr="(//field[@name='amount_total'])[last()]" position="after">
+            <xpath expr="(//field[@name='tax_totals_json'])[last()]" position="after">
                 <field name="amount_total_iva_devuelto" attrs="{'invisible': [('amount_total_iva_devuelto', '=', 0)]}"/>
                 <field name="amount_tax_electronic_invoice" attrs="{'invisible':[('move_type','in', ('out_invoice', 'out_refund'))]}"/>
                 <field name="amount_total_electronic_invoice" attrs="{'invisible':[('move_type','in', ('out_invoice', 'out_refund'))]}"/>
