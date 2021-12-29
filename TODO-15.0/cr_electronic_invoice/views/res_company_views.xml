@@ -62,14 +62,14 @@
                 </xpath>
 
                 <xpath expr="//page[1]" position="after">
-                    <page string="Facturación Electrónica">
+                    <page string="Electronic Invoice">
                         <group cols="2">
                             <group cols="2">
                                 <field name="signature"/>
                                 <field name="frm_ws_identificador"/>
                                 <field name="frm_ws_password" password="True"/>
                                 <field name="frm_pin" password="True"/>
-                                <field name="date_expiration_sign" force_save="True"/>
+                                <field name="date_expiration_sign" force_save="True" readonly="1"/>
                                 <field name="range_days"/>
                                 <field name="send_user_ids" widget="many2many_tags"/>
                             </group>
