@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+        <!--<record id="journal_nc_01" model="account.journal">
+            <field name="code">NCJ</field>
+            <field name="name">Notas de Crédito</field>
+            <field name="sucursal">1</field> 
+            <field name="terminal">1</field> 
+            <field name="type">sale</field>          
+        </record>-->
+<!--
+        <record id="journal_nd_01" model="account.journal">
+            <field name="code">NDJ</field>
+            <field name="name">Notas de Débito</field>
+            <field name="sucursal">1</field> 
+            <field name="terminal">1</field> 
+            <field name="type">sale</field>          
+        </record>
+
+        <record id="journal_fec_01" model="account.journal">
+            <field name="code">FECJ</field>
+            <field name="name">Facturas de Compra</field>
+            <field name="sucursal">1</field> 
+            <field name="terminal">1</field> 
+            <field name="type">purchase</field>          
+        </record>
+
+        <record id="journal_fee_01" model="account.journal">
+            <field name="code">FEEJ</field>
+            <field name="name">Facturas de Exportación</field>
+            <field name="sucursal">1</field> 
+            <field name="terminal">1</field> 
+            <field name="type">sale</field>          
+        </record>
+
+        <record id="journal_te_01" model="account.journal">
+            <field name="code">TEJ</field>
+            <field name="name">Tiquete Electrónico</field>
+            <field name="sucursal">1</field> 
+            <field name="terminal">1</field> 
+            <field name="type">sale</field>          
+        </record>
+-->
+    </data>
+</odoo>
