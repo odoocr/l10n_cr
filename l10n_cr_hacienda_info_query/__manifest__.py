@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
         "name" : "Consultar Información de Clientes en Hacienda Costa Rica",
-        'version': '14.0.1.0.0',
+        'version': '15.0.1.0.0',
         "author" : "Odoo CR, Factura Sempai, FSS Solutions",
         'license': 'LGPL-3',
         "website" : "https://github.com/odoocr/l10n_cr",
@@ -10,11 +10,17 @@
         "description": """Actualización automática de nombre de clientes a partir del API de Hacienda""",
         "depends" : ['base','contacts', 'point_of_sale'],
         "data" : [
-                'views/res_company.xml',
-                'views/assets.xml',
+                'views/res_company.xml'
                 ],
-        'qweb':[
-                'static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml',
+        'assets': {
+                'point_of_sale.assets': [
+                        'l10n_cr_hacienda_info_query/static/src/js/actualizar_pos.js',
+                        'l10n_cr_hacienda_info_query/static/src/js/models.js',
+                        'l10n_cr_hacienda_info_query/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js'
                 ],
+                'web.assets_qweb': [
+                        'l10n_cr_hacienda_info_query/static/src/xml/**/*',
+                ]
+        },
         "installable": True
 }
