@@ -64,11 +64,11 @@ class ResCurrencyRate(models.Model):
                           help='The buying rate of the currency to the currency of rate 1.')
 
     # Rate as it is get
-    original_rate = fields.Float(string='Selling Rate in Costa Rica', digits=(6, 2),
+    inverse_company_rate = fields.Float(string='Selling Rate in Costa Rica', digits=(6, 2),
                                  help='The selling exchange rate from CRC to USD as it is send from BCCR')
 
     # Rate as it is get
-    original_rate_2 = fields.Float(string='Buying Rate in Costa Rica', digits=(6, 2),
+    inverse_company_rate_2 = fields.Float(string='Buying Rate in Costa Rica', digits=(6, 2),
                                    help='The buying exchange rate from CRC to USD as it is send from BCCR')
 
     @api.model
@@ -140,23 +140,23 @@ class ResCurrencyRate(models.Model):
 
                         if len(ratesIds) > 0:
                             newRate = ratesIds.write({'rate': sellingRate,
-                                                    'original_rate': sellingOriginalRate,
+                                                    'inverse_company_rate': sellingOriginalRate,
                                                     'rate_2': buyingRate,
-                                                    'original_rate_2': buyingOriginalRate,
+                                                    'inverse_company_rate_"': buyingOriginalRate,
                                                     'currency_id': currency_id.id})
                         else:
                             newRate = self.create({'name': currentDateStr,
                                                 'rate': sellingRate,
-                                                'original_rate': sellingOriginalRate,
+                                                'inverse_company_rate': sellingOriginalRate,
                                                 'rate_2': buyingRate,
-                                                'original_rate_2': buyingOriginalRate,
+                                                'inverse_company_rate_2': buyingOriginalRate,
                                                 'currency_id': currency_id.id})
 
                         _logger.debug({'name': currentDateStr,
                                     'rate': sellingRate,
-                                    'original_rate': sellingOriginalRate,
+                                    'inverse_company_rate': sellingOriginalRate,
                                     'rate_2': buyingRate,
-                                    'original_rate_2': buyingOriginalRate,
+                                    'inverse_company_rate_2': buyingOriginalRate,
                                     'currency_id': currency_id.id})
                     else:
                         _logger.error("Error loading currency rates, dates for a buying (%s) and selling (%s) rates don't match" % (buyingRateNodes[nodeIndex].find("DES_FECHA").text, sellingRateNodes[nodeIndex].find("DES_FECHA").text))
@@ -189,11 +189,11 @@ class ResCurrencyRate(models.Model):
                         for rate_line in data:
                             today = datetime.datetime.strptime(rate_line['fecha'], '%Y-%m-%d %H:%M:%S')
                             vals = {}
-                            vals['original_rate'] = rate_line['venta']
+                            vals['inverse_company_rate'] = rate_line['venta']
                             # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                            vals['rate'] =  1 / vals['original_rate']
-                            vals['original_rate_2'] = rate_line['compra']
-                            vals['rate_2'] = 1 / vals['original_rate_2']
+                            vals['rate'] =  1 / vals['inverse_company_rate']
+                            vals['inverse_company_rate_2'] = rate_line['compra']
+                            vals['rate_2'] = 1 / vals['inverse_company_rate_2']
                             vals['currency_id'] = self.env.ref('base.USD').id
 
                             rate_id = self.env['res.currency.rate'].search([('name', '=', today.date())], limit=1)
@@ -221,11 +221,11 @@ class ResCurrencyRate(models.Model):
                     for company in companies:
                         _logger.error(company.id)
                         vals = {}
-                        vals['original_rate'] = data['dolar']['venta']['valor']
+                        vals['inverse_company_rate'] = data['dolar']['venta']['valor']
                         # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                        vals['rate'] =  1 / vals['original_rate']
-                        vals['original_rate_2'] = data['dolar']['compra']['valor']
-                        vals['rate_2'] = 1 / vals['original_rate_2']
+                        vals['rate'] =  1 / vals['inverse_company_rate']
+                        vals['inverse_company_rate_2'] = data['dolar']['compra']['valor']
+                        vals['rate_2'] = 1 / vals['inverse_company_rate_2']
                         vals['currency_id'] = self.env.ref('base.USD').id
 
                         rate_id = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
@@ -254,9 +254,9 @@ class ResCurrencyRate(models.Model):
         self.create({
             'name': name,
             'rate': currency_rate_obj.rate,
-            'original_rate': currency_rate_obj.original_rate,
+            'inverse_company_rate': currency_rate_obj.inverse_company_rate,
             'rate_2': currency_rate_obj.rate_2,
-            'original_rate_2': currency_rate_obj.original_rate_2,
+            'inverse_company_rate_2': currency_rate_obj.inverse_company_rate_2,
             'currency_id': currency_rate_obj.currency_id.id,
             'company_id': currency_rate_obj.company_id.id,
         })

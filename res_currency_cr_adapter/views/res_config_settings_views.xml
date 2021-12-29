@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_crc_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.crc.view.form</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='main_currency_setting_container']" position="inside">
+                    <div class="col-12 col-lg-6 o_setting_box" id="main_currency_l10n_cr">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Costa Rica Currency Adapter</span>
+                            <div class="text-muted">
+                                Update the dollar exchange rate from Ministerio de Hacienda or BCCR
+                            </div>
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="exchange_source" class="col-lg-3 o_light_label" string="Exchange rate origin"/>
+                                    <field name="exchange_source" string="Exchange rate origin"/>
+
+                                    <label for="bccr_username" class="col-lg-3 o_light_label" string="Username registered in the BCCR" attrs="{'invisible': [('exchange_source', '!=', 'bccr')]}"/>
+                                    <field name="bccr_username" string="User name registered in the BCCR" attrs="{'required': [('exchange_source', '=', 'bccr')], 'invisible': [('exchange_source', '!=', 'bccr')]}"/>
+
+                                    <label for="bccr_email" class="col-lg-3 o_light_label" string="Email registered in the BCCR" attrs="{'invisible': [('exchange_source', '!=', 'bccr')]}"/>
+                                    <field name="bccr_email" string="email registered in the BCCR" attrs="{'required': [('exchange_source', '=', 'bccr')], 'invisible': [('exchange_source', '!=', 'bccr')]}"/>
+
+                                    <label for="bccr_token" class="col-lg-3 o_light_label" string="BCCR Token" attrs="{'invisible': [('exchange_source', '!=', 'bccr')]}"/>
+                                    <field name="bccr_token" string="BCCR Token" password="True" attrs="{'required': [('exchange_source', '=', 'bccr')], 'invisible': [('exchange_source', '!=', 'bccr')]}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+           </field>
+        </record>
+    </data>
+</odoo>
