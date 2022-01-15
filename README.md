@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.com/odoocr/l10n_cr.svg?branch=14.0)](https://travis-ci.com/odoocr/l10n_cr)
+[![Build Status](https://travis-ci.com/odoocr/l10n_cr.svg?branch=15.0)](https://travis-ci.com/odoocr/l10n_cr)
 
-**¡ESTA VERSIÓN NO ESTÁ FUNCIONAL. ESTÁ EN PROCESO LA MIGRACIÓN DE 12.0 A 15.0!**
+**¡ESTA VERSIÓN NO ESTÁ FUNCIONAL. ESTÁ EN PROCESO LA MIGRACIÓN DE 14.0 A 15.0!**
 
 
 Para ayuda y soporte la comunidad de Odoo CR cuenta con un grupo en Telegram: https://t.me/OdooCR
