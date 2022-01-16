@@ -4,11 +4,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 13.0\n"
+"Project-Id-Version: Odoo Server 14.0-20210913\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-28 04:28+0000\n"
-"PO-Revision-Date: 2020-06-28 04:28+0000\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2022-01-16 23:09+0000\n"
+"PO-Revision-Date: 2022-01-16 23:09+0000\n"
+"Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -73,10 +73,66 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
+"\n"
+"<div style=\"font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; \">\n"
+"\n"
+"    <p>Hola ${object.partner_id.name},</p>\n"
+"\n"
+"    <p>Una nueva factura está disponible para usted: </p>\n"
+"\n"
+"    <p style=\"border-left: 1px solid #8e0000; margin-left: 30px;\">\n"
+"       &nbsp;&nbsp;<strong>REFERENCIA</strong><br />\n"
+"       &nbsp;&nbsp;Número de Factura: <strong>${object.name}</strong><br />\n"
+"       &nbsp;&nbsp;Fecha de Factura: ${object.date_order}<br />\n"
+"       % if object.user_id:\n"
+"       &nbsp;&nbsp;Su contacto: <a href=\"mailto:${object.user_id.email or ''}?subject=Invoice%20${object.number}\">${object.user_id.name}</a>\n"
+"       % endif\n"
+"    </p>\n"
+"\n"
+"    <br/>\n"
+"    <p>Si tiene alguna pregunta, no dude en ponerse en contacto con nosotros.</p>\n"
+"    <p>Gracias por escoger ${object.company_id.name or 'us'}!</p>\n"
+"    <br/>\n"
+"    <br/>\n"
+"    <div style=\"width: 375px; margin: 0px; padding: 0px; background-color: #8E0000; border-top-left-radius: 5px 5px; border-top-right-radius: 5px 5px; background-repeat: repeat no-repeat;\">\n"
+"        <h3 style=\"margin: 0px; padding: 2px 14px; font-size: 12px; color: #DDD;\">\n"
+"            <strong style=\"text-transform:uppercase;\">${object.company_id.name}</strong></h3>\n"
+"    </div>\n"
+"    <div style=\"width: 347px; margin: 0px; padding: 5px 14px; line-height: 16px; background-color: #F2F2F2;\">\n"
+"        <span style=\"color: #222; margin-bottom: 5px; display: block; \">\n"
+"        % if object.company_id.street:\n"
+"            ${object.company_id.street}<br/>\n"
+"        % endif\n"
+"        % if object.company_id.street2:\n"
+"            ${object.company_id.street2}<br/>\n"
+"        % endif\n"
+"        % if object.company_id.city or object.company_id.zip:\n"
+"            ${object.company_id.zip} ${object.company_id.city}<br/>\n"
+"        % endif\n"
+"        % if object.company_id.country_id:\n"
+"            ${object.company_id.state_id and ('%s, ' % object.company_id.state_id.name) or ''} ${object.company_id.country_id.name or ''}<br/>\n"
+"        % endif\n"
+"        </span>\n"
+"        % if object.company_id.phone:\n"
+"            <div style=\"margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; \">\n"
+"                Teléfono:&nbsp; ${object.company_id.phone}\n"
+"            </div>\n"
+"        % endif\n"
+"        % if object.company_id.website:\n"
+"            <div>\n"
+"                Web :&nbsp;<a href=\"${object.company_id.website}\">${object.company_id.website}</a>\n"
+"            </div>\n"
+"        %endif\n"
+"        <p></p>\n"
+"    </div>\n"
+"</div>\n"
+"            "
 
 #. module: cr_electronic_invoice_pos
 #: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
 #: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice_pos/models/electronic_invoice.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice_pos/models/electronic_invoice.py:0
 #, python-format
 msgid " REFUND"
 msgstr "REEMBOLSO"
@@ -84,27 +140,27 @@ msgstr "REEMBOLSO"
 #. module: cr_electronic_invoice_pos
 #: model:mail.template,subject:cr_electronic_invoice_pos.email_template_pos_invoice
 msgid "${object.company_id.name|safe} Invoice (Ref ${object.number or 'n/a'})"
+msgstr "${object.company_id.name|safe} Factura (Ref ${object.number or 'n/a'})"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
+msgid ""
+"<br/>\n"
+"                            Cédula:"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
 msgid ""
 "<br/>\n"
-"                            Ced.Jur:"
+"                            Teléfono:"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
 msgid ""
 "<br/>\n"
-"                            Tel:"
-msgstr ""
-
-#. module: cr_electronic_invoice_pos
-#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid ""
-"<br/>\n"
-"                            Version Documento: 4.3<br/>"
+"                            Versión Documento: 4.3<br/>"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
@@ -123,13 +179,22 @@ msgid "Accepted"
 msgstr "Aceptado"
 
 #. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_needaction
+msgid "Action Needed"
+msgstr "Accion necesaria"
+
+#. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__error_count
 msgid "Amount of errors"
 msgstr "Cantidad de errores"
 
 #. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_attachment_count
+msgid "Attachment Count"
+msgstr "Recuento de archivos adjuntos"
+
+#. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__sucursal
-#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
 msgid "Branch"
 msgstr "Sucursal"
 
@@ -144,27 +209,25 @@ msgid "Cant"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
-#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid "Cedula:"
+#: model:pos.payment.method,name:cr_electronic_invoice_pos.PaymentMethods_3
+msgid "Cheque"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid "Clave Numerica:"
+msgid "Clave Numérica:"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #. openerp-web
 #: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
+#: code:addons/l10n_cr/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
 #, python-format
 msgid "Clave:"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
-#. openerp-web
-#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-#, python-format
 msgid "Cliente:"
 msgstr ""
 
@@ -176,6 +239,8 @@ msgstr "Consecutivo"
 #. module: cr_electronic_invoice_pos
 #. openerp-web
 #: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
+#: code:addons/l10n_cr/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
 #, python-format
 msgid "Consecutivo:"
 msgstr ""
@@ -188,22 +253,38 @@ msgid "Consulta Hacienda POS"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
-#. openerp-web
-#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
-#: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
-#, python-format
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Crear Secuencias"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
 msgid "Cédula:"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid "Descripcion"
+msgid "Descripción"
 msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_account_journal__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_payment_method__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_stock_picking__display_name
+msgid "Display Name"
+msgstr "Mostrar nombre"
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__economic_activity_id
 msgid "Economic Activity"
 msgstr "Actividad Económica"
+
+#. module: cr_electronic_invoice_pos
+#: model:pos.payment.method,name:cr_electronic_invoice_pos.PaymentMethods_1
+msgid "Efectivo"
+msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields.selection,name:cr_electronic_invoice_pos.selection__pos_order__tipo_documento__nc
@@ -212,7 +293,6 @@ msgstr "Nota de Crédito Electrónica"
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__NC_sequence_id
-#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
 msgid "Electronic Credit Note Sequence"
 msgstr "Secuencia de Nota de Crédito Electrónica"
 
@@ -224,7 +304,6 @@ msgstr "Factura Electrónica"
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__FE_sequence_id
-#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
 msgid "Electronic Invoice Sequence"
 msgstr "Secuencia de Factura Electrónica"
 
@@ -240,7 +319,6 @@ msgstr "Tiquete Electrónico"
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__TE_sequence_id
-#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
 msgid "Electronic Ticket Sequence"
 msgstr "Secuencia de Tiquete Electrónico"
 
@@ -266,7 +344,7 @@ msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid "FACTURA ELECTRONICA"
+msgid "FACTURA ELECTRÓNICA"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
@@ -283,18 +361,54 @@ msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid "Factura:"
+msgid "Fecha:"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
-#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid "Fecha:"
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_follower_ids
+msgid "Followers"
+msgstr "Seguidores"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_channel_ids
+msgid "Followers (Channels)"
+msgstr "Seguidores (Canales)"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Seguidores (Socios)"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_account_journal__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_payment_method__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_stock_picking__id
+msgid "ID"
 msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__message_needaction
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__message_unread
+msgid "If checked, new messages require your attention."
+msgstr "Si está marcado, los nuevos mensajes requieren su atención. "
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__message_has_error
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si está marcada, algunos mensajes tienen un error de entrega."
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields.selection,name:cr_electronic_invoice_pos.selection__pos_order__state_tributacion__firma_invalida
 msgid "Invalid Sign"
 msgstr "Firma Inválida"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_is_follower
+msgid "Is Follower"
+msgstr "Es seguidor"
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__date_issuance
@@ -312,13 +426,42 @@ msgid "La clave de comprobante debe ser única"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_account_journal____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_payment_method____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_stock_picking____last_update
+msgid "Last Modified on"
+msgstr "Última modificación el"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "Archivo adjunto principal"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_has_error
+msgid "Message Delivery error"
+msgstr "Error de entrega de mensajes"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_ids
+msgid "Messages"
+msgstr "Mensajes"
+
+#. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
 msgid "Monto"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
+#: model:ir.model,name:cr_electronic_invoice_pos.model_pos_payment_method
+msgid "Métodos de pago POS"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid "NOTA DE CREDITO ELECTRONICA"
+msgid "NOTA DE CRÉDITO ELECTRÓNICA"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
@@ -330,6 +473,36 @@ msgstr "No aplica"
 #: model:ir.model.fields.selection,name:cr_electronic_invoice_pos.selection__pos_order__state_tributacion__no_encontrado
 msgid "Not found"
 msgstr "No encontrado"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Número de acciones"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_has_error_counter
+msgid "Number of errors"
+msgstr "Número de errores"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr "Número de mensajes que requieren una acción"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Número de mensajes con error de entrega"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__message_unread_counter
+msgid "Number of unread messages"
+msgstr "Número de mensajes no leídos"
+
+#. module: cr_electronic_invoice_pos
+#: model:pos.payment.method,name:cr_electronic_invoice_pos.PaymentMethods_99
+msgid "Otros (se debe indicar el medio de pago)"
+msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
@@ -365,6 +538,16 @@ msgstr ""
 #: model:ir.model.fields.selection,name:cr_electronic_invoice_pos.selection__pos_order__state_tributacion__procesando
 msgid "Procesing"
 msgstr "Procesando"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_order_electronic_invoice_form
+msgid "Re-send mail"
+msgstr "Re-enviar correo"
+
+#. module: cr_electronic_invoice_pos
+#: model:pos.payment.method,name:cr_electronic_invoice_pos.PaymentMethods_5
+msgid "Recaudado por tercero"
+msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__tipo_documento
@@ -410,9 +593,30 @@ msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice_pos/models/electronic_invoice.py:0
 #, python-format
 msgid "Return Products"
 msgstr "Devolver productos"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Error de entrega de SMS"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Secuencia de Facturas Electrónicas"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Secuencia de Notas de Crédito Electrónicas"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Secuencia de Tiquetes Electrónicos"
+msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields.selection,name:cr_electronic_invoice_pos.selection__pos_order__state_email__sent
@@ -420,19 +624,37 @@ msgid "Sent"
 msgstr "Enviado"
 
 #. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_payment_method__sequence
+msgid "Sequence"
+msgstr "Secuencia"
+
+#. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__tipo_documento
-msgid "Show document type in concordance with Ministerio de Hacienda classification"
-msgstr "Indica el tipo de documento de acuerdo a la clasificación del Ministerio de Hacienda"
+msgid ""
+"Show document type in concordance with Ministerio de Hacienda classification"
+msgstr ""
+"Indica el tipo de documento de acuerdo a la clasificación del Ministerio de "
+"Hacienda"
+
+#. module: cr_electronic_invoice_pos
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form
+msgid "Sucursal"
+msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
-msgid "TIQUETE ELECTRONICO"
+msgid "TIQUETE ELECTRÓNICO"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:pos.payment.method,name:cr_electronic_invoice_pos.PaymentMethods_2
+msgid "Tarjeta"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__xml_respuesta_tributacion
 msgid "Taxation XML response"
-msgstr "Taxation XML response"
+msgstr "XML Respuesta Tributación"
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__fname_xml_respuesta_tributacion
@@ -447,6 +669,7 @@ msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice_pos/models/electronic_invoice.py:0
 #, python-format
 msgid ""
 "To return product(s), you need to open a session that will be used to "
@@ -459,11 +682,36 @@ msgid "Transfer"
 msgstr "Transferencia"
 
 #. module: cr_electronic_invoice_pos
+#: model:pos.payment.method,name:cr_electronic_invoice_pos.PaymentMethods_4
+msgid "Transferencia – depósito"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_unread
+msgid "Unread Messages"
+msgstr "Mensajes no leídos"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__message_unread_counter
+msgid "Unread Messages Counter"
+msgstr "Contador de mensajes no leídos"
+
+#. module: cr_electronic_invoice_pos
 #: model:ir.actions.server,name:cr_electronic_invoice_pos.ir_cron_valida_hacienda_pos_ir_actions_server
 #: model:ir.cron,cron_name:cr_electronic_invoice_pos.ir_cron_valida_hacienda_pos
 #: model:ir.cron,name:cr_electronic_invoice_pos.ir_cron_valida_hacienda_pos
 msgid "Valida Hacienda POS"
 msgstr ""
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__website_message_ids
+msgid "Website Messages"
+msgstr "Mensajes del sitio web"
+
+#. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__website_message_ids
+msgid "Website communication history"
+msgstr "Historial de comunicación del sitio web"
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields.selection,name:cr_electronic_invoice_pos.selection__pos_order__state_email__no_email
