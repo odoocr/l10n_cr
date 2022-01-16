@@ -1,4 +1,4 @@
-[LOG] 2021-12-19 12:01 a.m
+[LOG] 2022-01-16 05:24 p.m.
 
 This version is for testing only, it is still under development, use it at your own risk, neither Odoocr and the developers who make modifications to this version of code are responsible for the errors it generates.
 
@@ -20,7 +20,3 @@ This version is for testing only, it is still under development, use it at your 
 
 *****TESTS:
 *Please, if you test this version, I would appreciate if you create an ISSUE in github to be able to identify the problems that are presented in this version and to be able to stabilize it, if you consider necessary, you can add the list in this file in the TO-DO section
-
-*****TODO:
-    cr_electronic_invoice_pos
-        *Remove backend dependency for document sequences: The current operation requires that the POS always have a connection to the backend, since it consults the last electronic consecutive available through RPC 
