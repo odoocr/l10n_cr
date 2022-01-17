@@ -89,10 +89,10 @@
                     <field name="reference_code_id" attrs="{'required':[('pos_order_id','!=',False)]}"/>
                     <field name="pos_order_id"/>
                     <field name="state_tributacion" readonly="1"/>
-                    <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
-                    <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
                     <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
                     <field name="xml_comprobante" filename="fname_xml_comprobante" readonly="1"/>
+                    <field name="fname_xml_respuesta_tributacion" invisible="1" readonly="1"/>
+                    <field name="xml_respuesta_tributacion" filename="fname_xml_respuesta_tributacion" readonly="1"/>
 		</field>
                 <xpath expr="//sheet[1]" position="after">
                     <div class="oe_chatter">
@@ -359,4 +359,3 @@
 
 
 </odoo>
-

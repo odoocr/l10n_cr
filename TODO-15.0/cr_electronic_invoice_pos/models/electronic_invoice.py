@@ -640,7 +640,7 @@ class PosOrder(models.Model):
                 xml_firmado = api_facturae.sign_xml(
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
                 doc.fname_xml_comprobante = doc.tipo_documento + '_' + docName + '.xml'
-                doc.xml_comprobante = base64.encodestring(xml_firmado)
+                doc.xml_comprobante = base64.b64encode(xml_firmado)
                 _logger.info('E-INV CR - SIGNED XML:%s', doc.fname_xml_comprobante)
 
             else:

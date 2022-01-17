@@ -17,8 +17,7 @@
 		'data/data.xml',
 		'data/payment_methods_data.xml',
 		'views/pos_payment_method.xml',
-		'views/pos_templates.xml',
-		#'views/pos_views.xml',
+		'views/pos_templates.xml'
 	],
 	'qweb': ['static/src/xml/pos.xml'],
 	'installable': True,

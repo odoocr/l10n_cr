@@ -586,7 +586,7 @@ class AccountInvoiceElectronic(models.Model):
 
                             inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
 
-                            inv.xml_comprobante = base64.encodestring(xml_firmado)
+                            inv.xml_comprobante = base64.b64encode(xml_firmado)
                             inv.tipo_documento = tipo_documento
 
                             if inv.state_tributacion != 'procesando':
@@ -905,6 +905,10 @@ class AccountInvoiceElectronic(models.Model):
 
 
     def generate_and_send_invoices(self, invoices):
+        def cleanhtml(raw_html):
+            CLEANR = re.compile('<.*?>') 
+            cleantext = re.sub(CLEANR, '', raw_html)
+            return cleantext
         total_invoices = len(invoices)
         current_invoice = 0
 
@@ -970,7 +974,7 @@ class AccountInvoiceElectronic(models.Model):
                 tipo_documento_referencia = False
                 razon_referencia = False
                 currency = inv.currency_id
-                invoice_comments = escape(inv.narration)
+                invoice_comments = escape(cleanhtml(inv.narration))
 
                 if (inv.invoice_id or inv.not_loaded_invoice) and inv.reference_code_id and inv.reference_document_id:
                     if inv.invoice_id:
@@ -1270,7 +1274,7 @@ class AccountInvoiceElectronic(models.Model):
                     inv.company_id.frm_pin,
                     xml_to_sign)
 
-                inv.xml_comprobante = base64.encodestring(xml_firmado)
+                inv.xml_comprobante = base64.b64encode(xml_firmado)
                 inv.fname_xml_comprobante = inv.tipo_documento + '_' + inv.number_electronic + '.xml'
 
                 _logger.info('E-INV CR - SIGNED XML:%s', inv.fname_xml_comprobante)
