@@ -1338,7 +1338,7 @@ class AccountInvoiceElectronic(models.Model):
             # Digital Invoice or ticket
             if inv.move_type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
                 pass   
-            elif inv.move_type == 'out_invoice':
+            elif inv.move_type in ('out_invoice', 'out_refund'):
                 # tipo de identificación
                 if inv.partner_id and inv.partner_id.vat and not inv.partner_id.identification_id:
                     raise UserError('Seleccione el tipo de identificación del cliente en su perfil')
