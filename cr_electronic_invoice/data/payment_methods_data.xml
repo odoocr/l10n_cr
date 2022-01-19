@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- payment methods -->
+        <record id="cr_electronic_invoice.PaymentMethods_1" model="payment.methods">
+            <field name="sequence">01</field>
+            <field name="name">Efectivo</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.PaymentMethods_2" model="payment.methods">
+            <field name="sequence">02</field>
+            <field name="name">Tarjeta</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.PaymentMethods_3" model="payment.methods">
+            <field name="sequence">03</field>
+            <field name="name">Cheque</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.PaymentMethods_4" model="payment.methods">
+            <field name="sequence">04</field>
+            <field name="name">Transferencia – depósito</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.PaymentMethods_5" model="payment.methods">
+            <field name="sequence">05</field>
+            <field name="name">Recaudado por tercero</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.PaymentMethods_99" model="payment.methods">
+            <field name="sequence">99</field>
+            <field name="name">Otros (se debe indicar el medio de pago)</field>
+            <field name="active">true</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- reference codes -->
+        <record id="cr_electronic_invoice.ReferenceCode_1" model="reference.code">
+            <field name="code">01</field>
+            <field name="name">Anula Documento de Referencia</field>
+            <field name="active">true</field>
+        </record>
+
+         <record id="cr_electronic_invoice.ReferenceCode_2" model="reference.code">
+            <field name="code">02</field>
+            <field name="name">Corrige texto de ocumento de referencia</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceCode_3" model="reference.code">
+            <field name="code">03</field>
+            <field name="name">Corrige monto</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceCode_4" model="reference.code">
+            <field name="code">04</field>
+            <field name="name">Referencia a otro documento</field>
+            <field name="active">true</field>
+        </record>
+
+        <record id="cr_electronic_invoice.ReferenceCode_5" model="reference.code">
+            <field name="code">05</field>
+            <field name="name">Sustituye comprobante provisional por contigencia</field>
+            <field name="active">true</field>
+        </record>
+
+         <record id="cr_electronic_invoice.ReferenceCode_99" model="reference.code">
+            <field name="code">99</field>
+            <field name="name">Otros</field>
+            <field name="active">true</field>
+        </record>
+
+    </data>
+</odoo>
