@@ -28,7 +28,7 @@
                 </field>
 
                 <field name="invoice_date" position="attributes">
-                    <attribute name="readonly">-4</attribute>
+                    <attribute name="attrs">{'invisible': [('type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))], 'readonly': [('type', 'in', ('out_invoice', 'out_refund', 'out_receipt')), ('state', '=', 'draft')]}</attribute>
                 </field>
 
                 <field name="invoice_date" position="after">
