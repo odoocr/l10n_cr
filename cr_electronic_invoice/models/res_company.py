@@ -281,7 +281,7 @@ class CompanyElectronic(models.Model):
                 for activity in economic_activities:
                     activity.active = True
 
-                self.name = json_response["name"]
+                self.legal_name = json_response["name"]
             else:
                 alert = {
                     'title': json_response["status"],

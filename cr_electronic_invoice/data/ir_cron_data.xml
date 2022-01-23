@@ -58,15 +58,14 @@
         </record>
 
         <record id="ir_cron_vat_exoneration_expired" model="ir.cron">
-			<field name="name">FECR: Check clients VAT exoneration expiration</field>
-			<field name="model_id" ref="model_res_partner" />
-			<field name="state">code</field>
-			<field name="code">model.check_exonerations()</field>
-			<field name="interval_number">1</field>
-			<field name="interval_type">days</field>
-			<field name="numbercall">-1</field>
-			<field name="doall" eval="False" />
-		</record>
-
+            <field name="name">FECR: Check clients VAT exoneration expiration</field>
+            <field name="model_id" ref="model_res_partner" />
+            <field name="state">code</field>
+            <field name="code">model.check_exonerations()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+        </record>
     </data>
 </odoo>

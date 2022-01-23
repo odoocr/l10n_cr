@@ -15,7 +15,6 @@ class IvaCodeType(models.Model):
     percentage_exoneration = fields.Integer(string="Percentage of VAT Exoneration", required=False)
     tax_root = fields.Many2one("account.tax", string="Parent Tax", required=False, )
     non_tax_deductible = fields.Boolean(string='Indicates if this tax is no deductible for Rent and VAT',)
-    iva_devuelto_account_id = fields.Many2one("account.account", string="Cuenta de IVA Devuelto", required=False)
 
     @api.onchange('percentage_exoneration')
     def _onchange_percentage_exoneration(self):
