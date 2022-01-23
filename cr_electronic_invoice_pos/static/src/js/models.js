@@ -73,9 +73,6 @@
                 loaded: function(self, sequence){
                     self.FE_sequence = sequence[0];
                     self.TE_sequence = sequence[1];
-                    console.log("load_server_data");
-                    console.log(self.FE_sequence);
-                    console.log(self.TE_sequence); 
                 },
             });
             return PosModelParent.load_server_data.call(this, arguments);
@@ -146,12 +143,6 @@
 
             return json;
         },
-        init_from_JSON: function(json){
-            _super.prototype.init_from_JSON.call(this, arguments);
-            this.number_electronic = json.number_electronic;
-            this.sequence = json.sequence;
-            this.tipo_documento = json.tipo_documento;
-        },
         set_number_electronic: function (number_electronic) {
             this.number_electronic = number_electronic;
         },
@@ -169,7 +160,7 @@
         },
         get_tipo_documento: function () {
             return this.tipo_documento;
-        },
+        }
     });
 
 });
