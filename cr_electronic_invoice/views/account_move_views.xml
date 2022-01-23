@@ -9,13 +9,13 @@
             <xpath expr="//div[@name='button_box']" position="after">
                 <group  attrs="{'invisible':[('move_type','in', ('in_invoice', 'in_refund', 'entry'))]}">
                     <div class="alert alert-danger" role="alert" attrs="{'invisible':['|', ('state_tributacion','not in', (False)), ('state', 'in', ('draft', 'cancel'))]}">
-                        The document has not been issued, if you need to send it manually press
+                        The document has not yet been issued, it will be sent automatically in 5 minutes, if you need to send it manually press 
                         <button class="btn btn-primary" name="generate_and_send_invoice" type="object" string="Send Document"/>
                     </div>
                 </group>
                 <group attrs="{'invisible':[('move_type','=', 'entry')]}">
                     <div class="alert alert-warning" role="alert" attrs="{'invisible':['|', ('state_tributacion','not in', ('procesando')), ('state', 'in', ('draft', 'cancel'))]}">
-                        The document was issued successfully, if you need to consult it manually press
+                        The document was issued successfully, however we still do not have the answer, it will be consulted in 10 minutes, if you wish to consult it manually press 
                         <button class="btn btn-primary" name="action_check_hacienda" type="object" string="Consult Document"/>
                     </div>
                 </group>
