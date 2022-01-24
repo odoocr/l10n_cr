@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_tax_form_inherit" model="ir.ui.view">
+            <field name="name">account.tax.form.inherit</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="tax_code"/>
+                    <field name="iva_tax_desc"/>
+                    <field name="iva_tax_code"/>
+                    <field name="has_exoneration"/>
+                    <field name="non_tax_deductible"/>
+                </field>
+                 <xpath expr="//page[2]" position="after">
+                    <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">
+                        <group>
+                            <field name="tax_root"/>
+                             <field name="percentage_exoneration"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

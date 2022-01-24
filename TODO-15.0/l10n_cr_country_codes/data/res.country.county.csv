@@ -1,0 +1,82 @@
+id,code,name,state_id:id
+county_San_José_SJ,01,San José,base.state_SJ
+county_Alajuelita_SJ,10,Alajuelita,base.state_SJ
+county_Vásquez_de_Coronado_SJ,11,Vásquez de Coronado,base.state_SJ
+county_Acosta_SJ,12,Acosta,base.state_SJ
+county_Tibás_SJ,13,Tibás,base.state_SJ
+county_Moravia_SJ,14,Moravia,base.state_SJ
+county_Montes_de_Oca_SJ,15,Montes de Oca,base.state_SJ
+county_Turrubares_SJ,16,Turrubares,base.state_SJ
+county_Dota_SJ,17,Dota,base.state_SJ
+county_Curridabat_SJ,18,Curridabat,base.state_SJ
+county_Pérez_Zeledón_SJ,19,Pérez Zeledón,base.state_SJ
+county_Escazú_SJ,02,Escazú,base.state_SJ
+county_León_Cortéz_Castro_SJ,20,León Cortéz Castro,base.state_SJ
+county_Desamparados_SJ,03,Desamparados,base.state_SJ
+county_Puriscal_SJ,04,Puriscal,base.state_SJ
+county_Tarrazú_SJ,05,Tarrazú,base.state_SJ
+county_Aserrí_SJ,06,Aserrí,base.state_SJ
+county_Mora_SJ,07,Mora,base.state_SJ
+county_Goicoechea_SJ,08,Goicoechea,base.state_SJ
+county_Santa_Ana_SJ,09,Santa Ana,base.state_SJ
+county_Alajuela_A,01,Alajuela,base.state_A
+county_San_Carlos_A,10,San Carlos,base.state_A
+county_Zarcero_A,11,Zarcero,base.state_A
+county_Valverde_Vega_A,12,Valverde Vega,base.state_A
+county_Upala_A,13,Upala,base.state_A
+county_Los_Chiles_A,14,Los Chiles,base.state_A
+county_Guatuso_A,15,Guatuso,base.state_A
+county_San_Ramón_A,02,San Ramón,base.state_A
+county_Grecia_A,03,Grecia,base.state_A
+county_San_Mateo_A,04,San Mateo,base.state_A
+county_Atenas_A,05,Atenas,base.state_A
+county_Naranjo_A,06,Naranjo,base.state_A
+county_Palmares_A,07,Palmares,base.state_A
+county_Poás_A,08,Poás,base.state_A
+county_Orotina_A,09,Orotina,base.state_A
+county_Cartago_C,01,Cartago,base.state_C
+county_Paraíso_C,02,Paraíso,base.state_C
+county_La_Unión_C,03,La Unión,base.state_C
+county_Jiménez_C,04,Jiménez,base.state_C
+county_Turrialba_C,05,Turrialba,base.state_C
+county_Alvarado_C,06,Alvarado,base.state_C
+county_Oreamuno_C,07,Oreamuno,base.state_C
+county_El_Guarco_C,08,El Guarco,base.state_C
+county_Heredia_H,01,Heredia,base.state_H
+county_Sarapiquí_H,10,Sarapiquí,base.state_H
+county_Barva_H,02,Barva,base.state_H
+county_Santo_Domingo_H,03,Santo Domingo,base.state_H
+county_Santa_Bárbara_H,04,Santa Bárbara,base.state_H
+county_San_Rafaél_H,05,San Rafaél,base.state_H
+county_San_Isidro_H,06,San Isidro,base.state_H
+county_Belén_H,07,Belén,base.state_H
+county_Flores_H,08,Flores,base.state_H
+county_San_Pablo_H,09,San Pablo,base.state_H
+county_Liberia_G,01,Liberia,base.state_G
+county_La_Cruz_G,10,La Cruz,base.state_G
+county_Hojancha_G,11,Hojancha,base.state_G
+county_Nicoya_G,02,Nicoya,base.state_G
+county_Santa_Cruz_G,03,Santa Cruz,base.state_G
+county_Bagaces_G,04,Bagaces,base.state_G
+county_Carrillo_G,05,Carrillo,base.state_G
+county_Cañas_G,06,Cañas,base.state_G
+county_Abangáres_G,07,Abangáres,base.state_G
+county_Tilarán_G,08,Tilarán,base.state_G
+county_Nandayure_G,09,Nandayure,base.state_G
+county_Puntarenas_P,01,Puntarenas,base.state_P
+county_Corredores_P,10,Corredores,base.state_P
+county_Garabito_P,11,Garabito,base.state_P
+county_Esparza_P,02,Esparza,base.state_P
+county_Buenos_Aires_P,03,Buenos Aires,base.state_P
+county_Montes_de_Oro_P,04,Montes de Oro,base.state_P
+county_Osa_P,05,Osa,base.state_P
+county_Aguirre_P,06,Aguirre,base.state_P
+county_Golfito_P,07,Golfito,base.state_P
+county_Coto_Brus_P,08,Coto Brus,base.state_P
+county_Parrita_P,09,Parrita,base.state_P
+county_Limón_L,01,Limón,base.state_L
+county_Pococí_L,02,Pococí,base.state_L
+county_Siquirres_L,03,Siquirres,base.state_L
+county_Talamanca_L,04,Talamanca,base.state_L
+county_Matina_L,05,Matina,base.state_L
+county_Guácimo_L,06,Guácimo,base.state_L

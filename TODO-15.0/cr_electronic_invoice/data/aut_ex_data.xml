@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="cr_electronic_invoice.AutEx_1" 
+            model="aut.ex">
+            <field name="code">01</field>
+            <field name="name">Compras autorizadas</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_2" 
+            model="aut.ex">
+            <field name="code">02</field>
+            <field name="name">Ventas exentas a diplomáticos</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_3" 
+            model="aut.ex">
+            <field name="code">03</field>
+            <field name="name">Autorizado por Ley Especial</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_4" 
+            model="aut.ex">
+            <field name="code">04</field>
+            <field name="name">Exenciones Dirección General de Hacienda</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_5" 
+            model="aut.ex">
+            <field name="code">05</field>
+            <field name="name">Transitorio V</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_6" 
+            model="aut.ex">
+            <field name="code">06</field>
+            <field name="name">Transitorio IX</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_7" 
+            model="aut.ex">
+            <field name="code">07</field>
+            <field name="name">Transitorio XVII</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+        <record id="cr_electronic_invoice.AutEx_99" 
+            model="aut.ex">
+            <field name="code">99</field>
+            <field name="name">Otros</field>
+            <field name="active" 
+                eval="True"/>
+        </record>
+
+    </data>
+</odoo>

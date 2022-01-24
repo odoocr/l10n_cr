@@ -1,0 +1,2126 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* cr_electronic_invoice
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0-20210913\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-10-24 04:49+0000\n"
+"PO-Revision-Date: 2021-10-24 04:49+0000\n"
+"Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: cr_electronic_invoice
+#: model:mail.template,subject:cr_electronic_invoice.email_template_invoice_vendor
+msgid "${object.company_id.name} Invoice (Ref ${object.number or 'n/a'})"
+msgstr "${object.company_id.name} Documento (Ref ${object.number or 'n/a'})"
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_Servicio
+msgid "10% Servicio"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:mail.template,body_html:cr_electronic_invoice.email_template_edi_expiration_notice
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"\n"
+"                    <h1>NOTIFICACIÓN IMPORTANTE!!</h1>\n"
+"\n"
+"                    <p>\n"
+"                        ${object.company_id.get_message_to_send()}\n"
+"                    </p>\n"
+"\n"
+"                </div>\n"
+"            "
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:mail.template,body_html:cr_electronic_invoice.email_template_invoice_vendor
+msgid ""
+"<div>\n"
+"    <p>\n"
+"        Dear ${object.partner_id.name}\n"
+"        % set access_action = object.with_context(force_website=True).get_access_action()\n"
+"        % set is_online = access_action and access_action['type'] == 'ir.actions.act_url'\n"
+"        % set access_url = object.get_mail_url()\n"
+"\n"
+"        % if object.partner_id.parent_id:\n"
+"        (<i>${object.partner_id.parent_id.name}</i>)\n"
+"        % endif\n"
+"        ,\n"
+"    </p>\n"
+"    <p>\n"
+"        ${object.company_id.name} has accepted in \"Ministerio de Hacienda\" your\n"
+"        % if object.number:\n"
+"        invoice <strong>${object.number}</strong>\n"
+"        % else:\n"
+"        invoice\n"
+"        % endif\n"
+"        % if object.origin:\n"
+"        (with reference: ${object.origin})\n"
+"        % endif\n"
+"        amounting in <strong>${format_amount(object.amount_total, object.currency_id)}</strong>\n"
+"        from ${object.company_id.name}.\n"
+"    </p>\n"
+"\n"
+"    <br/>\n"
+"    <strong>Electronic number: </strong> ${object.number_electronic}\n"
+"    <br/>\n"
+"    <strong>Confirmation date: </strong> ${object.date_issuance}\n"
+"    <br/>\n"
+"    <strong>Confirmation Message: </strong> ${object.state_invoice_partner}\n"
+"    <br/>\n"
+"    <strong>\"Hacienda\" status: </strong> ${object.state_tributacion}\n"
+"\n"
+"    <br/><br/>\n"
+"    <strong>Issuing company </strong>\n"
+"    <br/>\n"
+"    <strong>Name: </strong>${object.partner_id.name}\n"
+"    <br/>\n"
+"    <strong>Id: </strong>${object.partner_id.vat}\n"
+"\n"
+"    <br/><br/>\n"
+"    <strong>Receiving company </strong>\n"
+"    <br/>\n"
+"    <strong>Name: </strong>${object.company_id.name}\n"
+"    <br/>\n"
+"    <strong>Id: </strong>${object.company_id.vat}\n"
+"    <br/><br/>\n"
+"    Attached you'll find the XMLs with the message sent to \"Hacienda\" and its response for your backup\n"
+"    <br/><br/>\n"
+"    <p>Thank you,</p>\n"
+"    <p style=\"color:#888888\">\n"
+"        % if object.user_id and object.user_id.signature:\n"
+"        ${object.user_id.signature | safe}\n"
+"        % endif\n"
+"    </p>\n"
+"</div>\n"
+"            "
+msgstr ""
+"<div>\n"
+"    <p>\n"
+"        Estimado ${object.partner_id.name}\n"
+"        % set access_action = object.with_context(force_website=True).get_access_action()\n"
+"        % set is_online = access_action and access_action['type'] == 'ir.actions.act_url'\n"
+"        % set access_url = object.get_mail_url()\n"
+"\n"
+"        % if object.partner_id.parent_id:\n"
+"        (<i>${object.partner_id.parent_id.name}</i>)\n"
+"        % endif\n"
+"        ,\n"
+"    </p>\n"
+"    <p>\n"
+"        ${object.company_id.name} ha sido aceptado en el \"Ministerio de Hacienda\" su\n"
+"        % if object.number:\n"
+"        documento <strong>${object.number}</strong>\n"
+"        % else:\n"
+"        documento\n"
+"        % endif\n"
+"        % if object.origin:\n"
+"        (con referencia: ${object.origin})\n"
+"        % endif\n"
+"        por un monto de <strong>${format_amount(object.amount_total, object.currency_id)}</strong>\n"
+"        de ${object.company_id.name}.\n"
+"    </p>\n"
+"\n"
+"    <br/>\n"
+"    <strong>Número Electrónico: </strong> ${object.number_electronic}\n"
+"    <br/>\n"
+"    <strong>Fecha de Confirmación: </strong> ${object.date_issuance}\n"
+"    <br/>\n"
+"    <strong>Mensaje de Confirmación: </strong> ${object.state_invoice_partner}\n"
+"    <br/>\n"
+"    <strong>Estado ante \"Hacienda\": </strong> ${object.state_tributacion}\n"
+"\n"
+"    <br/><br/>\n"
+"    <strong>Emisor</strong>\n"
+"    <br/>\n"
+"    <strong>Nombre: </strong>${object.partner_id.name}\n"
+"    <br/>\n"
+"    <strong>Identificación: </strong>${object.partner_id.vat}\n"
+"\n"
+"    <br/><br/>\n"
+"    <strong>Receptor </strong>\n"
+"    <br/>\n"
+"    <strong>Nombre: </strong>${object.company_id.name}\n"
+"    <br/>\n"
+"    <strong>Identificación: </strong>${object.company_id.vat}\n"
+"    <br/><br/>\n"
+"    Adjunto encontrará los XMLs con el mensaje enviado a \"Hacienda\" y la respuesta para su respaldo\n"
+"    <br/><br/>\n"
+"    <p>Gracias,</p>\n"
+"    <p style=\"color:#888888\">\n"
+"        % if object.user_id and object.user_id.signature:\n"
+"        ${object.user_id.signature | safe}\n"
+"        % endif\n"
+"    </p>\n"
+"</div>\n"
+"            "
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid ""
+"Ability to select a package type in sales orders and to force a"
+"quantity that is a multiple of the number of units per package."
+msgstr ""
+"Capacidad para seleccionar un tipo de paquete en las órdenes de venta"
+"y forzar una cantidad que sea un múltiplo del número de unidades por paquete."
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_account_move_reversal
+msgid "Account Move Reversal"
+msgstr "Revocación de movimiento en cuenta"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_invoice_partner__2
+msgid "Aceptacion parcial"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
+msgid "Aceptación Electrónica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_invoice_partner__1
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_send_invoice__aceptado
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_tributacion__aceptado
+msgid "Aceptado"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_needaction
+msgid "Action Needed"
+msgstr "Acción Necesaria"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__active
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__active
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__active
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__active
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__active
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__active
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__active
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_economic_activity_filter
+msgid "Active"
+msgstr "Activo"
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.act_window,name:cr_electronic_invoice.action_economic_activity
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_economic_activity
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_economic_activity_form
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_economic_activity_tree
+msgid "Actividad Económica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_economic_activity_filter
+msgid "Activity"
+msgstr "Actividad"
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_alc
+msgid "Alquiler de Uso Comercial"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_al
+msgid "Alquiler de Uso Habitacional"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__invoice_amount_text
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__invoice_amount_text
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__invoice_amount_text
+msgid "Amount in Letters"
+msgstr "Monto en letras"
+
+#. module: cr_electronic_invoice
+#: model:uom.category,name:cr_electronic_invoice.product_uom_categ_area
+msgid "Area"
+msgstr "Área"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_attachment_count
+msgid "Attachment Count"
+msgstr "Recuento de archivos adjuntos"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Attributes"
+msgstr "Atributos"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__type_exoneration
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__type_exoneration
+msgid "Authorization Type"
+msgstr "Tipo de Autorización"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__sucursal
+msgid "Branch"
+msgstr "Sucursal"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_category__cabys_code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_product__cabys_code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template__cabys_code
+msgid "CAByS Code"
+msgstr "Código CAByS"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_product_category__cabys_code
+#: model:ir.model.fields,help:cr_electronic_invoice.field_product_product__cabys_code
+#: model:ir.model.fields,help:cr_electronic_invoice.field_product_template__cabys_code
+msgid "CAByS code from Ministerio de Hacienda"
+msgstr "Código CAByS de Ministerio de Hacienda"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
+msgid "Cargar datos del XML"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_tercero
+msgid "Cobro de un tercero"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product__code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__code
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_uom_uom__code
+msgid "Code"
+msgstr "Código"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_product__code_type_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template__code_type_id
+msgid "Code Type"
+msgstr "Tipo de Código"
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_com
+msgid "Comisiones"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__commercial_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__commercial_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__commercial_name
+msgid "Commercial Name"
+msgstr "Nombre Comercial"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_product__commercial_measurement
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template__commercial_measurement
+msgid "Commercial Unit"
+msgstr "Unidad Comercial"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_res_company
+msgid "Companies"
+msgstr "Compañías"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__company_id
+msgid "Company"
+msgstr "Compañía"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__company_vat
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__company_vat
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__company_vat
+msgid "Company Tax ID"
+msgstr "Identificación de la compañía"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_company.py:0
+#: code:addons/cr_electronic_invoice/models/res_partner.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_company.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_partner.py:0
+#, python-format
+msgid "Company VAT is invalid"
+msgstr "El IVA de la compañía no es válido"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
+msgid "Comprobantes Electrónicos"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.act_window,name:cr_electronic_invoice.action_sale_conditions
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_sale_conditions
+msgid "Condiciones de Venta"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment_term__sale_conditions_id
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_sale_conditions_form
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_sale_conditions_tree
+msgid "Condiciones de venta"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_res_config_settings
+msgid "Config Settings"
+msgstr "Opciones de configuración"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__sequence
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__sequence
+msgid "Consecutive"
+msgstr "Consecutivo"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__consecutive_number_receiver
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__consecutive_number_receiver
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__consecutive_number_receiver
+msgid "Consecutive Receiver Number"
+msgstr "Número consecutivo del Receptor"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_tree_inherit
+msgid "Consecutivo"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.server,name:cr_electronic_invoice.ir_cron_consultahacienda_ir_actions_server
+#: model:ir.cron,cron_name:cr_electronic_invoice.ir_cron_consultahacienda
+#: model:ir.cron,name:cr_electronic_invoice.ir_cron_consultahacienda
+msgid "Consulta Hacienda FE Clientes"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.server,name:cr_electronic_invoice.ir_cron_confirmahacienda_ir_actions_server
+#: model:ir.cron,cron_name:cr_electronic_invoice.ir_cron_confirmahacienda
+#: model:ir.cron,name:cr_electronic_invoice.ir_cron_confirmahacienda
+msgid "Consulta Hacienda FE Proveedores"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_company_form_inherit
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_res_partner_inherit
+msgid "Consultar Actividad Economica en Hacienda"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
+msgid "Consultar Hacienda"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_res_partner
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_parafiscal
+msgid "Contribución parafiscal"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_exportacion
+msgid "Costos de Exportación"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__create_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__create_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__create_date
+msgid "Created on"
+msgstr "Creado en"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__signature
+msgid "Cryptographic Key"
+msgstr "Llave criptográfica"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Customer"
+msgstr "Socio de Negocio"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_account_move_reversal_form_inherit
+msgid "Código Referencia"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.act_window,name:cr_electronic_invoice.action_reference_code
+msgid "Código de Referencia"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_reference_code
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_reference_code_tree
+msgid "Código de referencia"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__date_issuance
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__date_issuance
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__date_issuance
+msgid "Date of issue"
+msgstr "Fecha de emisión"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__range_days
+msgid "Days range"
+msgstr "Rango de días"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_config_settings.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_config_settings.py:0
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_config_settings__expense_analytic_account_id
+#, python-format
+msgid "Default Analytic Account for expenses when loading data from XML"
+msgstr "Cuenta analítica predeterminada para gastos al cargar datos desde XML"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__activity_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__activity_id
+msgid "Default Economic Activity"
+msgstr "Actividad económica por defecto"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_config_settings.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_config_settings.py:0
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_config_settings__expense_account_id
+#, python-format
+msgid "Default Expense Account when loading data from XML"
+msgstr "Cuenta de gastos predeterminada al cargar datos desde XML"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Default account for expenses when importing electronic invoice"
+msgstr "Cuenta predeterminada para gastos al importar factura electrónica"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Default account used for expenses when importing electronic invoice"
+msgstr "Cuenta predeterminada utilizada para gastos al importar factura electrónica"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid ""
+"Default analytic account for expenses when importing electronic invoice"
+msgstr ""
+"Cuenta analítica predeterminada para gastos al importar factura electrónica"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid ""
+"Default analytic account used for expenses when importing electronic invoice"
+msgstr ""
+"Cuenta analítica predeterminada utilizada para gastos al importar factura electrónica"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__activity_id
+msgid "Default economic activity"
+msgstr "Actividad económica por defecto"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Default product for expenses when importing electronic invoice"
+msgstr "Producto por defecto para gastos al importar factura electrónica"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_config_settings.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_config_settings.py:0
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_config_settings__expense_product_id
+#, python-format
+msgid "Default product for expenses when loading data from XML"
+msgstr "Producto predeterminado para gastos al cargar datos desde XML"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Default product used for expenses when importing electronic invoice"
+msgstr "Producto predeterminado utilizado para gastos al importar factura electrónica"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__description
+msgid "Description"
+msgstr "Descripción"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__res_company__frm_ws_ambiente__disabled
+msgid "Deshabilitado"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__discount_note
+msgid "Discount note"
+msgstr "Nota de Descuento"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_reversal__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment_term__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_mail_compose_message__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_category__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__display_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_uom_uom__display_name
+msgid "Display Name"
+msgstr "Mostrar nombre"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_tree_inherit
+msgid "Doc Elect."
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_account_move_reversal_form_inherit
+msgid "Documento Referencia"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.act_window,name:cr_electronic_invoice.action_reference_document
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_reference_document
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_reference_document_form
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_reference_document_tree
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_resolution_form
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_resolution_tree
+msgid "Documentos de referencia"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__date_expiration_sign
+msgid "Due date"
+msgstr "Fecha de Vencimiento"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__economic_activities_ids
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__economic_activities_ids
+msgid "Economic Activities"
+msgstr "Actividades Económicas"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__economic_activity_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__economic_activity_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__economic_activity_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_product__economic_activity_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template__economic_activity_id
+msgid "Economic Activity"
+msgstr "Actividad Económica"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__economic_activities_ids
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__economic_activities_ids
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__economic_activities_ids
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_category__economic_activity_id
+msgid "Economic activities"
+msgstr "Actividades Económicas"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__economic_activity_id
+msgid "Economic activity"
+msgstr "Actividad Económica"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_product_category__economic_activity_id
+#: model:ir.model.fields,help:cr_electronic_invoice.field_product_product__economic_activity_id
+#: model:ir.model.fields,help:cr_electronic_invoice.field_product_template__economic_activity_id
+msgid "Economic activity code from Ministerio de Hacienda"
+msgstr "Código de actividad económica del Ministerio de Hacienda"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__NC_sequence_id
+msgid "Electronic Credit Notes Sequence"
+msgstr "Secuencia de notas de crédito electrónicas"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__ND_sequence_id
+msgid "Electronic Debit Notes Sequence"
+msgstr "Secuencia de notas de débito electrónicas"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__FE_sequence_id
+msgid "Electronic Invoice Sequence"
+msgstr "Secuencia de facturas electrónicas"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__TE_sequence_id
+msgid "Electronic Ticket Sequence"
+msgstr "Secuencia de tiquetes electrónicos"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__frm_ws_password
+msgid "Electronic invoice password"
+msgstr "Contraseña de factura electrónica"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__frm_ws_identificador
+msgid "Electronic invoice user"
+msgstr "Usuario factura electrónica"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__number_electronic
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__number_electronic
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__number_electronic
+msgid "Electronic number"
+msgstr "Número electrónico"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_mail_compose_message
+msgid "Email composition wizard"
+msgstr "Asistente de redacción de correo electrónico"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_email__sent
+msgid "Enviado"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.server,name:cr_electronic_invoice.ir_cron_send_expiration_notice_ir_actions_server
+#: model:ir.cron,cron_name:cr_electronic_invoice.ir_cron_send_expiration_notice
+#: model:ir.cron,name:cr_electronic_invoice.ir_cron_send_expiration_notice
+msgid "Enviar Aviso de Expiración de Llave Criptográfica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
+msgid "Enviar FEC"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
+msgid "Enviar Mensaje Receptor"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.server,name:cr_electronic_invoice.ir_cron_mr_hacienda_invoice_ir_actions_server
+#: model:ir.cron,cron_name:cr_electronic_invoice.ir_cron_mr_hacienda_invoice
+#: model:ir.cron,name:cr_electronic_invoice.ir_cron_mr_hacienda_invoice
+msgid "Envio Mensaje Receptor"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__frm_ws_ambiente
+msgid "Environment"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_send_invoice__error
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_tributacion__error
+msgid "Error"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_email__fe_error
+msgid "Error FE"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/api_facturae.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/api_facturae.py:0
+#, python-format
+msgid "Error Obteniendo el Token desde MH. Excepcion %s"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__frm_ws_ambiente
+msgid ""
+"Es el ambiente en al cual se le está actualizando el certificado. Para el "
+"ambiente de calidad (stag), para el ambiente de producción (prod). "
+"Requerido."
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__frm_pin
+msgid "Es el pin correspondiente al certificado. Requerido"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__state_tributacion
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__state_tributacion
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__state_tributacion
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_tree_inherit
+msgid "Estado FE"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__state_send_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__state_send_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__state_send_invoice
+msgid "Estado FE Proveedor"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__state_email
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__state_email
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__state_email
+msgid "Estado email"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_Exento
+msgid "Exento"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_res_partner_inherit
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_tax_form_inherit
+msgid "Exoneration"
+msgstr "Exoneración"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__institution_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__institution_name
+msgid "Exoneration Issuer"
+msgstr "Emisor de exoneración"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__exoneration_number
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__exoneration_number
+msgid "Exoneration Number"
+msgstr "Número de exoneración"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__date_expiration
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__date_expiration
+msgid "Expiration Date"
+msgstr "Fecha de expiración"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_product__tariff_head
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template__tariff_head
+msgid "Export Tax rate"
+msgstr "Tasa de impuesto a la exportación"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__fe
+msgid "Factura Electrónica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__fec
+msgid "Factura Electrónica de Compra"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__fee
+msgid "Factura Electrónica de Exportación"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_account_journal_inherit_form
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_company_form_inherit
+msgid "Facturación Electrónica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_electronic_invoice
+msgid "Facturación electrónica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__field_id
+msgid "Field"
+msgstr "Campo"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__fname_xml_comprobante
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__fname_xml_comprobante
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__fname_xml_comprobante
+msgid "File name XML voucher"
+msgstr "Nombre del Comprobante XML"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_send_invoice__firma_invalida
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_tributacion__firma_invalida
+msgid "Firma Inválida"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_follower_ids
+msgid "Followers"
+msgstr "Seguidores"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_channel_ids
+msgid "Followers (Channels)"
+msgstr "Seguidores (Canales)"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Seguidores (Socios)"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__economic_activity__sale_type__goods
+msgid "Goods"
+msgstr "Bienes"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Hacienda API is disabled in company"
+msgstr "Hacienda API está deshabilitada en la empresa"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__electronic_invoice_return_message
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__electronic_invoice_return_message
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__electronic_invoice_return_message
+msgid "Hacienda answer"
+msgstr "Respuesta de Hacienda"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__has_exoneration
+msgid "Has Exoneration"
+msgstr "Posee exoneración"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__has_exoneration
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__has_exoneration
+msgid "Has Exoneration?"
+msgstr "¿Tiene exoneración?"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_reversal__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment_term__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_mail_compose_message__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_category__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_config_settings__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_uom_uom__id
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_economic_activity_filter
+msgid "ID"
+msgstr "Identificación"
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IEBA
+msgid "IEBA"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IEBE
+msgid "IEBE"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IPT
+msgid "IPT"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IRBU
+msgid "IRBU"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IUC
+msgid "IUC"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IVA0
+msgid "IVA 0%"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IVA1
+msgid "IVA 1%"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IVA13
+msgid "IVA 13%"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IVA2
+msgid "IVA 2%"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IVA4
+msgid "IVA 4%"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IVA8
+msgid "IVA 8%"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_iva_devuelto
+msgid "IVA Devuelto"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_IVA_ND
+msgid "IVA No deducible"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__identification_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__identification_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__identification_id
+msgid "Id Type"
+msgstr "Tipo de Identificación"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__message_needaction
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__message_unread
+msgid "If checked, new messages require your attention."
+msgstr "Si está marcada, los mensajes nuevos requieren su atención."
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__message_has_error
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si está marcado, algunos mensajes tienen un error de entrega."
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__ignore_total_difference
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__ignore_total_difference
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__ignore_total_difference
+msgid "Ignore Difference in Totals"
+msgstr "Ignorar la diferencia en los totales"
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_servicio
+msgid "Impuesto de Servicio 10%"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_economic_activity_filter
+msgid "Inactive"
+msgstr "Inactivo"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_config_settings.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_config_settings.py:0
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_config_settings__load_lines
+#, python-format
+msgid ""
+"Indicates if invoice lines should be load when loading a Costa Rican Digital"
+" Invoice"
+msgstr ""
+"Indica si se deben cargar líneas de factura al cargar una factura digital costarricense"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__non_tax_deductible
+msgid "Indicates if this invoice is non-tax deductible"
+msgstr "Indica si esta factura no es deducible de impuestos"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_product__non_tax_deductible
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template__non_tax_deductible
+msgid "Indicates if this product is non-tax deductible"
+msgstr "Indica si este producto no es deducible de impuestos"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__non_tax_deductible
+msgid "Indicates if this tax is no deductible for Rent and VAT"
+msgstr "Indica si este impuesto no es deducible por Renta e IVA "
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_bank_statement_line__tipo_documento
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_move__tipo_documento
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_payment__tipo_documento
+msgid ""
+"Indicates the type of document according to the classification of the "
+"Ministerio de Hacienda"
+msgstr ""
+"Indica el tipo de documento según la clasificación del Ministerio de Hacienda"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
+msgid "Información Electrónica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_i
+msgid "Intereses"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__product_code
+msgid "Internal Reference"
+msgstr "Referencia Interna"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_account_invoice_filter
+msgid "Invoice"
+msgstr "Documento"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__invoice_field_ids
+msgid "Invoice Field's"
+msgstr "Campos de Documento"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_reversal__invoice_id
+msgid "Invoice Id"
+msgstr "Identifiación de Documento"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__invoice_qr_type
+msgid "Invoice Qr Type"
+msgstr "Tipo de Documento QR"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__res_company__invoice_qr_type__by_info
+msgid "Invoice Text Information"
+msgstr "Información de texto de la factura"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__res_company__invoice_qr_type__by_url
+msgid "Invoice Url"
+msgstr "URL del Documento"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Invoice XML has not been generated for id:"
+msgstr "No se ha generado XML del documento para el id:"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_invoice_import_wizard.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_invoice_import_wizard.py:0
+#, python-format
+msgid ""
+"Invoice successfully imported from email sent by <b>%s</b> on %s with subject <i>%s</i>."
+msgstr ""
+"Documento exitosamente importado del correo electrónico enviado por <b>%s</b> en %s con el asunto <i>%s</i>."
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_is_follower
+msgid "Is Follower"
+msgstr "Es seguidor"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__date_issue
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__date_issue
+msgid "Issue Date"
+msgstr "Fecha de Emisión"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__export
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__export
+msgid "It's export"
+msgstr "Es exportador"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_account_journal
+msgid "Journal"
+msgstr "Diario"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_account_move
+msgid "Journal Entry"
+msgstr "Asiento contable"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_account_move_line
+msgid "Journal Item"
+msgstr "Apunte contable"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.constraint,message:cr_electronic_invoice.constraint_account_move_number_electronic_uniq
+msgid "La clave de comprobante debe ser única"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_reversal____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment_term____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_mail_compose_message____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_category____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_product_template____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_config_settings____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions____last_update
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_uom_uom____last_update
+msgid "Last Modified on"
+msgstr "Última modificación el"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__write_uid
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__write_uid
+msgid "Last Updated by"
+msgstr "Última actualización por"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__write_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__write_date
+msgid "Last Updated on"
+msgstr "Última actualización en"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Load invoice lines?"
+msgstr "¿Cargar líneas de factura?"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__cce
+msgid "MR Aceptación"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__cpce
+msgid "MR Aceptación Parcial"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__rce
+msgid "MR Rechazo"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "Adjunto principal"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_has_error
+msgid "Message Delivery error"
+msgstr "Error de entrega de mensaje"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_ids
+msgid "Messages"
+msgstr "Mensajes"
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_mcuadrado
+msgid "Metro Cuadrado"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_mcubico
+msgid "Metro Cubico"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_payment_methods_tree
+msgid "Métodos de Pago"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.act_window,name:cr_electronic_invoice.action_payment_methods
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_payment_methods
+msgid "Métodos de pago"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:mail.template,subject:cr_electronic_invoice.email_template_edi_expiration_notice
+msgid "NOTIFICACIÓN IMPORTANTE!!"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__categ_name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_aut_ex__name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_code_type_product__name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_code__name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_reference_document__name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__name
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_send_invoice__na
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_tributacion__na
+msgid "No Aplica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_send_invoice__ne
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_tributacion__ne
+msgid "No Encontrado"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "No hay tipo de cambio registrado para la moneda %s"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__nc
+msgid "Nota de Crédito"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__nd
+msgid "Nota de Débito"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_identification_type__notes
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__notes
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Número de acciones"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__error_count
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__error_count
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__error_count
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_has_error_counter
+msgid "Number of errors"
+msgstr "Número de errores"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr "Número de mensajes que requieren una acción"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Número de mensajes con error de entrega"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__message_unread_counter
+msgid "Number of unread messages"
+msgstr "Número de mensajes sin leer"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_partner.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_partner.py:0
+#, python-format
+msgid "Número de teléfono inválido"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__not_loaded_invoice_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__not_loaded_invoice_date
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__not_loaded_invoice_date
+msgid "Original Invoice Date not loaded"
+msgstr "Fecha de la factura original no cargada"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__not_loaded_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__not_loaded_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__not_loaded_invoice
+msgid "Original Invoice Number not loaded"
+msgstr "Número de factura original no cargado"
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_os
+msgid "Otro Tipo de Servicio"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_otros_cargos
+msgid "Otros Cargos"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__tax_root
+msgid "Parent Tax"
+msgstr "Impuesto Padre"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Partner"
+msgstr "Socio de Negocio"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__partner_vat
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__partner_vat
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__partner_vat
+msgid "Partner Tax ID"
+msgstr "Identificación de Socio de Negocio"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Partner does not have a default payment method"
+msgstr "El socio de negocio no tiene un método de pago predeterminado"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Partner is not assigne to this invoice"
+msgstr "El socio de negocio no está asignado a esta factura"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_partner__payment_methods_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_users__payment_methods_id
+msgid "Payment Method"
+msgstr "Método de pago"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_account_payment_term
+msgid "Payment Terms"
+msgstr "Plazos de pago"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__payment_methods_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__payment_methods_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__payment_methods_id
+msgid "Payment methods"
+msgstr "Métodos de pagos"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__percentage_exoneration
+msgid "Percentage of VAT Exoneration"
+msgstr "Porcentaje de exoneración del IVA"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__frm_pin
+msgid "Pin"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_company.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_company.py:0
+#, python-format
+msgid "Please Add Invoice Field's"
+msgstr "Por favor agregue el campo de la factura"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_send_invoice__procesando
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_tributacion__procesando
+msgid "Procesando"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__res_company__frm_ws_ambiente__api-prod
+msgid "Producción"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Product Catalog"
+msgstr "Catálogo de producto"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_product_category
+msgid "Product Category"
+msgstr "Categoría de producto"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_product_template
+msgid "Product Template"
+msgstr "Plantilla de producto"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_uom_uom
+msgid "Product Unit of Measure"
+msgstr "Unidad de medida del producto"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__res_company__frm_ws_ambiente__api-stag
+msgid "Pruebas"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__qr_image
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__qr_image
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__qr_image
+msgid "QR Code"
+msgstr "Código QR"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_invoice_partner__3
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_send_invoice__rechazado
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_tributacion__rechazado
+msgid "Rechazado"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_tributacion__recibido
+msgid "Recibido"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_reversal__reference_code_id
+msgid "Reference Code"
+msgstr "Código de Referencia"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_reversal__reference_document_id
+msgid "Reference Document Id"
+msgstr "ID de Documento de Referencia"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__reference_document_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__reference_document_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__reference_document_id
+msgid "Reference Document Type"
+msgstr "Tipo de Documento de Referencia"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__reference_code_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__reference_code_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__reference_code_id
+msgid "Reference code"
+msgstr "Código de Referencia"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__invoice_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__invoice_id
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__invoice_id
+msgid "Reference document"
+msgstr "Documento de Referencia"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
+msgid "Referencia Documento Electrónico"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:uom.category,name:cr_electronic_invoice.product_uom_categ_rent
+msgid "Rent"
+msgstr "Renta"
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.act_window,name:cr_electronic_invoice.action_resolution
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_resolution
+msgid "Resoluciones"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__date_resolution
+msgid "Resolution Date"
+msgstr "Fecha de Resolución"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Response XML from Hacienda has not been received"
+msgstr "No se ha recibido el XML de respuesta de Hacienda"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__state_invoice_partner
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__state_invoice_partner
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__state_invoice_partner
+msgid "Respuesta del Cliente"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/wizard/account_move_reversal.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/wizard/account_move_reversal.py:0
+#, python-format
+msgid "Reversal of: %(move_name)s, %(reason)s"
+msgstr "Reversión de: %(move_name)s, %(reason)s"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/wizard/account_move_reversal.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/wizard/account_move_reversal.py:0
+#, python-format
+msgid "Reversal of: %s"
+msgstr "Reversión de: %s"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/wizard/account_move_reversal.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/wizard/account_move_reversal.py:0
+#, python-format
+msgid "Reverse Moves"
+msgstr "Movimientos inversos"
+
+#. module: cr_electronic_invoice
+#: model:account.tax.group,name:cr_electronic_invoice.tax_group_SC
+msgid "SC"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Error de entrega de SMS"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_economic_activity__sale_type
+msgid "Sale Type"
+msgstr "Tpo de Venta"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_economic_activity_filter
+msgid "Search Activity"
+msgstr "Buscar Actividad"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__CCE_sequence_id
+msgid "Secuencia Aceptación"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__CPCE_sequence_id
+msgid "Secuencia Parcial"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__RCE_sequence_id
+msgid "Secuencia Rechazo"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__FEC_sequence_id
+msgid "Secuencia de Facturas Electrónicas de Compra"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__CCE_sequence_id
+msgid ""
+"Secuencia de confirmacion de aceptación de comprobante electrónico. Dejar en"
+" blanco y el sistema automaticamente se lo creará."
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__CPCE_sequence_id
+msgid ""
+"Secuencia de confirmación de aceptación parcial de comprobante electrónico. "
+"Dejar en blanco y el sistema automáticamente se lo creará."
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__RCE_sequence_id
+msgid ""
+"Secuencia de confirmación de rechazo de comprobante electrónico. Dejar en "
+"blanco y el sistema automáticamente se lo creará."
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Sell and purchase products in different units of measure"
+msgstr "Vender y comprar productos en diferentes unidades de medida"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Sell products by multiple of unit # per package"
+msgstr "Vender productos por múltiplo de unidad # por paquete"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Send Invoice"
+msgstr "Enviar Documento"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Send a product-specific email once the invoice is paid"
+msgstr "Envíe un correo electrónico específico del producto una vez que se pague la factura"
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid ""
+"Sending an email is useful if you need to share specific information or "
+"content about a product (instructions, rules, links, media, etc.). Create "
+"and set the email template from the product detail form (in Sales tab)."
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_invoice_qr_fields__sequence
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_payment_methods__sequence
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_sale_conditions__sequence
+msgid "Sequence"
+msgstr "Secuencia"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__FEE_sequence_id
+msgid "Sequence of Electronic Export Invoices"
+msgstr "Secuencia de facturas de exportación electrónicas"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__economic_activity__sale_type__services
+#: model:uom.category,name:cr_electronic_invoice.product_uom_categ_service
+msgid "Services"
+msgstr "Servicios"
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_spe
+msgid "Servicios Personales"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_sp
+msgid "Servicios Profesionales"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:uom.uom,name:cr_electronic_invoice.product_uom_st
+msgid "Servicios Técnicos"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Set product attributes (e.g. color, size) to sell variants"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__state_email__no_email
+msgid "Sin cuenta de correo"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__sucursal_MR
+msgid "Sucursal para secuencias de MRs"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__tariff_head
+msgid "Tariff item for export invoice"
+msgstr "Partida arancelaria para factura de exportación"
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_account_tax
+msgid "Tax"
+msgstr "Impuesto"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__tax_code
+msgid "Tax Code"
+msgstr "Código de Impuesto"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/api_facturae.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/api_facturae.py:0
+#, python-format
+msgid ""
+"Tax code %s and percentage %s as non-tax deductible is not registered in the"
+" system"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/api_facturae.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/api_facturae.py:0
+#, python-format
+msgid "Tax code %s and percentage %s is not registered in the system"
+msgstr "El código de impuestos %s y el porcentaje %s no están registrados en el sistema "
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_product_product__tariff_head
+#: model:ir.model.fields,help:cr_electronic_invoice.field_product_template__tariff_head
+msgid "Tax rate to apply for exporting invoices"
+msgstr "Tasa de impuesto a aplicar para la exportación de facturas"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__terminal
+msgid "Terminal"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__terminal_MR
+msgid "Terminal para secuencias de MRs"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_company_form_inherit
+msgid "Test get token"
+msgstr "Probar a obtener token"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_bank_statement_line__partner_vat
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_move__partner_vat
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_payment__partner_vat
+msgid "The Parnter Tax Identification Number."
+msgstr "El número de identificación fiscal del socio de negocio."
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_config_settings.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_config_settings.py:0
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_config_settings__expense_analytic_account_id
+#, python-format
+msgid "The analytic account used when loading Costa Rican digital invoice"
+msgstr "La cuenta analítica utilizada al cargar la factura digital costarricense"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_config_settings.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_config_settings.py:0
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_config_settings__expense_product_id
+#, python-format
+msgid "The default product used when loading Costa Rican digital invoice"
+msgstr "El producto predeterminado utilizado al cargar la factura digital costarricense"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/res_config_settings.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/res_config_settings.py:0
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_config_settings__expense_account_id
+#, python-format
+msgid "The expense account used when loading Costa Rican digital invoice"
+msgstr "La cuenta de gastos utilizada al cargar la factura digital costarricense"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/api_facturae.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/api_facturae.py:0
+#, python-format
+msgid "The provider in the invoice does not exists. Please review it."
+msgstr "El proveedor en la factura no existe. Por favor, revísalo."
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid ""
+"There is no \"Non tax deductible\" tax with the tax percentage of this "
+"product"
+msgstr ""
+"No hay ningún impuesto \"no deducible de impuestos\" con el porcentaje de impuestos de este producto"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__third_party_id
+msgid "Third - other charges"
+msgstr "Tercero - otros cargos"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_invoice_import_wizard.py:0
+#: code:addons/cr_electronic_invoice/models/api_facturae.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_invoice_import_wizard.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/api_facturae.py:0
+#, python-format
+msgid "This XML file is not XML-compliant. Error: %s"
+msgstr "Este archivo XML no es compatible con XML. Error: %s"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_invoice_import_wizard.py:0
+#: code:addons/cr_electronic_invoice/models/api_facturae.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_invoice_import_wizard.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/api_facturae.py:0
+#, python-format
+msgid "This is a TICKET only invoices are valid for taxes"
+msgstr "Esto es un TICKET solo las facturas son válidas para impuestos"
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_bomberos
+msgid "Timbre de Benemérito Cuerpo de Bomberos de Costa Rica"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_profesionales
+msgid "Timbre de Colegios Profesionales"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:product.template,name:cr_electronic_invoice.product_cruz_roja
+msgid "Timbre de la Cruz Roja"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.act_window,name:cr_electronic_invoice.action_identification_type
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_identification_type
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_identification_type_form
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_identification_type_tree
+msgid "Tipo de identificación"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.act_window,name:cr_electronic_invoice.action_code_type_product
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_code_type_product_form
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_code_type_product_tree
+msgid "Tipos de códigos"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.ui.menu,name:cr_electronic_invoice.menu_code_type_product
+msgid "Tipos de códigos(Productos)"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__account_move__tipo_documento__te
+msgid "Tiquete Electrónico"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__amount_total_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__amount_total_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__amount_total_electronic_invoice
+msgid "Total FE"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__amount_tax_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__amount_tax_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__amount_tax_electronic_invoice
+msgid "Total FE taxes"
+msgstr "Total Impuestos FE"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__total_tax
+msgid "Total tax"
+msgstr "Total Impuestos"
+
+#. module: cr_electronic_invoice
+#: model:product.template,uom_name:cr_electronic_invoice.product_bomberos
+#: model:product.template,uom_name:cr_electronic_invoice.product_cruz_roja
+#: model:product.template,uom_name:cr_electronic_invoice.product_exportacion
+#: model:product.template,uom_name:cr_electronic_invoice.product_iva_devuelto
+#: model:product.template,uom_name:cr_electronic_invoice.product_otros_cargos
+#: model:product.template,uom_name:cr_electronic_invoice.product_parafiscal
+#: model:product.template,uom_name:cr_electronic_invoice.product_profesionales
+#: model:product.template,uom_name:cr_electronic_invoice.product_servicio
+#: model:product.template,uom_name:cr_electronic_invoice.product_tercero
+msgid "Unidad"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
+msgid "Units of Measure"
+msgstr "Unidad de Medida"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_unread
+msgid "Unread Messages"
+msgstr "Mensajes sin leer"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__message_unread_counter
+msgid "Unread Messages Counter"
+msgstr "Contador de mensajes sin leer"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__send_user_ids
+msgid "Users"
+msgstr "Usuarios"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__iva_tax_code
+msgid "VAT Rate Code"
+msgstr "Código de Tarifa IVA"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_tax__iva_tax_desc
+msgid "VAT Tax Rate"
+msgstr "Tarifa IVA"
+
+#. module: cr_electronic_invoice
+#: model:ir.actions.server,name:cr_electronic_invoice.ir_cron_valida_hacienda_invoice_ir_actions_server
+#: model:ir.cron,cron_name:cr_electronic_invoice.ir_cron_valida_hacienda_invoice
+#: model:ir.cron,name:cr_electronic_invoice.ir_cron_valida_hacienda_invoice
+msgid "Valida Facturas Hacienda"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Vendor"
+msgstr "Proveedor"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__xml_supplier_approval
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__xml_supplier_approval
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__xml_supplier_approval
+msgid "Vendor XML"
+msgstr "XML Proveedor"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__fname_xml_supplier_approval
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__fname_xml_supplier_approval
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__fname_xml_supplier_approval
+msgid "Vendor XML voucher file name"
+msgstr "Nombre de XML Proveedor"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__tipo_documento
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__tipo_documento
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__tipo_documento
+msgid "Voucher Type"
+msgstr "Tipo de Comprobante"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__website_message_ids
+msgid "Website Messages"
+msgstr "Mensajes del Sitio Web"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__website_message_ids
+msgid "Website communication history"
+msgstr "Historial de Comunicación del Sitio Web"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__fname_xml_respuesta_tributacion
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__fname_xml_respuesta_tributacion
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__fname_xml_respuesta_tributacion
+msgid "XML File Name Tributación Response"
+msgstr "Respuesta de tributación de nombre de archivo XML"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__xml_respuesta_tributacion
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__xml_respuesta_tributacion
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__xml_respuesta_tributacion
+msgid "XML Tributación Response"
+msgstr "XML Respuesta Tributación"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__xml_comprobante
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__xml_comprobante
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__xml_comprobante
+msgid "XML voucher"
+msgstr "Comprobante XML"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#: code:addons/l10n_cr/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid ""
+"You must select the aceptance state: Accepted, Parcial Accepted or Rejected"
+msgstr ""
+"Debe seleccionar el estado de aceptación: Aceptado, Aceptado parcialmente o Rechazado"
+
+#. module: cr_electronic_invoice
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_bank_statement_line__company_vat
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_move__company_vat
+#: model:ir.model.fields,help:cr_electronic_invoice.field_account_payment__company_vat
+msgid "Your Company Tax Identification Number."
+msgstr "Número de identificación fiscal de su empresa."
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_aut_ex
+msgid "aut.ex"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_code_type_product
+msgid "code.type.product"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_economic_activity
+msgid "economic.activity"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_identification_type
+msgid "identification.type"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_invoice_qr_fields
+msgid "invoice.qr.fields"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_payment_methods
+msgid "payment.methods"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_reference_code
+msgid "reference.code"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_reference_document
+msgid "reference.document"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_resolution
+msgid "resolution"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: model:ir.model,name:cr_electronic_invoice.model_sale_conditions
+msgid "sale.conditions"
+msgstr ""
