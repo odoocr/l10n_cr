@@ -3,7 +3,7 @@
 
 {
     'name': 'Costa Rica Currency Adapter',
-    'version': '14.0.1.0.0',
+    'version': '15.0.1.0.0',
     'category': 'Account',
     'author': "Akurey S.A.",
     'website': 'https://github.com/akurey/ak-odoo',

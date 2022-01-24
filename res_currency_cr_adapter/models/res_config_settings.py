@@ -18,7 +18,6 @@ class ResConfigSettings(models.TransientModel):
     bccr_token = fields.Char(string="Token to use in the BCCR", required=False, )
     
     
-    @api.model
     def get_values(self):
         res = super(ResConfigSettings, self).get_values()
         get_param = self.env['ir.config_parameter'].sudo().get_param
@@ -30,7 +29,6 @@ class ResConfigSettings(models.TransientModel):
         )
         return res
 
-    @api.model
     def set_values(self):
         super(ResConfigSettings, self).set_values()
         set_param = self.env['ir.config_parameter'].sudo().set_param
