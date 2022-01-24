@@ -104,18 +104,6 @@ class CompanyElectronic(models.Model):
         if self.invoice_qr_type == 'by_info' and not self.invoice_field_ids:
             raise UserError(_("Please Add Invoice Field's"))
 
-    @api.onchange('mobile')
-    def _onchange_mobile(self):
-        if self.mobile:
-            mobile = phonenumbers.parse(self.mobile, self.country_id.code)
-            valid = phonenumbers.is_valid_number(mobile)
-            if not valid:
-                alert = {
-                    'title': 'Atención',
-                    'message': 'Número de teléfono inválido'
-                }
-                return {'value': {'mobile': ''}, 'warning': alert}
-
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:

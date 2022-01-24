@@ -30,7 +30,7 @@ class ResConfigSettings(models.TransientModel):
         default=True
     )
 
-    @api.model
+
     def get_values(self):
         res = super(ResConfigSettings, self).get_values()
         get_param = self.env['ir.config_parameter'].sudo().get_param
