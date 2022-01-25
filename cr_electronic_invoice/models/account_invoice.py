@@ -286,8 +286,16 @@ class AccountInvoiceElectronic(models.Model):
     fname_xml_supplier_approval = fields.Char(
         string="Nombre de archivo Comprobante XML proveedor", required=False,
         copy=False, attachment=True)
+    amount_total_iva_13 = fields.Monetary(
+        string='Total IVA 13', copy=False, readonly=True, )
+    amount_total_iva_4 = fields.Monetary(
+        string='Total IVA 4', copy=False, readonly=True, )
+    amount_total_iva_2 = fields.Monetary(
+        string='Total IVA 2', copy=False, readonly=True, )
     amount_tax_electronic_invoice = fields.Monetary(
         string='Total de impuestos FE', readonly=True, )
+    amount_total_iva_devuelto = fields.Monetary(
+        string='IVA Devuelto', copy=False, readonly=True, )
     amount_total_electronic_invoice = fields.Monetary(
         string='Total FE', readonly=True, )
     tipo_documento = fields.Selection(
@@ -1101,7 +1109,6 @@ class AccountInvoiceElectronic(models.Model):
                 otros_cargos_id = 0
                 line_number = 0
                 total_otros_cargos = 0.0
-                total_iva_devuelto = 0.0
                 total_servicio_salon = 0.0
                 total_servicio_gravado = 0.0
                 total_servicio_exento = 0.0
@@ -1114,6 +1121,13 @@ class AccountInvoiceElectronic(models.Model):
                 base_subtotal = 0.0
                 _old_rate_exoneration = False
                 _no_CABYS_code = False
+
+                # Revisamos si existe IVA Devuelto
+                if inv.amount_total_iva_devuelto:
+                    total_iva_devuelto = inv.amount_total_iva_devuelto
+                    inv.amount_total -= inv.amount_total_iva_devuelto
+                else:
+                    total_iva_devuelto = 0.0
 
                 for inv_line in inv.invoice_line_ids:
                     # Revisamos si está línea es de Otros Cargos
@@ -1513,25 +1527,27 @@ class AccountInvoiceElectronic(models.Model):
             if currency.name != inv.company_id.currency_id.name and (
                     not currency.rate_ids or not (len(currency.rate_ids) > 0)):
                 raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
+            
+            #Devolucion del IVA   
+            # Inicializamos las variables que controlan los montos de cada impuesto         
+            inv.amount_total_iva_2 = 0.0
+            inv.amount_total_iva_4 = 0.0
+            inv.amount_total_iva_13 = 0.0
+            inv.amount_total_iva_devuelto =  0.0
 
-            # actividad_clinica = self.env.ref('cr_electronic_invoice.activity_851101')
-            # if actividad_clinica.id == inv.economic_activity_id.id and inv.payment_methods_id.sequence == '02':
-            if inv.economic_activity_id.name == 'CLINICA, CENTROS MEDICOS, HOSPITALES PRIVADOS Y OTROS' and inv.payment_methods_id.sequence == '02':
-                iva_devuelto = 0
-                for i in inv.invoice_line_ids:
-                    for t in i.invoice_line_tax_ids:
-                        if t.tax_code == '01' and t.iva_tax_code == '04':
-                            iva_devuelto += i.price_total - i.price_subtotal
-                if iva_devuelto:
-                    prod_iva_devuelto = self.env.ref('cr_electronic_invoice.product_iva_devuelto')
-                    inv_line_iva_devuelto = self.env['account.invoice.line'].create({
-                        'name': 'IVA Devuelto',
-                        'invoice_id': inv.id,
-                        'product_id': prod_iva_devuelto.id,
-                        'account_id': prod_iva_devuelto.property_account_income_id.id,
-                        'price_unit': -iva_devuelto,
-                        'quantity': 1,
-                    })
+            for i in inv.invoice_line_ids:
+                #Distribuimos el Impuesto en cada variable segun corresponda
+                if i.invoice_line_tax_ids["amount"] == 2:
+                    inv.amount_total_iva_2 += round(i.price_tax, 5)
+                elif i.invoice_line_tax_ids["amount"] == 4:
+                    inv.amount_total_iva_4 += round(i.price_tax, 5)
+                elif i.invoice_line_tax_ids["amount"] == 13:
+                    inv.amount_total_iva_13 += round(i.price_tax, 5)
+
+                # Revisamos si aplica para la devolucion del IVA: Servicio de Salud Privado, Pago con medio electronico e IVA Reducido 4%
+                if api_facturae.has_iva_devuelto(inv, i):
+                    inv.amount_total_iva_devuelto += round(i.price_tax, 5)
+                    #inv.amount_total = inv.amount_total - inv.amount_total_iva_devuelto   
 
             super(AccountInvoiceElectronic, inv).action_invoice_open()
             if not inv.number_electronic:
@@ -1558,6 +1574,56 @@ class AccountInvoiceElectronic(models.Model):
             inv.move_name = inv.sequence
             inv.move_id.name = inv.sequence
             inv.state_tributacion = False
+
+            # Se ajusta el asiento contable para incluir la linea de la Devolucion del IVA, unicamente cuando hay devolucion.          
+            if inv.amount_total_iva_devuelto:
+                if inv.move_id:
+                    inv.move_id.state = 'draft'
+                    if inv.type == 'out_invoice':
+                        credit = 'credit'
+                        debit = 'debit'
+                    elif inv.type == 'out_refund': 
+                        credit = 'debit'
+                        debit = 'credit'                    
+
+                    # Se valida si existe definida una cuenta contable especifica para el 'IVA Devuelto' en el impuesto,
+                    # de lo contrario se usa la cuenta del impuesto predeterminada.
+                    for inv_line in inv.invoice_line_ids:
+                        if inv_line.invoice_line_tax_ids.amount == 4:
+                            if inv_line.invoice_line_tax_ids.iva_devuelto_account_id.id: 
+                                iva_devuelto_account_id = inv_line.invoice_line_tax_ids.iva_devuelto_account_id.id
+                                break
+                            elif inv_line.invoice_line_tax_ids.account_id.id: 
+                                iva_devuelto_account_id = inv_line.invoice_line_tax_ids.account_id.id
+                                break
+                            else:
+                                for tax in inv.tax_line_ids: # Si se no encuentra ninguna cuenta en el impuesto, usa la misma de tax_line_ids.
+                                    iva_devuelto_account_id = tax.account_id.id
+                                    break
+                                break
+
+                    # La primera linea se hace un credito con la devolucion al cliente. 
+                    credit_line = self.env['account.move.line'].with_context(check_move_validity=False).create({
+                        'move_id': inv.move_id.id, 
+                        'account_id': inv.account_id.id, 
+                        'partner_id': inv.partner_id.id,
+                        'name': 'Reintegro al cliente del monto de IVA 4%',
+                        credit: inv.amount_total_iva_devuelto
+                            
+                    })
+                    # La segunda linea se hace un debito con la Devolucion del IVA. 
+                    debit_line = self.env['account.move.line'].with_context(check_move_validity=False).create({
+                        'move_id': inv.move_id.id, 
+                        'account_id': iva_devuelto_account_id,
+                        'partner_id': inv.partner_id.id,
+                        'name': 'Devolucion del IVA 4% (Tarifa Reducida)',
+                        debit : inv.amount_total_iva_devuelto
+                        
+                    })
+                    inv.move_id.line_ids+=credit_line
+                    inv.move_id.line_ids+=debit_line
+                    inv.move_id.state = 'posted'
+
 
     @api.multi
     @api.onchange('amount_total')

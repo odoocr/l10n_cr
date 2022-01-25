@@ -2,15 +2,15 @@
 <templates id="template" xml:space="preserve">
     <t t-extend="PosTicket">
         <t t-jquery="div.pos-center-align:first" t-operation="after">
-          <t t-if="order.attributes.number_electronic">
+          <t t-if="order.number_electronic">
             <div class="pos-center-align">
                   Clave: <br/>
-                  <t t-esc="order.attributes.number_electronic.substring(0,25)"/><br/>
-                  <t t-esc="order.attributes.number_electronic.substring(25,50)"/>
+                  <t t-esc="order.number_electronic.substring(0,25)"/><br/>
+                  <t t-esc="order.number_electronic.substring(25,50)"/>
             </div>
             <div class="pos-center-align">
                   Consecutivo: <br/>
-                  <t t-esc="order.attributes.number_electronic.substring(21,41)"/>
+                  <t t-esc="order.number_electronic.substring(21,41)"/>
             </div>
           </t>
         </t>
