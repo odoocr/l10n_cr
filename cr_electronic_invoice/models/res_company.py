@@ -31,6 +31,7 @@ class CompanyElectronic(models.Model):
     _inherit = ['res.company', 'mail.thread', ]
 
     commercial_name = fields.Char(string="Commercial Name", required=False, )
+    legal_name = fields.Char(string="Nombre Legal", required=False)
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
     date_expiration_sign = fields.Datetime(string="Fecha de Vencimiento")

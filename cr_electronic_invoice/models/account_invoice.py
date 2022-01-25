@@ -1531,7 +1531,7 @@ class AccountInvoiceElectronic(models.Model):
                 for i in inv.invoice_line_ids:
                     if inv_line.product_id:
                         #Remove any existing IVA Devuelto lines
-                        if inv_line.product_id.id = prod_iva_devuelto.id:
+                        if inv_line.product_id.id == prod_iva_devuelto.id:
                             inv_line.unlink
                         elif inv_line.product_id.categ_id.name == 'Servicios de Salud':
                             iva_devuelto += i.price_tax

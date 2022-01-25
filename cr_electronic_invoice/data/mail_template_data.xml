@@ -3,7 +3,7 @@
 
     <!-- Mail template are declared in a NOUPDATE block
          so users can freely customize/delete them -->
-    <data noupdate="1">
+    <data noupdate="0">
         <!--Email template -->
         <record id="email_template_edi_expiration_notice" model="mail.template">
             <field name="name">Key Expiration Notice</field>
@@ -122,11 +122,11 @@
                     ${user.name}
                     <br/>
                     <br/>
-                    ${object.get_followup_table_html() | safe}
                     <br/>
                 </div>
             ]]>
             </field>
+            <!--                    ${object.get_followup_table_html() | safe}-->
         </record>
     </data>
 </odoo>
