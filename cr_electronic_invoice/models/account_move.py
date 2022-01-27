@@ -1050,11 +1050,9 @@ class AccountInvoiceElectronic(models.Model):
                             else:
                                 _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
                                 continue
-
-                            if inv_line.product_id.cabys_code:
-                                line["codigoCabys"] = inv_line.product_id.cabys_code
-                            elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
-                                line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
+                        else:
+                            _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                            continue
 
                         if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
                             line["partidaArancelaria"] = inv_line.tariff_head
@@ -1080,10 +1078,10 @@ class AccountInvoiceElectronic(models.Model):
                                     _tax_exoneration_rate = min(i.percentage_exoneration, _tax_rate)
                                     _percentage_exoneration = _tax_exoneration_rate / _tax_rate
                                     taxes_lookup[i.id] = {'tax_code': i.tax_root.tax_code,
-                                                          'tarifa': i.tax_root.amount,
+                                                          'tarifa': _tax_rate,
                                                           'iva_tax_desc': i.tax_root.iva_tax_desc,
                                                           'iva_tax_code': i.tax_root.iva_tax_code,
-                                                          'exoneration_percentage': i.percentage_exoneration,
+                                                          'exoneration_percentage': _tax_exoneration_rate,
                                                           'amount_exoneration': i.amount}
                                 else:
                                     taxes_lookup[i.id] = {'tax_code': i.tax_code,
@@ -1174,12 +1172,16 @@ class AccountInvoiceElectronic(models.Model):
                         'MontoCargo': total_servicio_salon
                     }
 
+                # TODO: CORREGIR BUG NUMERO DE FACTURA NO SE GUARDA EN LA REFERENCIA DE LA NC CUANDO SE CREA MANUALMENTE
+                if inv.invoice_id and not inv.origin:
+                    inv.origin = inv.invoice_id.display_name
+
+
                 if _no_CABYS_code and inv.tipo_documento != 'NC':  # CAByS is not required for financial NCs
+                    inv.state_tributacion = 'error'
                     inv.message_post(
                                 subject='Error',
                                 body=_no_CABYS_code)
-                    if inv.tipo_documento == 'FEC':
-                                raise UserError(_no_CABYS_code)
                     continue
 
 
@@ -1398,7 +1400,6 @@ class AccountInvoiceElectronic(models.Model):
                     sucursal_id = self.env.user.company_id.terminal_MR
 
                 response_json = api_facturae.get_clave_hacienda(inv,
-
                                                             inv.tipo_documento,
                                                             sequence,
                                                             sucursal_id,
