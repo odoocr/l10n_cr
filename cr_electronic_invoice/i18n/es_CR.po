@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0-20210913\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-19 05:03+0000\n"
-"PO-Revision-Date: 2021-12-19 05:03+0000\n"
+"POT-Creation-Date: 2022-01-23 14:57+0000\n"
+"PO-Revision-Date: 2022-01-23 14:57+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1020,6 +1020,9 @@ msgid "IVA 8%"
 msgstr ""
 
 #. module: cr_electronic_invoice
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__amount_total_iva_devuelto
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move__amount_total_iva_devuelto
+#: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__amount_total_iva_devuelto
 #: model:product.template,name:cr_electronic_invoice.product_iva_devuelto
 msgid "IVA Devuelto"
 msgstr ""
@@ -1962,18 +1965,21 @@ msgstr ""
 #. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
 msgid ""
-"The document has not been issued, if you need to send it manually press"
+"The document has not yet been issued, it will be sent automatically in 5 "
+"minutes, if you need to send it manually press"
 msgstr ""
-"El documento no ha sido emitido, si necesita enviarlo manualmente presione"
-
+"El documento aún no ha sido emitido, se enviará automáticamente en 5 minutos, "
+"si necesita enviarlo manualmente presione"
 
 #. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
 msgid ""
-"The document was issued successfully, if you need to consult it manually "
-"press"
+"The document was issued successfully, however we still do not have the "
+"answer, it will be consulted in 10 minutes, if you wish to consult it "
+"manually press"
 msgstr ""
-"El documento fue emitido con éxito!, si necesita consultarlo manualmente presione "
+"El documento fue emitido exitosamente, sin embargo aún no tenemos la respuesta, "
+"será consultado en 10 minutos, si desea consultarlo manualmente presione"
 
 #. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/account_journal.py:0
