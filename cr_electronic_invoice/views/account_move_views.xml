@@ -21,23 +21,20 @@
                 </field>
                 <field name="partner_id" position="after">
                     <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": [("type","in", ("in_invoice", "in_refund"))]}'/>
-                    <field name="economic_activity_id" attrs="{'required':['|', ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC')]}" domain="[('id', 'in', economic_activities_ids),]"
+                    <field name="economic_activity_id" attrs="{'required':['|', ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC')], 'invisible':[('type','=', 'entry')]}" domain="[('id', 'in', economic_activities_ids),]"
                            options='{"no_open": True, "no_create": True, "active_test": [("type","in", ("in_invoice", "in_refund"))]}'/>
                     <field name="number_electronic" readonly="1"/>
                     <field name="sequence" readonly="1"/>
                 </field>
 
                 <field name="invoice_date" position="attributes">
-                    <attribute name="readonly">-4</attribute>
+                    <attribute name="attrs">{'invisible': [('type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))], 'readonly': [('type', 'in', ('out_invoice', 'out_refund', 'out_receipt')), ('state', '=', 'draft')]}</attribute>
                 </field>
 
                 <field name="invoice_date" position="after">
-                    <field name="date_issuance" readonly="-2"/>
-                </field>
-
-                <field name="date_issuance" position="after">
-                    <field name="tipo_documento" attrs="{'readonly':[('state','!=','draft')], 'required':[('type','in', ('out_invoice', 'out_refund'))]}"/>
-                    <field name="payment_methods_id" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="date_issuance" readonly="-2" attrs="{'invisible':[('type','=', 'entry')]}"/>
+                    <field name="tipo_documento" attrs="{'readonly':[('state','!=','draft')], 'required':[('type','in', ('out_invoice', 'out_refund'))], 'invisible':[('type','=','entry')]}"/>
+                    <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')], 'required':[('type','in', ('out_invoice', 'out_refund'))], 'invisible':[('type','=','entry')]}"/>
                 </field>
 
                 <!--<field name="invoice_payment_term_id" position="after">
@@ -62,12 +59,12 @@
                 </xpath>
 
                 <xpath expr="(//field[@name='amount_total'])[last()]" position="after">
-                    <field name="amount_tax_electronic_invoice" attrs="{'invisible':[('type','in', ('out_invoice', 'out_refund'))]}"/>
-                    <field name="amount_total_electronic_invoice" attrs="{'invisible':[('type','in', ('out_invoice', 'out_refund'))]}"/>
+                    <field name="amount_tax_electronic_invoice" attrs="{'invisible':['|', ('type','in', ('out_invoice', 'out_refund')), ('type','=', 'entry')]}"/>
+                    <field name="amount_total_electronic_invoice" attrs="{'invisible':['|', ('type','in', ('out_invoice', 'out_refund')),('type','=', 'entry')]}"/>
                 </xpath>
 
-                <xpath expr="//page[2]" position="after">
-                    <page name="fe_invoice_data" string="Información Electrónica" >
+                <xpath expr="//page[2]" position="after" >
+                    <page name="fe_invoice_data" string="Información Electrónica" attrs="{'invisible':[('type','=', 'entry')]}" >
                         <group id="fe_tab_group" col="2" >
                             <group string="Aceptación Electrónica" name="fe_in_info_group" colspan="2" col="5" attrs="{'invisible':['|', ('tipo_documento','=', 'FEC'), ('type','in', ('out_invoice', 'out_refund'))]}">
                                 <field name="fname_xml_supplier_approval" invisible="1" colspan="5" />

@@ -28,9 +28,9 @@
                             <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" colspan="2" /> 
                             <field name="economic_activities_ids" readonly="0"  widget="section_and_note_one2many" mode="tree" context="{'partner_id': id}" colspan="7" >
                                 <tree editable="bottom" >
-                                <field name="code" />
-                                <field name="name"/>
-                                <field name="sale_type"/>
+                                    <field name="code" />
+                                    <field name="name"/>
+                                    <field name="sale_type"/>
                                 </tree>
                             </field>
                         </group>
