@@ -256,12 +256,13 @@ class AccountInvoiceElectronic(models.Model):
         [('1', 'Aceptado'),
          ('2', 'Aceptacion parcial'),
          ('3', 'Rechazado')],
-        'Respuesta del Cliente')
+        'Respuesta del Cliente',
+         copy=False )
 
-    reference_code_id = fields.Many2one("reference.code", string="Código de referencia", required=False, )
+    reference_code_id = fields.Many2one("reference.code", string="Código de referencia", required=False, copy=False )
 
     reference_document_id = fields.Many2one("reference.document", string="Tipo Documento de referencia",
-                                            required=False, )
+                                            required=False, copy=False )
 
     payment_methods_id = fields.Many2one("payment.methods", string="Métodos de Pago", required=False, )
 
@@ -299,7 +300,8 @@ class AccountInvoiceElectronic(models.Model):
                    ('CCE', 'MR Aceptación'),
                    ('CPCE', 'MR Aceptación Parcial'),
                    ('RCE', 'MR Rechazo'),
-                   ('FEC', 'Factura Electrónica de Compra')],
+                   ('FEC', 'Factura Electrónica de Compra'),
+                   ('disabled', 'Electronic Documents Disabled')],
         string="Tipo Comprobante",
         required=False, default='FE',
         help='Indica el tipo de documento de acuerdo a la '
@@ -314,7 +316,7 @@ class AccountInvoiceElectronic(models.Model):
 
     ignore_total_difference = fields.Boolean(string="Ingorar Diferencia en Totales", required=False, default=False)
 
-    error_count = fields.Integer(string="Cantidad de errores", required=False, default="0")
+    error_count = fields.Integer(string="Cantidad de errores", required=False, default="0", copy=False)
 
     economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False,
                                            context={'active_test': False}, )
@@ -331,21 +333,20 @@ class AccountInvoiceElectronic(models.Model):
          "La clave de comprobante debe ser única"),
     ]
 
-    # @api.multi
     @api.onchange('partner_id', 'company_id')
     def _get_economic_activities(self):
         for inv in self:
             if inv.type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
                     inv.economic_activities_ids = inv.partner_id.economic_activities_ids
-                    inv.economic_activities_id = inv.partner_id.activity_id
+                    inv.economic_activity_id = inv.partner_id.activity_id
             else:
                 inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
-                inv.economic_activities_id = inv.company_id.activity_id
+                inv.economic_activity_id = inv.company_id.activity_id
 
             # Temporal hack while Hacienda force us to use Economic activity per line
             for line in inv.invoice_line_ids:
-                line.economic_activity_id = inv.economic_activities_id
+                line.economic_activity_id = inv.economic_activity_id
 
     @api.multi
     @api.onchange('partner_id')
@@ -355,10 +356,14 @@ class AccountInvoiceElectronic(models.Model):
 
         if self.type in ('in_invoice', 'in_refund'):
             if self.partner_id:
+                #Nuevo para auto seleccionar la actividad economica del cliente al momento de seleccionarlo
+                if self.partner_id.activity_id:
+                    self.economic_activity_id = self.partner_id.activity_id
+
                 if self.partner_id.payment_methods_id:
                     self.payment_methods_id = self.partner_id.payment_methods_id
-                else:
-                    raise UserError(_('Partner does not have a default payment method'))
+                #else:
+                #    raise UserError(_('Partner does not have a default payment method'))
 
     @api.multi
     def action_invoice_sent(self):
@@ -369,7 +374,7 @@ class AccountInvoiceElectronic(models.Model):
         else:
             email_template = self.env.ref('account.email_template_edi_invoice', False)
 
-        email_template.attachment_ids = [(5)]
+        email_template.attachment_ids = [(5,0,0)]
 
         if self.env.user.company_id.frm_ws_ambiente == 'disabled':
             email_template.with_context(type='binary', default_type='binary').send_mail(self.id, raise_exception=False,
@@ -730,11 +735,11 @@ class AccountInvoiceElectronic(models.Model):
                                     elif status == 400:
                                         inv.state_tributacion = 'ne'
                                         _logger.error(
-                                            'MAB - Aceptacion Documento:%s no encontrado en Hacienda.',
+                                            'E-INV CR - Aceptacion Documento:%s no encontrado en Hacienda.',
                                             inv.number_electronic + '-' + inv.consecutive_number_receiver)
                                     else:
                                         _logger.error(
-                                            'MAB - Error inesperado en Send Acceptance File - Abortando')
+                                            'E-INV CR - Error inesperado en Send Acceptance File - Abortando')
                                         return
 
     @api.multi
@@ -901,7 +906,7 @@ class AccountInvoiceElectronic(models.Model):
                             raise_exception=False,
                             force_send=True)  # default_type='binary'
 
-                        email_template.attachment_ids = [(5)]
+                        email_template.attachment_ids = [(5,0,0)]
 
                 elif estado_m_h in ('firma_invalida'):
                     if i.error_count > 10:
@@ -1058,8 +1063,6 @@ class AccountInvoiceElectronic(models.Model):
                     dia = inv.number_electronic[3:5]  # '%02d' % now_cr.day,
                     mes = inv.number_electronic[5:7]  # '%02d' % now_cr.month,
                     anno = inv.number_electronic[7:9]  # str(now_cr.year)[2:4],
-                    # date_cr = now_cr.strftime("%Y-%m-%dT%H:%M:%S-06:00")
-                    # date_cr = api_facturae.get_time_hacienda()
                     date_cr = now_cr.strftime("20" + anno + "-" + mes + "-" + dia + "T%H:%M:%S-06:00")
 
                     inv.date_issuance = date_cr
@@ -1092,7 +1095,7 @@ class AccountInvoiceElectronic(models.Model):
                         razon_referencia = inv.reference_code_id.name
 
                     if inv.payment_term_id:
-                        sale_conditions = inv.payment_term_id.sale_conditions_id and inv.payment_term_id.sale_conditions_id.code or '01'
+                        sale_conditions = inv.payment_term_id.sale_conditions_id and inv.payment_term_id.sale_conditions_id.sequence or '01'
                     else:
                         sale_conditions = '01'
 
@@ -1123,6 +1126,9 @@ class AccountInvoiceElectronic(models.Model):
                     _no_CABYS_code = False
 
                     for inv_line in inv.invoice_line_ids:
+                        if inv_line.display_type:  # skip sections and notes
+                            continue
+
                         # Revisamos si está línea es de Otros Cargos
                         if inv_line.product_id and inv_line.product_id.id == self.env.ref(
                                 'cr_electronic_invoice.product_iva_devuelto').id:
@@ -1227,9 +1233,8 @@ class AccountInvoiceElectronic(models.Model):
                                                               'exoneration_percentage': _tax_exoneration_rate,
                                                               'amount_exoneration': i.amount}
                                     else:
-                                        _tax_rate = i.amount
                                         taxes_lookup[i.id] = {'tax_code': i.tax_code,
-                                                              'tarifa': _tax_rate,
+                                                              'tarifa': i.amount,
                                                               'iva_tax_desc': i.iva_tax_desc,
                                                               'iva_tax_code': i.iva_tax_code}
 
@@ -1573,6 +1578,7 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             inv.invoice_amount_text = extensions.text_converter.number_to_text_es(inv.amount_total)
 
+"""
 class AccountInvoiceInherit(models.Model):
     _inherit = "account.invoice"
     @api.multi
@@ -1600,3 +1606,4 @@ class AccountInvoiceInherit(models.Model):
                     tax_grouped[key]['amount'] += val['amount']
                     tax_grouped[key]['base'] += round_curr(val['base'])
         return tax_grouped
+"""
