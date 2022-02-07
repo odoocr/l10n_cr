@@ -1448,6 +1448,10 @@ class AccountInvoiceElectronic(models.Model):
                     inv.not_loaded_invoice and inv.not_loaded_invoice_date and inv.reference_code_id and inv.reference_document_id):
                 raise UserError('Datos incompletos de referencia para nota de crédito no cargada')
 
+            if inv.type == 'in_invoice' and inv.partner_id.country_id and \
+                inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and inv.partner_id.vat and inv.economic_activity_id is False:
+                raise UserError('Las facturas FEC requieren que el proveedor tenga definida la actividad económica')
+
             # Digital Invoice or ticket
             if inv.type in ('out_invoice', 'out_refund') and inv.number_electronic:  # Keep original Number Electronic
                 pass
@@ -1533,13 +1537,13 @@ class AccountInvoiceElectronic(models.Model):
             if inv.economic_activity_id.name == 'CLINICA, CENTROS MEDICOS, HOSPITALES PRIVADOS Y OTROS' and inv.payment_methods_id.sequence == '02':
                 prod_iva_devuelto = self.env.ref('cr_electronic_invoice.product_iva_devuelto')
                 iva_devuelto = 0
-                for i in inv.invoice_line_ids:
+                for inv_line in inv.invoice_line_ids:
                     if inv_line.product_id:
                         #Remove any existing IVA Devuelto lines
                         if inv_line.product_id.id == prod_iva_devuelto.id:
                             inv_line.unlink
                         elif inv_line.product_id.categ_id.name == 'Servicios de Salud':
-                            iva_devuelto += i.price_tax
+                            iva_devuelto += inv_line.price_tax
                 if iva_devuelto:
                     inv_line_iva_devuelto = self.env['account.invoice.line'].create({
                         'name': 'IVA Devuelto',
