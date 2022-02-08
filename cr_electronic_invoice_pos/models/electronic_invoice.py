@@ -179,9 +179,9 @@ class PosOrder(models.Model):
 
     def refund(self):
         """Create a copy of order  for refund order"""
-        PosOrder = self.env['pos.order']
+        refund_orders = self.env['pos.order']
         reference_code_id = self.env['reference.code'].search(
-            [('code', '=', '01')], limit=1)
+            [('code', '=', '01')], limit=1)   # "01" : Anula documento de referencia
         current_session = self.env['pos.session'].search([('state', '!=', 'closed'),
                                                           ('user_id', '=',
                                                            self.env.uid),
@@ -196,6 +196,8 @@ class PosOrder(models.Model):
             if order.tipo_documento in ('FE', 'TE'):
                 tipo_documento = 'NC'
                 referenced_order = order.id
+                #TODO:  check if original document is rejected by Hacienda, and create replacement doc instead of NC
+                # need to fill reference.document with code 10 : Sustituye factura rechazada por el Ministerio de Hacienda
             elif order.partner_id and order.partner_id.vat:
                 tipo_documento = 'FE'
                 referenced_order = order.pos_order_id and order.pos_order_id.id or order.id
@@ -203,7 +205,7 @@ class PosOrder(models.Model):
                 tipo_documento = 'TE'
                 referenced_order = order.pos_order_id and order.pos_order_id.id or order.id
 
-            clone = order.copy({
+            refund_order = order.copy({
                 'name': order.name + (tipo_documento == 'NC' and _(' REFUND') or ''),
                 'session_id': current_session.id,
                 'date_order': fields.Datetime.now(),
@@ -217,20 +219,24 @@ class PosOrder(models.Model):
                 'amount_paid': 0,
             })
             for line in order.lines:
-                clone_line = line.copy({
+                PosOrderLineLot = self.env['pos.pack.operation.lot']
+                for pack_lot in line.pack_lot_ids:
+                    PosOrderLineLot += pack_lot.copy()
+                line.copy({
                     'name': line.name + _(' REFUND'),
-                    'order_id': clone.id,
                     'qty': -line.qty,
+                    'order_id': refund_order.id,
                     'price_subtotal': -line.price_subtotal,
                     'price_subtotal_incl': -line.price_subtotal_incl,
-                })
-            PosOrder += clone
+                    'pack_lot_ids': PosOrderLineLot,
+                    })
+            refund_orders |= refund_order
+
         return {
             'name': _('Return Products'),
-            'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'pos.order',
-            'res_id': PosOrder.ids[0],
+            'res_id': refund_orders.ids[0],
             'view_id': False,
             'context': self.env.context,
             'type': 'ir.actions.act_window',
@@ -440,7 +446,6 @@ class PosOrder(models.Model):
                     else:
                         doc.tipo_documento = 'NC'
                         numero_documento_referencia = doc.pos_order_id.number_electronic
-                        codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
                     tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
                     numero_documento_referencia = doc.pos_order_id.number_electronic
