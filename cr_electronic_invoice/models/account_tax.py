@@ -10,7 +10,7 @@ class IvaCodeType(models.Model):
     tax_code = fields.Char(string="Tax Code", required=False, )
     iva_tax_desc = fields.Char(string="VAT Tax Rate", default='N/A', required=False, )
     iva_tax_code = fields.Char(string="VAT Rate Code", default='N/A', required=False, )
-    has_exoneration = fields.Boolean(string="It's a exoneration", required=False)
+    has_exoneration = fields.Boolean(string="Has Exoneration", required=False)
     percentage_exoneration = fields.Integer(string="Percentage of VAT Exoneration", required=False)
     tax_root = fields.Many2one("account.tax", string="Parent Tax", required=False, )
     non_tax_deductible = fields.Boolean(string='Indicates if this tax is no deductible for Rent and VAT',)
@@ -29,5 +29,3 @@ class IvaCodeType(models.Model):
                 self.amount = self.tax_root.amount - self.percentage_exoneration
         else:
             raise UserError('El porcentaje no puede ser mayor a 13')
-
-

@@ -33,5 +33,39 @@
             <field name="numbercall">-1</field>
             <field name="doall" eval="False" />
         </record>
+
+        <record id="ir_cron_mr_hacienda_invoice" model="ir.cron">
+            <field name="name">Envio Mensaje Receptor</field>
+            <field name="model_id" ref="model_account_invoice" />
+            <field name="state">code</field>
+            <field name="code">model.send_mrs_to_hacienda()</field>
+            <field name="interval_number">10</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+        </record>
+
+        <record id="ir_cron_send_expiration_notice" model="ir.cron">
+            <field name="name">Enviar Aviso de Expiración de Llave Criptográfica</field>
+            <field name="model_id" ref="base.model_res_company"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_email_notifications()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(datetime.today() + timedelta(days=1)).strftime('%Y-%m-%d 00:01:00')"></field>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <record id="ir_cron_vat_exoneration_expired" model="ir.cron">
+            <field name="name">FECR: Check clients VAT exoneration expiration</field>
+            <field name="model_id" ref="model_res_partner" />
+            <field name="state">code</field>
+            <field name="code">model.check_exonerations()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+        </record>
     </data>
 </odoo>
