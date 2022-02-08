@@ -201,11 +201,11 @@ def get_token_hacienda(inv, tipo_ambiente):
     else:
         headers = {}
         data = {
-            'client_id': tipo_ambiente,
-            'client_secret': '',
-            'grant_type': 'password',
-            'username': inv.company_id.frm_ws_identificador,
-            'password': inv.company_id.frm_ws_password
+                'client_id': tipo_ambiente,
+                'client_secret': '',
+                'grant_type': 'password',
+                'username': inv.company_id.frm_ws_identificador,
+                'password': inv.company_id.frm_ws_password
         }
 
         # establecer el ambiente al cual me voy a conectar
@@ -451,7 +451,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
             sb.Append('<Receptor>')
             sb.Append('<Nombre>' + escape(str(receiver_company.name[:99])) + '</Nombre>')
 
-            if inv.tipo_documento == 'FEE' or id_code=='05':
+            if inv.tipo_documento == 'FEE' or id_code == '05' :
                 if receiver_company.vat:
                     sb.Append('<IdentificacionExtranjero>' + receiver_company.vat + '</IdentificacionExtranjero>')
             else:
@@ -712,7 +712,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             error_caused_by = response.headers.get(
                 'X-Error-Cause') if 'X-Error-Cause' in response.headers else ''
             error_caused_by += response.headers.get('validation-exception', '')
-            _logger.info('Status: {}, Text {}'.format(
+            _logger.error('Status: {}, Text {}'.format(
                 response.status_code, error_caused_by))
 
             return {'status': response.status_code, 'text': error_caused_by}
@@ -890,21 +890,18 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
 
     # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
     # se carga el xml devuelto por Hacienda
-    last_state = False
+    last_state = inv.state_tributacion
+    inv.state_tributacion = estado_m_h
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
-        last_state = inv.state_tributacion
-        inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
         if xml_firmado:
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-        inv.state_tributacion = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
@@ -1017,13 +1014,12 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
     invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
     activity_node = invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)
+    activity_id = False
     activity = False
     if activity_node:
-        activity_id = activity_node[0].text
-        activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_id)],
-                                                                                           limit=1)
-    else:
-        activity_id = False
+        activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_node[0].text)], limit=1)
+        activity_id = activity.id
+        
     invoice.economic_activity_id = activity
     invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
     invoice.date_invoice = invoice.date_issuance
@@ -1190,9 +1186,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 'sequence': line.xpath("inv:NumeroLinea", namespaces=namespaces)[0].text,
                 'discount': discount_percentage,
                 'discount_note': discount_note,
-                # 'total_amount': total_amount,
                 'product_id': product,
-                'account_id': account_id.id or False,
+                'account_id': account_id.id,
                 'account_analytic_id': analytic_account,
                 'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                 'total_tax': total_tax,
@@ -1212,7 +1207,6 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
     tax_node = invoice_xml.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
     if tax_node:
         invoice.amount_tax_electronic_invoice = tax_node[0].text
-
     invoice.compute_taxes()
 
 
