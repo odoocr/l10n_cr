@@ -4,7 +4,6 @@
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 from zeep import Client
-# from datetime import datetime, date, timedelta
 import datetime
 from datetime import timedelta
 import xml.etree.ElementTree
