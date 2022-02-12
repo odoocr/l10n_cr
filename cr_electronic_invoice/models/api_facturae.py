@@ -201,11 +201,11 @@ def get_token_hacienda(inv, tipo_ambiente):
     else:
         headers = {}
         data = {
-            'client_id': tipo_ambiente,
-            'client_secret': '',
-            'grant_type': 'password',
-            'username': inv.company_id.frm_ws_identificador,
-            'password': inv.company_id.frm_ws_password
+                'client_id': tipo_ambiente,
+                'client_secret': '',
+                'grant_type': 'password',
+                'username': inv.company_id.frm_ws_identificador,
+                'password': inv.company_id.frm_ws_password
         }
 
         # establecer el ambiente al cual me voy a conectar
@@ -257,7 +257,6 @@ def refresh_token_hacienda(tipo_ambiente, token):
         return token_hacienda
     except ImportError:
         raise Warning('Error Refrescando el Token desde MH')
-
 
 def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
                   detalle_mensaje, cedula_receptor,
@@ -360,7 +359,6 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
 
     return str(sb)
 
-
 def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 total_servicio_exento, totalServExonerado,
                 total_mercaderia_gravado, total_mercaderia_exento,
@@ -406,7 +404,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.Append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.Append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.Append('<Emisor>')
-    sb.Append('<Nombre>' + escape(issuing_company.name) + '</Nombre>')
+    sb.Append('<Nombre>' + escape(issuing_company.legal_name or issuing_company.name) + '</Nombre>')
     sb.Append('<Identificacion>')
     sb.Append('<Tipo>' + issuing_company.identification_id.code + '</Tipo>')
     sb.Append('<Numero>' + issuing_company.vat + '</Numero>')
@@ -453,7 +451,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
             sb.Append('<Receptor>')
             sb.Append('<Nombre>' + escape(str(receiver_company.name[:99])) + '</Nombre>')
 
-            if inv.tipo_documento == 'FEE':
+            if inv.tipo_documento == 'FEE' or id_code == '05' :
                 if receiver_company.vat:
                     sb.Append('<IdentificacionExtranjero>' + receiver_company.vat + '</IdentificacionExtranjero>')
             else:
@@ -501,80 +499,79 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     payment_method_length = len(payment_methods_id)
     for payment_method_counter in range(payment_method_length):
         sb.Append('<MedioPago>' + payment_methods_id[payment_method_counter] + '</MedioPago>')
-    sb.Append('<DetalleServicio>')
 
-    detalle_factura = lines
-    response_json = json.loads(detalle_factura)
+    if lines:
+        sb.Append('<DetalleServicio>')
 
-    for (k, v) in response_json.items():
-        numero_linea = numero_linea + 1
+        for (k, v) in lines.items():
+            numero_linea = numero_linea + 1
 
-        sb.Append('<LineaDetalle>')
-        sb.Append('<NumeroLinea>' + str(numero_linea) + '</NumeroLinea>')
+            sb.Append('<LineaDetalle>')
+            sb.Append('<NumeroLinea>' + str(numero_linea) + '</NumeroLinea>')
 
-        if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
-            sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
+            if inv.tipo_documento == 'FEE' and v.get('partidaArancelaria'):
+                sb.Append('<PartidaArancelaria>' + str(v['partidaArancelaria']) + '</PartidaArancelaria>')
 
-        if v.get('codigoCabys'):
-            sb.Append('<Codigo>' + (v['codigoCabys']) + '</Codigo>')
+            if v.get('codigoCabys'):
+                sb.Append('<Codigo>' + (v['codigoCabys']) + '</Codigo>')
 
-        if v.get('codigo'):
-            sb.Append('<CodigoComercial>')
-            sb.Append('<Tipo>04</Tipo>')
-            sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
-            sb.Append('</CodigoComercial>')
+            if v.get('codigo'):
+                sb.Append('<CodigoComercial>')
+                sb.Append('<Tipo>04</Tipo>')
+                sb.Append('<Codigo>' + (v['codigo']) + '</Codigo>')
+                sb.Append('</CodigoComercial>')
 
-        sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
-        sb.Append('<UnidadMedida>' +
-                  str(v['unidadMedida']) + '</UnidadMedida>')
-        sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
-        sb.Append('<PrecioUnitario>' +
-                  str(v['precioUnitario']) + '</PrecioUnitario>')
-        sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
-        if v.get('montoDescuento'):
-            sb.Append('<Descuento>')
-            sb.Append('<MontoDescuento>' +
-                      str(v['montoDescuento']) + '</MontoDescuento>')
-            if v.get('naturalezaDescuento'):
-                sb.Append('<NaturalezaDescuento>' +
-                          str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
-            sb.Append('</Descuento>')
+            sb.Append('<Cantidad>' + str(v['cantidad']) + '</Cantidad>')
+            sb.Append('<UnidadMedida>' +
+                      str(v['unidadMedida']) + '</UnidadMedida>')
+            sb.Append('<Detalle>' + str(v['detalle']) + '</Detalle>')
+            sb.Append('<PrecioUnitario>' +
+                      str(v['precioUnitario']) + '</PrecioUnitario>')
+            sb.Append('<MontoTotal>' + str(v['montoTotal']) + '</MontoTotal>')
+            if v.get('montoDescuento'):
+                sb.Append('<Descuento>')
+                sb.Append('<MontoDescuento>' +
+                          str(v['montoDescuento']) + '</MontoDescuento>')
+                if v.get('naturalezaDescuento'):
+                    sb.Append('<NaturalezaDescuento>' +
+                              str(v['naturalezaDescuento']) + '</NaturalezaDescuento>')
+                sb.Append('</Descuento>')
 
-        sb.Append('<SubTotal>' + str(v['subtotal']) + '</SubTotal>')
+            sb.Append('<SubTotal>' + str(v['subtotal']) + '</SubTotal>')
 
-        # TODO: ¿qué es base imponible? ¿porqué podría ser diferente del subtotal?
-        # if inv.tipo_documento != 'FEE':
-        #   sb.Append('<BaseImponible>' + str(v['subtotal']) + '</BaseImponible>')
+            # TODO: ¿qué es base imponible? ¿porqué podría ser diferente del subtotal?
+            # if inv.tipo_documento != 'FEE':
+            #   sb.Append('<BaseImponible>' + str(v['subtotal']) + '</BaseImponible>')
 
-        if v.get('impuesto'):
-            for (a, b) in v['impuesto'].items():
-                tax_code = str(b['iva_tax_code'])
-                sb.Append('<Impuesto>')
-                sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
-                if tax_code.isdigit():
-                    sb.Append('<CodigoTarifa>' + tax_code + '</CodigoTarifa>')
-                sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
-                sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
+            if v.get('impuesto'):
+                for (a, b) in v['impuesto'].items():
+                    tax_code = str(b['iva_tax_code'])
+                    sb.Append('<Impuesto>')
+                    sb.Append('<Codigo>' + str(b['codigo']) + '</Codigo>')
+                    if tax_code.isdigit():
+                        sb.Append('<CodigoTarifa>' + tax_code + '</CodigoTarifa>')
+                    sb.Append('<Tarifa>' + str(b['tarifa']) + '</Tarifa>')
+                    sb.Append('<Monto>' + str(b['monto']) + '</Monto>')
 
-                if inv.tipo_documento != 'FEE':
-                    if b.get('exoneracion'):
-                        sb.Append('<Exoneracion>')
-                        sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
-                        sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
-                        sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
-                        sb.Append(
-                            '<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
-                        sb.Append('<PorcentajeExoneracion>' + str(
-                            b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
-                        sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
-                        sb.Append('</Exoneracion>')
-                sb.Append('</Impuesto>')
+                    if inv.tipo_documento != 'FEE':
+                        if b.get('exoneracion'):
+                            sb.Append('<Exoneracion>')
+                            sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
+                            sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
+                            sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
+                            sb.Append(
+                                '<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                            sb.Append('<PorcentajeExoneracion>' + str(
+                                b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                            sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
+                            sb.Append('</Exoneracion>')
+                    sb.Append('</Impuesto>')
 
-            sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
+                sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
 
-        sb.Append('<MontoTotalLinea>' + str(v['montoTotalLinea']) + '</MontoTotalLinea>')
-        sb.Append('</LineaDetalle>')
-    sb.Append('</DetalleServicio>')
+            sb.Append('<MontoTotalLinea>' + str(v['montoTotalLinea']) + '</MontoTotalLinea>')
+            sb.Append('</LineaDetalle>')
+        sb.Append('</DetalleServicio>')
 
     if otrosCargos:
         sb.Append('<OtrosCargos>')
@@ -715,7 +712,7 @@ def send_xml_fe(inv, token, date, xml, tipo_ambiente):
             error_caused_by = response.headers.get(
                 'X-Error-Cause') if 'X-Error-Cause' in response.headers else ''
             error_caused_by += response.headers.get('validation-exception', '')
-            _logger.info('Status: {}, Text {}'.format(
+            _logger.error('Status: {}, Text {}'.format(
                 response.status_code, error_caused_by))
 
             return {'status': response.status_code, 'text': error_caused_by}
@@ -893,21 +890,18 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
 
     # Siempre sin importar el estado se actualiza la fecha de acuerdo a la devuelta por Hacienda y
     # se carga el xml devuelto por Hacienda
-    last_state = False
+    last_state = inv.state_tributacion
+    inv.state_tributacion = estado_m_h
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
-        last_state = inv.state_tributacion
-        inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
         if xml_firmado:
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
     elif inv.type == 'in_invoice' or inv.type == 'in_refund':
-        last_state = inv.state_tributacion
         if xml_firmado:
             inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
             inv.xml_comprobante = xml_firmado
-        inv.state_tributacion = estado_m_h
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
@@ -1020,13 +1014,12 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
 
     invoice.number_electronic = invoice_xml.xpath("inv:Clave", namespaces=namespaces)[0].text
     activity_node = invoice_xml.xpath("inv:CodigoActividad", namespaces=namespaces)
+    activity_id = False
     activity = False
     if activity_node:
-        activity_id = activity_node[0].text
-        activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_id)],
-                                                                                           limit=1)
-    else:
-        activity_id = False
+        activity = invoice.env['economic.activity'].with_context(active_test=False).search([('code', '=', activity_node[0].text)], limit=1)
+        activity_id = activity.id
+        
     invoice.economic_activity_id = activity
     invoice.date_issuance = invoice_xml.xpath("inv:FechaEmision", namespaces=namespaces)[0].text
     invoice.date_invoice = invoice.date_issuance
@@ -1080,14 +1073,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                                                         'email': correo_emisor,
                                                         'street': otrassenas_emisor,
                                                         'supplier': 'True'})
-        partner = invoice.env['res.partner'].search([('vat', '=', emisor),
-                                                 ('supplier', '=', True),
-                                                 '|',
-                                                 ('company_id', '=', invoice.company_id.id),
-                                                 ('company_id', '=', False)],
-                                                limit=1)
-        if partner:
-            invoice.partner_id = partner
+        if new_partner:
+            invoice.partner_id = new_partner
         else:
             raise UserError(_('The provider in the invoice does not exists. I tried to created without success. Please review it.'))
 
@@ -1202,9 +1189,8 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                 'sequence': line.xpath("inv:NumeroLinea", namespaces=namespaces)[0].text,
                 'discount': discount_percentage,
                 'discount_note': discount_note,
-                # 'total_amount': total_amount,
                 'product_id': product,
-                'account_id': account_id.id or False,
+                'account_id': account_id.id,
                 'account_analytic_id': analytic_account,
                 'amount_untaxed': float(line.xpath("inv:SubTotal", namespaces=namespaces)[0].text),
                 'total_tax': total_tax,
@@ -1224,7 +1210,6 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
     tax_node = invoice_xml.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
     if tax_node:
         invoice.amount_tax_electronic_invoice = tax_node[0].text
-
     invoice.compute_taxes()
 
 
@@ -1240,28 +1225,3 @@ def p12_expiration_date(p12file, password):
             raise
         else:
             raise
-
-def has_iva_devuelto(inv, inv_line):
-    # Ley 9635 Fortalecimiento a las Finanzas Públicas
-    # Artículo 11- Tarifa reducida. Se establecen las siguientes tarifas reducidas:
-    #      1. Del cuatro por ciento (4%) para los siguientes bienes o servicios:
-    #           a. La compra de boletos o pasajes aéreos, cuyo origen o destino sea el territorio nacional, para cualquier clase de viaje. 
-    #           Tratándose del transporte aéreo internacional, el impuesto se cobrará sobre la base del diez por ciento (10%) del valor del boleto.
-    #           b. Los servicios de salud privados prestados por centros de salud autorizados, o profesionales en ciencias de la salud autorizados. 
-    #           Los profesionales en ciencias de la salud deberán, además, encontrarse incorporados en el colegio profesional respectivo.
-    # Reglamento
-    # Artículo 39.- Reembolso del impuesto sobre el Valor Agregado a consumidores finales
-    #   1) En el caso de la prestación de servicios de salud privados, cuando el pago se realice mediante tarjetas de crédito o de débito o cualquier otro medio electrónico 
-    #   de pago que mediante resolución general autorice la Administración Tributaria, siempre y cuando esta tenga acceso a la información de la transacción realizada; 
-    #   el contribuyente que preste el servicio deberá reembolsar el impuesto cobrado al consumidor final. 
-    #   Para estos efectos, el contribuyente utilizará el campo asignado dentro de la estructura del comprobanteelectrónico para registrar el reembolso del impuesto.
-    
-    if inv.economic_activity_id.name == 'CLINICA, CENTROS MEDICOS, HOSPITALES PRIVADOS Y OTROS' or inv.economic_activity_id.name == 'SERVICOS DE MEDICO GENERAL':
-        if inv.payment_methods_id["name"] == 'Tarjeta' or inv.payment_methods_id["name"] == 'Transferencia – depósito':
-            if inv_line.product_id and inv_line.product_id.categ_id.name == 'Servicios de Salud':
-                if inv_line.invoice_line_tax_ids["amount"] == 4:
-                    return True
-
-
-    
-    return False

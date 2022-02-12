@@ -13,10 +13,7 @@
                     <field name="has_exoneration"/>
                     <field name="non_tax_deductible"/>
                 </field>
-                <field name="refund_account_id" position="after">
-                    <field name="iva_devuelto_account_id" attrs="{'invisible': [('amount', '!=', 4 )]}"/>
-                </field>
-                <xpath expr="//page[2]" position="after">
+                 <xpath expr="//page[2]" position="after">
                     <page name="exoneration_config" string="Exoneration" attrs="{'invisible': [('has_exoneration', '!=', True)]}">
                         <group>
                             <field name="tax_root"/>
