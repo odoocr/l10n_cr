@@ -23,8 +23,11 @@
 						'cr_electronic_invoice_pos/static/src/js/models.js'
                 ],
                 'web.assets_qweb': [
-                        'l10n_cr_hacienda_info_query/static/src/xml/**/*',
+                        'cr_electronic_invoice_pos/static/src/xml/**/*',
                 ]
     },
+	"qweb": [
+        "static/src/xml/pos.xml"
+    ],
 	'installable': True,
 }

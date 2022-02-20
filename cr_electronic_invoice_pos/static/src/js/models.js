@@ -122,10 +122,14 @@
         },
         export_for_printing: function(){
             var result = _super.prototype.export_for_printing.call(this, arguments);
-            if (this.sequence && this.number_electronic && this.tipo_documento) {
-                result.sequence = this.sequence;
-                result.number_electronic = this.number_electronic;
-                result.tipo_documento = this.tipo_documento;
+            var sequence = this.get_sequence();
+            var number_electronic = this.get_number_electronic();
+            var tipo_documento = this.get_tipo_documento();
+
+            if (sequence && number_electronic && tipo_documento) {
+                result.sequence = sequence;
+                result.number_electronic = number_electronic;
+                result.tipo_documento = tipo_documento;
             }
 
             return result;
