@@ -1029,7 +1029,7 @@ class AccountInvoiceElectronic(models.Model):
                 else:
                     total_iva_devuelto = 0.0
 
-                for inv_line in inv.invoice_line_ids:
+                for inv_line in inv.invoice_line_ids.filtered(lambda x: not x.display_type):
                     # Revisamos si está línea es de Otros Cargos
                     if inv_line.product_id and inv_line.product_id.id == self.env.ref('cr_electronic_invoice.product_iva_devuelto').id:
                         total_iva_devuelto = -inv_line.price_total
@@ -1445,14 +1445,36 @@ class AccountInvoiceElectronic(models.Model):
             inv.name = inv.sequence
             #inv.move_name = inv.sequence
             #inv.move_id.name = inv.sequence
-            inv.state_tributacion = False
+            # FIX account.move to draft erases state_tributacion
+            #inv.state_tributacion = False
 
-    
-    @api.onchange('amount_total')
-    def update_text_amount(self):
-        for inv in self:
-            inv.invoice_amount_text = extensions.text_converter.number_to_text_es(inv.amount_total)
-    
+    def _compute_amount(self):
+        for move in self:
+            if move.payment_state == 'invoicing_legacy':
+                move.payment_state = move.payment_state
+                continue
+            total = 0.0
+            total_currency = 0.0
+            currencies = move._get_lines_onchange_currency().currency_id
+            for line in move.line_ids:
+                if move._payment_state_matters():
+                    if not line.exclude_from_invoice_tab:
+                        total_currency += line.amount_currency
+                    elif line.tax_line_id:
+                        total_currency += line.amount_currency
+                else:
+                    if line.debit:
+                        total_currency += line.amount_currency
+            if move.move_type == 'entry' or move.is_outbound():
+                sign = 1
+            else:
+                sign = -1
+            amount_total = sign * (total_currency if len(currencies) == 1 else total)
+            move.invoice_amount_text = extensions.text_converter.number_to_text_es(amount_total)
+
+        res = super(AccountInvoiceElectronic, self)._compute_amount()
+        return res
+
     def _reverse_moves(self, default_values_list=None, cancel=False):
         ''' Reverse a recordset of account.move.
         If cancel parameter is true, the reconcilable or liquidity lines

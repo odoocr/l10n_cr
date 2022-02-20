@@ -872,7 +872,8 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     if inv.move_type == 'out_invoice' or inv.move_type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
         last_state = inv.state_tributacion
-        inv.state_tributacion = estado_m_h
+        if estado_m_h:
+            inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
         if xml_firmado:
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'

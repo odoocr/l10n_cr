@@ -35,9 +35,10 @@
                 <button name="create_partner_from_xml" class="oe_highlight" type="object" string="Create Provider" attrs="{'invisible':['|','|',('move_type','in',('entry', 'out_invoice', 'out_refund')),('partner_id','!=', False),('xml_supplier_approval','=', False)]}"/>
             </xpath>
 
-            <field name="narration" position="before">
-                <field name="invoice_amount_text"/>
-            </field>
+            <xpath expr="//field[@name='narration']/.." position="inside">
+                <br/>
+               <field name="invoice_amount_text"  class="oe_inline" nolabel="1"/>
+               </xpath>
 
 
             <field name="partner_id" position="after">
@@ -61,13 +62,24 @@
             </field>
 
 
-            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+           <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+                <field name="categ_name" invisible="1" readonly="1"/>
+                <field name="product_code" invisible="1" readonly="1"/>
+                <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
+            </xpath>
+            <!-- Move views -->
+            <xpath expr="//field[@name='line_ids']//tree//field[@name='name']" position="after">
                 <field name="categ_name" invisible="1" readonly="1"/>
                 <field name="product_code" invisible="1" readonly="1"/>
                 <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
             </xpath>
 
             <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
+                <field name="discount_note"/>
+                <field name="tariff_head"/>
+            </xpath>
+            <!-- Move views -->
+            <xpath expr="//field[@name='line_ids']//tree//field[@name='discount']" position="after">
                 <field name="discount_note"/>
                 <field name="tariff_head"/>
             </xpath>
