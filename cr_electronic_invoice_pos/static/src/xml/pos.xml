@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('orderlines')]" position="before">
+            <t t-if="receipt.number_electronic">
+                <div class="pos-receipt-center-align">
+                    Clave: <br/>
+                    <t t-esc="receipt.number_electronic.substring(0,25)"/><br/>
+                    <t t-esc="receipt.number_electronic.substring(25,50)"/>
+                </div>
+                <div class="pos-receipt-center-align">
+                    Consecutivo: <br/>
+                    <t t-esc="receipt.number_electronic.substring(21,41)"/>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+</templates>
