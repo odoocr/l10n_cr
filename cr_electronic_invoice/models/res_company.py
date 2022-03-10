@@ -31,11 +31,13 @@ class CompanyElectronic(models.Model):
     _inherit = ['res.company', 'mail.thread', ]
 
     commercial_name = fields.Char(string="Commercial Name", required=False, )
+    legal_name = fields.Char(string="Nombre Legal", required=False)
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Cryptographic Key", )
     date_expiration_sign = fields.Datetime(string="Due date", default='1985-08-28 00:00:00')
     range_days = fields.Integer(string='Days range', default=5)
     send_user_ids = fields.Many2many('res.users', 'res_company_res_sendusers_rel', string='Users')
+    to_emails = fields.Char(string='Email')
 
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
@@ -130,87 +132,6 @@ class CompanyElectronic(models.Model):
         new_comp_id.try_create_configuration_sequences()
         return new_comp_id #new_comp.id
 
-    def try_create_configuration_sequences(self):
-        """ Try to automatically add the Comprobante Confirmation sequence to the company.
-            It will first check if sequence already exists before attempt to create. The s
-            equence is coded with the following syntax:
-                account.invoice.supplier.<tipo>.<company_name>
-            where tipo is: accept, partial or reject, and company_name is either the first word
-            of the name or commercial name.
-        """
-        company_subname = self.commercial_name
-        if not company_subname:
-            company_subname = getattr(self, 'name')
-        company_subname = company_subname.split(' ')[0].lower()
-        ir_sequence = self.env['ir.sequence']
-        to_write = {}
-        for field, seq_code, seq_name in _TIPOS_CONFIRMACION:
-            if not getattr(self, field, None):
-                seq_code += company_subname
-                seq = self.env.ref(seq_code, raise_if_not_found=False) or ir_sequence.create({
-                    'name': seq_name,
-                    'code': seq_code,
-                    'implementation': 'standard',
-                    'padding': 10,
-                    'use_date_range': False,
-                    'company_id': getattr(self, 'id'),
-                })
-                to_write[field] = seq.id
-
-        if to_write:
-            self.write(to_write)
-
-    def test_get_token(self):
-        self.get_expiration_date()
-        token_m_h = api_facturae.get_token_hacienda(
-            self.env.user, self.frm_ws_ambiente)
-        if token_m_h:
-           _logger.info('E-INV CR - I got the token')
-        return 
-    
-    def get_expiration_date(self):
-        if self.signature and self.frm_pin:
-            self.date_expiration_sign = api_facturae.p12_expiration_date(self.signature, self.frm_pin)
-        else:
-            self.message_post(
-                subject='Error',
-                body="Signature requerido")
-
-    def action_get_economic_activities(self):
-        if self.vat:
-            json_response = api_facturae.get_economic_activities(self)
-
-            self.env.cr.execute('update economic_activity set active=False')
-
-            self.message_post(subject='Actividades Económicas',
-                            body='Aviso!.\n Cargando actividades económicas desde Hacienda')
-
-            if json_response["status"] == 200:
-                activities = json_response["activities"]
-                activities_codes = list()
-                for activity in activities:
-                    if activity["estado"] == "A":
-                        activities_codes.append(activity["codigo"])
-
-                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
-
-                for activity in economic_activities:
-                    activity.active = True
-
-                self.name = json_response["name"]
-            else:
-                alert = {
-                    'title': json_response["status"],
-                    'message': json_response["text"]
-                }
-                return {'value': {'vat': ''}, 'warning': alert}
-        else:
-            alert = {
-                'title': 'Atención',
-                'message': _('Company VAT is invalid')
-            }
-            return {'value': {'vat': ''}, 'warning': alert}
-    
     def write(self, vals):
         if vals.get('date_expiration_sign') or vals.get('range_days'):
             cron = self.env.ref('cr_electronic_invoice.ir_cron_send_expiration_notice', False)
@@ -275,3 +196,89 @@ class CompanyElectronic(models.Model):
             for user in self.env.user.company_id.send_user_ids:
                 if user.email:
                     template.with_context(lang=user.lang).send_mail(user.id, force_send=True, raise_exception=True)
+    def try_create_configuration_sequences(self):
+        """ Try to automatically add the Comprobante Confirmation sequence to the company.
+            It will first check if sequence already exists before attempt to create. The s
+            equence is coded with the following syntax:
+                account.invoice.supplier.<tipo>.<company_name>
+            where tipo is: accept, partial or reject, and company_name is either the first word
+            of the name or commercial name.
+        """
+        company_subname = self.commercial_name
+        if not company_subname:
+            company_subname = getattr(self, 'name')
+        company_subname = company_subname.split(' ')[0].lower()
+        ir_sequence = self.env['ir.sequence']
+        to_write = {}
+        for field, seq_code, seq_name in _TIPOS_CONFIRMACION:
+            if not getattr(self, field, None):
+                seq_code += company_subname
+                seq = self.env.ref(seq_code, raise_if_not_found=False) or ir_sequence.create({
+                    'name': seq_name,
+                    'code': seq_code,
+                    'implementation': 'standard',
+                    'padding': 10,
+                    'use_date_range': False,
+                    'company_id': getattr(self, 'id'),
+                })
+                to_write[field] = seq.id
+
+        if to_write:
+            self.write(to_write)
+
+    def test_get_token(self):
+        self.get_expiration_date()
+        token_m_h = api_facturae.get_token_hacienda(
+            self.env.user, self.frm_ws_ambiente)
+        if token_m_h:
+            self.message_post(
+                subject='Info',
+                body="Token Correcto")
+        else:
+            self.message_post(
+                subject='Error',
+                body="Datos Incorrectos")
+        return
+
+    def get_expiration_date(self):
+        if self.signature and self.frm_pin:
+            self.date_expiration_sign = api_facturae.p12_expiration_date(self.signature, self.frm_pin)
+        else:
+            self.message_post(
+                subject='Error',
+                body="Signature requerido")
+
+    def action_get_economic_activities(self):
+        if self.vat:
+            json_response = api_facturae.get_economic_activities(self)
+
+            self.env.cr.execute('update economic_activity set active=False')
+
+            self.message_post(subject='Actividades Económicas',
+                            body='Aviso!.\n Cargando actividades económicas desde Hacienda')
+
+            if json_response["status"] == 200:
+                activities = json_response["activities"]
+                activities_codes = list()
+                for activity in activities:
+                    if activity["estado"] == "A":
+                        activities_codes.append(activity["codigo"])
+
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
+
+                for activity in economic_activities:
+                    activity.active = True
+
+                self.legal_name = json_response["name"]
+            else:
+                alert = {
+                    'title': json_response["status"],
+                    'message': json_response["text"]
+                }
+                return {'value': {'vat': ''}, 'warning': alert}
+        else:
+            alert = {
+                'title': 'Atención',
+                'message': _('Company VAT is invalid')
+            }
+            return {'value': {'vat': ''}, 'warning': alert}

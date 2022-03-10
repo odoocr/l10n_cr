@@ -19,12 +19,11 @@ class PartnerElectronic(models.Model):
     has_exoneration = fields.Boolean(string="Has Exoneration?", required=False)
     type_exoneration = fields.Many2one("aut.ex", string="Authorization Type", required=False, )
     exoneration_number = fields.Char(string="Exoneration Number", required=False, )
-
     percentage_exoneration = fields.Float(string="Percentage of VAT Exoneration", required=False)
-
     institution_name = fields.Char(string="Exoneration Issuer", required=False, )
     date_issue = fields.Date(string="Issue Date", required=False, )
     date_expiration = fields.Date(string="Expiration Date", required=False, )
+    date_notification = fields.Date(string="Last notification date", required=False, )
     activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", required=False, context={'active_test': False} )
     economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False})
     export = fields.Boolean(string="It's export", default=False)

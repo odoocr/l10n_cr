@@ -16,44 +16,45 @@ class AccountMoveReversal(models.TransientModel):
     """
     Account move reversal wizard, it cancel an account move by reversing it.
     """
-    @api.model
-    def _get_invoice_id(self):
-        context = dict(self._context or {})
-        active_id = context.get('active_id', False)
-        if active_id:
-            return active_id
-        return ''
-
-    reference_code_id = fields.Many2one(
-        "reference.code", string="Reference Code",
-        required=True, )
-    reference_document_id = fields.Many2one(
-        "reference.document", string="Reference Document Id",
-        required=True, )
-    invoice_id = fields.Many2one("account.move",
-                                 string="Invoice Id",
-                                 default=_get_invoice_id, required=False, )
+    reference_code_id = fields.Many2one("reference.code", string="Reference Code", required=True, )
+    reference_document_id = fields.Many2one("reference.document", string="Reference Document Id", required=True, )
 
     def _prepare_default_reversal(self, move):
-        reverse_date = self.date if self.date_mode == 'custom' else move.date
-        return {
-            'ref': _('Reversal of: %(move_name)s, %(reason)s', move_name=move.name, reason=self.reason) 
-                   if self.reason
-                   else _('Reversal of: %s', move.name),
-            'date': reverse_date,
-            'invoice_date': move.is_invoice(include_receipts=True) and (self.date or move.date) or False,
-            'tipo_documento': 'NC',
-            'reference_code_id': self.reference_code_id.id,
-			'reference_document_id': self.reference_document_id.id,
-			'invoice_id': move.id,
-            'journal_id': self.journal_id and self.journal_id.id or move.journal_id.id,
-            'invoice_payment_term_id': None,
-            'invoice_user_id': move.invoice_user_id.id,
-            'auto_post': True if reverse_date > fields.Date.context_today(self) else False,
-        }
+        default_values = super(AccountMoveReversal, self)._prepare_default_reversal(move)
 
-    
+        if move.tipo_documento in ('FE', 'TE') and move.state_tributacion == 'rechazado':
+            type_override = 'out_invoice'
+            tipo_doc = move.tipo_documento
+        elif move.type == 'out_refund':
+            type_override = 'out_invoice'
+            tipo_doc = 'ND'
+        elif move.type == 'out_invoice':
+            type_override = 'out_refund'
+            tipo_doc = 'NC'
+        elif move.type == 'in_invoice':
+            type_override = 'in_refund'
+            tipo_doc = 'NC'
+        else:
+            tipo_doc = 'ND'
+            type_override = 'in_invoice'
+
+        fe_values = {'invoice_id': move.id,
+                       'type_override': type_override,
+                       'tipo_documento': tipo_doc,
+                       'reference_code_id': self.reference_code_id.id,
+                       'reference_document_id': self.reference_document_id.id,
+                       'economic_activity_id': move.economic_activity_id.id,
+                       'payment_methods_id': move.payment_methods_id.id,
+                       'state_tributacion': False}
+
+        return {**default_values, **fe_values}
+    """
+    ### MAB - CHECK IF NOT NEEDED !!!!!
+    ### FE logic has been moved to _prepare_default_reversal, and number_electronic is assigned on post() so no need to call here
     def reverse_moves(self, mode='refund'):
+        if self.env.user.company_id.frm_ws_ambiente == 'disabled':
+            return super(AccountInvoiceRefund, self).reverse_moves(mode)
+
         self.ensure_one()
         moves = self.move_ids
 
@@ -105,3 +106,4 @@ class AccountMoveReversal(models.TransientModel):
                 'domain': [('id', 'in', moves_to_redirect.ids)],
             })
         return action
+    """
