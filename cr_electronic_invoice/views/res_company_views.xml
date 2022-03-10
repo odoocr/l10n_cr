@@ -35,7 +35,7 @@
                 </field> -->
 
                 <xpath expr="//page[1]" position="after">
-                    <page string="Facturación Electrónica">
+                    <page string="Electronic Invoice">
                         <group cols="2">
                             <group cols="2">
                                 <field name="signature"/>

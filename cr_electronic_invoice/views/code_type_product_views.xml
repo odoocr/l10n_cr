@@ -5,8 +5,8 @@
             <field name="name">code.type.product.form</field>
             <field name="model">code.type.product</field>
             <field name="arch" type="xml">
-                <form string="Tipos de códigos">
-                    <sheet string="Tipos de códigos">
+                <form string="Code types">
+                    <sheet string="Code types">
                         <group col="4">
                             <field name="code"/>
                             <field name="name"/>
@@ -20,7 +20,7 @@
             <field name="name">code.type.product.tree</field>
             <field name="model">code.type.product</field>
             <field name="arch" type="xml">
-                <tree string="Tipos de códigos" editable="bottom">
+                <tree string="Code types" editable="bottom">
                     <field name="code"/>
                     <field name="name"/>
                 </tree>
@@ -28,7 +28,7 @@
         </record>
 
         <record id="action_code_type_product" model="ir.actions.act_window">
-            <field name="name">Tipos de códigos</field>
+            <field name="name">Code types</field>
             <field name="res_model">code.type.product</field>
             <field name="view_mode">tree,form</field>
         </record>

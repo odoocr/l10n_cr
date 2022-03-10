@@ -26,7 +26,7 @@
                 </div>
             </field>
         </record>
-
+        <!--Email template -->
         <record id="email_template_invoice_vendor" model="mail.template">
             <field name="name">Invoicing: Vendor Invoice email</field>
             <field name="email_from">${(object.user_id.email and '&quot;%s&quot; &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>

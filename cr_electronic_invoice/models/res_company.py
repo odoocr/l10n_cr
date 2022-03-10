@@ -255,7 +255,6 @@ class CompanyElectronic(models.Model):
                 subject='Error',
                 body="Signature requerido")
 
-    @api.multi
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
