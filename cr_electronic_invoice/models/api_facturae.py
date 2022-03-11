@@ -1029,7 +1029,10 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
     tipo_emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Tipo", namespaces=namespaces)[0].text
     nombre_emisor = invoice_xml.xpath("inv:Emisor/inv:Nombre", namespaces=namespaces)[0].text
     pais_emisor = invoice.env['res.country'].search([('name', '=', 'Costa Rica')], limit=1).id
-    telefono_emisor = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)[0].text
+    try:
+        telefono_emisor = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)[0].text
+    except IndexError:
+        telefono_emisor = ''
     otrassenas_emisor = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:OtrasSenas", namespaces=namespaces)[0].text
     correo_emisor = invoice_xml.xpath("inv:Emisor/inv:CorreoElectronico", namespaces=namespaces)[0].text
 
