@@ -1,0 +1,360 @@
+[MASTER]
+ignore=CVS,.git,scenarios,LICENSE,*.md
+persistent=yes
+cache-size=500
+# This extension are not used for this configuration file but are useful to process disable comments based on these ones
+load-plugins=pylint.extensions.docstyle, pylint.extensions.mccabe, pylint_odoo
+extension-pkg-whitelist=lxml
+
+[ODOOLINT]
+readme_template_url="https://github.com/OCA/maintainer-tools/blob/master/template/module/README.rst"
+manifest_required_authors=Odoo CR, Vauxoo,
+   Odoo Community Association (OCA),
+   Jarsa Sistemas,
+manifest_required_keys=license,installable
+manifest_deprecated_keys=description,active
+
+[MESSAGES CONTROL]
+enable=python3
+disable=no-member,
+   no-absolute-import,
+   no-value-for-parameter,
+   too-many-function-args,
+   unexpected-keyword-arg,
+   attribute-defined-outside-init,
+   protected-access,
+   arguments-differ,
+   abstract-method,
+   no-init,
+   fixme,
+   unused-argument,
+   missing-docstring,
+   line-too-long,
+   bad-whitespace,
+   bad-continuation,
+   no-self-use,
+   too-many-instance-attributes,
+   too-few-public-methods,
+   too-many-branches,
+   too-many-statements,
+   locally-disabled,
+   import-error,
+   odoolint,
+   nonstandard-exception,
+   no-name-in-module,
+   wrong-import-order,
+   unsubscriptable-object,
+   cell-var-from-loop,
+   basestring-builtin,
+   unicode-builtin,
+   useless-super-delegation,
+   map-builtin-not-iterating,
+   round-builtin,
+   long-builtin,
+   consider-merging-classes-inherited,
+   access-member-before-definition,
+   consider-using-ternary,
+   too-complex,
+   bad-docstring-quotes,
+   docstring-first-line-empty,
+   inconsistent-return-statements,
+   dict-keys-not-iterating,
+   dict-values-not-iterating,
+   wrong-import-order,
+   missing-super-argument,
+   old-division,
+   broad-except,
+   self-cls-assignment,
+   try-except-raise,
+   raise-missing-from,
+   arguments-renamed,
+   bad-option-value,
+   c-extension-no-member,
+   consider-using-dict-items,
+   consider-using-f-string,
+   cyclic-import,
+   import-self,
+   unspecified-encoding,
+   unused-private-member,
+   keyword-arg-before-vararg,
+   ungrouped-imports,
+   duplicate-code,
+   assignment-from-no-return,
+
+# odoolint disabled because this checks is available just in changed modules in PR conf.
+# import-error Because odoo use incompatible sys-modules https://bitbucket.org/logilab/pylint/issues/616/modules-renamed-with-sysmodules-are-unable
+# nonstandard-exception disabled because we use follow custom exceptions: https://github.com/OCA/maintainer-tools/blob/master/template/module/exceptions.py#L8
+# wrong-import-order: Disabled here but enabled in pr-conf
+# consider-merging-classes-inherited: Disabled here but enabled in pr-conf
+# useless-super-delegation: Disabled here but enabled in pr-conf
+# unsubscriptable-object: TODO: Enabled after fix https://github.com/PyCQA/pylint/issues/811
+# access-member-before-definition: Disable because odoo use decorator to asign variables
+# too-complex: Disabled here but enabled in pr-conf
+# bad-docstring-quotes: Disabled here but enabled in pr-conf
+# docstring-first-line-empty: Disabled here but enabled in pr-conf
+# consider-using-ternary: Disabled because I'm not sure of use even this way (and waiting PyCQA/pylint#1239)
+# inconsistent-return-statements: Disabled because all methods returns "None" by default if is not defined
+# dict-keys-not-iterating: Disabled because we are sending dict.keys() like as valid parameters.
+# dict-values-not-iterating: Disabled because we are checking if a value exists e.g. "value in dict.values()"
+# wrong-import-order: Disabled because this check requires a full installed environment, and MQT is not installing requirements for lints
+# missing-super-argument: Disable because py3 now is supporting super without parameters.
+# old-division: Disable because py3 doesn't require this parameter, but it is checked for this version. Maybe it is a temp bug but I prefer disable it
+# broad-except: It is a valid case when you don't know all custom cases of exception
+# self-cls-assignment: Odoo uses this valid sentence self = self.with_context(...)
+# try-except-raise: Valid case when you want to raise a exception but not another one.
+# raise-missing-from: We are not using this style right now
+# consider-using-f-string: We don't like force to use f-string (yet)
+# unspecified-encoding: utf-8 is the default and the used for us
+# c-extension-no-member: We are not installing all the packages so can't be inspected
+# import-self: It is raising error for "from . import models" and it is used a lot
+# bad-option-value: Raises error when a check doesn't exists but what about multi-compatibility
+# arguments-renamed: It is raising weird errors
+# consider-using-dict-items: It is only a style but not big deal
+# cyclic-import: Raises error when 2 files use "from . import models" and it is used a lot
+# unused-private-member: We can define _methods unused in the same class but inheriting
+# keyword-arg-before-vararg: Disabled because it raises error for `def method(self, kw1, *args, **kwargs)` but we like using kw1 as the first one even if it is not set as `kw1=something`
+# ungrouped-imports: We uses a lot "from odoo import fields;from odoo.tools import ..." so it is a valid case for us
+# duplicate-code: Enable after fix https://github.com/PyCQA/pylint/issues/214
+# assignment-from-no-return: pylint doesn't have the full context of all modules even we could return the same
+
+#***Enabled and how to fix***
+#E1103 - maybe-no-member
+#     Instance of 'bool' has no 'name' member 
+#     Fix changing "var=False" by "var=None" in assignment.
+#E1601 - print sentence detect
+#     You can remove print sentence or if really needs it replace by a
+#     logger.info() in odoo.
+#     Or if is a python module (not odoo) use sys.stdout directly:
+#        print "My Old Print"
+#        sys.stdout.write("My New Print\n")
+#F0401 - http://pylint-messages.wikidot.com/messages:f0401
+#   Fix adding odoo to path before run pylint
+#   PYTHONPATH=${PYTHONPATH}:tu_odoo_path pylint command...
+#   other case of this problem should be:
+#   add from openerp.addons.MYMODULE import ANYONE
+#R0801 - Sometimes is because you are using a bad coding in header file
+#        http://stackoverflow.com/questions/12209430/pylint-raising-r0801-for-coding-declaration-lines
+#        NOTE pylint: disable don't work in this cases.
+#        If you need force to use a duplicate code, then you can create a small change into two files.
+#        The ideal fix is don't use duplicate code, better re-use code.
+#W0102 - dangerous-default-value. 
+   #Not use
+   #def fc(param0, param1=[], param2={}):
+   #You can use:
+   #def fc(param0, param1=None, param2=None):
+   #    if param1 is None:
+   #        param1 = []
+   #    if params2 is None:
+   #        param2 = {}
+   #More info here: https://doc.odoo.com/contribute/15_guidelines/coding_guidelines_framework/#the-infamous-context
+#W0141 - Bad-builtin. Used builtin function 'file', can be fixed using the sentence "with open(fname) as fjob: fobj.read()", the "fobj.close()" sentence is not needed.
+         # This problem can be fixed "translating" your code using builtin function
+         # to list comprehension equivalent code, here's an example:
+         # > map(str, my_sequence) gives this error in pylint
+         # > [str(item) for item in my_sequence] is the equivalent code and doesn't report an error with pylint
+#W0142 - star-args. method(**my_dict) replace with method(my_dict). If use string.format check this link: http://stackoverflow.com/a/5952429/3753497
+#W0403 - http://programmers.stackexchange.com/questions/159503/whats-wrong-with-relative-imports-in-python
+       # You can use auto-script from https://github.com/Vauxoo/pylint-conf/blob/master/fix_unused_imports/replace_import.py to remove all relative import
+       # Resumen: from . import mylocalfolder
+#W0611 - Unused import. Fixing remove this unused import. Or run "autoflake --remove-all-unused-imports -ri . && bzr revert ./*/__init__.py ./*/*/__init__.py ./*/*/*/__init__.py" TODO: exclude __init__.py
+#W0612 - unused-variable. You can fix it deleting variable.  Or run "autoflake --remove-unused-variables -ri . && bzr revert ./*/__init__.py ./*/*/__init__.py ./*/*/*/__init__.py" TODO: exclude __init__.py
+#W0621 - redefining name %r from outer scope (line %s) Used when a variable’s name hide a name defined in the outer scope.
+         #  you use a variable with name of some class. don't use same names for variables and classes. Example:
+         # class account_invoice_tax(self):
+         #     account_invoice_tax = "text"  #  Name of variable same that class
+         # Fix:
+         # class account_invoice_tax(self):
+         #     account_invoice_tax_var = "text"
+         # If this variable is internal of odoo/openerp and you can't change it then you should use a disable pylint message in this line.
+         #   e.g. def method_function(self, cr, uid, ids, fields...)  # pylint: disable=W0621
+         #   fields is a variable reserved of methods by odoo/openerp and is a class name reserved by odoo/openerp too.
+         #
+         # For new api you can fix it using fields_list instead fields. See the example in: https://github.com/odoo/odoo/blob/8.0/openerp/models.py#L1284-L1295
+         # e.g.
+         # @api.model
+         # def default_get(self, fields_list):
+         #     """ default_get(fields) -> default_values
+         #
+         #     Return default values for the fields in ``fields_list``. Default
+         #     values are determined by the context, user defaults, and the model
+         #     itself.
+         #
+         #     :param fields_list: a list of field names
+         #     :return: a dictionary mapping each field name to its corresponding
+         #         default value, if it has one.
+         #
+         #     """
+#W0622 - Redefining built-in 'id', can be fixed using a variable name
+         # unreserved system like "ids".
+         #
+         # If this variable is internal of odoo/openerp and you can't change
+         # it then you should use a disable pylint message in this line.
+         #
+         #  e.g. def odoo_method(self, cr, uid, id, context=None)  # pylint: disable=W0621
+         #
+         # There are some cases when you can avoid the pylint disable, is
+         # better avoid the error than disable then. One case is when making
+         # openerp import.
+         #
+         #  e.g. from openerp.exceptions import Warning, ValuationError
+         #
+         # The last example generate a Redefining built-in 'Warning' message.
+         # You can avoid this error importing like this:
+         #
+         #  e.g. from openerp import exceptions
+         #
+         # And then when you want to call Warning or Valuation call them like
+         # this:
+         #
+         #      e.g. raise exceptions.Warning,
+         #      e.g. raise exceptions.ValuationError
+         #
+#W0703 - Catching too general exception. Change "except" by "except ImportError" or "except ClassError". if you need any exception then use "except BaseException, e" or "except BaseException"
+#W1201 - logging-not-lazy Specify string format args as loggin funct parameters.
+         # Fix:
+         #   Before:
+         #     _logger.warning('Msg with a param %s' % param1)
+         #   After:
+         #     _logger.warning('Msg with a param %s', param1)
+#W1401 - Anomalous-backslash-in-string. You can fix using a prefix 'r'. Example before and after, from re.match("[^@]+\.[^@]+", string) to re.match(r"[^@]+\.[^@]+", string)
+#W1504 - unidiomatic-typecheck. You can prefer use instance function.
+         # Fix:
+         #  Before: type(myvar) is list
+         #  After: isinstance(myvar, list)
+#C0303 - Trailing whitespace http://pylint-messages.wikidot.com/messages:c0303. Remove final spaces before of newline. Many editor has a auto-remove this spaces or autopep8 remove it too.
+#C0411 - wrong-import-order. You can fix it executing: `pip install isort && isort your_file.py`
+#C1001 (old-style-class)] Old-style class defined
+#   You can just use the new-style class instead. More info here: - http://stackoverflow.com/questions/54867/old-style-and-new-style-classes-in-python
+#   Fix changing "class amount_to_text:" by "class amount_to_text(object):" .
+#W0640 - ("Cell variable defined in loop"). You must not define a local function inside a loop. You can either extract the local function outside the loop into a varaible and then use this variable inside the loop or modify the logic to do not use a local function using another tools like orm methods https://bitbucket.org/logilab/pylint/issue/271/spurious-warning-w0640-issued-for-loop
+# W8201 - incoherent-interpreter-exec-perm: Execute chmod -x myfile.py or delete the interpreter comment #!/bin/BINPATH or if you really want a binary file use: chmod +x myfile.py and add the interpreter comment #!/bin/BINPATH.
+# R1260 - too-complex: To fix it use the following rules https://github.com/FreeCodeCamp/FreeCodeCamp/wiki/The-Return-Early-Pattern
+
+#*** How to fix pylint-odoo***
+# sql-injection - Fix with the following guideline https://github.com/OCA/maintainer-tools/blob/master/CONTRIBUTING.md#no-sql-injection
+# invalid-commit - Fix with the following guideline https://github.com/OCA/maintainer-tools/blob/master/CONTRIBUTING.md#never-commit-the-transaction
+
+#***Disabled and why***
+#E0611 (no-name-in-module). Because we don't have a PYTHONPATH to odoo in all cases.
+#E1101 (no-member) - make a error with this sentence: product_obj = self.pool['product.product']
+#E1120 (no-value-for-parameter) - Methods from new api make this false negative.
+#E1121 (too-many-function-args) - too-many-function-args. This is because you are changing args of an method.
+#        You can fix it using exactly same args from original method into inherit method.
+#        Into Odoo-8.0 this is a little hardly with decorators. This forces you to use the new api, but your code work fine with old api yet.
+#        TODO: Enabling when we have time to migrate all our modules.
+#E1123 (unexpected-keyword-arg) Show error with context.
+#W0201 (attribute-defined-outside-init) - Attribute self.field defined outside __init__. New v8 api use fields with self.field without __init__ constructor into _inherit class.
+#W0123 - eval-used, You can fix it with `ast.literal_eval`, view example https://bitbucket.org/logilab/pylint/pull-request/95/add-new-warning-eval-used/diff
+#        If you get error `ValueError: malformed string` then you can use:
+#          `from openerp.tools.safe_eval import safe_eval`
+#          `code_variable = 6`
+#          `safe_eval('var_eval * 2', {'var_eval': code_variable})` <- 12
+#W0212 (protected-access) - Odoo use many underscore methods
+#W0221 (arguments-differ) - Odoo 8.0 use decorator and rewrite original function and make this false error.
+#W0223 (abstract-method) - Odoo use abstract method without overriden.
+#W0232 (no-init) - odoo use class without __init__
+#W0511 (fixme) - Used when a warning note as FIXME or TODO is detected. This is not a error.
+#W0613 (unused-argument) odoo use many unused argument. Example cr, uid, name o super method.
+#C0111 (missing-docstring) - Missing docstring http://pylint-messages.wikidot.com/messages:c0111. Too much work. WIP
+#C0301 (line-too-long) - Enabled from flake8
+#C0326 (bad-whitespace) - Enabled from flake8
+#C0330 (bad-continuation) - Enabled from flake8
+#R0201 (no-self-use) - Method could be a function http://pylint-messages.wikidot.com/messages:r0201. odoo use many method without decorator.
+#R0902 (too-many-instance-attributes) - Odoo use many initial attributes into __init__ of class myclass: myAttr1
+#R0903 (too-few-public-methods) - odoo use many public methods in classes
+#R0912 - Too many branches. Odoo use many method with many branches.
+#I0011 (locally-disabled) - Add a fail of ignore added, but this isn't a error. NOTE: There is a bug with this disable: https://bitbucket.org/logilab/pylint/issue/340/pylint-disable-c0302-does-not-work
+#W0110 - Deprecated-lambda.
+      # Filter on lambda could be replaced by comprehension list
+      # [element for element in list1 if element not in list2]
+#C0103 - Invalid-name
+      # Used when a name doesn't fit the naming convention associated to its type (constant, variable, class…).
+      # This message belongs to the basic checker.
+      # You can to check regex from "[BASIC]" section of this pylint-conf to verify valid names
+#W1202 - Use % formatting in logging functions and pass the % parameters as arguments
+      # When is used .format to concatenate strings or when is used "% (param)"
+      # Example dict: _logger.info('Cron Job will compute {length} products'.format(length=total))
+      #            or _logger.info('Cron Job will compute %(length)s products'% ({'length': total}))
+      # Solve with: _logger.info('Cron Job will compute %(length)s products', {'length': total})
+      # Example tuple:  _logger.info('Cron Job will compute {0} products'.format(total,))
+      #              or _logger.info('Cron Job will compute %s products' % (total,)))
+      # Solve with: _logger.info('Cron Job will compute %s products', (total,))
+# cell-var-from-loop - With new api is very useful `for var in rows: self.filtered(lambda value: value.attribute.id == var.id)` but pylint don't like it because lambda method will be stored the last "value" of the loop in all lambda methods.
+      # for more information see the following example bad case: https://gist.github.com/moylop260/ec534248e35ab193a84501b8fd96b1fd
+
+#R0915 (too-many-statements) - TODO: Enable if mccabe isn't detect this cases... Can be fixed split method in more mini-function. More info here: http://doc.openerp.co.id/contribute/15_guidelines/coding_guidelines_framework.html#keep-your-methods-short-simple-when-possible
+# basestring-builtin For py27 is valid yet (py3 even use unicode string)
+# unicode-builtin For py27 is valid yet (py3 even use unicode string)
+# map-builtin-not-iterating For py27 map return a list (py3 return a generator)
+# round-builtin For py27 the round is valid yet (py3 return a integer TODO: Enable if you use py3 to check that don't fails)
+# long-builtin For py27 is long is valid yet (py3 merge long and integer TODO: Enable if you use py3 to check that don't fails)
+
+
+[REPORTS]
+msg-template={path}:{line}: [{msg_id}({symbol}), {obj}] {msg}
+# msg-template={module}:{line}: [{msg_id}({symbol})]
+output-format=colorized
+files-output=no
+reports=no
+evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+score=no
+
+[VARIABLES]
+init-import=no
+dummy-variables-rgx=_|dummy|e|checks|fast_suite
+additional-builtins=
+
+[TYPECHECK]
+ignore-mixin-members=yes
+ignored-classes=SQLObject
+generated-members=REQUEST,acl_users,aq_parent
+
+[BASIC]
+no-docstring-rgx=__.*__
+module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__)|(_logger))$
+#class-rgx=[A-Z_][a-zA-Z0-9]+$
+class-rgx=([a-z_][a-z0-9_]{2,59})|([A-Z_][a-zA-Z0-9]{2,59})$
+function-rgx=[a-z_][a-z0-9_]{2,59}$
+
+# Adding all unitest valid methods
+method-rgx=([a-z_][a-z0-9_]{2,59}|addTypeEqualityFunc|addCleanup|setUp|setUpClass|tearDownClass|tearDown|countTestCases|defaultTestResult|shortDescription|skipTest|runTest|test\_.*)$
+
+attr-rgx=[a-z_][a-z0-9_]{2,59}$
+argument-rgx=([a-z_][a-z0-9_]{2,59}$)
+variable-rgx=[a-z_][a-z0-9_]{1,59}$
+class-const-naming-style=snake_case
+inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
+good-names=_,cr,uid,id,ids,_logger,o,e,i,k,v,checks,fast_suite,maxDiff
+bad-names=
+
+[IMPORTS]
+deprecated-modules=regsub,TERMIOS,Bastion,rexec,pdb,pudb,ipdb,bs4
+
+[DESIGN]
+max-args=200
+max-locals=200
+max-returns=6
+max-branchs=25
+max-statements=200
+max-parents=7
+max-attributes=7
+min-public-methods=2
+max-public-methods=200
+
+[CLASSES]
+defining-attr-methods=__init__,__new__,setUp
+
+[FORMAT]
+max-line-length=119
+max-module-lines=10000
+indent-string='    '
+expected-line-ending-format=LF
+
+[SIMILARITIES]
+min-similarity-lines=14
+ignore-comments=yes
+ignore-docstrings=yes
+
+[MISCELLANEOUS]
+notes=FIXME,TODO

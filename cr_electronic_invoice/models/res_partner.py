@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import re, json, requests
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -13,18 +13,18 @@ _logger = logging.getLogger(__name__)
 class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
-    commercial_name = fields.Char(string="Commercial Name", required=False, )
-    identification_id = fields.Many2one("identification.type", string="Id Type",required=False, )
-    payment_methods_id = fields.Many2one("payment.methods", string="Payment Method", required=False, )
+    commercial_name = fields.Char()
+    identification_id = fields.Many2one()
+    payment_methods_id = fields.Many2one("payment.methods", string="Payment Method")
     has_exoneration = fields.Boolean(string="Has Exoneration?", required=False)
-    type_exoneration = fields.Many2one("aut.ex", string="Authorization Type", required=False, )
-    exoneration_number = fields.Char(string="Exoneration Number", required=False, )
+    type_exoneration = fields.Many2one("aut.ex", string="Authorization Type")
+    exoneration_number = fields.Char(string="Exoneration Number")
     percentage_exoneration = fields.Float(string="Percentage of VAT Exoneration", required=False)
-    institution_name = fields.Char(string="Exoneration Issuer", required=False, )
-    date_issue = fields.Date(string="Issue Date", required=False, )
-    date_expiration = fields.Date(string="Expiration Date", required=False, )
-    date_notification = fields.Date(string="Last notification date", required=False, )
-    activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", required=False, context={'active_test': False} )
+    institution_name = fields.Char(string="Exoneration Issuer")
+    date_issue = fields.Date(string="Issue Date")
+    date_expiration = fields.Date(string="Expiration Date")
+    date_notification = fields.Date(string="Last notification date")
+    activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", context={'active_test': False})
     economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False})
     export = fields.Boolean(string="It's export", default=False)
 

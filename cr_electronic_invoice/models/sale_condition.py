@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-from odoo import models, fields, api, _
+
+from odoo import models, fields
 
 
 class SaleConditions(models.Model):
     _name = "sale.conditions"
 
-    active = fields.Boolean(string="Active", required=False, default=True)
-    code = fields.Char(string="Code", required=False, )
-    sequence = fields.Char(string="Sequence", required=False, )
-    name = fields.Char(string="Name", required=False, )
-    notes = fields.Text(string="Notes", required=False, )
+    active = fields.Boolean(help='Set sale contitions active or inactive', default=True)
+    code = fields.Char(help='Sale contitions code', required=True)
+    sequence = fields.Char(help='Sale conditions sequence', required=True)
+    name = fields.Char(help='Sale conditions name', required=True)
+    notes = fields.Text(help='Sale conditions notes')

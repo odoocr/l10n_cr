@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from odoo import http, _
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.exceptions import AccessError, MissingError
@@ -12,10 +9,6 @@ _logger = logging.getLogger(__name__)
 
 
 class PortalAccount(CustomerPortal):
-
-    # ------------------------------------------------------------
-    # My Invoices
-    # ------------------------------------------------------------
 
     def _invoice_get_page_view_values(self, invoice, access_token, **kwargs):
         values = {

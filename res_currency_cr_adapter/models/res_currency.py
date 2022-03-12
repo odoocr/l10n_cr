@@ -26,11 +26,6 @@ class ResCurrencyRate(models.Model):
 
     def action_create_missing_exchange_rates(self):
         currency_rate_obj = self.env['res.currency.rate']
-
-        # last_day = currency_rate_obj.search([
-        #     ('company_id', '=', self.env.user.company_id.id),
-        #     ('currency_id', '=', self.id)
-        # ], limit=1, order='name desc')
         last_day = datetime.datetime.now().date()
 
         first_day = currency_rate_obj.search([
@@ -38,7 +33,6 @@ class ResCurrencyRate(models.Model):
             ('currency_id', '=', self.id)
         ], limit=1, order='name asc')
 
-        # range_day = last_day.name - first_day.name
         range_day = last_day - first_day.name
         date = first_day.name
         for day in range(range_day.days):
@@ -95,24 +89,17 @@ class ResCurrencyRate(models.Model):
             # Web Service Connection using the XML schema from BCCRR
             client = Client('https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx?WSDL')
 
-            response = client.service.ObtenerIndicadoresEconomicosXML(Indicador='318',
-                                                                    FechaInicio=initial_date,
-                                                                    FechaFinal=end_date,
-                                                                    Nombre=bccr_username,
-                                                                    SubNiveles='N',
-                                                                    CorreoElectronico=bccr_email,
-                                                                    Token=bccr_token)
+            response = client.service.ObtenerIndicadoresEconomicosXML(
+                Indicador='318', FechaInicio=initial_date, FechaFinal=end_date,
+                Nombre=bccr_username, SubNiveles='N', CorreoElectronico=bccr_email, Token=bccr_token)
+
             xmlResponse = xml.etree.ElementTree.fromstring(response)
             sellingRateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC")
 
             # Get Buying exchange Rate from BCCR
-            response = client.service.ObtenerIndicadoresEconomicosXML(Indicador='317',
-                                                                    FechaInicio=initial_date,
-                                                                    FechaFinal=end_date,
-                                                                    Nombre=bccr_username,
-                                                                    SubNiveles='N',
-                                                                    CorreoElectronico=bccr_email,
-                                                                    Token=bccr_token)
+            response = client.service.ObtenerIndicadoresEconomicosXML(
+                Indicador='317', FechaInicio=initial_date, FechaFinal=end_date,
+                Nombre=bccr_username, SubNiveles='N', CorreoElectronico=bccr_email, Token=bccr_token)
 
             xmlResponse = xml.etree.ElementTree.fromstring(response)
             buyingRateNodes = xmlResponse.findall("./INGC011_CAT_INDICADORECONOMIC")
@@ -139,18 +126,21 @@ class ResCurrencyRate(models.Model):
                         ratesIds = self.env['res.currency.rate'].search([('name', '=', currentDateStr)], limit=1)
 
                         if len(ratesIds) > 0:
-                            newRate = ratesIds.write({'rate': sellingRate,
-                                                    'original_rate': sellingOriginalRate,
-                                                    'rate_2': buyingRate,
-                                                    'original_rate_2': buyingOriginalRate,
-                                                    'currency_id': currency_id.id})
+                            newRate = ratesIds.write(
+                                {'rate': sellingRate,
+                                'original_rate': sellingOriginalRate,
+                                'rate_2': buyingRate,
+                                'original_rate_2': buyingOriginalRate,
+                                'currency_id': currency_id.id}
+                                )
                         else:
-                            newRate = self.create({'name': currentDateStr,
-                                                'rate': sellingRate,
-                                                'original_rate': sellingOriginalRate,
-                                                'rate_2': buyingRate,
-                                                'original_rate_2': buyingOriginalRate,
-                                                'currency_id': currency_id.id})
+                            newRate = self.create(
+                                {'name': currentDateStr,
+                                'rate': sellingRate,
+                                'original_rate': sellingOriginalRate,
+                                'rate_2': buyingRate,
+                                'original_rate_2': buyingOriginalRate,
+                                'currency_id': currency_id.id})
 
                         _logger.debug({'name': currentDateStr,
                                     'rate': sellingRate,
