@@ -14,8 +14,7 @@ import pytz
 
 class XAdESContext(SignatureContext):
     def __init__(self, policy):
-        """
-        Declaration
+        """Declaration
         :param policy: Policy class
         :type policy: xades.Policy
         """
@@ -23,8 +22,7 @@ class XAdESContext(SignatureContext):
         super(XAdESContext, self).__init__()
 
     def sign(self, node):
-        """
-        Signs a node
+        """Signs a node
         :param node: Signature node
         :type node: lxml.etree.Element
         :return: None 
@@ -47,8 +45,7 @@ class XAdESContext(SignatureContext):
         return res
 
     def verify(self, node):
-        """
-        verifies a signature
+        """verifies a signature
         :param node: Signature node
         :type node: lxml.etree.Element
         :return: 

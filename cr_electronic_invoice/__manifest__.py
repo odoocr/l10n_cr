@@ -63,6 +63,7 @@
     ],
     'external_dependencies': {
         "python": [
+            'cryptography',
             'xmlsig',
             'OpenSSL',
             'phonenumbers',

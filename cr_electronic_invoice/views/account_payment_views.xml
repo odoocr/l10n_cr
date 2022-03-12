@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    
         <!-- Quitar el boton de Cancelar Factura -->
         <record id="view_payment_methods_tree" model="ir.ui.view">
             <field name="name">payment.methods.tree</field>
@@ -31,5 +31,5 @@
             <field name="view_mode">tree,form</field>
             <!--<field name="search_view_id" ref="view_account_invoice_filter"/>-->
         </record>
-    </data>
+    
 </odoo>

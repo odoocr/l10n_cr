@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    
 
         <!-- payment methods -->
         <record id="PaymentMethods_1" model="pos.payment.method">
@@ -33,5 +33,5 @@
             <field name="name">Otros (se debe indicar el medio de pago)</field>
         </record>
 
-    </data>
+    
 </odoo>

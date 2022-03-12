@@ -21,9 +21,7 @@ else:
 
 
 class Policy(object):
-    """"
-    Policy class created in order to define different policies
-    """
+    """"Policy class created in order to define different policies."""
 
     hash_method = None
 
@@ -113,9 +111,7 @@ class PolicyId(Policy):
     name = None
 
     def set_transforms(self, node, value, sign=False):
-        """
-        Transformations of the policy if required. Modifies node and returns
-        transformed value
+        """Transformations of the policy if required. Modifies node and returns transformed value
         :param node: Policy node
         :param value: Original value
         :return: str

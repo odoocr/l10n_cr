@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    
         <menuitem id="menu_electronic_invoice" name="Electronic Invoice" parent="account.menu_finance_configuration"
                   sequence="1"/>
         <menuitem id="menu_payment_methods" name="Payment methods" parent="menu_electronic_invoice"
@@ -20,5 +20,5 @@
         <menuitem id="menu_economic_activity" name="Economic activity" parent="menu_electronic_invoice"
                   sequence="8" action="action_economic_activity"/>
 
-    </data>
+    
 </odoo>
