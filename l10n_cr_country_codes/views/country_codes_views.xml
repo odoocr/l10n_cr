@@ -7,8 +7,8 @@
             <field name="model">res.country.county</field>
             <field name="arch"
                    type="xml">
-                <form string="Canton">
-                    <sheet string="Canton">
+                <form string="County">
+                    <sheet string="County">
                         <group col="4">
                             <field name="code"/>
                             <field name="name"/>
@@ -25,7 +25,7 @@
             <field name="model">res.country.county</field>
             <field name="arch"
                    type="xml">
-                <tree string="Cantons">
+                <tree string="Counties">
                     <field name="code"/>
                     <field name="name"/>
                     <field name="state_id"/>
@@ -99,7 +99,7 @@
 
         <record id="action_res_country_county"
                 model="ir.actions.act_window">
-            <field name="name">Cantons</field>
+            <field name="name">Counties</field>
             <field name="res_model">res.country.county</field>
             <field name="view_mode">tree,form</field>
         </record>
@@ -119,7 +119,7 @@
         </record>
 
         <menuitem id="menu_res_country_county"
-                  name="Cantons"
+                  name="Counties"
                   parent="account.account_management_menu"
                   sequence="2"
                   action="action_res_country_county"/>

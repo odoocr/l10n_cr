@@ -5,8 +5,8 @@
             <field name="name">sale.conditions.form</field>
             <field name="model">sale.conditions</field>
             <field name="arch" type="xml">
-                <form string="Terms of sale">
-                    <sheet string="Terms of sale">
+                <form string="Sale terms">
+                    <sheet string="Sale terms">
                         <group col="4">
                             <field name="name"/>
                             <field name="sequence"/>
@@ -24,7 +24,7 @@
             <field name="name">sale.conditions.tree</field>
             <field name="model">sale.conditions</field>
             <field name="arch" type="xml">
-                <tree string="Terms of sale" editable="bottom">
+                <tree string="Sale terms" editable="bottom">
                     <field name="sequence"/>
                     <field name="name"/>
                     <field name="active"/>
@@ -33,7 +33,7 @@
         </record>
 
         <record id="action_sale_conditions" model="ir.actions.act_window">
-            <field name="name">Terms of sale</field>
+            <field name="name">Sale terms</field>
             <field name="res_model">sale.conditions</field>
             <field name="view_mode">tree,form</field>
         </record>

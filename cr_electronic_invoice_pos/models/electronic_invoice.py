@@ -145,10 +145,10 @@ class PosOrder(models.Model):
         sequence = int(sequence) if sequence else False
         if vals.get('session_id') and sequence:
             session = self.env['pos.session'].sudo().browse(vals['session_id'])
-            if tipo_documento == 'FE' and sequence >= session.config_id.journal_id.FE_sequence_id.number_next_actual:
-                    session.config_id.journal_id.FE_sequence_id.number_next_actual = sequence + 1
-            elif tipo_documento == 'TE' and sequence >= session.config_id.journal_id.TE_sequence_id.number_next_actual:
-                    session.config_id.journal_id.TE_sequence_id.number_next_actual = sequence + 1
+            if tipo_documento == 'FE' and sequence >= session.config_id.FE_sequence_id.number_next_actual:
+                    session.config_id.FE_sequence_id.number_next_actual = sequence + 1
+            elif tipo_documento == 'TE' and sequence >= session.config_id.TE_sequence_id.number_next_actual:
+                    session.config_id.TE_sequence_id.number_next_actual = sequence + 1
 
     def _order_fields(self, ui_order):
         vals = super(PosOrder, self)._order_fields(ui_order)
@@ -221,9 +221,7 @@ class PosOrder(models.Model):
         return order
 
     def action_pos_order_paid(self):
-        
         for order in self:
-
             if not order.pos_order_id:
                 continue
             if order.tipo_documento == 'FE':
@@ -500,7 +498,6 @@ class PosOrder(models.Model):
                     else:
                         doc.tipo_documento = 'NC'
                         numero_documento_referencia = doc.pos_order_id.number_electronic
-                        codigo_referencia = doc.reference_code_id.code
                         razon_referencia = 'nota credito'
                     tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
                     numero_documento_referencia = doc.pos_order_id.number_electronic
