@@ -18,129 +18,6 @@ from .. import extensions
 
 _logger = logging.getLogger(__name__)
 
-
-class AccountInvoiceRefund(models.TransientModel):
-    _inherit = "account.move.reversal"
-
-    @api.model
-    def _get_invoice_id(self):
-        context = dict(self._context or {})
-        active_id = context.get('active_id', False)
-        if active_id:
-            return active_id
-        return ''
-
-    reference_code_id = fields.Many2one("reference.code", string="Code reference", required=True, )
-    reference_document_id = fields.Many2one("reference.document", string="Reference Document Id", required=True, )
-    invoice_id = fields.Many2one("account.move", string="Invoice Id", default=_get_invoice_id, required=False, )
-
-    def reverse_moves(self, mode='refund'):
-        if self.env.user.company_id.frm_ws_ambiente == 'disabled':
-            return super(AccountInvoiceRefund, self).reverse_moves(mode)
-        else:
-            moves = self.env['account.move'].browse(self.env.context['active_ids']) if self.env.context.get('active_model') == 'account.move' else self.move_id
-
-            # Create default values.
-            default_values_list = []
-            for move in moves:
-                default_values = self._prepare_default_reversal(move)
-
-                # ---------------------------------------------------------------------------------------------
-                # Added for electronic invoice 
-                # ---------------------------------------------------------------------------------------------
-
-                if move.tipo_documento in ('FE', 'TE') and move.state_tributacion == 'rechazado':
-                    tipo_refund = 'out_invoice'
-                    tipo_doc = move.tipo_documento
-                elif move.type == 'out_invoice':
-                    tipo_refund = 'out_refund'
-                    tipo_doc = 'NC'
-                elif move.type == 'in_invoice':
-                    tipo_refund = 'in_refund'
-                    tipo_doc = 'NC'
-                else:
-                    tipo_doc = 'ND'
-                    tipo_refund = 'in_invoice'
-
-                fe_values = {'invoice_id': self.invoice_id.id,
-                               'type': tipo_refund,
-                               'tipo_documento': tipo_doc,
-                               'reference_code_id': self.reference_code_id.id,
-                               'reference_document_id': self.reference_document_id.id,
-                               'economic_activity_id': self.invoice_id.economic_activity_id.id,
-                               'payment_methods_id': self.invoice_id.payment_methods_id.id,
-                               'state_tributacion': False}
-
-                values = {**default_values, **fe_values}
-
-                default_values_list.append(values)
-                # --------------------------------------------------------------------------------------------
-
-            batches = [
-                [self.env['account.move'], [], True],   # Moves to be cancelled by the reverses.
-                [self.env['account.move'], [], False],  # Others.
-            ]
-            for move, default_vals in zip(moves, default_values_list):
-                is_auto_post = bool(default_vals.get('auto_post'))
-                is_cancel_needed = not is_auto_post and self.refund_method in ('cancel', 'modify')
-                batch_index = 0 if is_cancel_needed else 1
-                batches[batch_index][0] |= move
-                batches[batch_index][1].append(default_vals)
-
-            # Handle reverse method.
-            moves_to_redirect = self.env['account.move']
-            for moves, default_values_list, is_cancel_needed in batches:
-                new_moves = moves._reverse_moves(default_values_list, cancel=is_cancel_needed)
-
-                if self.refund_method == 'modify':
-                    moves_vals_list = []
-                    for move in moves.with_context(include_business_fields=True):
-                        moves_vals_list.append(move.copy_data({'date': self.date or move.date})[0])
-                    new_moves = self.env['account.move'].create(moves_vals_list)
-
-                moves_to_redirect |= new_moves
-
-                for new_move in new_moves:
-                    if not new_move.number_electronic:
-                        # if journal doesn't have sucursal use default from company
-                        sucursal_id = new_move.journal_id.sucursal
-                        if not sucursal_id:
-                            sucursal_id = self.env.user.company_id.sucursal_MR
-
-                        # if journal doesn't have terminal use default from company
-                        terminal_id = new_move.journal_id.terminal
-                        if not terminal_id:
-                            sucursal_id = self.env.user.company_id.terminal_MR
-
-                        response_json = api_facturae.get_clave_hacienda(new_move,
-                                                                    new_move.tipo_documento,
-                                                                    new_move.name,
-                                                                    sucursal_id,
-                                                                    terminal_id)
-
-                        new_move.number_electronic = response_json.get('clave')
-                        new_move.sequence = response_json.get('consecutivo')
-                        new_move.name = new_move.sequence
-
-        # Create action.
-        action = {
-            'name': _('Reverse Moves'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'account.move',
-        }
-        if len(moves_to_redirect) == 1:
-            action.update({
-                'view_mode': 'form',
-                'res_id': moves_to_redirect.id,
-            })
-        else:
-            action.update({
-                'view_mode': 'tree,form',
-                'domain': [('id', 'in', moves_to_redirect.ids)],
-            })
-        return action
-
-
 class InvoiceLineElectronic(models.Model):
     _inherit = "account.move.line"
 
@@ -261,7 +138,6 @@ class AccountInvoiceElectronic(models.Model):
         string='Total de impuestos FE', readonly=True, )
     amount_total_electronic_invoice = fields.Monetary(
         string='Total FE', readonly=True, )
-
     tipo_documento = fields.Selection(
         selection=[('FE', 'Factura Electrónica'),
                    ('FEE', 'Factura Electrónica de Exportación'),
@@ -291,50 +167,46 @@ class AccountInvoiceElectronic(models.Model):
 
     economic_activity_id = fields.Many2one("economic.activity", string="Actividad Económica", required=False, )
 
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', compute='_get_economic_activities', )
+    economic_activities_ids = fields.Many2many('economic.activity', string=u'Actividades Económicas', )
 
     not_loaded_invoice = fields.Char(string='Numero Factura Original no cargada', readonly=True, )
 
     not_loaded_invoice_date = fields.Date(string='Fecha Factura Original no cargada', readonly=True, )
-
-    #journal_id = fields.Many2one('account.journal', string='Journal', compute='_get_journal',)
 
     _sql_constraints = [
         ('number_electronic_uniq', 'unique (company_id, number_electronic)',
          "La clave de comprobante debe ser única"),
     ]
 
-    @api.onchange('partner_id', 'company_id')
-    def _get_economic_activities(self):
-        for inv in self:
-            inv.economic_activity_id = False
-            inv.economic_activities_ids = []
-            if inv.type in ('in_invoice', 'in_refund'):
-                if inv.partner_id:
-                    inv.economic_activities_ids = inv.partner_id.economic_activities_ids
-                    inv.economic_activity_id = inv.partner_id.activity_id
-            else:
-                inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', True)])
-                inv.economic_activity_id = inv.company_id.activity_id
-
     @api.onchange('partner_id')
-    def _partner_changed(self):
-        if self.partner_id.export:
-            self.tipo_documento = 'FEE'
+    def _onchange_partner_id(self):
+        super(AccountInvoiceElectronic, self)._onchange_partner_id()
+        self.payment_methods_id = self.partner_id.payment_methods_id
 
         if self.type in ('in_invoice', 'in_refund'):
             if self.partner_id:
-                #Nuevo para auto seleccionar la actividad economica del cliente al momento de seleccionarlo
-                if self.partner_id.activity_id:
-                    self.economic_activity_id = self.partner_id.activity_id
-                #else:
-                #    raise UserError(_('Partner does not have a default economic activity'))
+                self.economic_activities_ids = self.partner_id.economic_activities_ids
+                self.economic_activity_id = self.partner_id.activity_id
+            else:
+                self.economic_activity_id = False
+                self.economic_activities_ids = []
+        else:
+            self.economic_activities_ids = self.env['economic.activity'].search([('active', '=', True)])
+            self.economic_activity_id = self.company_id.activity_id
 
-                if self.partner_id.payment_methods_id:
-                    self.payment_methods_id = self.partner_id.payment_methods_id
-                #else:
-                #    raise UserError(_('Partner does not have a default payment method'))
-
+        if self.partner_id and self.partner_id.export:
+            self.tipo_documento = 'FEE'
+        elif self.type == 'out_refund':
+            self.tipo_documento = 'NC'
+        elif self.partner_id and self.partner_id.vat:
+            if self.partner_id.country_id and self.partner_id.country_id.code != 'CR':
+                self.tipo_documento = 'TE'
+            elif self.partner_id.identification_id and self.partner_id.identification_id.code == '05':
+                self.tipo_documento = 'TE'
+            else:
+                self.tipo_documento = 'FE'
+        else:
+            self.tipo_documento = 'TE'
 
     def action_invoice_sent(self):
         self.ensure_one()
@@ -407,7 +279,6 @@ class AccountInvoiceElectronic(models.Model):
             'target': 'new',
             'context': ctx,
         }
-
 
     @api.onchange('xml_supplier_approval')
     def _onchange_xml_supplier_approval(self):
@@ -495,8 +366,7 @@ class AccountInvoiceElectronic(models.Model):
             product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
             if product_id:
                 product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
-        
-        #self.invoice_line_ids = [(5, 0, 0)]
+            
         api_facturae.load_xml_data(self, load_lines, account, product, analytic_account)
 
     def action_send_mrs_to_hacienda(self):
@@ -705,28 +575,6 @@ class AccountInvoiceElectronic(models.Model):
                                             'E-INV CR - Error inesperado en Send Acceptance File - Abortando')
                                         return
 
-    @api.onchange('partner_id', 'company_id')
-    def _onchange_partner_id(self):
-        super(AccountInvoiceElectronic, self)._onchange_partner_id()
-        self.payment_methods_id = self.partner_id.payment_methods_id
-
-        if self.type == 'out_refund':
-            self.tipo_documento = 'NC'
-        elif self.partner_id and self.partner_id.vat:
-            if self.partner_id.country_id and self.partner_id.country_id.code != 'CR':
-                self.tipo_documento = 'TE'
-            elif self.partner_id.identification_id and self.partner_id.identification_id.code == '05':
-                self.tipo_documento = 'TE'
-            else:
-                self.tipo_documento = 'FE'
-        else:
-            self.tipo_documento = 'TE'
-
-        if self.type in ('in_invoice', 'in_refund'):
-            self.economic_activity_id = self.partner_id.activity_id
-        else:
-            self.economic_activity_id = self.company_id.activity_id
-
     @api.model
     # cron Job that verifies if the invoices are Validated at Tributación
     def _check_hacienda_for_invoices(self, max_invoices=10):
@@ -811,13 +659,13 @@ class AccountInvoiceElectronic(models.Model):
                         attachment_resp.mimetype = 'text/xml'
 
                         email_template.attachment_ids = [
-                        (6, 0, [attachment.id, attachment_resp.id])]
+                            (6, 0, [attachment.id, attachment_resp.id])]
 
                         email_template.with_context(type='binary',
-                                                default_type='binary').send_mail(
-                        i.id,
-                        raise_exception=False,
-                        force_send=True)  # default_type='binary'
+                                                    default_type='binary').send_mail(
+                            i.id,
+                            raise_exception=False,
+                            force_send=True)  # default_type='binary'
 
                         email_template.attachment_ids = [(5,0,0)]
 
@@ -976,7 +824,7 @@ class AccountInvoiceElectronic(models.Model):
                     tipo_documento_referencia = False
                     razon_referencia = False
                     currency = inv.currency_id
-                    invoice_comments = inv.narration
+                    invoice_comments = escape(inv.narration) if inv.narration != False else ''
 
                     if (inv.invoice_id or inv.not_loaded_invoice) and inv.reference_code_id and inv.reference_document_id:
                         if inv.invoice_id:
@@ -1058,7 +906,7 @@ class AccountInvoiceElectronic(models.Model):
                             line_taxes = inv_line.tax_ids.compute_all(
                                 price, currency, 1,
                                 product=inv_line.product_id,
-                                partner=inv_line.partner_id)
+                                partner=inv_line.move_id.partner_id)
 
                             price_unit = round(line_taxes['total_excluded'], 5)
 
@@ -1088,6 +936,7 @@ class AccountInvoiceElectronic(models.Model):
                             if inv_line.product_id:
                                 line["codigo"] = inv_line.product_id.default_code or ''
                                 line["codigoProducto"] = inv_line.product_id.code or ''
+
                                 if inv_line.product_id.cabys_code:
                                     line["codigoCabys"] = inv_line.product_id.cabys_code
                                 elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
@@ -1158,8 +1007,7 @@ class AccountInvoiceElectronic(models.Model):
 
                                             tax["exoneracion"] = {
                                                 "montoImpuesto": _tax_amount_exoneration,
-                                                "porcentajeCompra": int(
-                                                    taxes_lookup[i['id']]['exoneration_percentage'])
+                                                "porcentajeCompra": int(taxes_lookup[i['id']]['exoneration_percentage'])
                                             }
 
                                         taxes[tax_index] = tax
@@ -1167,8 +1015,7 @@ class AccountInvoiceElectronic(models.Model):
                                 line["impuesto"] = taxes
                                 line["impuestoNeto"] = round(_line_tax, 5)
 
-                            # Si no hay uom_id se asume como Servicio
-
+                            # Si no hay product_uom_id se asume como Servicio
                             if not inv_line.product_uom_id or inv_line.product_uom_id.category_id.name in ('Service', 'Services', 'Servicio', 'Servicios'):
                                 if taxes:
                                     if _tax_exoneration:
@@ -1328,6 +1175,8 @@ class AccountInvoiceElectronic(models.Model):
                 sequence = self.journal_id.FE_sequence_id.next_by_id()
             elif tipo_documento == 'TE':
                 sequence = self.journal_id.TE_sequence_id.next_by_id()
+            elif tipo_documento == 'ND':
+                sequence = self.journal_id.ND_sequence_id.next_by_id()
             elif tipo_documento == 'FEE':
                 sequence = self.journal_id.FEE_sequence_id.next_by_id()
             else:
@@ -1346,12 +1195,11 @@ class AccountInvoiceElectronic(models.Model):
 
         return (tipo_documento,sequence)
 
-
-    def action_post(self):
+    def post(self):
         # Revisamos si el ambiente para Hacienda está habilitado
         for inv in self:
             if inv.company_id.frm_ws_ambiente == 'disabled':
-                super(AccountInvoiceElectronic, inv).action_post()
+                super(AccountInvoiceElectronic, inv).post()
                 inv.tipo_documento = 'disabled'
                 continue
 
@@ -1411,9 +1259,8 @@ class AccountInvoiceElectronic(models.Model):
                 if tipo_documento and sequence:
                     inv.tipo_documento = tipo_documento
                 else:
-                    super(AccountInvoiceElectronic, inv).action_post()
+                    super(AccountInvoiceElectronic, inv).post()
                     continue
-
 
             # Calcular si aplica IVA Devuelto
             # Sólo aplica para clínicas y para pago por tarjeta
@@ -1437,7 +1284,7 @@ class AccountInvoiceElectronic(models.Model):
                         'quantity': 1,
                     })
 
-            super(AccountInvoiceElectronic, inv).action_post()
+            super(AccountInvoiceElectronic, inv).post()
             if not inv.number_electronic:
                 # if journal doesn't have sucursal use default from company
                 sucursal_id = inv.journal_id.sucursal or self.env.user.company_id.sucursal_MR
@@ -1456,10 +1303,79 @@ class AccountInvoiceElectronic(models.Model):
 
             inv.name = inv.sequence
             inv.state_tributacion = False
-            #inv.invoice_amount_text = ''
 
     @api.onchange('amount_total')
     def update_text_amount(self):
         for inv in self:
             inv.invoice_amount_text = extensions.text_converter.number_to_text_es(inv.amount_total)
 
+
+    def _reverse_move_vals(self, default_values, cancel=True):
+        move_vals = super(AccountInvoiceElectronic, self)._reverse_move_vals(default_values, cancel)
+        type_override = move_vals.get('type_override')
+        if type_override:
+            move_vals['type'] = type_override
+
+        return move_vals
+
+    """
+    ### MAB CHECK IF NOT NEEDED
+    def _reverse_moves(self, default_values_list=None, cancel=False):
+        ''' Reverse a recordset of account.move.
+        If cancel parameter is true, the reconcilable or liquidity lines
+        of each original move will be reconciled with its reverse's.
+
+        :param default_values_list: A list of default values to consider per move.
+                                    ('type' & 'reversed_entry_id' are computed in the method).
+        :return:                    An account.move recordset, reverse of the current self.
+        '''
+        if not default_values_list:
+            default_values_list = [{} for move in self]
+
+        if cancel:
+            lines = self.mapped('line_ids')
+            # Avoid maximum recursion depth.
+            if lines:
+                lines.remove_move_reconcile()
+
+        reverse_type_map = {
+            'entry': 'entry',
+            'out_invoice': 'out_refund',
+            'out_refund': 'entry',
+            'in_invoice': 'in_refund',
+            'in_refund': 'entry',
+            'out_receipt': 'entry',
+            'in_receipt': 'entry',
+        }
+
+        move_vals_list = []
+        for move, default_values in zip(self, default_values_list):
+            default_values.update({
+                'type': reverse_type_map[move.type],
+                'reversed_entry_id': move.id,
+            })
+            move_vals_list.append(move.with_context(move_reverse_cancel=cancel)._reverse_move_vals(default_values, cancel=cancel))
+
+        reverse_moves = self.env['account.move'].create(move_vals_list)
+        for move, reverse_move in zip(self, reverse_moves.with_context(check_move_validity=False)):
+            # Update amount_currency if the date has changed.
+            if move.date != reverse_move.date:
+                for line in reverse_move.line_ids:
+                    if line.currency_id:
+                        line._onchange_currency()
+            reverse_move._recompute_dynamic_lines(recompute_all_taxes=False)
+        reverse_moves._check_balanced()
+
+        # Reconcile moves together to cancel the previous one.
+        if cancel:
+            reverse_moves.with_context(move_reverse_cancel=cancel).post()
+            for move, reverse_move in zip(self, reverse_moves):
+                accounts = move.mapped('line_ids.account_id') \
+                    .filtered(lambda account: account.reconcile or account.internal_type == 'liquidity')
+                for account in accounts:
+                    (move.line_ids + reverse_move.line_ids)\
+                        .filtered(lambda line: line.account_id == account and line.balance)\
+                        .reconcile()
+
+        return reverse_moves
+    """

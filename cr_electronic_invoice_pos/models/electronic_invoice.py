@@ -102,18 +102,6 @@ class PosOrder(models.Model):
         vals['number_electronic'] = ui_order.get('number_electronic')
         return vals
 
-    def create(self, vals):
-        number_electronic = vals.get('number_electronic', False)
-        if vals.get('pos_order_id', False):
-            vals['number_electronic'] = '/'
-        elif number_electronic:
-            self.sequence_number_sync(vals)
-            if self.env['pos.order'].search([('number_electronic', 'like', number_electronic[21:41])]):
-                vals['number_electronic'] = self.env['ir.sequence'].next_by_code(
-                    'pos.order.recovery')
-        order = super(PosOrder, self).create(vals)
-        return order
-
     number_electronic = fields.Char(
         string="Electronic Number", required=False, copy=False, index=True)
     date_issuance = fields.Char(
@@ -162,6 +150,19 @@ class PosOrder(models.Model):
         ('number_electronic_uniq', 'unique (number_electronic)',
          "La clave de comprobante debe ser única"),
     ]
+
+    @api.model
+    def create(self, vals):
+        number_electronic = vals.get('number_electronic', False)
+        if vals.get('pos_order_id', False):
+            vals['number_electronic'] = '/'
+        elif number_electronic:
+            self.sequence_number_sync(vals)
+            if self.env['pos.order'].search([('number_electronic', 'like', number_electronic[21:41])]):
+                vals['number_electronic'] = self.env['ir.sequence'].next_by_code(
+                    'pos.order.recovery')
+        order = super(PosOrder, self).create(vals)
+        return order
 
     def action_pos_order_paid(self):
         for order in self:

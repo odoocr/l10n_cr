@@ -16,7 +16,6 @@
 		'views/electronic_invoice_views.xml',
 		'data/data.xml',
 		'views/pos_templates.xml',
-		#'views/pos_views.xml',
 	],
 	'qweb': ['static/src/xml/pos.xml'],
 	'installable': True,

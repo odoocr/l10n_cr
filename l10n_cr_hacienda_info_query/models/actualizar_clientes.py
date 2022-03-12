@@ -12,8 +12,8 @@ class res_company(models.Model):
     _name = 'res.company'
     _inherit = ['res.company']
 
-    ultima_respuesta = fields.Text(string="Última Respuesta de API", help="Última Respuesta de API, esto permite depurar errores en caso de existir")
-    url_base = fields.Char(string="URL Base", required=False, help="URL Base del END POINT", default="https://api.hacienda.go.cr/fe/ae?")
+    ultima_respuesta = fields.Text(string="Latest API response", help="Last API Response, this allows debugging errors if they exist")
+    url_base = fields.Char(string="URL Base", required=False, help="URL Base of the END POINT", default="https://api.hacienda.go.cr/fe/ae?")
 
 class res_partner(models.Model):
     _name = 'res.partner'

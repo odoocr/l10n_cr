@@ -441,7 +441,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
             sb.Append('<Receptor>')
             sb.Append('<Nombre>' + escape(str(receiver_company.name[:99])) + '</Nombre>')
 
-            if inv.tipo_documento == 'FEE' or id_code == '05' :
+            if inv.tipo_documento == 'FEE' or id_code == '05':
                 if receiver_company.vat:
                     sb.Append('<IdentificacionExtranjero>' + receiver_company.vat + '</IdentificacionExtranjero>')
             else:
@@ -859,6 +859,8 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     inv.state_tributacion = estado_m_h
     if inv.type == 'out_invoice' or inv.type == 'out_refund':
         # Se actualiza el estado con el que devuelve Hacienda
+        last_state = inv.state_tributacion
+        inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
         if xml_firmado:
             inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
@@ -871,7 +873,7 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
             inv.type == 'out_invoice' or inv.type == 'out_refund'):
-        inv.fname_xml_respuesta_tributacion = 'respuesta_' + inv.number_electronic + '.xml'
+        inv.fname_xml_respuesta_tributacion = 'AHC_' + inv.number_electronic + '.xml'
         inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
@@ -1151,12 +1153,12 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
         
         invoice.invoice_line_ids = new_lines
 
-        invoice.amount_total_electronic_invoice = invoice_xml.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)[0].text
+    invoice.amount_total_electronic_invoice = invoice_xml.xpath("inv:ResumenFactura/inv:TotalComprobante", namespaces=namespaces)[0].text
 
-        tax_node = invoice_xml.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
-        if tax_node:
-            invoice.amount_tax_electronic_invoice = tax_node[0].text
-        invoice._compute_amount()
+    tax_node = invoice_xml.xpath("inv:ResumenFactura/inv:TotalImpuesto", namespaces=namespaces)
+    if tax_node:
+        invoice.amount_tax_electronic_invoice = tax_node[0].text
+    invoice._compute_amount()
 
 def p12_expiration_date(p12file, password):
     try:

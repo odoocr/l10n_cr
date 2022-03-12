@@ -48,6 +48,7 @@
                             <field name="exoneration_number"/>
                             <field name="type_exoneration"/>
                             <field name="institution_name"/>
+                            <field name="percentage_exoneration"/>
                             <field name="date_issue"/>
                             <field name="date_expiration"/>
                         </group>
