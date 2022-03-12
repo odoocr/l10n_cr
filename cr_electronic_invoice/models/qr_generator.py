@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import qrcode
 import base64
 from io import BytesIO

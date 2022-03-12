@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+
 from odoo import models, fields, api, _
 
 
 class Resolution(models.Model):
     _name = "resolution"
 
-    active = fields.Boolean(string="Active", required=False, default=True)
-    name = fields.Char(string="Name", required=False, )
-    date_resolution = fields.Date(string="Resolution Date", required=False, )
+    active = fields.Boolean(help='Set active or inactive DGT resolutions.')
+    name = fields.Char(help='DGT resolution name.')
+    date_resolution = fields.Date(help='DGT expiration resolution date.')

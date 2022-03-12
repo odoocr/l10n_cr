@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 {
     'name': 'Códigos País para Facturación electrónica Costa Rica',
