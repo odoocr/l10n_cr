@@ -14,7 +14,7 @@ class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
     commercial_name = fields.Char()
-    identification_id = fields.Many2one()
+    identification_id = fields.Many2one("identification.type")
     payment_methods_id = fields.Many2one("payment.methods", string="Payment Method")
     has_exoneration = fields.Boolean(string="Has Exoneration?", required=False)
     type_exoneration = fields.Many2one("aut.ex", string="Authorization Type")

@@ -221,7 +221,7 @@ class AccountInvoiceElectronic(models.Model):
         super(AccountInvoiceElectronic, self)._onchange_partner_id()
         self.payment_methods_id = self.partner_id.payment_methods_id
 
-        if self.type in ('in_invoice', 'in_refund'):
+        if self.move_type in ('in_invoice', 'in_refund'):
             if self.partner_id:
                 self.economic_activities_ids = self.partner_id.economic_activities_ids
                 self.economic_activity_id = self.partner_id.activity_id
@@ -234,7 +234,7 @@ class AccountInvoiceElectronic(models.Model):
 
         if self.partner_id and self.partner_id.export:
             self.tipo_documento = 'FEE'
-        elif self.type == 'out_refund':
+        elif self.move_type == 'out_refund':
             self.tipo_documento = 'NC'
         elif self.partner_id and self.partner_id.vat:
             if self.partner_id.country_id and self.partner_id.country_id.code != 'CR':
@@ -1266,7 +1266,7 @@ class AccountInvoiceElectronic(models.Model):
         tipo_documento = self.tipo_documento
         sequence = False
 
-        if self.type == 'out_invoice':
+        if self.move_type == 'out_invoice':
             # tipo de identificación
             if self.partner_id and self.partner_id.vat and not self.partner_id.identification_id:
                 raise UserError('Seleccione el tipo de identificación del cliente en su perfil')
@@ -1286,12 +1286,12 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError('Tipo documento "%s" es inválido para una factura', tipo_documento)
 
         # Credit Note
-        elif self.type == 'out_refund':
+        elif self.move_type == 'out_refund':
             tipo_documento = 'NC'
             sequence = self.journal_id.NC_sequence_id.next_by_id()
 
         # Digital Supplier Invoice
-        elif self.type == 'in_invoice' and self.partner_id.country_id and \
+        elif self.move_type == 'in_invoice' and self.partner_id.country_id and \
             self.partner_id.country_id.code == 'CR' and self.partner_id.identification_id and self.partner_id.vat and self.xml_supplier_approval is False:
             tipo_documento = 'FEC'
             sequence = self.company_id.FEC_sequence_id.next_by_id()
@@ -1362,7 +1362,7 @@ class AccountInvoiceElectronic(models.Model):
                 if tipo_documento and sequence:
                     inv.tipo_documento = tipo_documento
                 else:
-                    super(AccountInvoiceElectronic, inv).post()
+                    super(AccountInvoiceElectronic, inv)._post()
                     continue
 
             # Calcular si aplica IVA Devuelto
