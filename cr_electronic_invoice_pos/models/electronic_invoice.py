@@ -40,73 +40,46 @@ class PosConfig(models.Model):
 
     def create_sequences(self):
         if self.journal_id:
-            self.journal_id.sucursal = self.sucursal
-            self.journal_id.terminal = self.terminal
+            inv_cedula = self.journal_id.company_id.vat
+            inv_cedula = str(inv_cedula).zfill(12)
+            sucursal = str(self.sucursal).zfill(3)
+            terminal = str(self.terminal).zfill(5)
 
-            # Check if FE_sequence_id exists
-            if self.journal_id.FE_sequence_id:
-                self.FE_sequence_id = self.journal_id.FE_sequence_id.id
+            tipo_doc = '01'
 
-            # Else create a new sequence for the journal
-            else:
-                inv_cedula = self.journal_id.company_id.vat
-                inv_cedula = str(inv_cedula).zfill(12)
-                sucursal = str(self.sucursal).zfill(3)
-                terminal = str(self.terminal).zfill(5)
-                tipo_doc = '01'
+            FE_sequence_id = self.env['ir.sequence'].sudo().create({
+                'name': 'Secuencia de Factura Electrónica POS: ' + self.name,
+                'code': 'sequence.pos.FE.' + str(self.id),
+                'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
+                'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
+                'padding': 10,
+            })
 
-                FE_sequence_id = self.env['ir.sequence'].sudo().create({
-                    'name': 'Secuencia de Factura Electrónica POS: ' + self.name,
-                    'code': 'sequence.pos.FE.' + str(self.id),
-                    'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
-                    'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
-                    'padding': 10,
-                })
+            self.FE_sequence_id = FE_sequence_id.id
 
-                self.FE_sequence_id = FE_sequence_id.id
-                self.journal_id.FE_sequence_id = FE_sequence_id.id
-            # Check if NC_sequence_id exists
-            if self.journal_id.NC_sequence_id:
-                self.NC_sequence_id = self.journal_id.NC_sequence_id.id
-            # Else create a new sequence for the journal
-            else:
-                inv_cedula = self.journal_id.company_id.vat
-                inv_cedula = str(inv_cedula).zfill(12)
-                sucursal = str(self.sucursal).zfill(3)
-                terminal = str(self.terminal).zfill(5)
-                tipo_doc = '03'
+            tipo_doc = '03'
 
-                NC_sequence_id = self.env['ir.sequence'].sudo().create({
-                    'name': 'Secuencia de Nota Crédito Electrónica POS: ' + self.name,
-                    'code': 'sequence.pos.NC.' + str(self.id),
-                    'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
-                    'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
-                    'padding': 10,
-                })
+            NC_sequence_id = self.env['ir.sequence'].sudo().create({
+                'name': 'Secuencia de Nota Crédito Electrónica POS: ' + self.name,
+                'code': 'sequence.pos.NC.' + str(self.id),
+                'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
+                'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
+                'padding': 10,
+            })
 
-                self.NC_sequence_id = NC_sequence_id.id
-                self.journal_id.NC_sequence_id = NC_sequence_id.id
-            # Check if TE_sequence_id exists
-            if self.journal_id.TE_sequence_id:
-                self.TE_sequence_id = self.journal_id.TE_sequence_id.id
-            # Else create a new sequence for the journal
-            else:
-                inv_cedula = self.journal_id.company_id.vat
-                inv_cedula = str(inv_cedula).zfill(12)
-                sucursal = str(self.sucursal).zfill(3)
-                terminal = str(self.terminal).zfill(5)
-                tipo_doc = '04'
+            self.NC_sequence_id = NC_sequence_id.id
 
-                TE_sequence_id = self.env['ir.sequence'].sudo().create({
-                    'name': 'Secuencia de Tiquete Electrónico POS: ' + self.name,
-                    'code': 'sequence.pos.TE.' + str(self.id),
-                    'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
-                    'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
-                    'padding': 10,
-                })
+            tipo_doc = '04'
 
-                self.TE_sequence_id = TE_sequence_id.id
-                self.journal_id.TE_sequence_id = TE_sequence_id.id
+            TE_sequence_id = self.env['ir.sequence'].sudo().create({
+                'name': 'Secuencia de Tiquete Electrónico POS: ' + self.name,
+                'code': 'sequence.pos.TE.' + str(self.id),
+                'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
+                'suffix': "1%(h12)s%(day)s%(month)s%(y)s",
+                'padding': 10,
+            })
+
+            self.TE_sequence_id = TE_sequence_id.id
 
 
 class PosOrder(models.Model):
@@ -237,7 +210,7 @@ class PosOrder(models.Model):
 
     def refund(self):
         """Create a copy of order  for refund order"""
-        PosOrder = self.env['pos.order']
+        pos_order = self.env['pos.order']
         reference_code_id = self.env['reference.code'].search(
             [('code', '=', '01')], limit=1)
         current_session = self.env['pos.session'].search([
@@ -273,13 +246,13 @@ class PosOrder(models.Model):
                 'amount_paid': 0,
             })
 
-            PosOrder += clone
+            pos_order += clone
         return {
             'name': _('Return Products'),
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'pos.order',
-            'res_id': PosOrder.ids[0],
+            'res_id': pos_order.ids[0],
             'view_id': False,
             'context': self.env.context,
             'type': 'ir.actions.act_window',
@@ -447,11 +420,11 @@ class PosOrder(models.Model):
 
     def _validahacienda_pos(self, max_orders=10, no_partner=True):
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
-                                                    '|', (no_partner, '=', True),
-                                                    '&', ('partner_id', '!=', False), ('partner_id.vat', '!=', False),
-                                                    ('tipo_documento', 'in', ('TE', 'FE', 'NC')),
-                                                    ('state_tributacion', '=', False)
-                                                    ], order="date_order", limit=max_orders)
+                                                   '|', (no_partner, '=', True),
+                                                   '&', ('partner_id', '!=', False), ('partner_id.vat', '!=', False),
+                                                   ('tipo_documento', 'in', ('TE', 'FE', 'NC')),
+                                                   ('state_tributacion', '=', False)
+                                                   ], order="date_order", limit=max_orders)
         total_orders = len(pos_orders)
         current_order = 0
         _logger.info(
@@ -459,18 +432,18 @@ class PosOrder(models.Model):
         for doc in pos_orders:
             current_order += 1
             _logger.info('E-INV CR - Valida Hacienda - POS Order: "%s"  -  %s / %s',
-                        doc.number_electronic, current_order, total_orders)
-            docName = doc.number_electronic
-            if not docName or not docName.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
+                         doc.number_electronic, current_order, total_orders)
+            doc_name = doc.number_electronic
+            if not doc_name or not doc_name.isdigit() or doc.company_id.frm_ws_ambiente == 'disabled':
                 _logger.error(
-                    'E-INV CR - Valida Hacienda - skipped Invoice %s', docName)
+                    'E-INV CR - Valida Hacienda - skipped Invoice %s', doc_name)
                 doc.state_tributacion = 'no_aplica'
                 continue
             now_utc = datetime.datetime.now(pytz.timezone('UTC'))
             now_cr = now_utc.astimezone(pytz.timezone('America/Costa_Rica'))
-            dia = docName[3:5]  # '%02d' % now_cr.day,
-            mes = docName[5:7]  # '%02d' % now_cr.month,
-            anno = docName[7:9]  # str(now_cr.year)[2:4],
+            dia = doc_name[3:5]  # '%02d' % now_cr.day,
+            mes = doc_name[5:7]  # '%02d' % now_cr.month,
+            anno = doc_name[7:9]  # str(now_cr.year)[2:4],
             date_cr = now_cr.strftime("20"+anno+"-"+mes+"-"+dia+"T%H:%M:%S-06:00")
             doc.name = doc.number_electronic[21:41]
             if not doc.xml_comprobante:
@@ -480,7 +453,7 @@ class PosOrder(models.Model):
                 razon_referencia = False
                 invoice_comments = False
                 tipo_documento_referencia = False
-                _no_CABYS_code = False
+                no_cabys_code = False
 
                 if not doc.pos_order_id:
                     if doc.amount_total < 0:
@@ -492,7 +465,7 @@ class PosOrder(models.Model):
                 else:
                     if doc.amount_total >= 0:
                         _logger.error(
-                            'E-INV CR - Valida Hacienda - skipped Invoice %s', docName)
+                            'E-INV CR - Valida Hacienda - skipped Invoice %s', doc_name)
                         doc.state_tributacion = 'no_aplica'
                         continue
                         doc.tipo_documento = 'ND'
@@ -561,7 +534,7 @@ class PosOrder(models.Model):
                     elif line.product_id.categ_id and line.product_id.categ_id.cabys_code:
                         dline["codigoCabys"] = line.product_id.categ_id.cabys_code
                     else:
-                        _no_CABYS_code='Aviso!.\nLinea sin código CABYS: %s' % line.product_id.name
+                        no_cabys_code = 'Aviso!.\nLinea sin código CABYS: %s' % line.product_id.name
                         continue
 
                     if line.discount and price_unit > 0:
@@ -576,7 +549,7 @@ class PosOrder(models.Model):
                         taxes_lookup = {}
                         for i in tax_ids:
                             taxes_lookup[i.id] = {
-                                'tax_code': i.tax_code, 
+                                'tax_code': i.tax_code,
                                 'tarifa': i.amount,
                                 'iva_tax_desc': i.iva_tax_desc,
                                 'iva_tax_code': i.iva_tax_code
@@ -615,17 +588,17 @@ class PosOrder(models.Model):
                     base_subtotal += subtotal_line
                     dline["montoTotalLinea"] = round(subtotal_line + _line_tax, 5)
                     lines[line_number] = dline
-                if _no_CABYS_code and doc.tipo_documento != 'NC':  # CAByS is not required for financial NCs
+                if no_cabys_code and doc.tipo_documento != 'NC':  # CAByS is not required for financial NCs
                     doc.state_tributacion = 'error'
                     doc.message_post(
                         subject='Error',
-                        body=_no_CABYS_code)
+                        body=no_cabys_code)
                     continue
 
                 if total_otros_cargos:
                     total_otros_cargos = round(total_otros_cargos, 5)
                     otros_cargos_id = 1
-                    otros_cargos[otros_cargos_id]= {'TipoDocumento': '06',
+                    otros_cargos[otros_cargos_id] = {'TipoDocumento': '06',
                                                     'Detalle': escape('Servicio salon 10%'),
                                                     'MontoCargo': total_otros_cargos}
                 doc.date_issuance = date_cr
@@ -643,7 +616,7 @@ class PosOrder(models.Model):
                 xml_to_sign = str(xml_string_builder)
                 xml_firmado = api_facturae.sign_xml(
                     doc.company_id.signature, doc.company_id.frm_pin, xml_to_sign)
-                doc.fname_xml_comprobante = doc.tipo_documento + '_' + docName + '.xml'
+                doc.fname_xml_comprobante = doc.tipo_documento + '_' + doc_name + '.xml'
                 doc.xml_comprobante = base64.encodestring(xml_firmado)
                 _logger.info('E-INV CR - SIGNED XML:%s', doc.fname_xml_comprobante)
 
