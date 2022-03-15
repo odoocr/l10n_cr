@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, tools
-from odoo.exceptions import UserError, Warning
 from datetime import datetime, date, timedelta
 import json, requests, re, logging
 

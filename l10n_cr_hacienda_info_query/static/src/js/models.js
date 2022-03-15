@@ -1,4 +1,5 @@
-odoo.define('l10n_cr_hacienda_info_query_init.models',function(require) {
+odoo.define('l10n_cr_hacienda_info_query_init.models',
+function(require) {
     "use strict";
     
     var core = require('web.core');

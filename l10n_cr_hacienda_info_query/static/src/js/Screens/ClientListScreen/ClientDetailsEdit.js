@@ -1,4 +1,5 @@
-odoo.define('l10n_cr_hacienda_info_query.ClientDetailsEdit', function(require) {
+odoo.define('l10n_cr_hacienda_info_query.ClientDetailsEdit',
+function(require) {
     'use strict';
 
     const { getDataURLFromFile } = require('web.utils');
