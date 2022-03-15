@@ -24,12 +24,8 @@ class IvaCodeType(models.Model):
         self.tax_compute_exoneration()
 
     def tax_compute_exoneration(self):
-        if self.percentage_exoneration:
+        if self.percentage_exoneration <= 13:
             if self.tax_root:
-                self.amount = self.tax_root.amount
-                percent = self.amount - self.percentage_exoneration
-                self.amount = percent
+                self.amount = self.tax_root.amount - self.percentage_exoneration
         else:
-            self.amount = self.tax_root.amount
-
-
+            raise UserError('El porcentaje no puede ser mayor a 13')

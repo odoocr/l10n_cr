@@ -45,7 +45,7 @@ class CompanyElectronic(models.Model):
 
     @api.onchange('district_id')
     def _calculate_postal_code(self):
-        if self.state_id.code != False and self.county_id.code != False and self.district_id.code != False:
+        if self.state_id.code and self.county_id.code and self.district_id.code:
             postal = str(self.state_id.code) + str(self.county_id.code) + str(self.district_id.code)
             self.zip = postal
         else:

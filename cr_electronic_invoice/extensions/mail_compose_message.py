@@ -15,4 +15,3 @@ class MailComposeMessage(models.TransientModel):
             for invoice in account_invoice.browse(invoice_ids):
                 invoice.invoice_sent = True
         return super(MailComposeMessage, self).send_mail(auto_commit=auto_commit)
-    
