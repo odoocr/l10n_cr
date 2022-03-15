@@ -7,8 +7,8 @@
             <field name="model">res.country.county</field>
             <field name="arch"
                    type="xml">
-                <form string="Cantón">
-                    <sheet string="Cantón">
+                <form string="County">
+                    <sheet string="County">
                         <group col="4">
                             <field name="code"/>
                             <field name="name"/>
@@ -25,7 +25,7 @@
             <field name="model">res.country.county</field>
             <field name="arch"
                    type="xml">
-                <tree string="Cantones">
+                <tree string="Counties">
                     <field name="code"/>
                     <field name="name"/>
                     <field name="state_id"/>
@@ -39,8 +39,8 @@
             <field name="model">res.country.district</field>
             <field name="arch"
                    type="xml">
-                <form string="Distrito">
-                    <sheet string="Distrito">
+                <form string="District">
+                    <sheet string="District">
                         <group col="4">
                             <field name="code"/>
                             <field name="name"/>
@@ -57,7 +57,7 @@
             <field name="model">res.country.district</field>
             <field name="arch"
                    type="xml">
-                <tree string="Distritos">
+                <tree string="Districts">
                     <field name="code"/>
                     <field name="name"/>
                     <field name="county_id"/>
@@ -71,8 +71,8 @@
             <field name="model">res.country.neighborhood</field>
             <field name="arch"
                    type="xml">
-                <form string="Barrio">
-                    <sheet string="Barrio">
+                <form string="Neighborhood">
+                    <sheet string="Neighborhood">
                         <group col="4">
                             <field name="code"/>
                             <field name="name"/>
@@ -89,7 +89,7 @@
             <field name="model">res.country.neighborhood</field>
             <field name="arch"
                    type="xml">
-                <tree string="Barrios">
+                <tree string="Neighborhoods">
                     <field name="code"/>
                     <field name="name"/>
                     <field name="district_id"/>
@@ -99,37 +99,37 @@
 
         <record id="action_res_country_county"
                 model="ir.actions.act_window">
-            <field name="name">Cantones</field>
+            <field name="name">Counties</field>
             <field name="res_model">res.country.county</field>
             <field name="view_mode">tree,form</field>
         </record>
 
         <record id="action_res_country_district"
                 model="ir.actions.act_window">
-            <field name="name">Distritos</field>
+            <field name="name">Districts</field>
             <field name="res_model">res.country.district</field>
             <field name="view_mode">tree,form</field>
         </record>
 
         <record id="action_res_country_neighborhood"
                 model="ir.actions.act_window">
-            <field name="name">Barrios</field>
+            <field name="name">Neighborhoods</field>
             <field name="res_model">res.country.neighborhood</field>
             <field name="view_mode">tree,form</field>
         </record>
 
         <menuitem id="menu_res_country_county"
-                  name="Cantones"
+                  name="Counties"
                   parent="account.account_management_menu"
                   sequence="2"
                   action="action_res_country_county"/>
         <menuitem id="menu_res_country_district"
-                  name="Distritos"
+                  name="Districts"
                   parent="account.account_management_menu"
                   sequence="2"
                   action="action_res_country_district"/>
         <menuitem id="menu_res_country_neighborhood"
-                  name="Barrios"
+                  name="Neighborhoods"
                   parent="account.account_management_menu"
                   sequence="2"
                   action="action_res_country_neighborhood"/>

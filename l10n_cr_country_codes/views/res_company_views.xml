@@ -13,7 +13,6 @@
                 </field>
 
                 <field name="zip" position="attributes">
-                    position="attributes">
                     <attribute name="attrs">{'invisible':
                         [('country_id','=',%(base.cr)d)]}
                     </attribute>

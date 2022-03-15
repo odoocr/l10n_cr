@@ -6,7 +6,7 @@
             <field name="name">payment.methods.tree</field>
             <field name="model">payment.methods</field>
             <field name="arch" type="xml">
-                <tree string="Métodos de Pago">
+                <tree string="Payment methods">
                     <field name="sequence"/>
                     <field name="name"/>
                     <field name="active"/>
@@ -26,7 +26,7 @@
         </record>
 
         <record id="action_payment_methods" model="ir.actions.act_window">
-            <field name="name">Métodos de pago</field>
+            <field name="name">Payment methods</field>
             <field name="res_model">payment.methods</field>
             <field name="view_mode">tree,form</field>
             <!--<field name="search_view_id" ref="view_account_invoice_filter"/>-->

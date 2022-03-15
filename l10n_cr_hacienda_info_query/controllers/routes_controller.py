@@ -38,7 +38,8 @@ class actualizar_pos_api(http.Controller):
             #Respuesta de la API
             if peticion.status_code in (200,202) and len(peticion._content) > 0:
                 contenido = json.loads(str(peticion._content,'utf-8'))
-                http.request.env.cr.execute("UPDATE res_company SET ultima_respuesta='%s' WHERE id=%s" % (ultimo_mensaje,company_id.id))
+
+                request.env.company.ultima_respuesta = ultimo_mensaje 
 
                 if 'nombre' in contenido:
 
