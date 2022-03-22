@@ -1,13 +1,11 @@
 # copyright  2018 Carlos Wong, Akurey SA
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-# Upgrade: Norlan Ruiz 2021
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)..
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api
+
 
 class PartnerElectronic(models.Model):
     _inherit = "res.partner"
-
 
     # Province
     state_id = fields.Many2one("res.country.state", string="Province")
@@ -51,7 +49,7 @@ class PartnerElectronic(models.Model):
         else:
             self.zip = False
         self.neighborhood_id = False
-    
+
     '''
         When the neighborhood changes, the city field of odoo is autocomplete
     '''
