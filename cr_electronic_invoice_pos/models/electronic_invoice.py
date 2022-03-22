@@ -2,7 +2,7 @@ import base64
 import logging
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-import odoo.addons.cr_electronic_invoice.models.api_facturae as api_facturae
+from odoo.addons.cr_electronic_invoice.models import api_facturae
 from xml.sax.saxutils import escape
 import datetime
 import pytz
@@ -10,14 +10,6 @@ from threading import Lock
 lock = Lock()
 
 _logger = logging.getLogger(__name__)
-
-
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
-
-    # @stacktrace
-    def create(self, vals):
-        return super().create(vals)
 
 
 class AccountJournal(models.Model):
@@ -30,7 +22,12 @@ class AccountJournal(models.Model):
 class PosConfig(models.Model):
     _inherit = 'pos.config'
     sucursal = fields.Integer(string="Branch", default="1")
-    terminal = fields.Integer(string="Terminal", default="1")
+    terminal = fields.Integer(help="Terminal number", default="1")
+    """
+        TODO: Cambiar formado de estos campos conforme al siguiente patron [a-z_][a-z0-9_]{2,59}$
+        Se podría hacer un prehook en donde se busque en la BD si estan estos campos FE_sequence_id y pasarlo al
+        formato fe_sequence_id, nc_sequence_id, te_sequence_id
+    """
     FE_sequence_id = fields.Many2one("ir.sequence", string="Electronic Invoice Sequence")
     NC_sequence_id = fields.Many2one(
         "ir.sequence",
@@ -47,7 +44,7 @@ class PosConfig(models.Model):
 
             tipo_doc = '01'
 
-            FE_sequence_id = self.env['ir.sequence'].sudo().create({
+            fe_sequence_id = self.env['ir.sequence'].sudo().create({
                 'name': 'Secuencia de Factura Electrónica POS: ' + self.name,
                 'code': 'sequence.pos.FE.' + str(self.id),
                 'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
@@ -55,11 +52,11 @@ class PosConfig(models.Model):
                 'padding': 10,
             })
 
-            self.FE_sequence_id = FE_sequence_id.id
+            self.FE_sequence_id = fe_sequence_id.id
 
             tipo_doc = '03'
 
-            NC_sequence_id = self.env['ir.sequence'].sudo().create({
+            nc_sequence_id = self.env['ir.sequence'].sudo().create({
                 'name': 'Secuencia de Nota Crédito Electrónica POS: ' + self.name,
                 'code': 'sequence.pos.NC.' + str(self.id),
                 'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
@@ -67,11 +64,11 @@ class PosConfig(models.Model):
                 'padding': 10,
             })
 
-            self.NC_sequence_id = NC_sequence_id.id
+            self.NC_sequence_id = nc_sequence_id.id
 
             tipo_doc = '04'
 
-            TE_sequence_id = self.env['ir.sequence'].sudo().create({
+            te_sequence_id = self.env['ir.sequence'].sudo().create({
                 'name': 'Secuencia de Tiquete Electrónico POS: ' + self.name,
                 'code': 'sequence.pos.TE.' + str(self.id),
                 'prefix': '506%(day)s%(month)s%(y)s' + inv_cedula + sucursal + terminal + tipo_doc,
@@ -79,7 +76,7 @@ class PosConfig(models.Model):
                 'padding': 10,
             })
 
-            self.TE_sequence_id = TE_sequence_id.id
+            self.TE_sequence_id = te_sequence_id.id
 
 
 class PosOrder(models.Model):
@@ -419,6 +416,11 @@ class PosOrder(models.Model):
         _logger.info('E-INV CR - Reenvia Correos - Finalizado')
 
     def _validahacienda_pos(self, max_orders=10, no_partner=True):
+        """
+            TODO: [R1260(too-complex), PosOrder._validahacienda_pos] '_validahacienda_pos' is too complex.
+            The McCabe rating is 26
+            Se debe intentar mejorar la puntuación
+        """
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    '|', (no_partner, '=', True),
                                                    '&', ('partner_id', '!=', False), ('partner_id.vat', '!=', False),
@@ -468,12 +470,13 @@ class PosOrder(models.Model):
                             'E-INV CR - Valida Hacienda - skipped Invoice %s', doc_name)
                         doc.state_tributacion = 'no_aplica'
                         continue
-                        doc.tipo_documento = 'ND'
-                        razon_referencia = 'Reemplaza Factura'
+                        # doc.tipo_documento = 'ND'
+                        # razon_referencia = 'Reemplaza Factura'
                     else:
                         doc.tipo_documento = 'NC'
                         numero_documento_referencia = doc.pos_order_id.number_electronic
                         razon_referencia = 'nota credito'
+
                     tipo_documento_referencia = doc.pos_order_id.number_electronic[29:31]
                     numero_documento_referencia = doc.pos_order_id.number_electronic
                     fecha_emision_referencia = doc.pos_order_id.date_issuance
@@ -481,8 +484,8 @@ class PosOrder(models.Model):
                 sale_conditions = '01'  # Contado !!   doc.sale_conditions_id.sequence,
                 currency_rate = 1
                 # Generamos las líneas de la factura
-                lines = dict()
-                otros_cargos = dict()
+                lines = dict({})
+                otros_cargos = dict({})
                 otros_cargos_id = 0
                 line_number = 0
                 total_servicio_gravado = 0.0
@@ -542,7 +545,7 @@ class PosOrder(models.Model):
                         dline["montoDescuento"] = descuento
                         dline["naturalezaDescuento"] = 'Descuento Comercial'
 
-                    taxes = dict()
+                    taxes = dict({})
                     _line_tax = 0.0
                     if tax_ids:
                         tax_index = 0
@@ -591,7 +594,7 @@ class PosOrder(models.Model):
                 if no_cabys_code and doc.tipo_documento != 'NC':  # CAByS is not required for financial NCs
                     doc.state_tributacion = 'error'
                     doc.message_post(
-                        subject='Error',
+                        subject=_('Error'),
                         body=no_cabys_code)
                     continue
 
@@ -599,8 +602,8 @@ class PosOrder(models.Model):
                     total_otros_cargos = round(total_otros_cargos, 5)
                     otros_cargos_id = 1
                     otros_cargos[otros_cargos_id] = {'TipoDocumento': '06',
-                                                    'Detalle': escape('Servicio salon 10%'),
-                                                    'MontoCargo': total_otros_cargos}
+                                                     'Detalle': escape('Servicio salon 10%'),
+                                                     'MontoCargo': total_otros_cargos}
                 doc.date_issuance = date_cr
                 invoice_comments = ''
                 doc.economic_activity_id = doc.company_id.activity_id
@@ -638,16 +641,16 @@ class PosOrder(models.Model):
                 if response_text.find('ya fue recibido anteriormente') != -1:
                     doc.state_tributacion = 'procesando'
                     doc.message_post(
-                        subject='Error', body='Ya recibido anteriormente, se pasa a consultar')
+                        subject=_('Error'), body=_('Ya recibido anteriormente, se pasa a consultar'))
                 elif doc.error_count > 10:
-                    doc.message_post(subject='Error', body=response_text)
+                    doc.message_post(subject=_('Error'), body=response_text)
                     doc.state_tributacion = 'error'
                     _logger.error('E-INV CR - Invoice: %s  Status: %s Error sending XML: %s',
                                   doc.name, response_status, response_text)
                 else:
                     doc.error_count += 1
                     doc.state_tributacion = 'procesando'
-                    doc.message_post(subject='Error', body=response_text)
+                    doc.message_post(subject=_('Error'), body=response_text)
                     _logger.error('E-INV CR - Invoice: %s  Status: %s Error sending XML: %s',
                                   doc.name, response_status, response_text)
         _logger.info('E-INV CR 014 - Valida Hacienda POS- Finalizado Exitosamente')

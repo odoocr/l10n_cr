@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <odoo>
-    
 
-        <!-- payment methods -->
-        <record id="PaymentMethods_1" model="pos.payment.method">
-            <field name="sequence">01</field>
-            <field name="name">Efectivo</field>
-        </record>
+    <!-- payment methods -->
+    <record id="PaymentMethods_1" model="pos.payment.method">
+        <field name="sequence">01</field>
+        <field name="name">Efectivo</field>
+    </record>
 
-        <record id="PaymentMethods_2" model="pos.payment.method">
-            <field name="sequence">02</field>
-            <field name="name">Tarjeta</field>
-        </record>
+    <record id="PaymentMethods_2" model="pos.payment.method">
+        <field name="sequence">02</field>
+        <field name="name">Tarjeta</field>
+    </record>
 
-        <record id="PaymentMethods_3" model="pos.payment.method">
-            <field name="sequence">03</field>
-            <field name="name">Cheque</field>
-        </record>
+    <record id="PaymentMethods_3" model="pos.payment.method">
+        <field name="sequence">03</field>
+        <field name="name">Cheque</field>
+    </record>
 
-        <record id="PaymentMethods_4" model="pos.payment.method">
-            <field name="sequence">04</field>
-            <field name="name">Transferencia – depósito</field>
-        </record>
+    <record id="PaymentMethods_4" model="pos.payment.method">
+        <field name="sequence">04</field>
+        <field name="name">Transferencia – depósito</field>
+    </record>
 
-        <record id="PaymentMethods_5" model="pos.payment.method">
-            <field name="sequence">05</field>
-            <field name="name">Recaudado por tercero</field>
-        </record>
+    <record id="PaymentMethods_5" model="pos.payment.method">
+        <field name="sequence">05</field>
+        <field name="name">Recaudado por tercero</field>
+    </record>
 
-        <record id="PaymentMethods_99" model="pos.payment.method">
-            <field name="sequence">99</field>
-            <field name="name">Otros (se debe indicar el medio de pago)</field>
-        </record>
+    <record id="PaymentMethods_99" model="pos.payment.method">
+        <field name="sequence">99</field>
+        <field name="name">Otros (se debe indicar el medio de pago)</field>
+    </record>
 
-    
 </odoo>
