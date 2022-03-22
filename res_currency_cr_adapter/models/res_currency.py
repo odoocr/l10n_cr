@@ -1,8 +1,7 @@
 # copyright  2018 Carlos Wong, Akurey S.A.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models, _
-from odoo.addons import decimal_precision as dp
+from odoo import api, fields, models
 from zeep import Client
 import datetime
 from datetime import timedelta
@@ -19,29 +18,38 @@ class ResCurrencyRate(models.Model):
     rate = fields.Float(digits='Currency Rate Precision')
 
     def _cron_create_missing_exchange_rates(self):
-        for currency in self.env['res.currency'].\
-            search([('id', '!=', self.env.user.company_id.currency_id.id)]):
-
+        for currency in self.env['res.currency'].search([('id', '!=', self.env.user.company_id.currency_id.id)]):
             currency.action_create_missing_exchange_rates()
 
     def action_create_missing_exchange_rates(self):
         currency_rate_obj = self.env['res.currency.rate']
-        last_day = datetime.datetime.now().date()
+        # A day is added to fix the loss of the current day
+        today = datetime.date.today()
+        last_day = today + datetime.timedelta(days=1)
 
         first_day = currency_rate_obj.search([
             ('company_id', '=', self.env.user.company_id.id),
             ('currency_id', '=', self.id)
         ], limit=1, order='name asc')
-
-        range_day = last_day - first_day.name
-        date = first_day.name
-        for day in range(range_day.days):
+        # If there is no record, you must fill the table with the current day
+        if not first_day:
+            # It is validated that the currency is dollars
             if self.id == self.env.ref('base.USD').id:
-                if not currency_rate_obj.search([('name', '=', date)], limit=1):
-                    currency_rate_obj._cron_update(date,date)
-            else:
-                currency_rate_obj._create_the_latest_exchange_rate_to_date(self, date)
-            date = date + timedelta(days=1)
+                # This will create the record of the day the option is run manually
+                currency_rate_obj._cron_update()
+        else:
+            range_day = last_day - first_day.name
+            date = first_day.name
+            for day in range(range_day.days):
+                if self.id == self.env.ref('base.USD').id:
+                    # It is validated if the exchange rate of that day really not exists
+                    if not currency_rate_obj.search([('name', '=', date)], limit=1):
+                        # TODO: It could be improved to make only one request and avoid one per day
+                        currency_rate_obj._cron_update(date, date)
+                    # If after updating it does not exist, it will be loaded on the last available day
+                    if not currency_rate_obj.search([('name', '=', date)], limit=1):
+                        currency_rate_obj._create_the_latest_exchange_rate_to_date(self, date)
+                date += timedelta(days=1)
 
 
 class ResCurrencyRate(models.Model):
@@ -109,8 +117,10 @@ class ResCurrencyRate(models.Model):
             nodeIndex = 0
             if len(sellingRateNodes) > 0 and len(sellingRateNodes) == len(buyingRateNodes):
                 while nodeIndex < len(sellingRateNodes):
-                    if sellingRateNodes[nodeIndex].find("DES_FECHA").text == buyingRateNodes[nodeIndex].find("DES_FECHA").text:
-                        currentDateStr = datetime.datetime.strptime(sellingRateNodes[nodeIndex].find("DES_FECHA").text, "%Y-%m-%dT%H:%M:%S-06:00").strftime('%Y-%m-%d')
+                    if sellingRateNodes[nodeIndex].find("DES_FECHA").text == \
+                       buyingRateNodes[nodeIndex].find("DES_FECHA").text:
+                        currentDateStr = datetime.datetime.strptime(sellingRateNodes[nodeIndex].find("DES_FECHA").text,
+                                                                    "%Y-%m-%dT%H:%M:%S-06:00").strftime('%Y-%m-%d')
 
                         sellingOriginalRate = float(sellingRateNodes[nodeIndex].find("NUM_VALOR").text)
                         buyingOriginalRate = float(buyingRateNodes[nodeIndex].find("NUM_VALOR").text)
@@ -126,34 +136,38 @@ class ResCurrencyRate(models.Model):
                         ratesIds = self.env['res.currency.rate'].search([('name', '=', currentDateStr)], limit=1)
 
                         if len(ratesIds) > 0:
-                            newRate = ratesIds.write(
+                            ratesIds.write(
                                 {'rate': sellingRate,
-                                'original_rate': sellingOriginalRate,
-                                'rate_2': buyingRate,
-                                'original_rate_2': buyingOriginalRate,
-                                'currency_id': currency_id.id}
+                                 'original_rate': sellingOriginalRate,
+                                 'rate_2': buyingRate,
+                                 'original_rate_2': buyingOriginalRate,
+                                 'currency_id': currency_id.id}
                                 )
                         else:
-                            newRate = self.create(
+                            self.create(
                                 {'name': currentDateStr,
-                                'rate': sellingRate,
-                                'original_rate': sellingOriginalRate,
-                                'rate_2': buyingRate,
-                                'original_rate_2': buyingOriginalRate,
-                                'currency_id': currency_id.id})
+                                 'rate': sellingRate,
+                                 'original_rate': sellingOriginalRate,
+                                 'rate_2': buyingRate,
+                                 'original_rate_2': buyingOriginalRate,
+                                 'currency_id': currency_id.id})
 
                         _logger.debug({'name': currentDateStr,
-                                    'rate': sellingRate,
-                                    'original_rate': sellingOriginalRate,
-                                    'rate_2': buyingRate,
-                                    'original_rate_2': buyingOriginalRate,
-                                    'currency_id': currency_id.id})
+                                       'rate': sellingRate,
+                                       'original_rate': sellingOriginalRate,
+                                       'rate_2': buyingRate,
+                                       'original_rate_2': buyingOriginalRate,
+                                       'currency_id': currency_id.id})
                     else:
-                        _logger.error("Error loading currency rates, dates for a buying (%s) and selling (%s) rates don't match" % (buyingRateNodes[nodeIndex].find("DES_FECHA").text, sellingRateNodes[nodeIndex].find("DES_FECHA").text))
+                        _logger.error("Error loading currency rates, dates for a buying (%s) "
+                                      "and selling (%s) rates don't match" %
+                                      (buyingRateNodes[nodeIndex].find("DES_FECHA").text,
+                                       sellingRateNodes[nodeIndex].find("DES_FECHA").text))
 
                     nodeIndex += 1
             else:
-                _logger.error("Error loading currency rates, dates range data for buying and selling rates don't match")
+                _logger.error("Error loading currency rates, "
+                              "dates range data for buying and selling rates don't match")
 
         if exchange_source == 'hacienda':
             _logger.debug("Getting exchange rates from HACIENDA")
@@ -180,8 +194,9 @@ class ResCurrencyRate(models.Model):
                             today = datetime.datetime.strptime(rate_line['fecha'], '%Y-%m-%d %H:%M:%S')
                             vals = {}
                             vals['original_rate'] = rate_line['venta']
-                            # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                            vals['rate'] =  1 / vals['original_rate']
+                            # Odoo utiliza un valor inverso,
+                            # a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
+                            vals['rate'] = 1 / vals['original_rate']
                             vals['original_rate_2'] = rate_line['compra']
                             vals['rate_2'] = 1 / vals['original_rate_2']
                             vals['currency_id'] = self.env.ref('base.USD').id
@@ -211,8 +226,11 @@ class ResCurrencyRate(models.Model):
                         _logger.error(company.id)
                         vals = {}
                         vals['original_rate'] = data['dolar']['venta']['valor']
-                        # Odoo utiliza un valor inverso, a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                        vals['rate'] =  1 / vals['original_rate']
+
+                        # Odoo utiliza un valor inverso,
+                        # a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
+
+                        vals['rate'] = 1 / vals['original_rate']
                         vals['original_rate_2'] = data['dolar']['compra']['valor']
                         vals['rate_2'] = 1 / vals['original_rate_2']
                         vals['currency_id'] = self.env.ref('base.USD').id
