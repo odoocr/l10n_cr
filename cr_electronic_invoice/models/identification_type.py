@@ -1,8 +1,6 @@
 
 
-from odoo import models, fields, api, _
-import logging
-_logger = logging.getLogger(__name__)
+from odoo import models, fields
 
 
 class IdentificationType(models.Model):

@@ -1,15 +1,14 @@
 
 
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
-from . import api_facturae
+from odoo import models, fields, _
+from odoo.exceptions import UserError
 import base64
 from lxml import etree
-from odoo.tests.common import Form
 import re
 import logging
 
 _logger = logging.getLogger(__name__)
+
 
 class AccountJournalInherit(models.Model):
     _name = 'account.journal'
@@ -22,15 +21,25 @@ class AccountJournalInherit(models.Model):
     FEE_sequence_id = fields.Many2one("ir.sequence", string="Sequence of Electronic Export Invoices")
     NC_sequence_id = fields.Many2one("ir.sequence", string="Electronic Credit Notes Sequence")
     ND_sequence_id = fields.Many2one("ir.sequence", string="Electronic Debit Notes Sequence")
-    expense_product_id = fields.Many2one('product.product', string="Default product for expenses when loading data from XML", help="The default product used when loading Costa Rican digital invoice")
-    expense_account_id = fields.Many2one('account.account', string="Default Expense Account when loading data from XML", help="The expense account used when loading Costa Rican digital invoice")
-    expense_analytic_account_id = fields.Many2one('account.analytic.account', string="Default Analytic Account for expenses when loading data from XML", help="The analytic account used when loading Costa Rican digital invoice")
-    load_lines = fields.Boolean(string="Indicates if invoice lines should be load when loading a Costa Rican Digital Invoice", default=True)
+    expense_product_id = fields.Many2one('product.product',
+                                         string="Default product for expenses when loading data from XML",
+                                         help="The default product used when loading Costa Rican digital invoice")
+    expense_account_id = fields.Many2one('account.account',
+                                         string="Default Expense Account when loading data from XML",
+                                         help="The expense account used when loading Costa Rican digital invoice")
+    expense_analytic_account_id = fields.Many2one('account.analytic.account',
+                                                  string="Default Analytic Account for expenses "
+                                                  "when loading data from XML",
+                                                  help="The analytic account used when loading "
+                                                  "Costa Rican digital invoice")
+    load_lines = fields.Boolean(string="Indicates if invoice lines should be load when loading a "
+                                "Costa Rican Digital Invoice", default=True)
 
     def invoice_from_xml(self, attachment):
         try:
             invoice_xml = etree.fromstring(base64.b64decode(attachment.datas))
-            document_type = re.search('FacturaElectronica|NotaCreditoElectronica|NotaDebitoElectronica|TiqueteElectronico', invoice_xml.tag).group(0)
+            document_names = "FacturaElectronica|NotaCreditoElectronica|NotaDebitoElectronica|TiqueteElectronico"
+            document_type = re.search(document_names, invoice_xml.tag).group(0)
             if document_type == 'TiqueteElectronico':
                 raise UserError(_("This is a TICKET only invoices are valid for taxes"))
         except Exception as e:
@@ -47,7 +56,6 @@ class AccountJournalInherit(models.Model):
         invoice.fname_xml_supplier_approval = attachment.name
         invoice.xml_supplier_approval = attachment.datas
         return invoice
-
 
     def create_invoice_from_attachment(self, attachment_ids=[]):
         """Create the invoices from files.
