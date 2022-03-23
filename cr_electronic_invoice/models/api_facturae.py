@@ -723,18 +723,22 @@ def schema_validator(xml_file, xsd_file) -> bool:
 def get_invoice_attachments(invoice, record_id):
     attachments = []
 
-    attachment = invoice.env['ir.attachment'].search(
-                        [('res_model', '=', 'account.move'), ('name', '=', invoice.fname_xml_comprobante),
-                         ('res_id', '=', record_id)], limit=1)
+    domain = [('res_model', '=', invoice._name),
+              ('res_id', '=', invoice.id),
+              ('res_field', '=', 'xml_comprobante'),
+              ('name', '=', invoice.tipo_documento + '_' + invoice.number_electronic + '.xml')]
+    attachment = invoice.env['ir.attachment'].sudo().search(domain, limit=1)
 
     if attachment.id:
         attachment.name = invoice.fname_xml_comprobante
         #attachment.datas_fname = invoice.fname_xml_comprobante
         attachments.append(attachment.id)
 
-    attachment_resp = invoice.env['ir.attachment'].search(
-        [('res_model', '=', 'account.move'), ('name', '=', invoice.fname_xml_respuesta_tributacion),
-            ('res_id', '=',record_id)], limit=1)
+    domain_resp = [('res_model', '=', invoice._name),
+                    ('res_id', '=', invoice.id),
+                    ('res_field', '=', 'xml_respuesta_tributacion'),
+                    ('name', '=', 'AHC_' + invoice.number_electronic + '.xml')]
+    attachment_resp = invoice.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
     if attachment_resp.id:
         attachment_resp.name = invoice.fname_xml_respuesta_tributacion
@@ -873,18 +877,45 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         inv.state_tributacion = estado_m_h
         inv.date_issuance = date_cr
         if xml_firmado:
-            inv.fname_xml_comprobante = 'comprobante_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
+            inv.fname_xml_comprobante = inv.tipo_documento + inv.number_electronic + '.xml'
+            
+            # inv.xml_comprobante = xml_firmado
+            self.env['ir.attachment'].sudo().create({'name': inv.tipo_documento + '_' + inv.number_electronic + '.xml',
+                                                      'type': 'binary',
+                                                      'datas': xml_firmado,
+                                                      'res_model': self._name,
+                                                      'res_id': inv.id,
+                                                      'res_field': 'xml_comprobante',
+                                                      'res_name': inv.tipo_documento + '_' + inv.number_electronic + '.xml',
+                                                      'mimetype': 'text/xml'})
     elif inv.move_type == 'in_invoice' or inv.move_type == 'in_refund':
         if xml_firmado:
-            inv.fname_xml_comprobante = 'receptor_' + inv.number_electronic + '.xml'
-            inv.xml_comprobante = xml_firmado
+            inv.fname_xml_comprobante = 'AHC_' + inv.number_electronic + '.xml'
+            
+            # inv.xml_comprobante = xml_firmado
+            self.env['ir.attachment'].sudo().create({'name': inv.tipo_documento + '_' + inv.number_electronic + '.xml',
+                                                      'type': 'binary',
+                                                      'datas': xml_firmado,
+                                                      'res_model': self._name,
+                                                      'res_id': inv.id,
+                                                      'res_field': 'xml_comprobante',
+                                                      'res_name': inv.tipo_documento + '_' + inv.number_electronic + '.xml',
+                                                      'mimetype': 'text/xml'})
 
     # Si fue aceptado o rechazado por haciendo se carga la respuesta
     if (estado_m_h == 'aceptado' or estado_m_h == 'rechazado') or (
             inv.move_type == 'out_invoice' or inv.move_type == 'out_refund'):
         inv.fname_xml_respuesta_tributacion = 'AHC_' + inv.number_electronic + '.xml'
-        inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+        
+        # inv.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+        self.env['ir.attachment'].create({'name': inv.fname_xml_respuesta_tributacion,
+                                        'type': 'binary',
+                                        'datas': response_json.get('respuesta-xml'),
+                                        'res_model': inv._name,
+                                        'res_id': inv.id,
+                                        'res_field': 'xml_respuesta_tributacion',
+                                        'res_name': inv.fname_xml_respuesta_tributacion,
+                                        'mimetype': 'text/xml'})
 
     # Si fue aceptado por Hacienda y es un factura de cliente o nota de crédito, se envía el correo con los documentos
     if inv.tipo_documento != 'FEC' and estado_m_h == 'aceptado' and (last_state is False or last_state == 'procesando'):
@@ -895,23 +926,6 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         else:
             email_template = self.env.ref(
                 'account.email_template_edi_invoice', False)
-        
-        self.env['ir.attachment'].create(
-                        {'name': inv.fname_xml_comprobante,
-                         'type': 'binary',
-                         'datas': inv.xml_comprobante,
-                         'res_model': self._name,
-                         'mimetype': 'text/xml',
-                         'res_id': inv.id
-                         })
-        self.env['ir.attachment'].create(
-            {'name': inv.fname_xml_respuesta_tributacion,
-                'type': 'binary',
-                'datas': inv.xml_respuesta_tributacion,
-                'res_model': self._name,
-                'mimetype': 'text/xml',
-                'res_id': inv.id
-                })
 
         attachments = get_invoice_attachments(inv, inv.id)
 
