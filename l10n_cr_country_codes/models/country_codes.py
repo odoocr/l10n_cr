@@ -23,7 +23,7 @@ class ResCountryDistrict(models.Model):
     _order = 'name'
 
     code = fields.Char(string="Code", required=True, )
-    county_id = fields.Many2one("res.country.county", string="Canton", required=True)
+    county_id = fields.Many2one("res.country.county", string="County", required=True)
     name = fields.Char(string="Name", required=True, )
 
 

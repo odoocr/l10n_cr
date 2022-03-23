@@ -23,12 +23,12 @@ class ProductElectronic(models.Model):
 
     economic_activity_id = fields.Many2one("economic.activity", string="Economic Activity", help='Economic activity code from Ministerio de Hacienda')
 
-    non_tax_deductible = fields.Boolean(string='Indicates if this product is non-tax deductible', default=False, )
+    non_tax_deductible = fields.Boolean(string='Non Tax Deductible', default=False, help='Indicates if this product is non-tax deductible')
 
 
 class ProductCategory(models.Model):
     _inherit = "product.category"
 
-    economic_activity_id = fields.Many2one("economic.activity", string="Economic activities", help='Economic activity code from Ministerio de Hacienda')
+    economic_activity_id = fields.Many2one("economic.activity", string="Economic Activity", help='Economic activity code from Ministerio de Hacienda')
 
     cabys_code = fields.Char(string="CAByS Code", help='CAByS code from Ministerio de Hacienda')
