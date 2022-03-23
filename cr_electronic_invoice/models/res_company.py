@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, date, timedelta
 import logging
+import re
 import phonenumbers
 
 from odoo import models, fields, api
@@ -29,8 +31,14 @@ class CompanyElectronic(models.Model):
     _inherit = ['res.company', 'mail.thread', ]
 
     commercial_name = fields.Char(string="Commercial Name", required=False, )
+    legal_name = fields.Char(string="Nombre Legal", required=False)
     activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
     signature = fields.Binary(string="Llave Criptográfica", )
+    date_expiration_sign = fields.Datetime(string="Fecha de Vencimiento")
+    range_days = fields.Integer(string='Rango de días', default=5)
+    send_user_ids = fields.Many2many('res.users', 'res_company_res_sendusers_rel', string='Usuarios')
+    to_emails = fields.Char(string='Email')
+
     identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
     frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
     frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
@@ -122,6 +130,79 @@ class CompanyElectronic(models.Model):
         new_comp_id.try_create_configuration_sequences()
         return new_comp_id #new_comp.id
 
+    def write(self, vals):
+        if vals.get('date_expiration_sign') or vals.get('range_days'):
+            cron = self.env.ref('cr_electronic_invoice.ir_cron_send_expiration_notice', False)
+
+            if not self.range_days:
+                return super(CompanyElectronic, self).write(vals)
+
+            date_expiration_sign = vals.get('date_expiration_sign') and vals['date_expiration_sign'] or self.date_expiration_sign
+            # date_expiration_sign = vals.get('date_expiration_sign') and \
+            #     datetime.strptime(vals['date_expiration_sign'], '%Y-%m-%d %H:%M:%S') or self.date_expiration_sign
+            if date_expiration_sign:
+                if isinstance(date_expiration_sign, str):
+                    date_expiration_sign = datetime.strptime(date_expiration_sign, '%Y-%m-%d %H:%M:%S')
+
+            range_days = vals.get('range_days') or self.range_days
+            next_call = date_expiration_sign - timedelta(days=range_days)
+            new_values = {
+                'nextcall': next_call
+            }
+
+            cron.write(new_values)
+        
+        return super(CompanyElectronic, self).write(vals)
+
+    def get_days_left(self):
+        today = datetime.today()
+        date_due = self.date_expiration_sign
+        range_days = date_due - today
+
+        return range_days.days
+    
+    def get_message_to_send(self):
+        days_left = self.get_days_left()
+
+        message = ''
+        if days_left >= 0:
+            message = f'Su llave criptográfica está a punto de expirar, le quedan {days_left} día(s)'
+        else:
+            message = f'No podrá validar porque su llave criptográfica expiró hace {abs(days_left)} día(s)'
+
+        return message
+
+    def _cron_send_email_notifications(self):
+        today = datetime.now()
+        user = self.env.user
+        date_due = user.company_id.date_expiration_sign
+        range_day = user.company_id.range_days
+
+        range_date = date_due - timedelta(days=range_day)
+        if today >= range_date:
+            template = self.env.ref('cr_electronic_invoice.email_template_edi_expiration_notice', False)
+
+            template_values = {
+                'email_to': '${object.email|safe}',
+                'email_cc': False,
+                'auto_delete': True,
+                'partner_to': False,
+                'scheduled_date': False,
+            }
+
+            template.write(template_values)
+
+            emails_to = user.company_id.send_user_ids.mapped('email') or []
+            if user.company_id.to_emails:
+                emails = user.company_id.to_emails.split(',')
+                emails_to.extend(emails)
+
+            for email in emails_to:
+                emails_to = {'email_to': email}
+
+                template.with_context(lang=user.lang).\
+                    send_mail(res_id=user.id, force_send=True, raise_exception=True, email_values=emails_to)
+
     def try_create_configuration_sequences(self):
         """ Try to automatically add the Comprobante Confirmation sequence to the company.
             It will first check if sequence already exists before attempt to create. The s
@@ -153,11 +234,26 @@ class CompanyElectronic(models.Model):
             self.write(to_write)
 
     def test_get_token(self):
+        self.get_expiration_date()
         token_m_h = api_facturae.get_token_hacienda(
             self.env.user, self.frm_ws_ambiente)
         if token_m_h:
-           _logger.info('E-INV CR - I got the token')
-        return 
+            self.message_post(
+                subject='Info',
+                body="Token Correcto")
+        else:
+            self.message_post(
+                subject='Error',
+                body="Datos Incorrectos")
+        return
+
+    def get_expiration_date(self):
+        if self.signature and self.frm_pin:
+            self.date_expiration_sign = api_facturae.p12_expiration_date(self.signature, self.frm_pin)
+        else:
+            self.message_post(
+                subject='Error',
+                body="Signature requerido")
 
     def action_get_economic_activities(self):
         if self.vat:
@@ -180,7 +276,7 @@ class CompanyElectronic(models.Model):
                 for activity in economic_activities:
                     activity.active = True
 
-                self.name = json_response["name"]
+                self.legal_name = json_response["name"]
             else:
                 alert = {
                     'title': json_response["status"],

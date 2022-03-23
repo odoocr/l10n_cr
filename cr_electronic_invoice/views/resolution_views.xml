@@ -7,8 +7,8 @@
             <field name="model">resolution</field>
             <field name="arch" 
                 type="xml">
-                <form string="Documentos de referencia">
-                    <sheet string="Documentos de referencia">
+                <form string="Reference documents">
+                    <sheet string="Reference documents">
                         <group col="4">
                             <field name="name"/>
                             <field name="active"/>
@@ -25,7 +25,7 @@
             <field name="model">resolution</field>
             <field name="arch" 
                 type="xml">
-                <tree string="Documentos de referencia">
+                <tree string="Reference documents">
                     <field name="name"/>
                     <field name="date_resolution"/>
                     <field name="active"/>
