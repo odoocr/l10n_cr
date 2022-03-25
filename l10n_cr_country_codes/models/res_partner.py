@@ -19,41 +19,30 @@ class PartnerElectronic(models.Model):
     # Neighborhood
     neighborhood_id = fields.Many2one("res.country.neighborhood", string="Neighborhood")
 
-    '''
-        When you change the province you must clean the other fields to avoid inconveniences
-    '''
+    # When you change the province you must clean the other fields to avoid inconveniences
     @api.onchange('state_id')
     def _change_state_id(self):
         self.county_id = False
         self.district_id = False
         self.neighborhood_id = False
 
-    '''
-        When you change the canton you must clean the other fields to avoid inconveniences
-    '''
-
+    # When you change the canton you must clean the other fields to avoid inconveniences
     @api.onchange('county_id')
     def _change_county_id(self):
         self.district_id = False
         self.neighborhood_id = False
 
-    '''
-        When you change the district you must clean the other fields to avoid inconveniences
-    '''
-
+    # When you change the district you must clean the other fields to avoid inconveniences
     @api.onchange('district_id')
     def _calculate_postal_code(self):
-        if self.state_id.code != False and self.county_id.code != False and self.district_id.code != False:
+        if self.state_id.code and self.county_id.code and self.district_id.code:
             postal = str(self.state_id.code) + str(self.county_id.code) + str(self.district_id.code)
             self.zip = postal
         else:
             self.zip = False
         self.neighborhood_id = False
 
-    '''
-        When the neighborhood changes, the city field of odoo is autocomplete
-    '''
-
+    # When the neighborhood changes, the city field of odoo is autocomplete
     @api.onchange('neighborhood_id')
     def _change_neighborhood_id(self):
         self.city = self.neighborhood_id.name
