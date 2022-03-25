@@ -58,6 +58,10 @@ class AccountJournalInherit(models.Model):
         return invoice
 
     def create_invoice_from_attachment(self, attachment_ids=[]):
+        # [W0102(dangerous-default-value), AccountJournalInherit.create_invoice_from_attachment]
+        # Dangerous default value [] as argument
+        # Method defined by Odoo
+
         """Create the invoices from files.
         :return: A action redirecting to account.move tree/form view.
         """

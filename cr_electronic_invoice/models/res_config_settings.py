@@ -32,7 +32,7 @@ class ResConfigSettings(models.TransientModel):
 
     @api.model
     def get_values(self):
-        res = super(ResConfigSettings, self).get_values()
+        res = super().get_values()
         get_param = self.env['ir.config_parameter'].sudo().get_param
         res.update(
             expense_account_id=int(get_param('expense_account_id')),
@@ -43,7 +43,7 @@ class ResConfigSettings(models.TransientModel):
         return res
 
     def set_values(self):
-        super(ResConfigSettings, self).set_values()
+        super().set_values()
         set_param = self.env['ir.config_parameter'].sudo().set_param
         set_param('expense_account_id', self.expense_account_id.id)
         set_param('load_lines', self.load_lines)

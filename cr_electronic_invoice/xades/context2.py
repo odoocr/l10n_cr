@@ -7,7 +7,7 @@ from .tobella_xades.constants import NS_MAP, EtsiNS, MAP_HASHLIB
 from .tobella_xades import XAdESContext, PolicyId, template, constants
 import hashlib
 import xmlsig
-from base64 import b64decode, b64encode
+from base64 import b64encode
 from urllib import parse, request
 import logging
 import datetime
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 URL_ESCAPE_PATTERN = re.compile('[\r\n]')
-URL_HACIENDA_PATTERN = re.compile('.+\.hacienda\.go\.cr$')
+URL_HACIENDA_PATTERN = re.compile(r'.+\.hacienda\.go\.cr$')
 
 
 def create_xades_epes_signature(sign_date=datetime.datetime.now(pytz.timezone('UTC'))):
@@ -33,7 +33,8 @@ def create_xades_epes_signature(sign_date=datetime.datetime.now(pytz.timezone('U
     signed_properties_id = 'SignedProperties-' + signature_id
     key_info_id = 'KeyInfoId-' + signature_id
     reference_id = 'Reference-{:04d}'.format(random.randint(min, max))
-    object_id = 'XadesObjectId-{:04d}'.format(random.randint(min, max))
+    # F841 local variable 'object_id' is assigned to but never used
+    # object_id = 'XadesObjectId-{:04d}'.format(random.randint(min, max))
 
     signature = xmlsig.template.create(
         xmlsig.constants.TransformInclC14N,
@@ -52,7 +53,8 @@ def create_xades_epes_signature(sign_date=datetime.datetime.now(pytz.timezone('U
     xmlsig.template.add_transform(ref, xmlsig.constants.TransformInclC14N)
     # Reference to the SignedProperties Digest
     ref = xmlsig.template.add_reference(signature, xmlsig.constants.TransformSha256,
-                                        uri='#' + signed_properties_id, uri_type='http://uri.etsi.org/01903#SignedProperties')
+                                        uri='#' + signed_properties_id,
+                                        uri_type='http://uri.etsi.org/01903#SignedProperties')
     xmlsig.template.add_transform(ref, xmlsig.constants.TransformInclC14N)
 
     ki = xmlsig.template.ensure_key_info(signature, name=key_info_id)

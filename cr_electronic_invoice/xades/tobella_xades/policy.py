@@ -55,7 +55,6 @@ class Policy(object):
         create_node(
             'X509SerialNumber', issuer_serial, DSigNs
         ).text = str(key_x509.serial_number)
-        return
 
     def validate_certificate(self, node, signature):
         certs = node.findall('etsi:Cert', namespaces=NS_MAP)
@@ -130,6 +129,8 @@ class PolicyId(Policy):
             identifier = policy_id.find('etsi:SigPolicyId',  namespaces=NS_MAP)
             remote = identifier.find('etsi:Identifier', namespaces=NS_MAP).text
         value = urllib.urlopen(remote).read()
+        # [R1732(consider-using-with), PolicyId.calculate_policy_node]
+        # Consider using 'with' for resource-allocating operations
         value = self.set_transforms(policy_id, value, sign)
         if sign:
             hash_method = self.hash_method

@@ -1,4 +1,3 @@
-
 import base64
 import datetime
 import logging
@@ -158,7 +157,7 @@ class AccountInvoiceElectronic(models.Model):
     economic_activity_id = fields.Many2one("economic.activity",
                                            string="Economic Activity", context={'active_test': False})
 
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic activities',
+    economic_activities_ids = fields.Many2many('economic.activity', string='Economic activities',
                                                compute='_get_economic_activities', context={'active_test': False})
 
     not_loaded_invoice = fields.Char(string='Original Invoice Number not loaded', readonly=True)
@@ -211,7 +210,9 @@ class AccountInvoiceElectronic(models.Model):
                         inv.economic_activities_ids = inv.partner_id.economic_activities_ids
                         inv.economic_activity_id = inv.partner_id.activity_id
                     else:
-                        raise UserError(_('The partner %s has no defined economic activity, please validate the information in the business partner before placing it!') % inv.partner_id.name)
+                        raise UserError(_('The partner %s has no defined economic activity, ' +
+                                          'please validate the information in the business ' +
+                                          'partner before placing it!') % inv.partner_id.name)
                 else:
                     inv.economic_activities_ids = self.env['economic.activity'].search([])
             else:
@@ -219,7 +220,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
-        super(AccountInvoiceElectronic, self)._onchange_partner_id()
+        super()._onchange_partner_id()
         self.payment_methods_id = self.partner_id.payment_methods_id
 
         if self.move_type in ('in_invoice', 'in_refund'):
@@ -249,7 +250,7 @@ class AccountInvoiceElectronic(models.Model):
 
     def action_invoice_sent_mass(self):
 
-        if self.invoice_id.move_type == 'in_invoice' or self.invoice_id.move_type == 'in_refund':
+        if self.invoice_id.move_type in ['in_invoice', 'in_refund']:
             email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor',
                                           raise_if_not_found=False)
         else:
@@ -305,7 +306,7 @@ class AccountInvoiceElectronic(models.Model):
     def action_invoice_sent(self):
         self.ensure_one()
 
-        if self.invoice_id.move_type == 'in_invoice' or self.invoice_id.move_type == 'in_refund':
+        if self.invoice_id.move_type in ['in_invoice', 'in_refund']:
             email_template = self.env.ref('cr_electronic_invoice.email_template_invoice_vendor',
                                           raise_if_not_found=False)
         else:
@@ -383,15 +384,14 @@ class AccountInvoiceElectronic(models.Model):
             try:
                 factura = etree.fromstring(xml_decoded)
             except Exception as e:
-                _logger.info(
-                    'E-INV CR - This XML file is not XML-compliant.  Exception %s' % e)
+                _logger.info('E-INV CR - This XML file is not XML-compliant.  Exception %s', e)
                 return {'status': 400,
                         'text': 'Excepción de conversión de XML'}
 
             pretty_xml_string = etree.tostring(
                 factura, pretty_print=True,
                 encoding='UTF-8', xml_declaration=True)
-            _logger.error('E-INV CR - send_file XML: %s' % pretty_xml_string)
+            _logger.error('E-INV CR - send_file XML: %s', pretty_xml_string)
             namespaces = factura.nsmap
             inv_xmlns = namespaces.pop(None)
             namespaces['inv'] = inv_xmlns
@@ -477,7 +477,7 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             if inv.xml_supplier_approval:
 
-                '''Verificar si el MR ya fue enviado y estamos esperando la confirmación'''
+                # Verificar si el MR ya fue enviado y estamos esperando la confirmación
                 if inv.state_tributacion == 'procesando':
 
                     token_m_h = api_facturae.get_token_hacienda(
@@ -497,36 +497,34 @@ class AccountInvoiceElectronic(models.Model):
                             inv.load_xml_data()
                         except UserError as error:
                             inv.state_tributacion = 'error'
-                            inv.message_post(
-                                subject='Error',
-                                body='Aviso!.\n Error en carga del XML del proveedor' + str(error))
+                            inv.message_post(subject=_('Error'),
+                                             body=_('Aviso!.\n Error en carga del XML del proveedor') + str(error))
                             continue
 
                     if abs(
                             inv.amount_total_electronic_invoice - inv.amount_total) > 1:
                         inv.state_tributacion = 'error'
                         inv.message_post(
-                            subject='Error',
-                            body='Aviso!.\n Monto total no concuerda con monto del XML')
+                            subject=_('Error'),
+                            body=_('Aviso!.\n Monto total no concuerda con monto del XML'))
                         continue
 
                     elif not inv.xml_supplier_approval:
                         inv.state_tributacion = 'error'
-                        inv.message_post(
-                            subject='Error',
-                            body='Aviso!.\n No se ha cargado archivo XML')
+                        inv.message_post(subject=_('Error'), body=_('Aviso!.\n No se ha cargado archivo XML'))
                         continue
 
                     elif not inv.company_id.sucursal_MR or not inv.company_id.terminal_MR:
                         inv.state_tributacion = 'error'
-                        inv.message_post(subject='Error',
-                                         body='Aviso!.\nPor favor configure el diario de compras, terminal y sucursal')
+                        inv.message_post(subject=_('Error'),
+                                         body=_('Aviso!.\nPor favor configure ' +
+                                                'el diario de compras, terminal y sucursal'))
                         continue
 
                     if not inv.state_invoice_partner:
                         inv.state_tributacion = 'error'
-                        msg_body = "Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado."
-                        inv.message_post(subject='Error',
+                        msg_body = _("Aviso!.\nDebe primero seleccionar el tipo de respuesta para el archivo cargado.")
+                        inv.message_post(subject=_('Error'),
                                          body=msg_body)
                         continue
 
@@ -555,7 +553,7 @@ class AccountInvoiceElectronic(models.Model):
                                 sequence = inv.company_id.RCE_sequence_id.next_by_id()
 
                             '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
-                            if inv.state_tributacion == 'rechazado' or inv.state_tributacion == 'error':
+                            if inv.state_tributacion in ['rechazado', 'error']:
                                 message_description += '<p><b>Cambiando consecutivo del Mensaje de Receptor</b><br/>' \
                                                        '<b>Consecutivo anterior: ' + \
                                                        '</b>' + inv.consecutive_number_receiver + \
@@ -574,7 +572,7 @@ class AccountInvoiceElectronic(models.Model):
                             if inv.amount_total_electronic_invoice is None or inv.amount_total_electronic_invoice == 0:
                                 inv.state_tributacion = 'error'
                                 msg_body = 'El monto Total de la Factura para el Mensaje Receptro es inválido'
-                                inv.message_post(subject='Error',
+                                inv.message_post(subject=_('Error'),
                                                  body=msg_body)
                                 continue
 
@@ -593,14 +591,14 @@ class AccountInvoiceElectronic(models.Model):
                                 inv.company_id.frm_pin, xml)
 
                             inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
-                            self.env['ir.attachment'].sudo().create({'name': tipo_documento + '_' + inv.number_electronic + '.xml',
-                                                      'type': 'binary',
-                                                      'datas': base64.encodestring(xml_firmado),
-                                                      'res_model': self._name,
-                                                      'res_id': inv.id,
-                                                      'res_field': 'xml_comprobante',
-                                                      'res_name': tipo_documento + '_' + inv.number_electronic + '.xml',
-                                                      'mimetype': 'text/xml'})
+                            self.env['ir.attachment'].sudo().create({'name': inv.fname_xml_comprobante,
+                                                                     'type': 'binary',
+                                                                     'datas': base64.encodestring(xml_firmado),
+                                                                     'res_model': inv._name,
+                                                                     'res_id': inv.id,
+                                                                     'res_field': 'xml_comprobante',
+                                                                     'res_name': inv.fname_xml_comprobante,
+                                                                     'mimetype': 'text/xml'})
                             # inv.xml_comprobante = base64.encodestring(xml_firmado)
                             inv.tipo_documento = tipo_documento
 
@@ -650,14 +648,16 @@ class AccountInvoiceElectronic(models.Model):
                                         inv.fname_xml_respuesta_tributacion = 'ACH_' + \
                                                                               inv.number_electronic + '-' + \
                                                                               inv.consecutive_number_receiver + '.xml'
-                                        self.env['ir.attachment'].create({'name': inv.fname_xml_respuesta_tributacion,
-                                                      'type': 'binary',
-                                                      'datas': response_json.get('respuesta-xml'),
-                                                      'res_model': self._name,
-                                                      'res_id': inv.id,
-                                                      'res_field': 'xml_respuesta_tributacion',
-                                                      'res_name': inv.fname_xml_respuesta_tributacion,
-                                                      'mimetype': 'text/xml'})
+                                        # file_name used to avoid: E501 line too long
+                                        file_name = inv.fname_xml_respuesta_tributacion
+                                        self.env['ir.attachment'].create({'name': file_name,
+                                                                          'type': 'binary',
+                                                                          'datas': response_json.get('respuesta-xml'),
+                                                                          'res_model': self._name,
+                                                                          'res_id': inv.id,
+                                                                          'res_field': 'xml_respuesta_tributacion',
+                                                                          'res_name': file_name,
+                                                                          'mimetype': 'text/xml'})
 
                                         _logger.error(
                                             'E-INV CR - Estado Documento:%s',
@@ -726,13 +726,13 @@ class AccountInvoiceElectronic(models.Model):
 
                 if not i.xml_comprobante:
                     i.state_tributacion = 'error'
-                    _logger.warning(u'E-INV CR - Documento:%s no tiene documento XML.  Estado: %s',
+                    _logger.warning('E-INV CR - Documento:%s no tiene documento XML.  Estado: %s',
                                     i.number_electronic, 'error')
                     continue
 
                 if not i.number_electronic or len(i.number_electronic) != 50:
                     i.state_tributacion = 'error'
-                    _logger.warning(u'E-INV CR - Documento:%s no cumple con formato de '
+                    _logger.warning('E-INV CR - Documento:%s no cumple con formato de '
                                     'número electrónico.  Estado: %s', i.number, 'error')
                     continue
 
@@ -792,10 +792,8 @@ class AccountInvoiceElectronic(models.Model):
 
                                 email_template.with_context(type='binary',
                                                             default_type='binary').send_mail(i.id,
-                                                                                            raise_exception=False,
-                                                                                            force_send=True)
-                                
-                                
+                                                                                             raise_exception=False,
+                                                                                             force_send=True)
                                 email_template.attachment_ids = [(5, 0, 0)]
 
                 elif estado_m_h in ('firma_invalida'):
@@ -841,9 +839,8 @@ class AccountInvoiceElectronic(models.Model):
                                   'Estado Hacienda: %s', i.number_electronic, estado_m_h)
             except Exception as error:
                 i.state_tributacion = 'error'
-                i.message_post(
-                    subject='Error',
-                    body='Aviso!.\n Error en _check_hacienda_for_invoices: '+str(error))
+                i.message_post(subject=_('Error'),
+                               body=_('Aviso!.\n Error en _check_hacienda_for_invoices: ') + str(error))
                 continue
 
     def action_check_hacienda(self):
@@ -1023,8 +1020,8 @@ class AccountInvoiceElectronic(models.Model):
                         currency_rate = round(1.0 / currency.rate, 5)
 
                     # Generamos las líneas de la factura
-                    lines = dict()
-                    otros_cargos = dict()
+                    lines = dict([])
+                    otros_cargos = dict([])
                     otros_cargos_id = 0
                     line_number = 0
                     total_otros_cargos = 0.0
@@ -1040,7 +1037,7 @@ class AccountInvoiceElectronic(models.Model):
                     total_impuestos = 0.0
                     base_subtotal = 0.0
                     _old_rate_exoneration = False
-                    _no_CABYS_code = False
+                    _no_cabys_code = False
 
                     for inv_line in inv.invoice_line_ids:
                         if inv_line.display_type:  # skip sections and notes
@@ -1113,10 +1110,10 @@ class AccountInvoiceElectronic(models.Model):
                                 elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
                                     line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
                                 else:
-                                    _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                                    _no_cabys_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
                                     continue
                             else:
-                                _no_CABYS_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
+                                _no_cabys_code = 'Aviso!.\nLinea sin código CABYS: %s' % inv_line.name
                                 continue
 
                             if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
@@ -1128,7 +1125,7 @@ class AccountInvoiceElectronic(models.Model):
                                 line["naturalezaDescuento"] = inv_line.discount_note or 'Descuento Comercial'
 
                             # Se generan los impuestos
-                            taxes = dict()
+                            taxes = dict([])
                             _line_tax = 0.0
                             _tax_exoneration = False
                             _percentage_exoneration = 0
@@ -1240,28 +1237,28 @@ class AccountInvoiceElectronic(models.Model):
                     if inv.invoice_id and not inv.invoice_origin:
                         inv.invoice_origin = inv.invoice_id.display_name
 
-                    if _no_CABYS_code and inv.tipo_documento != 'NC':  # CAByS is not required for financial NCs
+                    if _no_cabys_code and inv.tipo_documento != 'NC':  # CAByS is not required for financial NCs
                         inv.state_tributacion = 'error'
-                        inv.message_post(subject='Error', body=_no_CABYS_code)
+                        inv.message_post(subject=_('Error'), body=_no_cabys_code)
                         continue
 
                     if _old_rate_exoneration:
                         inv.state_tributacion = 'error'
-                        inv.message_post(
-                            subject='Error',
-                            body='Revisar definición de impuesto con exoneración, está en base 100 y debe ser base 13')
+                        inv.message_post(subject=_('Error'),
+                                         body=_('Revisar definición de impuesto con exoneración, ' +
+                                                'está en base 100 y debe ser base 13'))
                         continue
 
                     if abs(base_subtotal + total_impuestos +
                            total_otros_cargos - total_iva_devuelto - inv.amount_total) > 0.5:
                         inv.state_tributacion = 'error'
                         inv.message_post(
-                            subject='Error',
-                            body='Monto factura no concuerda con monto para XML. '
-                            'Factura: %s XML:%s base:%s impuestos:%s otros_cargos:%s iva_devuelto:%s' % (
-                                inv.amount_total, (base_subtotal + total_impuestos +
-                                                   total_otros_cargos - total_iva_devuelto),
-                                base_subtotal, total_impuestos, total_otros_cargos, total_iva_devuelto))
+                            subject=_('Error'),
+                            body=_('Monto factura no concuerda con monto para XML. '
+                                   'Factura: %s XML:%s base:%s impuestos:%s otros_cargos:%s iva_devuelto:%s') % (
+                                       inv.amount_total, (base_subtotal + total_impuestos +
+                                                          total_otros_cargos - total_iva_devuelto),
+                                       base_subtotal, total_impuestos, total_otros_cargos, total_iva_devuelto))
                         continue
                     total_servicio_gravado = round(total_servicio_gravado, 5)
                     total_servicio_exento = round(total_servicio_exento, 5)
@@ -1293,14 +1290,14 @@ class AccountInvoiceElectronic(models.Model):
 
                     # inv.xml_comprobante = base64.encodestring(xml_firmado)
                     inv.fname_xml_comprobante = inv.tipo_documento + '_' + inv.number_electronic + '.xml'
-                    self.env['ir.attachment'].sudo().create({'name': inv.tipo_documento + '_' + inv.number_electronic + '.xml',
-                                                      'type': 'binary',
-                                                      'datas': base64.encodestring(xml_firmado),
-                                                      'res_model': self._name,
-                                                      'res_id': inv.id,
-                                                      'res_field': 'xml_comprobante',
-                                                      'res_name': inv.tipo_documento + '_' + inv.number_electronic + '.xml',
-                                                      'mimetype': 'text/xml'})
+                    self.env['ir.attachment'].sudo().create({'name': inv.fname_xml_comprobante,
+                                                             'type': 'binary',
+                                                             'datas': base64.encodestring(xml_firmado),
+                                                             'res_model': self._name,
+                                                             'res_id': inv.id,
+                                                             'res_field': 'xml_comprobante',
+                                                             'res_name': inv.fname_xml_comprobante,
+                                                             'mimetype': 'text/xml'})
 
                     _logger.info('E-INV CR - SIGNED XML:%s', inv.fname_xml_comprobante)
                 else:
@@ -1327,9 +1324,9 @@ class AccountInvoiceElectronic(models.Model):
                             inv.state_tributacion = 'procesando'
                         else:
                             inv.state_tributacion = 'procesando'
-                        inv.message_post(subject='Error', body='Ya recibido anteriormente, se pasa a consultar')
+                        inv.message_post(subject=_('Error'), body=_('Ya recibido anteriormente, se pasa a consultar'))
                     elif inv.error_count > 10:
-                        inv.message_post(subject='Error', body=response_text)
+                        inv.message_post(subject=_('Error'), body=response_text)
                         inv.electronic_invoice_return_message = response_text
                         inv.state_tributacion = 'error'
                         _logger.error('E-INV CR  - Invoice: %s  Status: %s Error '
@@ -1340,12 +1337,13 @@ class AccountInvoiceElectronic(models.Model):
                             inv.state_tributacion = 'procesando'
                         else:
                             inv.state_tributacion = 'procesando'
-                        inv.message_post(subject='Error', body=response_text)
+                        inv.message_post(subject=_('Error'), body=response_text)
                         _logger.error('E-INV CR  - Invoice: %s  Status: %s Error '
                                       'sending XML: %s' % (inv.number_electronic, response_status, response_text))
             except Exception as error:
                 inv.state_tributacion = 'error'
-                inv.message_post(subject='Error', body='Aviso!.\n Error en generate_and_send_invoice: '+str(error))
+                inv.message_post(subject=_('Error'),
+                                 body=_('Aviso!.\n Error en generate_and_send_invoice: ') + str(error))
                 continue
 
     def get_invoice_sequence(self):
@@ -1357,7 +1355,8 @@ class AccountInvoiceElectronic(models.Model):
             if self.partner_id and self.partner_id.vat and not self.partner_id.identification_id:
                 raise UserError('Seleccione el tipo de identificación del cliente en su perfil')
 
-            if self.tipo_documento == 'FE' and (not self.partner_id.vat or self.partner_id.identification_id.code == '05'):
+            if self.tipo_documento == 'FE' and \
+               (not self.partner_id.vat or self.partner_id.identification_id.code == '05'):
                 self.tipo_documento = 'TE'
             if self.tipo_documento == 'FE':
                 sequence = self.journal_id.FE_sequence_id.next_by_id()
@@ -1502,7 +1501,7 @@ class AccountInvoiceElectronic(models.Model):
             inv.invoice_amount_text = extensions.text_converter.number_to_text_es(inv.amount_total)
 
     def _reverse_move_vals(self, default_values, cancel=True):
-        move_vals = super(AccountInvoiceElectronic, self)._reverse_move_vals(default_values, cancel)
+        move_vals = super()._reverse_move_vals(default_values, cancel)
         type_override = move_vals.get('type_override')
         if type_override:
             move_vals['move_type'] = type_override
@@ -1563,7 +1562,7 @@ class AccountInvoiceElectronic(models.Model):
             for move, reverse_move in zip(self, reverse_moves):
                 lines = move.line_ids.filtered(
                     lambda x: (x.account_id.reconcile or x.account_id.internal_type == 'liquidity')
-                              and not x.reconciled
+                    and not x.reconciled
                 )
                 for line in lines:
                     counterpart_lines = reverse_move.line_ids.filtered(lambda x: x.account_id == line.account_id

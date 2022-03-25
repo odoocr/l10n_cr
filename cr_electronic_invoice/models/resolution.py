@@ -1,5 +1,5 @@
 
-from odoo import models, fields, api, _
+from odoo import models, fields
 
 
 class Resolution(models.Model):

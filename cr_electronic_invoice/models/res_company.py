@@ -140,7 +140,7 @@ class CompanyElectronic(models.Model):
             cron = self.env.ref('cr_electronic_invoice.ir_cron_send_expiration_notice', False)
 
             if not self.range_days:
-                return super(CompanyElectronic, self).write(vals)
+                return super().write(vals)
 
             date_expiration_sign = vals.get('date_expiration_sign') and \
                 vals['date_expiration_sign'] or self.date_expiration_sign
@@ -158,7 +158,7 @@ class CompanyElectronic(models.Model):
 
             cron.write(new_values)
 
-        return super(CompanyElectronic, self).write(vals)
+        return super().write(vals)
 
     def get_days_left(self):
         today = datetime.today()
@@ -237,21 +237,20 @@ class CompanyElectronic(models.Model):
             self.env.user, self.frm_ws_ambiente)
         if token_m_h:
             self.message_post(
-                subject='Info',
-                body="Token Correcto")
+                subject=_('Info'),
+                body=_("Token Correcto"))
         else:
             self.message_post(
-                subject='Error',
-                body="Datos Incorrectos")
-        return
+                subject=_('Error'),
+                body=_("Datos Incorrectos"))
 
     def get_expiration_date(self):
         if self.signature and self.frm_pin:
             self.date_expiration_sign = api_facturae.p12_expiration_date(self.signature, self.frm_pin)
         else:
             self.message_post(
-                subject='Error',
-                body="Signature requerido")
+                subject=_('Error'),
+                body=_("Signature requerido"))
 
     def action_get_economic_activities(self):
         if self.vat:
@@ -259,12 +258,12 @@ class CompanyElectronic(models.Model):
 
             self.env.cr.execute('update economic_activity set active=False')
 
-            self.message_post(subject='Actividades Económicas',
-                              body='Aviso!.\n Cargando actividades económicas desde Hacienda')
+            self.message_post(subject=_('Actividades Económicas'),
+                              body=_('Aviso!.\n Cargando actividades económicas desde Hacienda'))
 
             if json_response["status"] == 200:
                 activities = json_response["activities"]
-                activities_codes = list()
+                activities_codes = list([])
                 for activity in activities:
                     if activity["estado"] == "A":
                         activities_codes.append(activity["codigo"])
