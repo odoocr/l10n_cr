@@ -19,7 +19,7 @@ class ResConfigSettings(models.TransientModel):
 
     @api.model
     def get_values(self):
-        res = super(ResConfigSettings, self).get_values()
+        res = super().get_values()
         get_param = self.env['ir.config_parameter'].sudo().get_param
         res.update(
             bccr_username=get_param('bccr_username'),
@@ -31,7 +31,7 @@ class ResConfigSettings(models.TransientModel):
 
     @api.model
     def set_values(self):
-        super(ResConfigSettings, self).set_values()
+        super().set_values()
         set_param = self.env['ir.config_parameter'].sudo().set_param
         set_param('bccr_username', self.bccr_username)
         set_param('bccr_email', self.bccr_email)
