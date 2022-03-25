@@ -769,22 +769,22 @@ class AccountInvoiceElectronic(models.Model):
 
                     if i.tipo_documento != 'FEC' and i.partner_id and i.partner_id.email:
                         email_template = self.env.ref('account.email_template_edi_invoice', False)
-                        domain = [('res_model', '=', self._name),
-                                  ('res_id', '=', self.id),
+                        domain = [('res_model', '=', i._name),
+                                  ('res_id', '=', i.id),
                                   ('res_field', '=', 'xml_comprobante'),
-                                  ('name', '=', self.tipo_documento + '_' + self.number_electronic + '.xml')]
+                                  ('name', '=', i.tipo_documento + '_' + i.number_electronic + '.xml')]
                         attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
                         if attachment:
-                            attachment.name = self.fname_xml_comprobante
+                            attachment.name = i.fname_xml_comprobante
 
-                            domain_resp = [('res_model', '=', self._name),
-                                           ('res_id', '=', self.id),
+                            domain_resp = [('res_model', '=', i._name),
+                                           ('res_id', '=', i.id),
                                            ('res_field', '=', 'xml_respuesta_tributacion'),
-                                           ('name', '=', 'AHC_' + self.number_electronic + '.xml')]
+                                           ('name', '=', 'AHC_' + i.number_electronic + '.xml')]
                             attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
                             if attachment_resp:
-                                attachment_resp.name = self.fname_xml_respuesta_tributacion
+                                attachment_resp.name = i.fname_xml_respuesta_tributacion
 
                                 attach_copy = attachment.copy()
                                 attach_resp_copy = attachment_resp.copy()
