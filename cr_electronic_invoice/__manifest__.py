@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 {
     'name': 'Facturación electrónica Costa Rica',
@@ -63,6 +63,7 @@
     ],
     'external_dependencies': {
         "python": [
+            'cryptography',
             'xmlsig',
             'OpenSSL',
             'phonenumbers',

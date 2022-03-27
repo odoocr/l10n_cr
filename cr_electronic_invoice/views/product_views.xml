@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    
         <record id="view_product_form_inherit" model="ir.ui.view">
             <field name="name">product.template.common.form.inherit</field>
             <field name="model">product.template</field>
@@ -32,5 +32,5 @@
                 </field>
             </field>
         </record>
-    </data>
+    
 </odoo>

@@ -31,6 +31,4 @@ function(require) {
         }
     
     ],{'before': 'res.country.state'});
- 
-    
     });
