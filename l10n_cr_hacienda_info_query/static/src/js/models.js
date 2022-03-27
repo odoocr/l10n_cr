@@ -30,6 +30,4 @@ odoo.define('l10n_cr_hacienda_info_query_init.models',function(require) {
         }
     
     ],{'before': 'res.country.state'});
- 
-    
     });

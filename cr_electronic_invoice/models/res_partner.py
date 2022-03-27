@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
-import re, json, requests
+import re
+import json
+import requests
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import phonenumbers
 import logging
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
@@ -13,19 +14,23 @@ _logger = logging.getLogger(__name__)
 class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
-    commercial_name = fields.Char(string="Commercial Name", required=False, )
-    identification_id = fields.Many2one("identification.type", string="Id Type",required=False, )
-    payment_methods_id = fields.Many2one("payment.methods", string="Payment Method", required=False, )
+    commercial_name = fields.Char()
+    identification_id = fields.Many2one("identification.type")
+    payment_methods_id = fields.Many2one("payment.methods", string="Payment Method")
     has_exoneration = fields.Boolean(string="Has Exoneration?", required=False)
-    type_exoneration = fields.Many2one("aut.ex", string="Authorization Type", required=False, )
-    exoneration_number = fields.Char(string="Exoneration Number", required=False, )
+    type_exoneration = fields.Many2one("aut.ex", string="Authorization Type")
+    exoneration_number = fields.Char(string="Exoneration Number")
     percentage_exoneration = fields.Float(string="Percentage of VAT Exoneration", required=False)
-    institution_name = fields.Char(string="Exoneration Issuer", required=False, )
-    date_issue = fields.Date(string="Issue Date", required=False, )
-    date_expiration = fields.Date(string="Expiration Date", required=False, )
-    date_notification = fields.Date(string="Last notification date", required=False, )
-    activity_id = fields.Many2one("economic.activity", string="Default Economic Activity", required=False, context={'active_test': False} )
-    economic_activities_ids = fields.Many2many('economic.activity', string=u'Economic Activities', context={'active_test': False})
+    institution_name = fields.Char(string="Exoneration Issuer")
+    date_issue = fields.Date(string="Issue Date")
+    date_expiration = fields.Date(string="Expiration Date")
+    date_notification = fields.Date(string="Last notification date")
+    activity_id = fields.Many2one("economic.activity",
+                                  string="Default Economic Activity",
+                                  context={'active_test': False})
+    economic_activities_ids = fields.Many2many('economic.activity',
+                                               string='Economic Activities',
+                                               context={'active_test': False})
     export = fields.Boolean(string="It's export", default=False)
 
     @api.onchange('phone')
@@ -75,16 +80,18 @@ class PartnerElectronic(models.Model):
                 self.vat = re.sub(r"[^0-9]+", "", self.vat)
                 if self.identification_id.code == '01':
                     if self.vat.isdigit() and len(self.vat) != 9:
-                        raise UserError(
-                            'La identificación tipo Cédula física debe de contener 9 dígitos, sin cero al inicio y sin guiones.')
+                        raise UserError('La identificación tipo Cédula física debe ' +
+                                        'de contener 9 dígitos, sin cero al inicio y sin guiones.')
                 elif self.identification_id.code == '02':
                     if self.vat.isdigit() and len(self.vat) != 10:
                         raise UserError(
-                            'La identificación tipo Cédula jurídica debe contener 10 dígitos, sin cero al inicio y sin guiones.')
+                            'La identificación tipo Cédula jurídica debe contener 10 ' +
+                            'dígitos, sin cero al inicio y sin guiones.')
                 elif self.identification_id.code == '03' and self.vat.isdigit():
                     if self.vat.isdigit() and len(self.vat) < 11 or len(self.vat) > 12:
                         raise UserError(
-                            'La identificación tipo DIMEX debe contener 11 o 12 dígitos, sin ceros al inicio y sin guiones.')
+                            'La identificación tipo DIMEX debe contener 11 o 12 ' +
+                            'dígitos, sin ceros al inicio y sin guiones.')
                 elif self.identification_id.code == '04' and self.vat.isdigit():
                     if self.vat.isdigit() and len(self.vat) != 9:
                         raise UserError(
@@ -96,16 +103,19 @@ class PartnerElectronic(models.Model):
             _logger.debug('E-INV CR  - Economic Activities: %s', json_response)
             if json_response["status"] == 200:
                 activities = json_response["activities"]
-                activities_codes = list()
+                # Activity Codes
+                a_codes = list([])
                 for activity in activities:
                     if activity["estado"] == "A":
-                        activities_codes.append(activity["codigo"])
-                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
+                        a_codes.append(activity["codigo"])
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code',
+                                                                                                             'in',
+                                                                                                             a_codes)])
 
                 self.economic_activities_ids = economic_activities
                 self.name = json_response["name"]
 
-                if len(activities_codes) >= 1:
+                if len(a_codes) >= 1:
                     self.activity_id = economic_activities[0]
             else:
                 alert = {
@@ -160,16 +170,19 @@ class PartnerElectronic(models.Model):
                 if 'identificacion' in contenido:
                     if self.vat != contenido.get('identificacion'):
                         raise UserError('El código de exoneración no concuerda con la cédula del socio de negocio.')
-                    fechaEmision = datetime.strptime(str(contenido.get('fechaEmision'))[:10], '%Y-%m-%d')
-                    self.date_issue = fechaEmision
-                    fechaVencimiento = datetime.strptime(str(contenido.get('fechaVencimiento'))[:10], '%Y-%m-%d')
-                    self.date_expiration = fechaVencimiento
+                    fecha_emision = datetime.strptime(str(contenido.get('fechaEmision'))[:10], '%Y-%m-%d')
+                    self.date_issue = fecha_emision
+                    fecha_vencimiento = datetime.strptime(str(contenido.get('fechaVencimiento'))[:10], '%Y-%m-%d')
+                    self.date_expiration = fecha_vencimiento
                     self.percentage_exoneration = float(contenido.get('porcentajeExoneracion'))
                     self.institution_name = contenido.get('nombreInstitucion')
 
                     tipoDocumento = contenido.get('tipoDocumento')
 
-                    autorizacion = self.env['aut.ex'].sudo().search([('code', '=', tipoDocumento.get('codigo')), ('active', '=', True)], limit=1)
+                    autorizacion = self.env['aut.ex'].sudo().search([('code',
+                                                                      '=',
+                                                                      tipoDocumento.get('codigo')),
+                                                                     ('active', '=', True)], limit=1)
 
                     if len(autorizacion) > 0:
                         self.type_exoneration = autorizacion.id

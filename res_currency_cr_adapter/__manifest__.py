@@ -8,7 +8,10 @@
     'author': "Akurey S.A.",
     'website': 'https://github.com/akurey/ak-odoo',
     'license': 'AGPL-3',
-    'depends': ['base', 'account' ],
+    'depends': [
+        'base',
+        'account'
+    ],
     'data': [
         'data/currency_data.xml',
         'views/res_currency_rate_view.xml',

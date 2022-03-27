@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 # © 2017 Creu Blanca
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
@@ -21,9 +21,7 @@ else:
 
 
 class Policy(object):
-    """"
-    Policy class created in order to define different policies
-    """
+    """"Policy class created in order to define different policies."""
 
     hash_method = None
 
@@ -57,7 +55,6 @@ class Policy(object):
         create_node(
             'X509SerialNumber', issuer_serial, DSigNs
         ).text = str(key_x509.serial_number)
-        return
 
     def validate_certificate(self, node, signature):
         certs = node.findall('etsi:Cert', namespaces=NS_MAP)
@@ -113,9 +110,7 @@ class PolicyId(Policy):
     name = None
 
     def set_transforms(self, node, value, sign=False):
-        """
-        Transformations of the policy if required. Modifies node and returns
-        transformed value
+        """Transformations of the policy if required. Modifies node and returns transformed value
         :param node: Policy node
         :param value: Original value
         :return: str
@@ -134,6 +129,8 @@ class PolicyId(Policy):
             identifier = policy_id.find('etsi:SigPolicyId',  namespaces=NS_MAP)
             remote = identifier.find('etsi:Identifier', namespaces=NS_MAP).text
         value = urllib.urlopen(remote).read()
+        # [R1732(consider-using-with), PolicyId.calculate_policy_node]
+        # Consider using 'with' for resource-allocating operations
         value = self.set_transforms(policy_id, value, sign)
         if sign:
             hash_method = self.hash_method

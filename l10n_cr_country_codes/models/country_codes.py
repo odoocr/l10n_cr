@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 from odoo import models, fields
 import logging
@@ -35,26 +35,3 @@ class ResCountryNeighborhood(models.Model):
     code = fields.Char(string="Code", required=True, )
     district_id = fields.Many2one("res.country.district", string="District", required=True)
     name = fields.Char(string="Name", required=True, )
-
-
-# TODO: Esto Realmente se necesita ¿? 08/10/2021: Norlan Ruiz
-class ResCountryState(models.Model):
-    _inherit = 'res.country.state'
-
-    def try_migrate_old_l10n_cr(self):
-        return
-        _logger.info('Check if needed to migrate old l10n_cr states')
-        self.env.cr.execute(
-            "SELECT module FROM ir_model_data WHERE model=%s AND name='state_SJ'", (self._name,)
-        )
-        if self.env.cr.fetchone() == 'l10n_cr':
-            _logger.info('Proceed to migrade old l10n_cr states')
-            self.env.cr.execute(
-                "UPDATE ir_model_data SET name=lower(name) WHERE model=%s AND module='l10n_cr'",
-                (self._name,)
-            )
-            self.env.cr.execute(
-                "UPDATE ir_model_data SET module='l10n_cr_country_codes' "
-                "WHERE model=%s AMD module='l10n_cr'",
-                (self._name,)
-            )

@@ -76,10 +76,10 @@ def number_to_text_es(number_in, join_dec=' Y ', separator=',', decimal_point='.
     converted = ''
 
     # Check type and convert to str
-    if type(number_in) != 'str':
-        number = str(number_in)
-    else:
+    if isinstance(number_in, str):
         number = number_in
+    else:
+        number = str(number_in)
 
     # Remove the separator from the string
     try:
@@ -132,21 +132,21 @@ def number_to_text_es(number_in, join_dec=' Y ', separator=',', decimal_point='.
     return converted
 
 
-def _convert_number(n):
+def _convert_number(number):
     output = ''
 
-    if n == '100':
+    if number == '100':
         output = "CIEN "
-    elif n[0] != '0':
-        output = HUNDREDS[int(n[0])-1]
+    elif number[0] != '0':
+        output = HUNDREDS[int(number[0])-1]
 
-    k = int(n[1:])
+    k = int(number[1:])
     if k <= 20:
         output += UNITS[k]
     else:
-        if (k > 30) & (n[2] != '0'):
-            output += '%sY %s' % (TENS[int(n[1])-2], UNITS[int(n[2])])
+        if (k > 30) & (number[2] != '0'):
+            output += '%sY %s' % (TENS[int(number[1])-2], UNITS[int(number[2])])
         else:
-            output += '%s%s' % (TENS[int(n[1])-2], UNITS[int(n[2])])
+            output += '%s%s' % (TENS[int(number[1])-2], UNITS[int(number[2])])
 
     return output

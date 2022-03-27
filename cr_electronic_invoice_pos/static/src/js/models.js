@@ -19,7 +19,7 @@
  *
  ******************************************************************************/
 
- odoo.define('cr_electronic_invoice_pos.models', function (require) {
+odoo.define('cr_electronic_invoice_pos.models', function (require) {
     "use strict";
 
     var ajax = require('web.ajax');
@@ -43,7 +43,7 @@
         };
         function pad(n, width, z) {
             z = z || '0';
-            n = n + '';
+            n += '';
             if (n.length < width) {
                 n = new Array(width - n.length + 1).join(z) + n;
             }

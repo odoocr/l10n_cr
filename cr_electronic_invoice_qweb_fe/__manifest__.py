@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -20,27 +20,24 @@
 ##############################################################################
 
 {
-    'name' : 'Costa Rica Electronic Invoice QWEB template',
-    'version' : '10.0',
-    'author' : 'CYSFuturo',
+    'name': 'Costa Rica Electronic Invoice QWEB template',
+    'version': '10.0',
+    'author': 'CYSFuturo',
     'summary': 'Update Invoice QWEB template to meet DGT requirements for Costa Rica',
-    'description': """
-Update Invoice QWEB template to meet DGT requirements for Costa Rica
-    """,
+    'description': """Update Invoice QWEB template to meet DGT requirements for Costa Rica""",
     'category': 'Accounting & Finance',
     'sequence': 4,
-    'website' : 'http://cysfuturo.com',
-    'depends' : ['cr_electronic_invoice', 'sale_stock'],
-    'demo' : [],
-    'data' : [
+    'website': 'http://cysfuturo.com',
+    'depends': ['cr_electronic_invoice', 'sale_stock'],
+    'demo': [
+    ],
+    'data': [
         'views/res_company_view.xml',
         'views/report_sales_invoice_qweb.xml',
     ],
-    'test' : [
+    'test': [
     ],
     'auto_install': False,
     'application': True,
     'installable': True,
 }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
