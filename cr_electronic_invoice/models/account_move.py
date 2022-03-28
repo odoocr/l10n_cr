@@ -10,7 +10,7 @@ from odoo.exceptions import UserError
 from odoo.tools.misc import get_lang
 
 from odoo.http import request
-from .qr_generator import generateQrCode
+from .qr_generator import GenerateQrCode
 from odoo.tools import html2plaintext
 
 from . import api_facturae
@@ -28,19 +28,12 @@ class InvoiceLineElectronic(models.Model):
             line.economic_activity_id = line.product_id and line.product_id.categ_id and \
                 line.product_id.categ_id.economic_activity_id and line.product_id.categ_id.economic_activity_id.id
 
-    discount_note = fields.Char(string="Discount note")
-    total_tax = fields.Float(string="Total tax")
-
+    discount_note = fields.Char()
+    total_tax = fields.Float()
     third_party_id = fields.Many2one("res.partner", string="Third - other charges")
-
     tariff_head = fields.Char(string="Tariff item for export invoice")
-
-    categ_name = fields.Char(
-        related='product_id.categ_id.name',
-    )
-    product_code = fields.Char(
-        related='product_id.default_code',
-    )
+    categ_name = fields.Char(related='product_id.categ_id.name')
+    product_code = fields.Char(related='product_id.default_code')
     economic_activity_id = fields.Many2one("economic.activity", string="Economic activity",
                                            required=False, store=True,
                                            context={'active_test': False},
@@ -158,7 +151,7 @@ class AccountInvoiceElectronic(models.Model):
                                            string="Economic Activity", context={'active_test': False})
 
     economic_activities_ids = fields.Many2many('economic.activity', string='Economic activities',
-                                               compute='_get_economic_activities', context={'active_test': False})
+                                               compute='_compute_economic_activities', context={'active_test': False})
 
     not_loaded_invoice = fields.Char(string='Original Invoice Number not loaded', readonly=True)
 
@@ -169,13 +162,13 @@ class AccountInvoiceElectronic(models.Model):
             "La clave de comprobante debe ser única"),
     ]
 
-    qr_image = fields.Binary("QR Code", compute='_generate_qr_code')
+    qr_image = fields.Binary("QR Code", compute='_compute_qr_code')
     partner_vat = fields.Char(string='Partner Tax ID', related="partner_id.vat",
                               store=True, index=True, help="The Parnter Tax Identification Number.")
     company_vat = fields.Char(string='Company Tax ID', related="partner_id.vat",
                               store=True, index=True, help="Your Company Tax Identification Number.")
 
-    def _generate_qr_code(self):
+    def _compute_qr_code(self):
         qr_info = ''
         if self.env.user.company_id.invoice_qr_type != 'by_info':
             qr_info = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
@@ -199,10 +192,10 @@ class AccountInvoiceElectronic(models.Model):
                             key = str(key).replace(_('Partner'), _('Vendor'))
                     qr_info += f"{key} : {value} <br/>"
                 qr_info = html2plaintext(qr_info)
-        self.qr_image = generateQrCode.generate_qr_code(qr_info)
+        self.qr_image = GenerateQrCode.generate_qr_code(qr_info)
 
     @api.onchange('partner_id', 'company_id')
-    def _get_economic_activities(self):
+    def _compute_economic_activities(self):
         for inv in self:
             if inv.move_type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
@@ -491,7 +484,7 @@ class AccountInvoiceElectronic(models.Model):
                 else:
 
                     if inv.state_tributacion and inv.state_tributacion in ('aceptado', 'rechazado', 'na'):
-                        raise UserError('Aviso!.\n La factura de proveedor ya fue confirmada')
+                        raise UserError(_('Aviso!.\n La factura de proveedor ya fue confirmada'))
                     if not inv.amount_total_electronic_invoice and inv.xml_supplier_approval:
                         try:
                             inv.load_xml_data()
@@ -501,12 +494,10 @@ class AccountInvoiceElectronic(models.Model):
                                              body=_('Aviso!.\n Error en carga del XML del proveedor') + str(error))
                             continue
 
-                    if abs(
-                            inv.amount_total_electronic_invoice - inv.amount_total) > 1:
+                    if abs(inv.amount_total_electronic_invoice - inv.amount_total) > 1:
                         inv.state_tributacion = 'error'
-                        inv.message_post(
-                            subject=_('Error'),
-                            body=_('Aviso!.\n Monto total no concuerda con monto del XML'))
+                        inv.message_post(subject=_('Error'),
+                                         body=_('Aviso!.\n Monto total no concuerda con monto del XML'))
                         continue
 
                     elif not inv.xml_supplier_approval:
@@ -532,7 +523,7 @@ class AccountInvoiceElectronic(models.Model):
 
                         message_description = "<p><b>Enviando Mensaje Receptor</b></p>"
 
-                        '''Si por el contrario es un documento nuevo, asignamos todos los valores'''
+                        # '''Si por el contrario es un documento nuevo, asignamos todos los valores'''
                         if not inv.xml_comprobante or inv.state_invoice_partner not in ['procesando', 'aceptado']:
 
                             if inv.state_invoice_partner == '1':
@@ -552,23 +543,28 @@ class AccountInvoiceElectronic(models.Model):
                                 tipo_documento = 'RCE'
                                 sequence = inv.company_id.RCE_sequence_id.next_by_id()
 
-                            '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
+                            # '''Si el mensaje fue rechazado, necesitamos generar un nuevo id'''
                             if inv.state_tributacion in ['rechazado', 'error']:
-                                message_description += '<p><b>Cambiando consecutivo del Mensaje de Receptor</b><br/>' \
-                                                       '<b>Consecutivo anterior: ' + \
-                                                       '</b>' + inv.consecutive_number_receiver + \
-                                                       '<br/>' \
-                                                       '<b>Estado anterior: </b>' + inv.state_tributacion + '</p>'
+                                message_description += '<p><b>'
+                                message_description += 'Cambiando consecutivo del Mensaje de Receptor</b><br/>'
+                                message_description += '</b><br/>'
+                                message_description += '<b>Consecutivo anterior:</b>'
+                                message_description += inv.consecutive_number_receiver
+                                message_description += '<br/>'
+                                message_description += '<b>Estado anterior: </b>'
+                                message_description += inv.state_tributacion
+                                message_description += '</p>'
 
-                            '''Solicitamos la clave para el Mensaje Receptor'''
-                            response_json = api_facturae.get_clave_hacienda(
-                                inv, tipo_documento, sequence,
-                                inv.company_id.sucursal_MR,
-                                inv.company_id.terminal_MR)
+                            # '''Solicitamos la clave para el Mensaje Receptor'''
+                            response_json = api_facturae.get_clave_hacienda(inv,
+                                                                            tipo_documento,
+                                                                            sequence,
+                                                                            inv.company_id.sucursal_MR,
+                                                                            inv.company_id.terminal_MR)
 
                             inv.consecutive_number_receiver = response_json.get(
                                 'consecutivo')
-                            '''Generamos el Mensaje Receptor'''
+                            # '''Generamos el Mensaje Receptor'''
                             if inv.amount_total_electronic_invoice is None or inv.amount_total_electronic_invoice == 0:
                                 inv.state_tributacion = 'error'
                                 msg_body = 'El monto Total de la Factura para el Mensaje Receptro es inválido'
@@ -872,10 +868,10 @@ class AccountInvoiceElectronic(models.Model):
             inv.send_mrs_to_hacienda()
 
     def action_create_fec(self):
-        if self.company_id.frm_ws_ambiente == 'disabled':
-            raise UserError(_('Hacienda API is disabled in company'))
-        else:
+        if not self.company_id.frm_ws_ambiente == 'disabled':
             self.generate_and_send_invoices(self)
+
+        raise UserError(_('Hacienda API is disabled in company'))
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
@@ -895,7 +891,7 @@ class AccountInvoiceElectronic(models.Model):
             for inv in invoices:
                 inv.message_post(
                     body=message,
-                    subject='NOTIFICACIÓN IMPORTANTE!!',
+                    subject=_('NOTIFICACIÓN IMPORTANTE!!'),
                     message_type='notification',
                     subtype=None,
                     parent_id=False,
@@ -910,7 +906,7 @@ class AccountInvoiceElectronic(models.Model):
         else:
             message = self.env.user.company_id.get_message_to_send()
             self.message_post(body=message,
-                              subject='NOTIFICACIÓN IMPORTANTE!!',
+                              subject=_('NOTIFICACIÓN IMPORTANTE!!'),
                               message_type='notification',
                               subtype=None,
                               parent_id=False)
@@ -929,7 +925,7 @@ class AccountInvoiceElectronic(models.Model):
                 if days_left <= self.env.user.company_id.range_days:
                     inv.message_post(
                         body=message,
-                        subject='NOTIFICACIÓN IMPORTANTE!!',
+                        subject=_('NOTIFICACIÓN IMPORTANTE!!'),
                         message_type='notification',
                         subtype=None,
                         parent_id=False,
@@ -949,7 +945,7 @@ class AccountInvoiceElectronic(models.Model):
                         msg_body = 'Se está enviando otra FEC porque la anterior fue rechazada por Hacienda. '
                         msg_body += 'Adjuntos los XMLs anteriores. Clave anterior: '
                         inv.message_post(body=msg_body + inv.number_electronic,
-                                         subject='Envío de una segunda FEC',
+                                         subject=_('Envío de una segunda FEC'),
                                          message_type='notification',
                                          subtype=None,
                                          parent_id=False,
@@ -1329,8 +1325,8 @@ class AccountInvoiceElectronic(models.Model):
                         inv.message_post(subject=_('Error'), body=response_text)
                         inv.electronic_invoice_return_message = response_text
                         inv.state_tributacion = 'error'
-                        _logger.error('E-INV CR  - Invoice: %s  Status: %s Error '
-                                      'sending XML: %s' % (inv.number_electronic, response_status, response_text))
+                        _logger.error(f'E-INV CR  - Invoice: {inv.number_electronic}' +
+                                      'Status: {response_status} Error sending XML: {response_text}')
                     else:
                         inv.error_count += 1
                         if inv.tipo_documento == 'FEC':
@@ -1353,7 +1349,7 @@ class AccountInvoiceElectronic(models.Model):
         if self.move_type == 'out_invoice':
             # tipo de identificación
             if self.partner_id and self.partner_id.vat and not self.partner_id.identification_id:
-                raise UserError('Seleccione el tipo de identificación del cliente en su perfil')
+                raise UserError(_('Seleccione el tipo de identificación del cliente en su perfil'))
 
             if self.tipo_documento == 'FE' and \
                (not self.partner_id.vat or self.partner_id.identification_id.code == '05'):
@@ -1389,26 +1385,26 @@ class AccountInvoiceElectronic(models.Model):
                 inv.tipo_documento = 'disabled'
                 continue
 
-            if inv.partner_id.has_exoneration and inv.partner_id.date_expiration and (
-                    inv.partner_id.date_expiration < datetime.date.today()):
-                raise UserError('La exoneración de este cliente se encuentra vencida')
+            if inv.partner_id.has_exoneration:
+                if inv.partner_id.date_expiration and (inv.partner_id.date_expiration > datetime.date.today()):
+                    raise UserError(_('La exoneración de este cliente se encuentra vencida'))
 
             currency = inv.currency_id
             sequence = False
             if (inv.invoice_id) and not (inv.reference_code_id and inv.reference_document_id):
-                raise UserError('Datos incompletos de referencia para nota de crédito')
+                raise UserError(_('Datos incompletos de referencia para nota de crédito'))
             elif (inv.not_loaded_invoice or inv.not_loaded_invoice_date) and not \
                 (inv.not_loaded_invoice and inv.not_loaded_invoice_date and
                  inv.reference_code_id and inv.reference_document_id):
-                raise UserError('Datos incompletos de referencia para nota de crédito no cargada')
+                raise UserError(_('Datos incompletos de referencia para nota de crédito no cargada'))
 
             if inv.move_type == 'in_invoice' and inv.partner_id.country_id and \
                 inv.partner_id.country_id.code == 'CR' and inv.partner_id.identification_id and \
                     inv.partner_id.vat and inv.economic_activity_id is False:
-                raise UserError('Las facturas FEC requieren que el proveedor tenga definida la actividad económica')
+                raise UserError(_('Las facturas FEC requieren que el proveedor tenga definida la actividad económica'))
             # tipo de identificación
             if not inv.company_id.identification_id:
-                raise UserError('Seleccione el tipo de identificación del emisor en el perfil de la compañía')
+                raise UserError(_('Seleccione el tipo de identificación del emisor en el perfil de la compañía'))
 
             if inv.partner_id and inv.partner_id.vat:
                 identificacion = re.sub('[^0-9]', '', inv.partner_id.vat)
@@ -1424,22 +1420,22 @@ class AccountInvoiceElectronic(models.Model):
                         id_code = '05'
 
                 if id_code == '01' and len(identificacion) != 9:
-                    raise UserError('La Cédula Física del receptor debe de tener 9 dígitos')
+                    raise UserError(_('La Cédula Física del receptor debe de tener 9 dígitos'))
                 elif id_code == '02' and len(identificacion) != 10:
-                    raise UserError('La Cédula Jurídica del receptor debe de tener 10 dígitos')
+                    raise UserError(_('La Cédula Jurídica del receptor debe de tener 10 dígitos'))
                 elif id_code == '03' and len(identificacion) not in (11, 12):
-                    raise UserError('La identificación DIMEX del receptor debe de tener 11 o 12 dígitos')
+                    raise UserError(_('La identificación DIMEX del receptor debe de tener 11 o 12 dígitos'))
                 elif id_code == '04' and len(identificacion) != 10:
-                    raise UserError('La identificación NITE del receptor debe de tener 10 dígitos')
+                    raise UserError(_('La identificación NITE del receptor debe de tener 10 dígitos'))
 
             if inv.invoice_payment_term_id and not inv.invoice_payment_term_id.sale_conditions_id:
-                raise UserError('No se pudo Crear la factura electrónica: \n Debe '
-                                'configurar condiciones de pago para %s' % (inv.invoice_payment_term_id.name))
+                raise UserError(_('No se pudo Crear la factura electrónica: \n Debe '
+                                'configurar condiciones de pago para %s') % (inv.invoice_payment_term_id.name))
 
             # Validate if invoice currency is the same as the company currency
             if currency.name != inv.company_id.currency_id.name and (not currency.rate_ids or not
                                                                      (len(currency.rate_ids) > 0)):
-                raise UserError(_('No hay tipo de cambio registrado para la moneda %s' % (currency.name)))
+                raise UserError(_('No hay tipo de cambio registrado para la moneda %s') % (currency.name))
 
             # Digital Invoice or ticket
             if inv.move_type in ('out_invoice', 'out_refund') and inv.number_electronic:
@@ -1509,14 +1505,14 @@ class AccountInvoiceElectronic(models.Model):
         return move_vals
 
     def _reverse_moves(self, default_values_list=None, cancel=False):
-        ''' Reverse a recordset of account.move.
+        """ Reverse a recordset of account.move.
         If cancel parameter is true, the reconcilable or liquidity lines
         of each original move will be reconciled with its reverse's.
 
         :param default_values_list: A list of default values to consider per move.
                                     ('type' & 'reversed_entry_id' are computed in the method).
         :return:                    An account.move recordset, reverse of the current self.
-        '''
+        """
         if not default_values_list:
             default_values_list = [{} for move in self]
 

@@ -19,7 +19,7 @@ class PartnerElectronic(models.Model):
     payment_methods_id = fields.Many2one("payment.methods", string="Payment Method")
     has_exoneration = fields.Boolean(string="Has Exoneration?", required=False)
     type_exoneration = fields.Many2one("aut.ex", string="Authorization Type")
-    exoneration_number = fields.Char(string="Exoneration Number")
+    exoneration_number = fields.Char()
     percentage_exoneration = fields.Float(string="Percentage of VAT Exoneration", required=False)
     institution_name = fields.Char(string="Exoneration Issuer")
     date_issue = fields.Date(string="Issue Date")
@@ -73,29 +73,26 @@ class PartnerElectronic(models.Model):
         if self.identification_id and self.vat:
             if self.identification_id.code == '05':
                 if len(self.vat) == 0 or len(self.vat) > 20:
-                    raise UserError(
-                        'La identificación debe tener menos de 20 carateres.')
+                    raise UserError(_('La identificación debe tener menos de 20 carateres.'))
             else:
                 # Remove leters, dashes, dots or any other special character.
                 self.vat = re.sub(r"[^0-9]+", "", self.vat)
                 if self.identification_id.code == '01':
                     if self.vat.isdigit() and len(self.vat) != 9:
-                        raise UserError('La identificación tipo Cédula física debe ' +
-                                        'de contener 9 dígitos, sin cero al inicio y sin guiones.')
+                        raise UserError(_('La identificación tipo Cédula física debe ' +
+                                        'de contener 9 dígitos, sin cero al inicio y sin guiones.'))
                 elif self.identification_id.code == '02':
                     if self.vat.isdigit() and len(self.vat) != 10:
-                        raise UserError(
-                            'La identificación tipo Cédula jurídica debe contener 10 ' +
-                            'dígitos, sin cero al inicio y sin guiones.')
+                        raise UserError(_('La identificación tipo Cédula jurídica debe contener 10 ' +
+                                          'dígitos, sin cero al inicio y sin guiones.'))
                 elif self.identification_id.code == '03' and self.vat.isdigit():
                     if self.vat.isdigit() and len(self.vat) < 11 or len(self.vat) > 12:
-                        raise UserError(
-                            'La identificación tipo DIMEX debe contener 11 o 12 ' +
-                            'dígitos, sin ceros al inicio y sin guiones.')
+                        raise UserError(_('La identificación tipo DIMEX debe contener 11 o 12 ' +
+                                          'dígitos, sin ceros al inicio y sin guiones.'))
                 elif self.identification_id.code == '04' and self.vat.isdigit():
                     if self.vat.isdigit() and len(self.vat) != 9:
-                        raise UserError(
-                            'La identificación tipo NITE debe contener 10 dígitos, sin ceros al inicio y sin guiones.')
+                        raise UserError(_('La identificación tipo NITE debe contener 10 dígitos, ' +
+                                          'sin ceros al inicio y sin guiones.'))
 
     def action_get_economic_activities(self):
         if self.vat:
@@ -160,7 +157,7 @@ class PartnerElectronic(models.Model):
                 self.percentage_exoneration = 0
                 self.institution_name = False
                 self.type_exoneration = False
-                # raise UserError('El documento de exoneración no existe.')
+                # raise UserError(_('El documento de exoneración no existe.'))
 
             if peticion.status_code in (200, 202) and len(peticion._content) > 0:
                 contenido = json.loads(str(peticion._content, 'utf-8'))
@@ -169,7 +166,7 @@ class PartnerElectronic(models.Model):
 
                 if 'identificacion' in contenido:
                     if self.vat != contenido.get('identificacion'):
-                        raise UserError('El código de exoneración no concuerda con la cédula del socio de negocio.')
+                        raise UserError(_('El código de exoneración no concuerda con la cédula del socio de negocio.'))
                     fecha_emision = datetime.strptime(str(contenido.get('fechaEmision'))[:10], '%Y-%m-%d')
                     self.date_issue = fecha_emision
                     fecha_vencimiento = datetime.strptime(str(contenido.get('fechaVencimiento'))[:10], '%Y-%m-%d')
@@ -177,11 +174,11 @@ class PartnerElectronic(models.Model):
                     self.percentage_exoneration = float(contenido.get('porcentajeExoneracion'))
                     self.institution_name = contenido.get('nombreInstitucion')
 
-                    tipoDocumento = contenido.get('tipoDocumento')
+                    tipo_documento = contenido.get('tipoDocumento')
 
                     autorizacion = self.env['aut.ex'].sudo().search([('code',
                                                                       '=',
-                                                                      tipoDocumento.get('codigo')),
+                                                                      tipo_documento.get('codigo')),
                                                                      ('active', '=', True)], limit=1)
 
                     if len(autorizacion) > 0:

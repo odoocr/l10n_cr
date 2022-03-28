@@ -26,7 +26,7 @@ class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
 
-    commercial_name = fields.Char(string="Commercial Name")
+    commercial_name = fields.Char()
     legal_name = fields.Char(string="Nombre Legal")
     activity_id = fields.Many2one("economic.activity",
                                   string="Default economic activity",

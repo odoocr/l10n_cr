@@ -9,7 +9,7 @@ class AccountMoveReversal(models.TransientModel):
     """
 
     reference_code_id = fields.Many2one("reference.code", string="Reference Code", required=True)
-    reference_document_id = fields.Many2one("reference.document", string="Reference Document Id", required=True)
+    reference_document_id = fields.Many2one("reference.document", string="Reference Document", required=True)
 
     def _prepare_default_reversal(self, move):
         default_values = super()._prepare_default_reversal(move)
