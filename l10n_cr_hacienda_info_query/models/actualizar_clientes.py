@@ -47,45 +47,24 @@ class ResPartner(models.Model):
                 contenido = json.loads(str(peticion._content, 'utf-8'))
                 self.env.company.ultima_respuesta = ultimo_mensaje
 
-                if 'nombre' in contenido:
+                if contenido.get('nombre') and contenido.get('tipoIdentificacion'):
+                    self.name = contenido.get('nombre')
                     if 'identification_id' in self._fields:
-                        if 'tipoIdentificacion' in contenido:
-                            clasificacion = contenido.get('tipoIdentificacion')
-                            # Cedula Fisica
-                            if clasificacion == '01':
-                                self.identification_id = self.env['identification.type'].search([(
-                                    'code', '=', '01')], limit=1).id
-                            # Cedula Juridica
-                            elif clasificacion == '02':
-                                self.identification_id = self.env['identification.type'].search([(
-                                    'code', '=', '02')], limit=1).id
-                            # Cedula Juridica
-                            elif clasificacion == '03':
-                                self.identification_id = self.env['identification.type'].search([(
-                                    'code', '=', '03')], limit=1).id
-                            # Cedula Juridica
-                            elif clasificacion == '04':
-                                self.identification_id = self.env['identification.type'].search([(
-                                    'code', '=', '04')], limit=1).id
-                            # Cedula Juridica
-                            elif clasificacion == '05':
-                                self.identification_id = self.env['identification.type'].search([(
-                                    'code', '=', '05')], limit=1).id
+                        clasificacion = contenido.get('tipoIdentificacion')
 
-                    if contenido.get('nombre') is not None:
-                        name = contenido.get('nombre')
-                        self.name = name
-                    if 'actividades' in contenido:
-                        actividades = contenido.get('actividades')
-                        for act in actividades:
-                            if act.get('estado') == 'A':
-                                if 'activity_id' in self._fields:
-                                    self.activity_id = self.env['economic.activity'].search([(
-                                        'code', '=', str(act.get('codigo')))], limit=1).id
+                        self.identification_id = self.env['identification.type'].search([('code',
+                                                                                          '=',
+                                                                                          clasificacion)], limit=1).id
+
+                if contenido.get('actividades') and 'activity_id' in self._fields:
+                    for act in contenido.get('actividades'):
+                        if act.get('estado') == 'A':
+                            self.activity_id = self.env['economic.activity'].search([('code',
+                                                                                      '=',
+                                                                                      str(act.get('codigo')))],
+                                                                                    limit=1).id
 
     @api.onchange('vat')
     def onchange_vat(self):
-        if not self.vat:
-            self.name = self.name
-        else:
+        if self.vat:
             self.definir_informacion(self.vat)
