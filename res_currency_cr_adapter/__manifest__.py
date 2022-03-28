@@ -5,7 +5,7 @@
     'name': 'Costa Rica Currency Adapter',
     'version': '14.0.1.0.0',
     'category': 'Account',
-    'author': "Akurey S.A.",
+    'author': "Odoo CR, Akurey S.A.",
     'website': 'https://github.com/akurey/ak-odoo',
     'license': 'AGPL-3',
     'depends': [
