@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 {
     'name': 'Códigos País para Facturación electrónica Costa Rica',
@@ -10,20 +10,19 @@
     'description': '''Códigos País para Facturación electrónica Costa Rica.''',
     'depends': [
         'base',
-
-        # Se ocupan realmente estas dependencias ¿? 08/10/2021: Norlan Ruiz
-        'account', 
-        'product', ],
+        'account',
+        'product'
+    ],
     'data': [
-             'data/res_country_state.xml',
-             'data/res.country.county.csv',
-             'data/res.country.district.csv',
-             'data/res.country.neighborhood.csv',
-             'security/ir.model.access.csv',
-             'views/country_codes_views.xml',
-             'views/res_company_views.xml',
-             'views/res_partner_views.xml',
-             ],
-    #"pre_init_hook": "pre_init_hook",
+        'data/res_country_state.xml',
+        'data/res.country.county.csv',
+        'data/res.country.district.csv',
+        'data/res.country.neighborhood.csv',
+        'security/ir.model.access.csv',
+        'views/country_codes_views.xml',
+        'views/res_company_views.xml',
+        'views/res_partner_views.xml',
+    ],
+    # "pre_init_hook": "pre_init_hook",
     'installable': True,
 }

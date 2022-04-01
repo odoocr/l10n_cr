@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
+
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import http, _
-from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
-from odoo.exceptions import AccessError, MissingError
-from collections import OrderedDict
+from odoo.addons.portal.controllers.portal import CustomerPortal
 from odoo.http import request
-
-import logging
-_logger = logging.getLogger(__name__)
 
 
 class PortalAccount(CustomerPortal):
@@ -23,15 +17,19 @@ class PortalAccount(CustomerPortal):
             'invoice': invoice
         }
 
-        domain = [('res_model', '=', 'account.move'), ('res_id', '=', invoice.id), ('name', 'like', invoice.tipo_documento + '_'+ invoice.number_electronic)]
-        domain_resp = [('res_model', '=', 'account.move'), ('res_id', '=', invoice.id),
-                               ('name', 'like', 'AHC_' + invoice.number_electronic)]
+        domain = [('res_model', '=', invoice._name),
+                  ('res_id', '=', invoice.id),
+                  ('res_field', '=', 'xml_comprobante'),
+                  ('name', '=', invoice.tipo_documento + '_' + invoice.number_electronic + '.xml')]
+        domain_resp = [('res_model', '=', invoice._name),
+                       ('res_id', '=', invoice.id),
+                       ('res_field', '=', 'xml_respuesta_tributacion'),
+                       ('name', '=', 'AHC_' + invoice.number_electronic + '.xml')]
 
         attachment = request.env['ir.attachment'].sudo().search(domain, limit=1)
         if attachment:
             values['xml_documento'] = attachment
 
-            
         attachment_resp = request.env['ir.attachment'].sudo().search(domain_resp, limit=1)
         if attachment_resp:
             values['xml_AHC'] = attachment_resp

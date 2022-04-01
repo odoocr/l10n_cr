@@ -1,0 +1,130 @@
+[MASTER]
+profile=no
+ignore=CVS,.git,scenarios,.bzr
+persistent=yes
+cache-size=500
+load-plugins=pylint.extensions.docstyle, pylint.extensions.mccabe, pylint_odoo
+
+[ODOOLINT]
+readme_template_url="https://github.com/OCA/maintainer-tools/blob/master/template/module/README.rst"
+license_allowed=AGPL-3,GPL-2,GPL-2 or any later version,
+    GPL-3,GPL-3 or any later version,LGPL-3,
+    Other OSI approved licence,Other proprietary,
+    OEEL-1, OPL-1,
+manifest_required_authors=Odoo CR, Vauxoo,
+  Odoo Community Association (OCA),
+  Jarsa Sistemas,
+manifest_required_keys=license
+manifest_deprecated_keys=description,active
+
+[MESSAGES CONTROL]
+disable=all
+enable=api-one-deprecated,
+  api-one-multi-together,
+  attribute-deprecated,
+  attribute-string-redundant,
+  character-not-valid-in-resource-link,
+  bad-docstring-quotes,
+  class-camelcase,
+  consider-merging-classes-inherited,
+  create-user-wo-reset-password,
+  dangerous-filter-wo-user,
+  dangerous-view-replace-wo-priority,
+  deprecated-data-xml-node,
+  # deprecated-openerp-xml-node,
+  docstring-first-line-empty,
+  duplicate-id-csv,
+  duplicate-po-message-definition,
+  duplicate-xml-fields,
+  duplicate-xml-record-id,
+  eval-referenced,
+  except-pass,
+  # file-not-used, can not be disabled
+  incoherent-interpreter-exec-perm,
+  invalid-commit,
+  # javascript-lint,  pre-commit is using eslint directly
+  license-allowed,
+  manifest-author-string,
+  manifest-deprecated-key,
+  manifest-maintainers-list,
+  manifest-required-author,
+  manifest-required-key,
+  manifest-version-format,
+  method-compute,
+  method-inverse,
+  method-required-super,
+  method-search,
+  missing-import-error,
+  missing-manifest-dependency,
+  missing-newline-extrafiles,
+  missing-readme,
+  missing-return,
+  no-utf8-coding-comment,
+  odoo-addons-relative-import,
+  openerp-exception-warning,
+  po-msgstr-variables,
+  po-syntax-error,
+  prefer-other-formatting,
+  print-used,
+  redundant-modulename-xml,
+  renamed-field-parameter,
+  resource-not-exist,
+  rst-syntax-error,
+  sql-injection,
+  str-format-used,
+  too-complex,
+  translation-contains-variable,
+  translation-field,
+  translation-required,
+  unnecessary-utf8-coding-comment,
+  use-vim-comment,
+  website-manifest-key-not-valid-uri,
+  useless-super-delegation,
+  wrong-tabs-instead-of-spaces,
+  xml-attribute-translatable,
+  xml-deprecated-qweb-directive,
+  # xml-deprecated-tree-attribute,
+  xml-syntax-error,
+  dangerous-qweb-replace-wo-priority,
+  context-overridden,
+
+[REPORTS]
+msg-template={path}:{line}: [{msg_id}({symbol}), {obj}] {msg}
+output-format=colorized
+files-output=no
+reports=no
+evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+score=no
+
+[FORMAT]
+indent-string='    '
+expected-line-ending-format=LF
+
+[BASIC]
+class-rgx=[A-Z_][a-zA-Z0-9]{2,59}
+module-rgx=.*
+const-rgx=.*
+function-rgx=.*
+method-rgx=.*
+attr-rgx=.*
+argument-rgx=.*
+variable-rgx=.*
+inlinevar-rgx=.*
+
+[SIMILARITIES]
+ignore-comments=yes
+ignore-docstrings=yes
+
+[MISCELLANEOUS]
+notes=FIXME,TODO
+
+[IMPORTS]
+deprecated-modules=openerp.osv
+
+[DESIGN]
+# McCabe complexity cyclomatic threshold for too-complex check
+#  Value definied from https://en.wikipedia.org/wiki/Cyclomatic_complexity
+#   - The figure of 10 had received substantial corroborating evidence,
+#     but that in some circumstances it may be appropriate to relax the restriction
+#     and permit modules with a complexity as high as 15
+max-complexity=15

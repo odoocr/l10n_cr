@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    
         <record id="view_resolution_form" 
             model="ir.ui.view">
             <field name="name">resolution.form</field>
@@ -39,5 +39,5 @@
             <field name="res_model">resolution</field>
             <field name="view_mode">tree,form</field>
         </record>
-    </data>
+    
 </odoo>

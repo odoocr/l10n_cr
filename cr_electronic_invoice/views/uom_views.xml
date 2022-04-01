@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    
         <record id="product_uom_form_view_inherit" model="ir.ui.view">
             <field name="name">uom.uom.form.inherit</field>
             <field name="model">uom.uom</field>
@@ -11,5 +11,5 @@
                 </field>
             </field>
         </record>
-    </data>
+    
 </odoo>
