@@ -1,2 +1,2 @@
- #import estadisticas #Odoo 8 hacia atras
-from . import actualizar_clientes 
+#import estadisticas #Odoo 8 hacia atras
+from . import actualizar_clientes

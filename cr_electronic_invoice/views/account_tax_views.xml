@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    
         <record id="view_tax_form_inherit" model="ir.ui.view">
             <field name="name">account.tax.form.inherit</field>
             <field name="model">account.tax</field>
@@ -23,5 +23,5 @@
                 </xpath>
             </field>
         </record>
-    </data>
+    
 </odoo>

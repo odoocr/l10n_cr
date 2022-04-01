@@ -25,7 +25,7 @@
 %(country_name)s</field>
         </record>
 
-        <!-- AL FINAL ATIVAMOS EL NO UPDATE -->
+        <!-- AL FINAL ACTIVAMOS EL NO UPDATE -->
 
         <function name="write" model="ir.model.data">
             <function name="search" model="ir.model.data">
@@ -57,5 +57,5 @@
         <record id="base.state_L" model="res.country.state">
             <field name="code">7</field>
         </record>
-    </data>
+    
 </odoo>
