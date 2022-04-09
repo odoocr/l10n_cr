@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    
+    <data>
         <!--Herencia de Compañia-->
         <record id="view_company_form_inherit" model="ir.ui.view">
             <field name="name">res.company.form.inherit</field>
@@ -37,5 +37,5 @@
                 </xpath>
             </field>
         </record>
-    
+    </data>
 </openerp>

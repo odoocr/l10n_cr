@@ -41,7 +41,7 @@ class ResPartner(models.Model):
         url_base_yo_contribuyo = self.env.company.url_base_yo_contribuyo
         usuario_yo_contribuyo = self.env.company.usuario_yo_contribuyo
         token_yo_contribuyo = self.env.company.token_yo_contribuyo
-        if url_base_yo_contribuyo:
+        if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
             url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
 
             if url_base_yo_contribuyo[-1:] == '/':
