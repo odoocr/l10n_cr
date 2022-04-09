@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -29,7 +29,7 @@ from odoo.report import report_sxw
 class SalesInvoicePrint(report_sxw.rml_parse):  # , common_report_header):
     # _name = 'report.sales.invoice.print'
     def __init__(self, cr, uid, name, context):
-        super(SalesInvoicePrint, self).__init__(cr, uid, name, context)
+        super().__init__(cr, uid, name, context)
         self.localcontext.update({
             'get_digits': self.get_digits,
             'time': time,
@@ -42,5 +42,3 @@ class ReportSalesInvoiceQWeb(osv.AbstractModel):
     _inherit = 'report.abstract_report'
     _template = 'account.report_invoice_document'
     _wrapped_report_class = SalesInvoicePrint
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

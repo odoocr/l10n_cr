@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
 
-from datetime import datetime, date, timedelta
-import logging
-import re
+
+from datetime import datetime, timedelta
+
 import phonenumbers
 
-from odoo import models, fields, api, _ 
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-from odoo.tools.safe_eval import safe_eval
 
 from . import api_facturae
-
-_logger = logging.getLogger(__name__)
 
 _TIPOS_CONFIRMACION = (
     # Provides listing of types of comprobante confirmations
@@ -30,37 +26,40 @@ class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
 
-    commercial_name = fields.Char(string="Commercial Name", required=False, )
-    legal_name = fields.Char(string="Nombre Legal", required=False)
-    activity_id = fields.Many2one("economic.activity", string="Default economic activity", required=False, context={'active_test': False})
+    commercial_name = fields.Char(string="Commercial Name")
+    legal_name = fields.Char(string="Nombre Legal")
+    activity_id = fields.Many2one("economic.activity",
+                                  string="Default economic activity",
+                                  context={'active_test': False})
     signature = fields.Binary(string="Cryptographic Key", )
     date_expiration_sign = fields.Datetime(string="Due date", default='1985-08-28 00:00:00')
     range_days = fields.Integer(string='Days range', default=5)
     send_user_ids = fields.Many2many('res.users', 'res_company_res_sendusers_rel', string='Users')
     to_emails = fields.Char(string='Email')
 
-    identification_id = fields.Many2one("identification.type", string="Id Type", required=False)
-    frm_ws_identificador = fields.Char(string="Electronic invoice user", required=False)
-    frm_ws_password = fields.Char(string="Electronic invoice password", required=False)
+    identification_id = fields.Many2one("identification.type", string="Id Type")
+    frm_ws_identificador = fields.Char(string="Electronic invoice user")
+    frm_ws_password = fields.Char(string="Electronic invoice password")
 
-    frm_ws_ambiente = fields.Selection(selection=[('disabled', 'Deshabilitado'), 
+    frm_ws_ambiente = fields.Selection(selection=[('disabled', 'Deshabilitado'),
                                                   ('api-stag', 'Pruebas'),
                                                   ('api-prod', 'Producción')],
-                                    string="Environment",
-                                    required=True, 
-                                    default='disabled',
-                                    help='Es el ambiente en al cual se le está actualizando el certificado. Para el ambiente '
-                                    'de calidad (stag), para el ambiente de producción (prod). Requerido.')
+                                       string="Environment",
+                                       required=True,
+                                       default='disabled',
+                                       help='Es el ambiente en al cual se le está actualizando el certificado. '
+                                       'Para el ambiente de calidad (stag), para el ambiente de producción (prod). '
+                                       'Requerido.')
 
-    frm_pin = fields.Char(string="Pin", 
+    frm_pin = fields.Char(string="Pin",
                           required=False,
                           help='Es el pin correspondiente al certificado. Requerido')
 
-    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", 
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs",
                                  required=False,
                                  default="1")
 
-    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", 
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs",
                                  required=False,
                                  default="1")
 
@@ -92,16 +91,20 @@ class CompanyElectronic(models.Model):
         readonly=False, copy=False,
     )
 
-    invoice_qr_type = fields.Selection([('by_url','Invoice Url'),('by_info','Invoice Text Information')],default='by_url',required=True)
-    invoice_field_ids = fields.One2many('invoice.qr.fields','company_id',string="Invoice Field's")
+    invoice_qr_type = fields.Selection([('by_url', 'Invoice Url'), ('by_info', 'Invoice Text Information')],
+                                       default='by_url',
+                                       required=True)
+    invoice_field_ids = fields.One2many('invoice.qr.fields',
+                                        'company_id',
+                                        string="Invoice Field's")
 
     # Se agrega campos para consultar información de exoneraciones
     ultima_respuesta_exo = fields.Text(string="Last API EXONET Response",
-                                         help="Last API EXONET Response, this allows debugging errors if they exist")
-    url_base_exo = fields.Char(string="URL Base EXONET", required=False, help="URL Base ENDPOINT EXONET",
-                                 default="https://api.hacienda.go.cr/fe/ex?")
+                                       help="Last API EXONET Response, this allows debugging errors if they exist")
+    url_base_exo = fields.Char(string="URL Base EXONET", help="URL Base ENDPOINT EXONET",
+                               default="https://api.hacienda.go.cr/fe/ex?")
 
-    @api.constrains('invoice_qr_type','invoice_field_ids')    
+    @api.constrains('invoice_qr_type', 'invoice_field_ids')
     def check_invoice_field_ids(self):
         if self.invoice_qr_type == 'by_info' and not self.invoice_field_ids:
             raise UserError(_("Please Add Invoice Field's"))
@@ -127,19 +130,20 @@ class CompanyElectronic(models.Model):
             where tipo is: accept, partial or reject, and company_name is either the first word
             of the name or commercial name.
         """
-        new_comp_id = super(CompanyElectronic, self).create(vals)
-        #new_comp = self.browse(new_comp_id)
+        new_comp_id = super().create(vals)
+        # new_comp = self.browse(new_comp_id)
         new_comp_id.try_create_configuration_sequences()
-        return new_comp_id #new_comp.id
+        return new_comp_id
 
     def write(self, vals):
         if vals.get('date_expiration_sign') or vals.get('range_days'):
             cron = self.env.ref('cr_electronic_invoice.ir_cron_send_expiration_notice', False)
 
             if not self.range_days:
-                return super(CompanyElectronic, self).write(vals)
+                return super().write(vals)
 
-            date_expiration_sign = vals.get('date_expiration_sign') and vals['date_expiration_sign'] or self.date_expiration_sign
+            date_expiration_sign = vals.get('date_expiration_sign') and \
+                vals['date_expiration_sign'] or self.date_expiration_sign
             # date_expiration_sign = vals.get('date_expiration_sign') and \
             #     datetime.strptime(vals['date_expiration_sign'], '%Y-%m-%d %H:%M:%S') or self.date_expiration_sign
             if date_expiration_sign:
@@ -154,7 +158,7 @@ class CompanyElectronic(models.Model):
 
             cron.write(new_values)
 
-        return super(CompanyElectronic, self).write(vals)
+        return super().write(vals)
 
     def get_days_left(self):
         today = datetime.today()
@@ -196,6 +200,7 @@ class CompanyElectronic(models.Model):
             for user in self.env.user.company_id.send_user_ids:
                 if user.email:
                     template.with_context(lang=user.lang).send_mail(user.id, force_send=True, raise_exception=True)
+
     def try_create_configuration_sequences(self):
         """ Try to automatically add the Comprobante Confirmation sequence to the company.
             It will first check if sequence already exists before attempt to create. The s
@@ -232,21 +237,20 @@ class CompanyElectronic(models.Model):
             self.env.user, self.frm_ws_ambiente)
         if token_m_h:
             self.message_post(
-                subject='Info',
-                body="Token Correcto")
+                subject=_('Info'),
+                body=_("Token Correcto"))
         else:
             self.message_post(
-                subject='Error',
-                body="Datos Incorrectos")
-        return
+                subject=_('Error'),
+                body=_("Datos Incorrectos"))
 
     def get_expiration_date(self):
         if self.signature and self.frm_pin:
             self.date_expiration_sign = api_facturae.p12_expiration_date(self.signature, self.frm_pin)
         else:
             self.message_post(
-                subject='Error',
-                body="Signature requerido")
+                subject=_('Error'),
+                body=_("Signature requerido"))
 
     def action_get_economic_activities(self):
         if self.vat:
@@ -254,17 +258,18 @@ class CompanyElectronic(models.Model):
 
             self.env.cr.execute('update economic_activity set active=False')
 
-            self.message_post(subject='Actividades Económicas',
-                            body='Aviso!.\n Cargando actividades económicas desde Hacienda')
+            self.message_post(subject=_('Actividades Económicas'),
+                              body=_('Aviso!.\n Cargando actividades económicas desde Hacienda'))
 
             if json_response["status"] == 200:
                 activities = json_response["activities"]
-                activities_codes = list()
+                activities_codes = list([])
                 for activity in activities:
                     if activity["estado"] == "A":
                         activities_codes.append(activity["codigo"])
 
-                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([('code', 'in', activities_codes)])
+                economic_activities = self.env['economic.activity'].with_context(active_test=False).search([
+                    ('code', 'in', activities_codes)])
 
                 for activity in economic_activities:
                     activity.active = True

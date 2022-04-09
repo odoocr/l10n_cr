@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 # © 2017 Creu Blanca
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
@@ -7,27 +7,25 @@ from os import path
 from lxml import etree
 
 from xmlsig import SignatureContext
-from .constants import NS_MAP, EtsiNS
+from .constants import NS_MAP
 from datetime import datetime
 import pytz
 
 
 class XAdESContext(SignatureContext):
     def __init__(self, policy):
-        """
-        Declaration
+        """Declaration
         :param policy: Policy class
         :type policy: xades.Policy
         """
         self.policy = policy
-        super(XAdESContext, self).__init__()
+        super().__init__()
 
     def sign(self, node):
-        """
-        Signs a node
+        """Signs a node
         :param node: Signature node
         :type node: lxml.etree.Element
-        :return: None 
+        :return: None
         """
         signed_properties = node.find(
             "ds:Object/etsi:QualifyingProperties["
@@ -43,15 +41,14 @@ class XAdESContext(SignatureContext):
             namespaces=NS_MAP)
         if unsigned_properties is not None:
             self.calculate_unsigned_properties(signed_properties, node, True)
-        res = super(XAdESContext, self).sign(node)
+        res = super().sign(node)
         return res
 
     def verify(self, node):
-        """
-        verifies a signature
+        """verifies a signature
         :param node: Signature node
         :type node: lxml.etree.Element
-        :return: 
+        :return:
         """
         schema = etree.XMLSchema(etree.parse(path.join(
             path.dirname(__file__), "data/XAdES.xsd"
@@ -71,7 +68,7 @@ class XAdESContext(SignatureContext):
             namespaces=NS_MAP)
         if unsigned_properties is not None:
             self.calculate_unsigned_properties(signed_properties, node, False)
-        res = super(XAdESContext, self).verify(node)
+        res = super().verify(node)
         return res
 
     def calculate_signed_properties(self, signed_properties, node, sign=False):

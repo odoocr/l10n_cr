@@ -10,7 +10,7 @@ def assert_valid_schema(data, schema_file):
     try:
         validate(data, schema)
         return True
-    except:
+    except Exception:
         return False
 
 

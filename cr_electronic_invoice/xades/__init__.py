@@ -25,8 +25,8 @@ def get_reversed_rdns_name(rdns):
     return name
 
 
-def b64_print(s):
-    return s
+def b64_print(s_variable):
+    return s_variable
 
 
 # Monkey patching xmlsig functions to remove unecesary tail and body newlines

@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
-import logging
-_logger = logging.getLogger(__name__)
+
+from odoo import models, fields
 
 
 class IdentificationType(models.Model):
     _name = "identification.type"
 
-    code = fields.Char(string="Code", required=False, )
-    name = fields.Char(string="Name", required=False, )
-    notes = fields.Text(string="Notes", required=False, )
+    code = fields.Char(help='Identification related code.')
+    name = fields.Char(help='Identification code name.')
+    notes = fields.Text(help='Identification notes.')

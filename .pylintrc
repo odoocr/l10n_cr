@@ -8,7 +8,7 @@ extension-pkg-whitelist=lxml
 
 [ODOOLINT]
 readme_template_url="https://github.com/OCA/maintainer-tools/blob/master/template/module/README.rst"
-manifest_required_authors=Vauxoo,
+manifest_required_authors=Odoo CR, Vauxoo,
    Odoo Community Association (OCA),
    Jarsa Sistemas,
 manifest_required_keys=license,installable
