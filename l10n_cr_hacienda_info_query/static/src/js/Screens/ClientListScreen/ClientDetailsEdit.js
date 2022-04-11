@@ -136,6 +136,7 @@ function(require) {
             this.changes[event.target.name] = event.target.value;
 
             this.changes['name'] = result['nombre'];
+            this.changes['email'] = result['email'];
 
         }
 

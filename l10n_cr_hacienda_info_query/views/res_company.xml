@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    
+    <data>
         <!--Herencia de Compañia-->
         <record id="view_company_form_inherit" model="ir.ui.view">
             <field name="name">res.company.form.inherit</field>
@@ -20,8 +20,19 @@
                             <field attrs="{'invisible' : [('ultima_respuesta', 'in', (False,''))], 'readonly' : [('ultima_respuesta', '!=', False)]}" colspan="4" name="ultima_respuesta"/>
                         </group>
                     </page>
+                    <page string="Correo Electrónico Automático">
+                        <separator string="URL Base Yo Contribuyo"/>
+                        <group col="4" colspan="2">
+                            <group col="2">
+                                <field name="url_base_yo_contribuyo" nolabel="1"/>
+                                <field name="usuario_yo_contribuyo"/>
+                                <field name="token_yo_contribuyo"/>
+                            </group>
+                            <group col="2"/>
+                        </group>
+                    </page>
                 </xpath>
             </field>
         </record>
-    
+    </data>
 </openerp>
