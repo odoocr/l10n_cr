@@ -28,7 +28,7 @@ class ActualizarPosApi(http.Controller):
 
             end_point = url_base_yo_contribuyo + 'identificacion=' + vat
 
-            headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo }
+            headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo}
 
             peticion = requests.get(end_point, headers=headers, timeout=10)
             self.email = peticion

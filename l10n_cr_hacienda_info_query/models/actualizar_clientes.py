@@ -16,17 +16,18 @@ class ResCompany(models.Model):
                            default="https://api.hacienda.go.cr/fe/ae?")
 
     url_base_yo_contribuyo = fields.Char(string="URL Base Yo Contribuyo",
-                           required=False,
-                           help="URL Base Yo Contribuyo",
-                           default="https://api.hacienda.go.cr/fe/mifacturacorreo?")
-    
+                                         required=False,
+                                         help="URL Base Yo Contribuyo",
+                                         default="https://api.hacienda.go.cr/fe/mifacturacorreo?")
+
     usuario_yo_contribuyo = fields.Char(string="Usuario Yo Contribuyo",
-                           required=False,
-                           help="Usuario Yo Contribuyo")
+                                        required=False,
+                                        help="Usuario Yo Contribuyo")
 
     token_yo_contribuyo = fields.Char(string="Token Yo Contribuyo",
-                           required=False,
-                           help="Token Yo Contribuyo")
+                                      required=False,
+                                      help="Token Yo Contribuyo")
+
 
 class ResPartner(models.Model):
 
@@ -49,7 +50,7 @@ class ResPartner(models.Model):
 
             end_point = url_base_yo_contribuyo + 'identificacion=' + cedula
 
-            headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo }
+            headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo}
 
             peticion = requests.get(end_point, headers=headers, timeout=10)
             all_emails_yo_contribuyo = ''
@@ -60,7 +61,7 @@ class ResPartner(models.Model):
                 for email_yo_contribuyo in emails_yo_contribuyo:
                     all_emails_yo_contribuyo = all_emails_yo_contribuyo + email_yo_contribuyo['Correo'] + ','
                 all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
-                self.email = all_emails_yo_contribuyo 
+                self.email = all_emails_yo_contribuyo
 
         url_base = self.env.company.url_base
         if url_base:
