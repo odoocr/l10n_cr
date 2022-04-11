@@ -1,4 +1,3 @@
-PS \l10n_cr> python ..\mqt\travis\test_precommit.py
 INFO:__main__:Use custom file \l10n_cr\.eslintrc.json
 INFO:__main__:Use custom file \l10n_cr\.flake8
 INFO:__main__:Use custom file \l10n_cr\.pre-commit-config-optional.yaml
@@ -21,7 +20,7 @@ cr_electronic_invoice\xades\tobella_xades\policy.py:131: [R1732(consider-using-w
 ************* Module cr_electronic_invoice.xades.tobella_xades.ns
 cr_electronic_invoice\xades\tobella_xades\ns.py:5: [C0103(invalid-name), ] Constant name "EtsiNS" doesn't conform to '(([A-Z_][A-Z0-9_]*)|(__.*__)|(_logger))$' pattern
 ************* Module l10n_cr_hacienda_info_query.controllers.routes_controller
-l10n_cr_hacienda_info_query\controllers\routes_controller.py:21: [R1702(too-many-nested-blocks), ActualizarPosApi.index] Too many nested blocks (6/5)
+l10n_cr_hacienda_info_query\controllers\routes_controller.py:46: [R1702(too-many-nested-blocks), ActualizarPosApi.index] Too many nested blocks (6/5)
 ************* Module res_currency_cr_adapter.models.res_currency
 res_currency_cr_adapter\models\res_currency.py:42: [W0612(unused-variable), ResCurrency.action_create_missing_exchange_rates] Unused variable 'day'
 res_currency_cr_adapter\models\res_currency.py:170: [R1702(too-many-nested-blocks), ResCurrencyRate._cron_update] Too many nested blocks (6/5)
@@ -102,8 +101,11 @@ pylint optional checks...................................................Failed
 
 ************* Module cr_electronic_invoice.extensions.text_converter
 cr_electronic_invoice\extensions\text_converter.py:75: [R1260(too-complex), number_to_text_es] 'number_to_text_es' is too complex. The McCabe rating is 17
+************* Module l10n_cr_hacienda_info_query.models.actualizar_clientes
+l10n_cr_hacienda_info_query\models\actualizar_clientes.py:23: [W8113(attribute-string-redundant), ResCompany] The attribute string is redundant. String parameter equal to name of variable
+l10n_cr_hacienda_info_query\models\actualizar_clientes.py:27: [W8113(attribute-string-redundant), ResCompany] The attribute string is redundant. String parameter equal to name of variable
 ************* Module l10n_cr_hacienda_info_query.controllers.routes_controller
-l10n_cr_hacienda_info_query\controllers\routes_controller.py:16: [R1260(too-complex), ActualizarPosApi.index] 'index' is too complex. The McCabe rating is 16
+l10n_cr_hacienda_info_query\controllers\routes_controller.py:16: [R1260(too-complex), ActualizarPosApi.index] 'index' is too complex. The McCabe rating is 20
 ************* Module res_currency_cr_adapter.models.res_config_settings
 res_currency_cr_adapter\models\res_config_settings.py:33: [W8110(missing-return), ResConfigSettings.set_values] Missing `return` (`super` is used) in method set_values.
 ************* Module l10n_cr_country_codes.__manifest__
@@ -195,6 +197,7 @@ cr_electronic_invoice_pos\models\electronic_invoice.py:418: [R1260(too-complex),
 ************* Module l10n_cr_country_codes.hooks
 l10n_cr_country_codes\hooks.py:1: [C0199(docstring-first-line-empty), ] First line empty in module docstring
 ************* Module l10n_cr_country_codes
+l10n_cr_country_codes\data\res_country_state.xml:2: [W7939(deprecated-data-xml-node), ]  Use <odoo> instead of <odoo><data> or use <odoo noupdate="1">instead of <odoo><data noupdate="1">
 l10n_cr_country_codes\views\res_company_views.xml:4: [W7940(dangerous-view-replace-wo-priority), ]  Dangerous use of "replace" from view with priority 0 < 99
 l10n_cr_country_codes\views\res_partner_views.xml:6: [W7940(dangerous-view-replace-wo-priority), ]  Dangerous use of "replace" from view with priority 0 < 99
 ************* Module cr_electronic_invoice.models.api_facturae
