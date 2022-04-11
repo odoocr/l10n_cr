@@ -35,7 +35,7 @@ class InvoiceLineElectronic(models.Model):
     categ_name = fields.Char(related='product_id.categ_id.name')
     product_code = fields.Char(related='product_id.default_code')
     economic_activity_id = fields.Many2one("economic.activity", string="Economic activity",
-                                           required=False, store=True,
+                                           store=True,
                                            context={'active_test': False},
                                            default=False)
     non_tax_deductible = fields.Boolean(string='Indicates if this invoice is non-tax deductible',)
@@ -112,8 +112,8 @@ class AccountInvoiceElectronic(models.Model):
     electronic_invoice_return_message = fields.Char(string='Hacienda answer', readonly=True)
 
     fname_xml_respuesta_tributacion = fields.Char(string="XML File Name Tributación Response",
-                                                  required=False, copy=False)
-    xml_comprobante = fields.Binary(string="XML voucher", required=False, copy=False, attachment=True)
+                                                  copy=False)
+    xml_comprobante = fields.Binary(string="XML voucher", copy=False, attachment=True)
     fname_xml_comprobante = fields.Char(string="File name XML voucher", copy=False)
     xml_supplier_approval = fields.Binary(string="Vendor XML", copy=False, attachment=True)
     fname_xml_supplier_approval = fields.Char(string="Vendor XML voucher file name", copy=False)
@@ -132,7 +132,7 @@ class AccountInvoiceElectronic(models.Model):
                    ('FEC', 'Factura Electrónica de Compra'),
                    ('disabled', 'Electronic Documents Disabled')],
         string="Voucher Type",
-        required=False, default='FE',
+        default='FE',
         help='Indicates the type of document according to the classification of the Ministerio de Hacienda')
 
     sequence = fields.Char(string='Consecutive', readonly=True, copy=False)
@@ -143,9 +143,9 @@ class AccountInvoiceElectronic(models.Model):
 
     invoice_amount_text = fields.Char(string='Amount in Letters', readonly=True, copy=False)
 
-    ignore_total_difference = fields.Boolean(string="Ignore Difference in Totals", required=False, default=False)
+    ignore_total_difference = fields.Boolean(string="Ignore Difference in Totals", default=False)
 
-    error_count = fields.Integer(string="Number of errors", required=False, default="0", copy=False)
+    error_count = fields.Integer(string="Number of errors", default="0", copy=False)
 
     economic_activity_id = fields.Many2one("economic.activity",
                                            string="Economic Activity", context={'active_test': False})

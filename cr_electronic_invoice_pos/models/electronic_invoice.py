@@ -165,7 +165,7 @@ class PosOrder(models.Model):
             ('NC', 'Electronic Credit Note')
             ],
         string="Receipt Type",
-        required=False, default='FE',
+        default='FE',
         help='Show document type in concordance with Ministerio de Hacienda classification')
 
     sequence = fields.Char(string='Consecutive', readonly=True, )

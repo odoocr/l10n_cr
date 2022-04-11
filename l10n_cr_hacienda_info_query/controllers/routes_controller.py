@@ -81,25 +81,13 @@ class ActualizarPosApi(http.Controller):
 
                     if 'identification_id' in res_partner._fields:
 
-                        id_type = http.request.env['identification.type']
-
                         if 'tipoIdentificacion' in contenido:
                             clasificacion = contenido.get('tipoIdentificacion')
                             # Cedula Fisica
-                            if clasificacion == '01':
-                                identification_id = id_type.search([('code', '=', '01')], limit=1).id
-                            # Cedula Juridica
-                            elif clasificacion == '02':
-                                identification_id = id_type.search([('code', '=', '02')], limit=1).id
-                            # Cedula Juridica
-                            elif clasificacion == '03':
-                                identification_id = id_type.search([('code', '=', '03')], limit=1).id
-                            # Cedula Juridica
-                            elif clasificacion == '04':
-                                identification_id = id_type.search([('code', '=', '04')], limit=1).id
-                            # Cedula Juridica
-                            elif clasificacion == '05':
-                                identification_id = id_type.search([('code', '=', '05')], limit=1).id
+                            identification_id = request.env['identification.type'].search([('code',
+                                                                                            '=',
+                                                                                            clasificacion)],
+                                                                                          limit=1).id
                     if contenido.get('nombre') is not None:
                         name = contenido.get('nombre')
                         if 'activity_id' in res_partner._fields:

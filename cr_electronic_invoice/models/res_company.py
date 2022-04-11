@@ -52,15 +52,15 @@ class CompanyElectronic(models.Model):
                                        'Requerido.')
 
     frm_pin = fields.Char(string="Pin",
-                          required=False,
+                          
                           help='Es el pin correspondiente al certificado. Requerido')
 
     sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs",
-                                 required=False,
+                                 
                                  default="1")
 
     terminal_MR = fields.Integer(string="Terminal para secuencias de MRs",
-                                 required=False,
+                                 
                                  default="1")
 
     CCE_sequence_id = fields.Many2one(

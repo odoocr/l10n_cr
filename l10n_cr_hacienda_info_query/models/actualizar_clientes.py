@@ -11,22 +11,20 @@ class ResCompany(models.Model):
     ultima_respuesta = fields.Text(string="Latest API response",
                                    help="Last API Response, this allows debugging errors if they exist")
     url_base = fields.Char(string="URL Base",
-                           required=False,
+                           
                            help="URL Base of the END POINT",
                            default="https://api.hacienda.go.cr/fe/ae?")
 
     url_base_yo_contribuyo = fields.Char(string="URL Base Yo Contribuyo",
-                                         required=False,
+                                         
                                          help="URL Base Yo Contribuyo",
                                          default="https://api.hacienda.go.cr/fe/mifacturacorreo?")
 
-    usuario_yo_contribuyo = fields.Char(string="Usuario Yo Contribuyo",
-                                        required=False,
-                                        help="Usuario Yo Contribuyo")
+    usuario_yo_contribuyo = fields.Char(string="Yo Contribuyo User",
+                                        help="Yo Contribuyo Developer Identification")
 
-    token_yo_contribuyo = fields.Char(string="Token Yo Contribuyo",
-                                      required=False,
-                                      help="Token Yo Contribuyo")
+    token_yo_contribuyo = fields.Char(string="Yo Contribuyo Token",
+                                      help="Yo Contribuyo Token provided by Ministerio de Hacienda")
 
 
 class ResPartner(models.Model):
