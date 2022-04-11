@@ -57,5 +57,5 @@
         <record id="base.state_L" model="res.country.state">
             <field name="code">7</field>
         </record>
-    
+    </data>
 </odoo>
