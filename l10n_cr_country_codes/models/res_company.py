@@ -50,13 +50,13 @@ class CompanyElectronic(models.Model):
 
     @api.onchange('district_id')
     def _calculate_postal_code(self):
-        if self.state_id.code != False and self.county_id.code != False and self.district_id.code != False:
+        if self.state_id.code and self.county_id.code and self.district_id.code:
             postal = str(self.state_id.code) + str(self.county_id.code) + str(self.district_id.code)
             self.zip = postal
         else:
             self.zip = False
         self.neighborhood_id = False
-    
+
     # When the neighborhood changes, the city field of odoo is autocomplete
 
     @api.onchange('neighborhood_id')
@@ -66,7 +66,7 @@ class CompanyElectronic(models.Model):
     def _get_company_address_field_names(self):
         """ Return a list of fields coming from the address partner to match
         on company address fields. Fields are labeled same on both models. """
-        res = super(CompanyElectronic, self)._get_company_address_field_names()
+        res = super()._get_company_address_field_names()
         res.append('neighborhood_id')
         res.append('district_id')
         res.append('county_id')
