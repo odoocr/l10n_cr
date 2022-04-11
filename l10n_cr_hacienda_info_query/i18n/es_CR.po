@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 14.0-20210913\n"
+"Project-Id-Version: Odoo Server 14.0-20220204\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-09 02:20+0000\n"
-"PO-Revision-Date: 2021-10-09 02:20+0000\n"
+"POT-Creation-Date: 2022-04-11 21:13+0000\n"
+"PO-Revision-Date: 2022-04-11 21:13+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -41,6 +41,11 @@ msgid "Contact"
 msgstr "Contacto"
 
 #. module: l10n_cr_hacienda_info_query
+#: model_terms:ir.ui.view,arch_db:l10n_cr_hacienda_info_query.view_company_form_inherit
+msgid "Correo Electrónico Automático"
+msgstr ""
+
+#. module: l10n_cr_hacienda_info_query
 #. openerp-web
 #: code:addons/l10n_cr_hacienda_info_query/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
 #, python-format
@@ -58,7 +63,7 @@ msgstr "Cantón"
 #: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query.field_res_company__display_name
 #: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query.field_res_partner__display_name
 msgid "Display Name"
-msgstr "Nombre mostrado"
+msgstr "Mostrar nombre"
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web
@@ -137,7 +142,9 @@ msgstr "Ningúno"
 #: code:addons/l10n_cr_hacienda_info_query/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js:0
 #, python-format
 msgid "Only web-compatible Image formats such as .png or .jpeg are supported."
-msgstr "Solo se admiten formatos de imagen compatibles con la web, como .png o .jpeg."
+msgstr ""
+"Solo se admiten formatos de imagen compatibles con la web, como .png o "
+".jpeg."
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web
@@ -175,6 +182,13 @@ msgid "URL Base"
 msgstr ""
 
 #. module: l10n_cr_hacienda_info_query
+#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query.field_res_company__url_base_yo_contribuyo
+#: model:ir.model.fields,help:l10n_cr_hacienda_info_query.field_res_company__url_base_yo_contribuyo
+#: model_terms:ir.ui.view,arch_db:l10n_cr_hacienda_info_query.view_company_form_inherit
+msgid "URL Base Yo Contribuyo"
+msgstr ""
+
+#. module: l10n_cr_hacienda_info_query
 #: model:ir.model.fields,help:l10n_cr_hacienda_info_query.field_res_company__url_base
 msgid "URL Base of the END POINT"
 msgstr "URL Base del END POINT"
@@ -185,3 +199,23 @@ msgstr "URL Base del END POINT"
 #, python-format
 msgid "Unsupported File Format"
 msgstr "Formato de archivo no soportado"
+
+#. module: l10n_cr_hacienda_info_query
+#: model:ir.model.fields,help:l10n_cr_hacienda_info_query.field_res_company__usuario_yo_contribuyo
+msgid "Yo Contribuyo Developer Identification"
+msgstr "Identificación del Desarrollador en Yo Contribuyo"
+
+#. module: l10n_cr_hacienda_info_query
+#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query.field_res_company__token_yo_contribuyo
+msgid "Yo Contribuyo Token"
+msgstr "Token Yo Contribuyo"
+
+#. module: l10n_cr_hacienda_info_query
+#: model:ir.model.fields,help:l10n_cr_hacienda_info_query.field_res_company__token_yo_contribuyo
+msgid "Yo Contribuyo Token provided by Ministerio de Hacienda"
+msgstr "Token Yo Contribuyo proporcionado por el Ministerio de Hacienda"
+
+#. module: l10n_cr_hacienda_info_query
+#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query.field_res_company__usuario_yo_contribuyo
+msgid "Yo Contribuyo User"
+msgstr "Usuario Yo Contribuyo"

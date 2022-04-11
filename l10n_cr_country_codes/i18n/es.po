@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 14.0-20210913\n"
+"Project-Id-Version: Odoo Server 14.0-20220204\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 23:15+0000\n"
-"PO-Revision-Date: 2021-10-08 23:15+0000\n"
+"POT-Creation-Date: 2022-04-11 21:16+0000\n"
+"PO-Revision-Date: 2022-04-11 21:16+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -27,21 +27,12 @@ msgstr "Recuento de archivos adjuntos"
 
 #. module: l10n_cr_country_codes
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_company__county_id
-#: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_district__county_id
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_partner__county_id
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_users__county_id
 #: model_terms:ir.ui.view,arch_db:l10n_cr_country_codes.view_company_form_inherit
-#: model_terms:ir.ui.view,arch_db:l10n_cr_country_codes.view_res_country_county_form
 #: model_terms:ir.ui.view,arch_db:l10n_cr_country_codes.view_res_partner_inherit
 msgid "Canton"
 msgstr "Cantón"
-
-#. module: l10n_cr_country_codes
-#: model:ir.actions.act_window,name:l10n_cr_country_codes.action_res_country_county
-#: model:ir.ui.menu,name:l10n_cr_country_codes.menu_res_country_county
-#: model_terms:ir.ui.view,arch_db:l10n_cr_country_codes.view_res_country_county_tree
-msgid "Cantons"
-msgstr "Cantones"
 
 #. module: l10n_cr_country_codes
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_county__code
@@ -61,6 +52,13 @@ msgid "Contact"
 msgstr "Contacto"
 
 #. module: l10n_cr_country_codes
+#: model:ir.actions.act_window,name:l10n_cr_country_codes.action_res_country_county
+#: model:ir.ui.menu,name:l10n_cr_country_codes.menu_res_country_county
+#: model_terms:ir.ui.view,arch_db:l10n_cr_country_codes.view_res_country_county_tree
+msgid "Counties"
+msgstr "Cantones"
+
+#. module: l10n_cr_country_codes
 #: model:ir.model,name:l10n_cr_country_codes.model_res_country_neighborhood
 msgid "Country State County District Neighborhood Subdivision"
 msgstr "Subdivisión País Provincia Cantón Distrito Barrio"
@@ -76,9 +74,10 @@ msgid "Country State County Subdivision"
 msgstr "Subdivisión País Provincia Cantón"
 
 #. module: l10n_cr_country_codes
-#: model:ir.model,name:l10n_cr_country_codes.model_res_country_state
-msgid "Country state"
-msgstr "Provincia"
+#: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_district__county_id
+#: model_terms:ir.ui.view,arch_db:l10n_cr_country_codes.view_res_country_county_form
+msgid "County"
+msgstr "Cantón"
 
 #. module: l10n_cr_country_codes
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_county__create_uid
@@ -99,10 +98,9 @@ msgstr "Creado en"
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_county__display_name
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_district__display_name
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_neighborhood__display_name
-#: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_state__display_name
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_partner__display_name
 msgid "Display Name"
-msgstr "Nombre mostrado"
+msgstr "Mostrar nombre"
 
 #. module: l10n_cr_country_codes
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_company__district_id
@@ -142,10 +140,9 @@ msgstr "Seguidores (Socios)"
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_county__id
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_district__id
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_neighborhood__id
-#: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_state__id
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_partner__id
 msgid "ID"
-msgstr ""
+msgstr "Identificación"
 
 #. module: l10n_cr_country_codes
 #: model:ir.model.fields,help:l10n_cr_country_codes.field_res_company__message_needaction
@@ -157,7 +154,7 @@ msgstr "Si está marcada, los mensajes nuevos requieren su atención."
 #: model:ir.model.fields,help:l10n_cr_country_codes.field_res_company__message_has_error
 #: model:ir.model.fields,help:l10n_cr_country_codes.field_res_company__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
+msgstr "Si está marcado, algunos mensajes tienen un error de entrega."
 
 #. module: l10n_cr_country_codes
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_company__message_is_follower
@@ -169,7 +166,6 @@ msgstr "Es seguidor"
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_county____last_update
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_district____last_update
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_neighborhood____last_update
-#: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_country_state____last_update
 #: model:ir.model.fields,field_description:l10n_cr_country_codes.field_res_partner____last_update
 msgid "Last Modified on"
 msgstr "Última modificación el"
