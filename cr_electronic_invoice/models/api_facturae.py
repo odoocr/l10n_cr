@@ -733,9 +733,14 @@ def get_invoice_attachments(invoice, record_id):
     attachment = invoice.env['ir.attachment'].sudo().search(domain, limit=1)
 
     if attachment.id:
-        attachment.name = invoice.fname_xml_comprobante
+        # attachment.name = invoice.fname_xml_comprobante
         # attachment.datas_fname = invoice.fname_xml_comprobante
-        attachments.append(attachment.id)
+        attach_copy = invoice.env['ir.attachment'].create({'name': invoice.fname_xml_comprobante,
+                                                           'type': 'binary',
+                                                           'datas': invoice.xml_comprobante,
+                                                           'res_name': invoice.fname_xml_comprobante,
+                                                           'mimetype': 'text/xml'})
+        attachments.append(attach_copy.id)
 
     domain_resp = [('res_model', '=', invoice._name),
                    ('res_id', '=', invoice.id),
@@ -744,9 +749,14 @@ def get_invoice_attachments(invoice, record_id):
     attachment_resp = invoice.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
     if attachment_resp.id:
-        attachment_resp.name = invoice.fname_xml_respuesta_tributacion
+        # attachment_resp.name = invoice.fname_xml_respuesta_tributacion
         # attachment_resp.datas_fname = invoice.fname_xml_respuesta_tributacion
-        attachments.append(attachment_resp.id)
+        attach_resp_copy = invoice.env['ir.attachment'].create({'name': invoice.fname_xml_respuesta_tributacion,
+                                                                'type': 'binary',
+                                                                'datas': invoice.xml_respuesta_tributacion,
+                                                                'res_name': invoice.fname_xml_respuesta_tributacion,
+                                                                'mimetype': 'text/xml'})
+        attachments.append(attach_resp_copy.id)
 
     return attachments
 

@@ -5,7 +5,7 @@ from io import BytesIO
 
 
 class GenerateQrCode():
-    def generate_qr_code(self, url):
+    def generate_qr_code(url):
         qr = qrcode.QRCode(version=4,
                            error_correction=qrcode.constants.ERROR_CORRECT_L,
                            box_size=20,

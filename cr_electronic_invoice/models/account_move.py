@@ -268,7 +268,7 @@ class AccountInvoiceElectronic(models.Model):
             attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
 
             if attachment:
-                attachment.name = self.fname_xml_comprobante
+                # attachment.name = self.fname_xml_comprobante
 
                 domain_resp = [('res_model', '=', 'account.move'),
                                ('res_id', '=', self.id),
@@ -277,10 +277,18 @@ class AccountInvoiceElectronic(models.Model):
                 attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
                 if attachment_resp:
-                    attachment_resp.name = self.fname_xml_respuesta_tributacion
+                    # attachment_resp.name = self.fname_xml_respuesta_tributacion
 
-                    attach_copy = attachment.copy()
-                    attach_resp_copy = attachment_resp.copy()
+                    attach_copy = self.env['ir.attachment'].create({'name': self.fname_xml_comprobante,
+                                                                    'type': 'binary',
+                                                                    'datas': self.xml_comprobante,
+                                                                    'res_name': self.fname_xml_comprobante,
+                                                                    'mimetype': 'text/xml'})
+                    attach_resp_copy = self.env['ir.attachment'].create({'name': self.fname_xml_respuesta_tributacion,
+                                                                         'type': 'binary',
+                                                                         'datas': self.xml_respuesta_tributacion,
+                                                                         'res_name': self.fname_xml_respuesta_tributacion,
+                                                                         'mimetype': 'text/xml'})
                     email_template.attachment_ids = [(6, 0, [attach_copy.id, attach_resp_copy.id])]
                     email_template.with_context(type='binary',
                                                 default_type='binary').send_mail(self.id,
@@ -323,7 +331,7 @@ class AccountInvoiceElectronic(models.Model):
                       ('name', '=', self.tipo_documento + '_' + self.number_electronic + '.xml')]
             attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
             if attachment:
-                attachment.name = self.fname_xml_comprobante
+                # attachment.name = self.fname_xml_comprobante
 
                 domain_resp = [('res_model', '=', self._name),
                                ('res_id', '=', self.id),
@@ -332,9 +340,17 @@ class AccountInvoiceElectronic(models.Model):
                 attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
                 if attachment_resp:
-                    attachment_resp.name = self.fname_xml_respuesta_tributacion
-                    attach_copy = attachment.copy()
-                    attach_resp_copy = attachment_resp.copy()
+                    # attachment_resp.name = self.fname_xml_respuesta_tributacion
+                    attach_copy = self.env['ir.attachment'].create({'name': self.fname_xml_comprobante,
+                                                                    'type': 'binary',
+                                                                    'datas': self.xml_comprobante,
+                                                                    'res_name': self.fname_xml_comprobante,
+                                                                    'mimetype': 'text/xml'})
+                    attach_resp_copy = self.env['ir.attachment'].create({'name': self.fname_xml_respuesta_tributacion,
+                                                                         'type': 'binary',
+                                                                         'datas': self.xml_respuesta_tributacion,
+                                                                         'res_name': self.fname_xml_respuesta_tributacion,
+                                                                         'mimetype': 'text/xml'})
                     email_template.attachment_ids = [(6, 0, [attach_copy.id, attach_resp_copy.id])]
                 else:
                     raise UserError(_('Response XML from Hacienda has not been received'))
