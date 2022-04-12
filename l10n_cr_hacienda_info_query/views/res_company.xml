@@ -30,9 +30,6 @@
                             </group>
                             <group col="2"/>
                         </group>
-                        <group col="4">
-                            <field attrs="{'invisible' : [('ultima_respuesta', 'in', (False,''))], 'readonly' : [('ultima_respuesta', '!=', False)]}" colspan="4" name="ultima_respuesta"/>
-                        </group>
                     </page>
                 </xpath>
             </field>
