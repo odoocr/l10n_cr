@@ -15,6 +15,20 @@ class res_company(models.Model):
     ultima_respuesta = fields.Text(string="Última Respuesta de API", help="Última Respuesta de API, esto permite depurar errores en caso de existir")
     url_base = fields.Char(string="URL Base", required=False, help="URL Base del END POINT", default="https://api.hacienda.go.cr/fe/ae?")
 
+    url_base_yo_contribuyo = fields.Char(string="URL Base Yo Contribuyo",
+                           required=False,
+                           help="URL Base Yo Contribuyo",
+                           default="https://api.hacienda.go.cr/fe/mifacturacorreo?")
+    
+    usuario_yo_contribuyo = fields.Char(string="Usuario Yo Contribuyo",
+                           required=False,
+                           help="Usuario Yo Contribuyo")
+
+    token_yo_contribuyo = fields.Char(string="Token Yo Contribuyo",
+                           required=False,
+                           help="Token Yo Contribuyo")
+
+
 class res_partner(models.Model):
     _name = 'res.partner'
     _inherit = "res.partner"
@@ -38,9 +52,32 @@ class res_partner(models.Model):
         #Valida que el campo vat(cedula) este lleno esto evita que se ejecute el codigo al inicio
         if self.vat:
             self.vat = self.limpiar_cedula(self.vat)
-#            self.cedula = self.vat
             url_base = self.company_id.url_base
             self.name = ''
+
+            url_base_yo_contribuyo = self.company_id.url_base_yo_contribuyo
+            usuario_yo_contribuyo = self.company_id.usuario_yo_contribuyo
+            token_yo_contribuyo = self.company_id.token_yo_contribuyo
+            if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
+                url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
+
+                if url_base_yo_contribuyo[-1:] == '/':
+                    url_base_yo_contribuyo = url_base_yo_contribuyo[:-1]
+
+                end_point = url_base_yo_contribuyo + 'identificacion=' + self.vat 
+
+                headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo }
+
+                peticion = requests.get(end_point, headers=headers, timeout=10)
+                all_emails_yo_contribuyo = ''
+
+                if peticion.status_code in (200, 202) and len(peticion._content) > 0:
+                    contenido = json.loads(str(peticion._content, 'utf-8'))
+                    emails_yo_contribuyo = contenido['Resultado']['Correos']
+                    for email_yo_contribuyo in emails_yo_contribuyo:
+                        all_emails_yo_contribuyo = all_emails_yo_contribuyo + email_yo_contribuyo['Correo'] + ','
+                    all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
+                    self.email = all_emails_yo_contribuyo 
 
             #Valida que existan el campo url_base
             if url_base:
