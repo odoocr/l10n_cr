@@ -12,36 +12,31 @@ pylint mandatory checks..................................................Failed
 - hook id: pylint
 - exit code: 30
 
-************* Module cr_electronic_invoice.models.account_journal
-cr_electronic_invoice\models\account_journal.py:60: [W0102(dangerous-default-value), AccountJournalInherit.create_invoice_from_attachment] Dangerous default value [] as argument
+************* Module cr_electronic_invoice.models.account_move
+cr_electronic_invoice\models\account_move.py:516: [R1724(no-else-continue), AccountInvoiceElectronic.send_mrs_to_hacienda] Unnecessary "elif" after "continue"
+cr_electronic_invoice\models\account_move.py:489: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.send_mrs_to_hacienda] Too many nested blocks (8/5)
+cr_electronic_invoice\models\account_move.py:730: [R1702(too-many-nested-blocks), AccountInvoiceElectronic._check_hacienda_for_invoices] Too many nested blocks (6/5)
+cr_electronic_invoice\models\account_move.py:940: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (6/5)
+cr_electronic_invoice\models\account_move.py:940: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (7/5)
+cr_electronic_invoice\models\account_move.py:940: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (7/5)
+cr_electronic_invoice\models\account_move.py:940: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (8/5)
+cr_electronic_invoice\models\account_move.py:940: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (9/5)
+cr_electronic_invoice\models\account_move.py:940: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (9/5)
+cr_electronic_invoice\models\account_move.py:940: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (9/5)
+cr_electronic_invoice\models\account_move.py:1347: [W1201(logging-not-lazy), AccountInvoiceElectronic.generate_and_send_invoices] Use lazy % formatting in logging functions
+cr_electronic_invoice\models\account_move.py:1356: [W1201(logging-not-lazy), AccountInvoiceElectronic.generate_and_send_invoices] Use lazy % formatting in logging functions
+cr_electronic_invoice\models\account_move.py:1391: [R0916(too-many-boolean-expressions), AccountInvoiceElectronic.get_invoice_sequence] Too many boolean expressions in if statement (6/5)
+cr_electronic_invoice\models\account_move.py:1413: [R1720(no-else-raise), AccountInvoiceElectronic.action_post] Unnecessary "elif" after "raise"
+cr_electronic_invoice\models\account_move.py:1420: [R0916(too-many-boolean-expressions), AccountInvoiceElectronic.action_post] Too many boolean expressions in if statement (6/5)
+cr_electronic_invoice\models\account_move.py:1441: [R1720(no-else-raise), AccountInvoiceElectronic.action_post] Unnecessary "elif" after "raise"
+cr_electronic_invoice\models\account_move.py:1480: [W0104(pointless-statement), AccountInvoiceElectronic.action_post] Statement seems to have no effect
 ************* Module cr_electronic_invoice.xades.tobella_xades.policy
 cr_electronic_invoice\xades\tobella_xades\policy.py:23: [R0205(useless-object-inheritance), Policy] Class 'Policy' inherits from object, can be safely removed from bases in python3
 cr_electronic_invoice\xades\tobella_xades\policy.py:131: [R1732(consider-using-with), PolicyId.calculate_policy_node] Consider using 'with' for resource-allocating operations
 ************* Module cr_electronic_invoice.xades.tobella_xades.ns
 cr_electronic_invoice\xades\tobella_xades\ns.py:5: [C0103(invalid-name), ] Constant name "EtsiNS" doesn't conform to '(([A-Z_][A-Z0-9_]*)|(__.*__)|(_logger))$' pattern
-************* Module l10n_cr_hacienda_info_query.controllers.routes_controller
-l10n_cr_hacienda_info_query\controllers\routes_controller.py:46: [R1702(too-many-nested-blocks), ActualizarPosApi.index] Too many nested blocks (6/5)
-************* Module res_currency_cr_adapter.models.res_currency
-res_currency_cr_adapter\models\res_currency.py:42: [W0612(unused-variable), ResCurrency.action_create_missing_exchange_rates] Unused variable 'day'
-res_currency_cr_adapter\models\res_currency.py:170: [R1702(too-many-nested-blocks), ResCurrencyRate._cron_update] Too many nested blocks (6/5)
-************* Module cr_electronic_invoice.models.account_move
-cr_electronic_invoice\models\account_move.py:497: [R1724(no-else-continue), AccountInvoiceElectronic.send_mrs_to_hacienda] Unnecessary "elif" after "continue"
-cr_electronic_invoice\models\account_move.py:470: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.send_mrs_to_hacienda] Too many nested blocks (8/5)
-cr_electronic_invoice\models\account_move.py:711: [R1702(too-many-nested-blocks), AccountInvoiceElectronic._check_hacienda_for_invoices] Too many nested blocks (6/5)
-cr_electronic_invoice\models\account_move.py:921: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (6/5)
-cr_electronic_invoice\models\account_move.py:921: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (7/5)
-cr_electronic_invoice\models\account_move.py:921: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (7/5)
-cr_electronic_invoice\models\account_move.py:921: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (8/5)
-cr_electronic_invoice\models\account_move.py:921: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (9/5)
-cr_electronic_invoice\models\account_move.py:921: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (9/5)
-cr_electronic_invoice\models\account_move.py:921: [R1702(too-many-nested-blocks), AccountInvoiceElectronic.generate_and_send_invoices] Too many nested blocks (9/5)
-cr_electronic_invoice\models\account_move.py:1328: [W1201(logging-not-lazy), AccountInvoiceElectronic.generate_and_send_invoices] Use lazy % formatting in logging functions
-cr_electronic_invoice\models\account_move.py:1337: [W1201(logging-not-lazy), AccountInvoiceElectronic.generate_and_send_invoices] Use lazy % formatting in logging functions
-cr_electronic_invoice\models\account_move.py:1372: [R0916(too-many-boolean-expressions), AccountInvoiceElectronic.get_invoice_sequence] Too many boolean expressions in if statement (6/5)
-cr_electronic_invoice\models\account_move.py:1394: [R1720(no-else-raise), AccountInvoiceElectronic.action_post] Unnecessary "elif" after "raise"
-cr_electronic_invoice\models\account_move.py:1401: [R0916(too-many-boolean-expressions), AccountInvoiceElectronic.action_post] Too many boolean expressions in if statement (6/5)
-cr_electronic_invoice\models\account_move.py:1422: [R1720(no-else-raise), AccountInvoiceElectronic.action_post] Unnecessary "elif" after "raise"
-cr_electronic_invoice\models\account_move.py:1461: [W0104(pointless-statement), AccountInvoiceElectronic.action_post] Statement seems to have no effect
+************* Module cr_electronic_invoice.models.account_journal
+cr_electronic_invoice\models\account_journal.py:60: [W0102(dangerous-default-value), AccountJournalInherit.create_invoice_from_attachment] Dangerous default value [] as argument
 ************* Module cr_electronic_invoice.xades.context2
 cr_electronic_invoice\xades\context2.py:29: [W0622(redefined-builtin), create_xades_epes_signature] Redefining built-in 'min'
 cr_electronic_invoice\xades\context2.py:30: [W0622(redefined-builtin), create_xades_epes_signature] Redefining built-in 'max'
@@ -49,14 +44,8 @@ cr_electronic_invoice\xades\context2.py:120: [C0103(invalid-name), validate_haci
 cr_electronic_invoice\xades\context2.py:177: [W1202(logging-format-interpolation), PolicyId2.calculate_policy_node] Use lazy % formatting in logging functions
 cr_electronic_invoice\xades\context2.py:192: [R1732(consider-using-with), PolicyId2.calculate_policy_node] Consider using 'with' for resource-allocating operations
 cr_electronic_invoice\xades\context2.py:205: [R1711(useless-return), PolicyId2.calculate_certificate] Useless return at end of function or method
-************* Module cr_electronic_invoice_pos.models.electronic_invoice
-cr_electronic_invoice_pos\models\electronic_invoice.py:55: [C0103(invalid-name), PosConfig.create_sequences] Attribute name "FE_sequence_id" doesn't conform to '[a-z_][a-z0-9_]{2,59}$' pattern
-cr_electronic_invoice_pos\models\electronic_invoice.py:67: [C0103(invalid-name), PosConfig.create_sequences] Attribute name "NC_sequence_id" doesn't conform to '[a-z_][a-z0-9_]{2,59}$' pattern
-cr_electronic_invoice_pos\models\electronic_invoice.py:79: [C0103(invalid-name), PosConfig.create_sequences] Attribute name "TE_sequence_id" doesn't conform to '[a-z_][a-z0-9_]{2,59}$' pattern
-cr_electronic_invoice_pos\models\electronic_invoice.py:463: [R1724(no-else-continue), PosOrder._validahacienda_pos] Unnecessary "else" after "continue"
-cr_electronic_invoice_pos\models\electronic_invoice.py:429: [R1702(too-many-nested-blocks), PosOrder._validahacienda_pos] Too many nested blocks (6/5)
 ************* Module cr_electronic_invoice.models.api_facturae
-cr_electronic_invoice\models\api_facturae.py:963: [C0325(superfluous-parens), ] Unnecessary parens after 'if' keyword
+cr_electronic_invoice\models\api_facturae.py:973: [C0325(superfluous-parens), ] Unnecessary parens after 'if' keyword
 cr_electronic_invoice\models\api_facturae.py:62: [W0621(redefined-outer-name), limit] Redefining name 'limit' from outer scope (line 62)
 cr_electronic_invoice\models\api_facturae.py:133: [R1720(no-else-raise), get_clave_hacienda] Unnecessary "elif" after "raise"
 cr_electronic_invoice\models\api_facturae.py:171: [W0105(pointless-string-statement), ] String statement has no effect
@@ -82,14 +71,25 @@ cr_electronic_invoice\models\api_facturae.py:487: [W0612(unused-variable), gen_x
 cr_electronic_invoice\models\api_facturae.py:524: [W0612(unused-variable), gen_xml_v43] Unused variable 'a'
 cr_electronic_invoice\models\api_facturae.py:692: [R1705(no-else-return), send_xml_fe] Unnecessary "else" after "return"
 cr_electronic_invoice\models\api_facturae.py:696: [W1202(logging-format-interpolation), send_xml_fe] Use lazy % formatting in logging functions
-cr_electronic_invoice\models\api_facturae.py:759: [C0103(invalid-name), string_to_base64] Argument name "s" doesn't conform to '([a-z_][a-z0-9_]{2,59}$)' pattern
-cr_electronic_invoice\models\api_facturae.py:764: [C0103(invalid-name), string_strip] Argument name "s" doesn't conform to '([a-z_][a-z0-9_]{2,59}$)' pattern
-cr_electronic_invoice\models\api_facturae.py:776: [C0103(invalid-name), base64_utf8_decoder] Argument name "s" doesn't conform to '([a-z_][a-z0-9_]{2,59}$)' pattern
-cr_electronic_invoice\models\api_facturae.py:788: [W0622(redefined-builtin), StringBuilder.append] Redefining built-in 'str'
-cr_electronic_invoice\models\api_facturae.py:1071: [E1206(logging-too-few-args), load_xml_data] Not enough arguments for logging format string
-cr_electronic_invoice\models\api_facturae.py:1082: [R1702(too-many-nested-blocks), load_xml_data] Too many nested blocks (6/5)
+cr_electronic_invoice\models\api_facturae.py:769: [C0103(invalid-name), string_to_base64] Argument name "s" doesn't conform to '([a-z_][a-z0-9_]{2,59}$)' pattern
+cr_electronic_invoice\models\api_facturae.py:774: [C0103(invalid-name), string_strip] Argument name "s" doesn't conform to '([a-z_][a-z0-9_]{2,59}$)' pattern
+cr_electronic_invoice\models\api_facturae.py:786: [C0103(invalid-name), base64_utf8_decoder] Argument name "s" doesn't conform to '([a-z_][a-z0-9_]{2,59}$)' pattern
+cr_electronic_invoice\models\api_facturae.py:798: [W0622(redefined-builtin), StringBuilder.append] Redefining built-in 'str'
+cr_electronic_invoice\models\api_facturae.py:1081: [E1206(logging-too-few-args), load_xml_data] Not enough arguments for logging format string
+cr_electronic_invoice\models\api_facturae.py:1092: [R1702(too-many-nested-blocks), load_xml_data] Too many nested blocks (6/5)
 ************* Module cr_electronic_invoice.xades.tobella_xades.xades_context
 cr_electronic_invoice\xades\tobella_xades\xades_context.py:74: [R1711(useless-return), XAdESContext.calculate_signed_properties] Useless return at end of function or method
+************* Module cr_electronic_invoice.models.qr_generator
+cr_electronic_invoice\models\qr_generator.py:8: [E0213(no-self-argument), GenerateQrCode.generate_qr_code] Method should have "self" as first argument
+************* Module res_currency_cr_adapter.models.res_currency
+res_currency_cr_adapter\models\res_currency.py:42: [W0612(unused-variable), ResCurrency.action_create_missing_exchange_rates] Unused variable 'day'
+res_currency_cr_adapter\models\res_currency.py:170: [R1702(too-many-nested-blocks), ResCurrencyRate._cron_update] Too many nested blocks (6/5)
+************* Module cr_electronic_invoice_pos.models.electronic_invoice
+cr_electronic_invoice_pos\models\electronic_invoice.py:55: [C0103(invalid-name), PosConfig.create_sequences] Attribute name "FE_sequence_id" doesn't conform to '[a-z_][a-z0-9_]{2,59}$' pattern
+cr_electronic_invoice_pos\models\electronic_invoice.py:67: [C0103(invalid-name), PosConfig.create_sequences] Attribute name "NC_sequence_id" doesn't conform to '[a-z_][a-z0-9_]{2,59}$' pattern
+cr_electronic_invoice_pos\models\electronic_invoice.py:79: [C0103(invalid-name), PosConfig.create_sequences] Attribute name "TE_sequence_id" doesn't conform to '[a-z_][a-z0-9_]{2,59}$' pattern
+cr_electronic_invoice_pos\models\electronic_invoice.py:463: [R1724(no-else-continue), PosOrder._validahacienda_pos] Unnecessary "else" after "continue"
+cr_electronic_invoice_pos\models\electronic_invoice.py:429: [R1702(too-many-nested-blocks), PosOrder._validahacienda_pos] Too many nested blocks (6/5)
 
 javascript optional checks...............................................Passed
 INFO:__main__:****************************************************************************************************
@@ -99,23 +99,35 @@ pylint optional checks...................................................Failed
 - hook id: pylint
 - exit code: 28
 
+************* Module cr_electronic_invoice.models.account_move
+cr_electronic_invoice\models\account_move.py:488: [R1260(too-complex), AccountInvoiceElectronic.send_mrs_to_hacienda] 'send_mrs_to_hacienda' is too complex. The McCabe rating is 24
+cr_electronic_invoice\models\account_move.py:708: [R1260(too-complex), AccountInvoiceElectronic._check_hacienda_for_invoices] '_check_hacienda_for_invoices' is too complex. The McCabe rating is 18
+cr_electronic_invoice\models\account_move.py:934: [R1260(too-complex), AccountInvoiceElectronic.generate_and_send_invoices] 'generate_and_send_invoices' is too complex. The McCabe rating is 51
+cr_electronic_invoice\models\account_move.py:1399: [R1260(too-complex), AccountInvoiceElectronic.action_post] 'action_post' is too complex. The McCabe rating is 29
+cr_electronic_invoice\models\account_move.py:215: [W8110(missing-return), AccountInvoiceElectronic._onchange_partner_id] Missing `return` (`super` is used) in method _onchange_partner_id.
+cr_electronic_invoice\models\account_move.py:1399: [W8110(missing-return), AccountInvoiceElectronic.action_post] Missing `return` (`super` is used) in method action_post.
+************* Module l10n_cr_country_codes.hooks
+l10n_cr_country_codes\hooks.py:1: [C0199(docstring-first-line-empty), ] First line empty in module docstring
+************* Module l10n_cr_country_codes
+l10n_cr_country_codes\data\res_country_state.xml:2: [W7939(deprecated-data-xml-node), ]  Use <odoo> instead of <odoo><data> or use <odoo noupdate="1">instead of <odoo><data noupdate="1">
+l10n_cr_country_codes\views\res_company_views.xml:4: [W7940(dangerous-view-replace-wo-priority), ]  Dangerous use of "replace" from view with priority 0 < 99
+l10n_cr_country_codes\views\res_partner_views.xml:6: [W7940(dangerous-view-replace-wo-priority), ]  Dangerous use of "replace" from view with priority 0 < 99
 ************* Module cr_electronic_invoice.extensions.text_converter
 cr_electronic_invoice\extensions\text_converter.py:75: [R1260(too-complex), number_to_text_es] 'number_to_text_es' is too complex. The McCabe rating is 17
-************* Module l10n_cr_hacienda_info_query.models.actualizar_clientes
-l10n_cr_hacienda_info_query\models\actualizar_clientes.py:23: [W8113(attribute-string-redundant), ResCompany] The attribute string is redundant. String parameter equal to name of variable
-l10n_cr_hacienda_info_query\models\actualizar_clientes.py:27: [W8113(attribute-string-redundant), ResCompany] The attribute string is redundant. String parameter equal to name of variable
-************* Module l10n_cr_hacienda_info_query.controllers.routes_controller
-l10n_cr_hacienda_info_query\controllers\routes_controller.py:16: [R1260(too-complex), ActualizarPosApi.index] 'index' is too complex. The McCabe rating is 20
-************* Module res_currency_cr_adapter.models.res_config_settings
-res_currency_cr_adapter\models\res_config_settings.py:33: [W8110(missing-return), ResConfigSettings.set_values] Missing `return` (`super` is used) in method set_values.
-************* Module l10n_cr_country_codes.__manifest__
-l10n_cr_country_codes\__manifest__.py:3: [C8103(manifest-deprecated-key), ] Deprecated key "description" in manifest file
+************* Module cr_electronic_invoice_qweb_fe.__manifest__
+cr_electronic_invoice_qweb_fe\__manifest__.py:22: [C8102(manifest-required-key), ] Missing required key "license" in manifest file
+cr_electronic_invoice_qweb_fe\__manifest__.py:22: [C8103(manifest-deprecated-key), ] Deprecated key "description" in manifest file
 ************* Module cr_electronic_invoice.xades
 cr_electronic_invoice\xades\__init__.py:8: [C0199(docstring-first-line-empty), get_reversed_rdns_name] First line empty in function docstring
-************* Module res_currency_cr_adapter.models.res_currency
-res_currency_cr_adapter\models\res_currency.py:76: [R1260(too-complex), ResCurrencyRate._cron_update] '_cron_update' is too complex. The McCabe rating is 20
-************* Module cr_electronic_invoice_qweb_fe
-cr_electronic_invoice_qweb_fe\__init__.py:1: [C7902(missing-readme), ] README.rst missing file. Template here: https://github.com/OCA/maintainer-tools/blob/master/template/module/README.rst
+************* Module cr_electronic_invoice.models.account_tax
+cr_electronic_invoice\models\account_tax.py:8: [W8113(attribute-string-redundant), IvaCodeType] The attribute string is redundant. String parameter equal to name of variable
+cr_electronic_invoice\models\account_tax.py:11: [W8113(attribute-string-redundant), IvaCodeType] The attribute string is redundant. String parameter equal to name of variable
+************* Module cr_electronic_invoice.xades.context2
+cr_electronic_invoice\xades\context2.py:84: [C0199(docstring-first-line-empty), XAdESContext2.fill_x509_issuer_name] First line empty in method docstring
+cr_electronic_invoice\xades\context2.py:101: [C0199(docstring-first-line-empty), XAdESContext2.is_signed] First line empty in method docstring
+cr_electronic_invoice\xades\context2.py:111: [C0199(docstring-first-line-empty), validate_hacienda_url] First line empty in function docstring
+************* Module res_currency_cr_adapter.models.res_config_settings
+res_currency_cr_adapter\models\res_config_settings.py:33: [W8110(missing-return), ResConfigSettings.set_values] Missing `return` (`super` is used) in method set_values.
 ************* Module cr_electronic_invoice
 cr_electronic_invoice\data\aut_ex_data.xml:4: [W7909(redundant-modulename-xml), ]  Redundant name module reference in xml_ids "AutEx_1".
 cr_electronic_invoice\data\aut_ex_data.xml:10: [W7909(redundant-modulename-xml), ]  Redundant name module reference in xml_ids "AutEx_2".
@@ -173,36 +185,19 @@ cr_electronic_invoice\data\sale_conditions_data.xml:48: [W7909(redundant-modulen
 cr_electronic_invoice\data\sale_conditions_data.xml:55: [W7909(redundant-modulename-xml), ]  Redundant name module reference in xml_ids "SaleConditions_8".
 cr_electronic_invoice\data\sale_conditions_data.xml:62: [W7909(redundant-modulename-xml), ]  Redundant name module reference in xml_ids "SaleConditions_9".
 cr_electronic_invoice\data\sale_conditions_data.xml:69: [W7909(redundant-modulename-xml), ]  Redundant name module reference in xml_ids "SaleConditions_99".
-************* Module cr_electronic_invoice.models.account_move
-cr_electronic_invoice\models\account_move.py:469: [R1260(too-complex), AccountInvoiceElectronic.send_mrs_to_hacienda] 'send_mrs_to_hacienda' is too complex. The McCabe rating is 24
-cr_electronic_invoice\models\account_move.py:689: [R1260(too-complex), AccountInvoiceElectronic._check_hacienda_for_invoices] '_check_hacienda_for_invoices' is too complex. The McCabe rating is 18
-cr_electronic_invoice\models\account_move.py:915: [R1260(too-complex), AccountInvoiceElectronic.generate_and_send_invoices] 'generate_and_send_invoices' is too complex. The McCabe rating is 51
-cr_electronic_invoice\models\account_move.py:1380: [R1260(too-complex), AccountInvoiceElectronic.action_post] 'action_post' is too complex. The McCabe rating is 29
-cr_electronic_invoice\models\account_move.py:215: [W8110(missing-return), AccountInvoiceElectronic._onchange_partner_id] Missing `return` (`super` is used) in method _onchange_partner_id.
-cr_electronic_invoice\models\account_move.py:1380: [W8110(missing-return), AccountInvoiceElectronic.action_post] Missing `return` (`super` is used) in method action_post.
-************* Module cr_electronic_invoice_qweb_fe.__manifest__
-cr_electronic_invoice_qweb_fe\__manifest__.py:22: [C8102(manifest-required-key), ] Missing required key "license" in manifest file
-cr_electronic_invoice_qweb_fe\__manifest__.py:22: [C8103(manifest-deprecated-key), ] Deprecated key "description" in manifest file
-************* Module cr_electronic_invoice.models.account_tax
-cr_electronic_invoice\models\account_tax.py:8: [W8113(attribute-string-redundant), IvaCodeType] The attribute string is redundant. String parameter equal to name of variable
-cr_electronic_invoice\models\account_tax.py:11: [W8113(attribute-string-redundant), IvaCodeType] The attribute string is redundant. String parameter equal to name of variable
-************* Module cr_electronic_invoice.__manifest__
-cr_electronic_invoice\__manifest__.py:3: [C8103(manifest-deprecated-key), ] Deprecated key "description" in manifest file
-************* Module cr_electronic_invoice.xades.context2
-cr_electronic_invoice\xades\context2.py:84: [C0199(docstring-first-line-empty), XAdESContext2.fill_x509_issuer_name] First line empty in method docstring
-cr_electronic_invoice\xades\context2.py:101: [C0199(docstring-first-line-empty), XAdESContext2.is_signed] First line empty in method docstring
-cr_electronic_invoice\xades\context2.py:111: [C0199(docstring-first-line-empty), validate_hacienda_url] First line empty in function docstring
-************* Module cr_electronic_invoice_pos.models.electronic_invoice
-cr_electronic_invoice_pos\models\electronic_invoice.py:418: [R1260(too-complex), PosOrder._validahacienda_pos] '_validahacienda_pos' is too complex. The McCabe rating is 26
-************* Module l10n_cr_country_codes.hooks
-l10n_cr_country_codes\hooks.py:1: [C0199(docstring-first-line-empty), ] First line empty in module docstring
-************* Module l10n_cr_country_codes
-l10n_cr_country_codes\data\res_country_state.xml:2: [W7939(deprecated-data-xml-node), ]  Use <odoo> instead of <odoo><data> or use <odoo noupdate="1">instead of <odoo><data noupdate="1">
-l10n_cr_country_codes\views\res_company_views.xml:4: [W7940(dangerous-view-replace-wo-priority), ]  Dangerous use of "replace" from view with priority 0 < 99
-l10n_cr_country_codes\views\res_partner_views.xml:6: [W7940(dangerous-view-replace-wo-priority), ]  Dangerous use of "replace" from view with priority 0 < 99
+************* Module cr_electronic_invoice_qweb_fe
+cr_electronic_invoice_qweb_fe\__init__.py:1: [C7902(missing-readme), ] README.rst missing file. Template here: https://github.com/OCA/maintainer-tools/blob/master/template/module/README.rst
 ************* Module cr_electronic_invoice.models.api_facturae
 cr_electronic_invoice\models\api_facturae.py:247: [R1260(too-complex), gen_xml_mr_43] 'gen_xml_mr_43' is too complex. The McCabe rating is 17
 cr_electronic_invoice\models\api_facturae.py:343: [R1260(too-complex), gen_xml_v43] 'gen_xml_v43' is too complex. The McCabe rating is 44
-cr_electronic_invoice\models\api_facturae.py:970: [R1260(too-complex), load_xml_data] 'load_xml_data' is too complex. The McCabe rating is 29
+cr_electronic_invoice\models\api_facturae.py:980: [R1260(too-complex), load_xml_data] 'load_xml_data' is too complex. The McCabe rating is 29
+************* Module cr_electronic_invoice.__manifest__
+cr_electronic_invoice\__manifest__.py:3: [C8103(manifest-deprecated-key), ] Deprecated key "description" in manifest file
+************* Module l10n_cr_country_codes.__manifest__
+l10n_cr_country_codes\__manifest__.py:3: [C8103(manifest-deprecated-key), ] Deprecated key "description" in manifest file
+************* Module res_currency_cr_adapter.models.res_currency
+res_currency_cr_adapter\models\res_currency.py:76: [R1260(too-complex), ResCurrencyRate._cron_update] '_cron_update' is too complex. The McCabe rating is 20
+************* Module cr_electronic_invoice_pos.models.electronic_invoice
+cr_electronic_invoice_pos\models\electronic_invoice.py:418: [R1260(too-complex), PosOrder._validahacienda_pos] '_validahacienda_pos' is too complex. The McCabe rating is 26
 
 INFO:__main__:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
