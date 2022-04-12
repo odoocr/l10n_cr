@@ -11,12 +11,10 @@ class ResCompany(models.Model):
     ultima_respuesta = fields.Text(string="Latest API response",
                                    help="Last API Response, this allows debugging errors if they exist")
     url_base = fields.Char(string="URL Base",
-                           
                            help="URL Base of the END POINT",
                            default="https://api.hacienda.go.cr/fe/ae?")
 
     url_base_yo_contribuyo = fields.Char(string="URL Base Yo Contribuyo",
-                                         
                                          help="URL Base Yo Contribuyo",
                                          default="https://api.hacienda.go.cr/fe/mifacturacorreo?")
 
