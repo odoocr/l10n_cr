@@ -278,16 +278,17 @@ class AccountInvoiceElectronic(models.Model):
 
                 if attachment_resp:
                     # attachment_resp.name = self.fname_xml_respuesta_tributacion
-
-                    attach_copy = self.env['ir.attachment'].create({'name': self.fname_xml_comprobante,
+                    fname_xml_comprobante = self.fname_xml_comprobante
+                    attach_copy = self.env['ir.attachment'].create({'name': fname_xml_comprobante,
                                                                     'type': 'binary',
                                                                     'datas': self.xml_comprobante,
-                                                                    'res_name': self.fname_xml_comprobante,
+                                                                    'res_name': fname_xml_comprobante,
                                                                     'mimetype': 'text/xml'})
-                    attach_resp_copy = self.env['ir.attachment'].create({'name': self.fname_xml_respuesta_tributacion,
+                    fname_xml_respuesta_tributacion = self.fname_xml_respuesta_tributacion
+                    attach_resp_copy = self.env['ir.attachment'].create({'name': fname_xml_respuesta_tributacion,
                                                                          'type': 'binary',
                                                                          'datas': self.xml_respuesta_tributacion,
-                                                                         'res_name': self.fname_xml_respuesta_tributacion,
+                                                                         'res_name': fname_xml_respuesta_tributacion,
                                                                          'mimetype': 'text/xml'})
                     email_template.attachment_ids = [(6, 0, [attach_copy.id, attach_resp_copy.id])]
                     email_template.with_context(type='binary',
@@ -341,15 +342,17 @@ class AccountInvoiceElectronic(models.Model):
 
                 if attachment_resp:
                     # attachment_resp.name = self.fname_xml_respuesta_tributacion
-                    attach_copy = self.env['ir.attachment'].create({'name': self.fname_xml_comprobante,
+                    fname_xml_comprobante = self.fname_xml_comprobante
+                    fname_xml_respuesta_tributacion = self.fname_xml_respuesta_tributacion
+                    attach_copy = self.env['ir.attachment'].create({'name': fname_xml_comprobante,
                                                                     'type': 'binary',
                                                                     'datas': self.xml_comprobante,
-                                                                    'res_name': self.fname_xml_comprobante,
+                                                                    'res_name': fname_xml_comprobante,
                                                                     'mimetype': 'text/xml'})
-                    attach_resp_copy = self.env['ir.attachment'].create({'name': self.fname_xml_respuesta_tributacion,
+                    attach_resp_copy = self.env['ir.attachment'].create({'name': fname_xml_respuesta_tributacion,
                                                                          'type': 'binary',
                                                                          'datas': self.xml_respuesta_tributacion,
-                                                                         'res_name': self.fname_xml_respuesta_tributacion,
+                                                                         'res_name': fname_xml_respuesta_tributacion,
                                                                          'mimetype': 'text/xml'})
                     email_template.attachment_ids = [(6, 0, [attach_copy.id, attach_resp_copy.id])]
                 else:
@@ -1640,3 +1643,25 @@ class AccountInvoiceElectronic(models.Model):
                 cliente = self.env['res.partner'].create(info)
                 cliente.onchange_vat()
                 self.partner_id = cliente.id
+
+    def get_xml_document(self, invoice_id):
+        tab_id = []
+        invoice = self.env['account.move'].sudo().browse(invoice_id)
+        domain = [('res_model', '=', invoice._name),
+                  ('res_id', '=', invoice.id),
+                  ('res_field', '=', 'xml_comprobante'),
+                  ('name', '=', invoice.tipo_documento + '_' + invoice.number_electronic + '.xml')]
+        attachment = self.env['ir.attachment'].sudo().search(domain, limit=1)
+        if attachment:
+            tab_id.append(attachment.id)
+            domain_resp = [('res_model', '=', invoice._name),
+                           ('res_id', '=', invoice.id),
+                           ('res_field', '=', 'xml_respuesta_tributacion'),
+                           ('name', '=', 'AHC_' + invoice.number_electronic + '.xml')]
+            attachment_resp = self.env['ir.attachment'].sudo().search(domain_resp, limit=1)
+
+            if attachment_resp:
+                tab_id.append(attachment_resp.id)
+
+        url = f'/web/binary/download_document?tab_id={tab_id}&invoice_id={invoice_id}'
+        return url

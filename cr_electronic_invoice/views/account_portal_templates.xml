@@ -119,41 +119,15 @@
                                 </div>
                             </li>
                             <li class="list-group-item flex-grow-1">
-                                <div class="small mb-1">
-                                    <strong class="text-muted">
-                                    XML Document Issued
-                                    </strong>
-                                </div>
                                 <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
-                                    <t t-if="xml_documento">
-                                        <div class="btn-group flex-grow-1 mb-1">
-                                            <a t-attf-href="/web/content/#{xml_documento.id}?download=true" target="_blank">
-                                                <div class='oe_attachment_embedded o_image' t-att-title="xml_documento.name" t-att-data-mimetype="xml_documento.mimetype" t-attf-data-src="/web/image/#{xml_documento.id}/50x50"/>
-                                                <span>DOC_</span>
-                                                <span t-field="invoice.name"/>
-                                                <span>.xml</span>
-                                            </a>
-                                        </div>
-                                    </t>
-                                </div>
-                            </li>
-                            <li class="list-group-item flex-grow-1">
-                                <div class="small mb-1">
-                                    <strong class="text-muted">
-                                    XML Response MH
-                                    </strong>
-                                </div>
-                                <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
-                                    <t t-if="xml_AHC">
-                                        <div class="btn-group flex-grow-1 mb-1">
-                                            <a t-attf-href="/web/content/#{xml_AHC.id}?download=true" target="_blank">
-                                                <div class='oe_attachment_embedded o_image' t-att-title="xml_AHC.name" t-att-data-mimetype="xml_AHC.mimetype" t-attf-data-src="/web/image/#{xml_AHC.id}/50x50"/>
-                                                <span>AHC_</span>
-                                                <span t-field="invoice.name"/>
-                                                <span>.xml</span>
-                                            </a>
-                                        </div>
-                                    </t>
+                                    <div class="btn-group flex-grow-1 mr-1 mb-1">
+                                        <a class="btn btn-secondary btn-block o_download_btn" t-att-href="invoice.get_xml_document(invoice.id)" id="get_xml" title="Get XML">
+                                            <!-- SVG Source: https://icons.getbootstrap.com/icons/filetype-xml/ -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filetype-xml" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM3.527 11.85h-.893l-.823 1.439h-.036L.943 11.85H.012l1.227 1.983L0 15.85h.861l.853-1.415h.035l.85 1.415h.908l-1.254-1.992 1.274-2.007Zm.954 3.999v-2.66h.038l.952 2.159h.516l.946-2.16h.038v2.661h.715V11.85h-.8l-1.14 2.596h-.025L4.58 11.85h-.806v3.999h.706Zm4.71-.674h1.696v.674H8.4V11.85h.791v3.325Z"/>
+                                            </svg>
+ Get XMLs</a>
+                                    </div>
                                 </div>
                             </li>
                             <li t-if="invoice.invoice_user_id" class="list-group-item flex-grow-1">
