@@ -31,7 +31,6 @@ class ActualizarPosApi(http.Controller):
             headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo }
 
             peticion = requests.get(end_point, headers=headers, timeout=10)
-            self.email = peticion
             all_emails_yo_contribuyo = ''
 
             if peticion.status_code in (200, 202) and len(peticion._content) > 0:
