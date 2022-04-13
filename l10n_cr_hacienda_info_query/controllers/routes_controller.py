@@ -1,13 +1,9 @@
 from datetime import datetime
 import json
 import requests
-import logging
 
 from odoo import http
 from odoo.http import request
-
-
-_logger = logging.getLogger(__name__)
 
 
 class ActualizarPosApi(http.Controller):
@@ -21,7 +17,6 @@ class ActualizarPosApi(http.Controller):
         url_base_yo_contribuyo = get_param('url_base_yo_contribuyo')
         usuario_yo_contribuyo = get_param('usuario_yo_contribuyo')
         token_yo_contribuyo = get_param('token_yo_contribuyo')
-
 
         if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
             url_base_yo_contribuyo = url_base_yo_contribuyo.strip()

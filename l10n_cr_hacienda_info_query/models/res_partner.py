@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, api
 from datetime import datetime
 import json
 import requests
