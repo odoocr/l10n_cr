@@ -14,12 +14,15 @@ class ActualizarPosApi(http.Controller):
     # https://api.thunder.com.ve/control_rig/84:F3:EB:22:6E:D9
     @http.route(['/cedula/<vat>', ], type='http', auth="user", website=True)
     def index(self, vat):
+        set_param = request.env['ir.config_parameter'].sudo().set_param
+        get_param = request.env['ir.config_parameter'].sudo().get_param
 
-        company_id = http.request.env['res.company'].sudo().search([], limit=1)
+        url_base = get_param('url_base')
+        url_base_yo_contribuyo = get_param('url_base_yo_contribuyo')
+        usuario_yo_contribuyo = get_param('usuario_yo_contribuyo')
+        token_yo_contribuyo = get_param('token_yo_contribuyo')
 
-        url_base_yo_contribuyo = company_id.url_base_yo_contribuyo
-        usuario_yo_contribuyo = company_id.usuario_yo_contribuyo
-        token_yo_contribuyo = company_id.token_yo_contribuyo
+
         if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
             url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
 
@@ -31,7 +34,7 @@ class ActualizarPosApi(http.Controller):
             headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo}
 
             peticion = requests.get(end_point, headers=headers, timeout=10)
-            self.email = peticion
+
             all_emails_yo_contribuyo = ''
 
             if peticion.status_code in (200, 202) and len(peticion._content) > 0:
@@ -40,8 +43,6 @@ class ActualizarPosApi(http.Controller):
                 for email_yo_contribuyo in emails_yo_contribuyo:
                     all_emails_yo_contribuyo = all_emails_yo_contribuyo + email_yo_contribuyo['Correo'] + ','
                 all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
-
-        url_base = company_id.url_base
 
         if url_base:
             # Elimina la barra al final de la URL para prevenir error al conectarse
@@ -57,15 +58,12 @@ class ActualizarPosApi(http.Controller):
             ultimo_mensaje = 'Fecha/Hora: ' + str(datetime.now()) + \
                              ', Codigo: ' + str(peticion.status_code) + \
                              ', Mensaje: ' + str(peticion._content.decode())
-
+            set_param('ultima_respuesta', ultimo_mensaje)
             # Respuesta de la API
             if peticion.status_code in (200, 202) and len(peticion._content) > 0:
                 contenido = json.loads(str(peticion._content, 'utf-8'))
 
-                request.env.company.ultima_respuesta = ultimo_mensaje
-
                 if 'nombre' in contenido:
-
                     identification_id = ''
                     res_partner = http.request.env['res.partner']
 
@@ -98,6 +96,3 @@ class ActualizarPosApi(http.Controller):
                         else:
                             retorno = {"nombre": str(name)}
                         return '%s' % str(retorno).replace("'", "\"")
-
-            else:
-                request.env.company.ultima_respuesta = ultimo_mensaje

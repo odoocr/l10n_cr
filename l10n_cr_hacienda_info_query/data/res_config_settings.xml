@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="url_base_yo_contribuyo" model="ir.config_parameter">
+            <field name="key">url_base_yo_contribuyo</field>
+            <field name="value">https://api.hacienda.go.cr/fe/mifacturacorreo?</field>
+        </record>
+        <record id="url_base" model="ir.config_parameter">
+            <field name="key">url_base</field>
+            <field name="value">https://api.hacienda.go.cr/fe/ae?</field>
+        </record>
+    </data>
+</odoo>

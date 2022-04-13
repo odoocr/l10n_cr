@@ -4,40 +4,22 @@ import json
 import requests
 
 
-class ResCompany(models.Model):
-    _name = 'res.company'
-    _inherit = ['res.company']
-
-    ultima_respuesta = fields.Text(string="Latest API response",
-                                   help="Last API Response, this allows debugging errors if they exist")
-    url_base = fields.Char(string="URL Base",
-                           help="URL Base of the END POINT",
-                           default="https://api.hacienda.go.cr/fe/ae?")
-
-    url_base_yo_contribuyo = fields.Char(string="URL Base Yo Contribuyo",
-                                         help="URL Base Yo Contribuyo",
-                                         default="https://api.hacienda.go.cr/fe/mifacturacorreo?")
-
-    usuario_yo_contribuyo = fields.Char(string="Yo Contribuyo User",
-                                        help="Yo Contribuyo Developer Identification")
-
-    token_yo_contribuyo = fields.Char(string="Yo Contribuyo Token",
-                                      help="Yo Contribuyo Token provided by Ministerio de Hacienda")
-
-
 class ResPartner(models.Model):
-
-    _name = 'res.partner'
-    _inherit = "res.partner"
+    _inherit = 'res.partner'
 
     def limpiar_cedula(self, vat):
         if vat:
             return ''.join(i for i in vat if i.isdigit())
 
     def definir_informacion(self, cedula):
-        url_base_yo_contribuyo = self.env.company.url_base_yo_contribuyo
-        usuario_yo_contribuyo = self.env.company.usuario_yo_contribuyo
-        token_yo_contribuyo = self.env.company.token_yo_contribuyo
+        set_param = self.env['ir.config_parameter'].sudo().set_param
+        get_param = self.env['ir.config_parameter'].sudo().get_param
+
+        url_base_yo_contribuyo = get_param('url_base_yo_contribuyo')
+        usuario_yo_contribuyo = get_param('usuario_yo_contribuyo')
+        token_yo_contribuyo = get_param('token_yo_contribuyo')
+        url_base = get_param('url_base')
+
         if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
             url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
 
@@ -59,7 +41,6 @@ class ResPartner(models.Model):
                 all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
                 self.email = all_emails_yo_contribuyo
 
-        url_base = self.env.company.url_base
         if url_base:
             url_base = url_base.strip()
 
@@ -75,10 +56,9 @@ class ResPartner(models.Model):
             ultimo_mensaje = 'Fecha/Hora: ' + str(datetime.now()) + \
                              ', Codigo: ' + str(peticion.status_code) + \
                              ', Mensaje: ' + str(peticion._content.decode())
-
+            set_param('ultima_respuesta', ultimo_mensaje)
             if peticion.status_code in (200, 202) and len(peticion._content) > 0:
                 contenido = json.loads(str(peticion._content, 'utf-8'))
-                self.env.company.ultima_respuesta = ultimo_mensaje
 
                 if contenido.get('nombre') and contenido.get('tipoIdentificacion'):
                     self.name = contenido.get('nombre')
