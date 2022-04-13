@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0-20220204\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-11 21:21+0000\n"
-"PO-Revision-Date: 2022-04-11 21:21+0000\n"
+"POT-Creation-Date: 2022-04-13 01:34+0000\n"
+"PO-Revision-Date: 2022-04-13 01:34+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -77,6 +77,36 @@ msgstr "${user.company_id.commercial_name}: Exoneración de IVA vencida"
 #. module: cr_electronic_invoice
 #: model:account.tax.group,name:cr_electronic_invoice.tax_group_Servicio
 msgid "10% Servicio"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "<b>Previous consecutive:</b>"
+msgstr "<b>Consecutivo anterior:</b>"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "<b>Previous state: </b>"
+msgstr "<b>Estado anterior: </b>"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "<br /><b>Consecutivo de mensaje: </b>"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "<br /><b>Documento: </b>"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "<br/><b>Mensaje indicado:</b>"
 msgstr ""
 
 #. module: cr_electronic_invoice
@@ -156,6 +186,77 @@ msgid ""
 "                </p>\n"
 "            </div>\n"
 "        "
+msgstr ""
+"<div>\n"
+"    <p>\n"
+"        Estimado ${object.partner_id.name}\n"
+"        % set access_action = object.with_context(force_website=True).get_access_action()\n"
+"        % set is_online = access_action and access_action['type'] == 'ir.actions.act_url'\n"
+"        % set access_url = object.get_mail_url()\n"
+"\n"
+"        % if object.partner_id.parent_id:\n"
+"        (<i>${object.partner_id.parent_id.name}</i>)\n"
+"        % endif\n"
+"        ,\n"
+"    </p>\n"
+"    <p>\n"
+"        ${object.company_id.name} ha sido aceptado en el \"Ministerio de Hacienda\" su\n"
+"        % if object.number:\n"
+"        documento <strong>${object.number}</strong>\n"
+"        % else:\n"
+"        documento\n"
+"        % endif\n"
+"        % if object.origin:\n"
+"        (con referencia: ${object.origin})\n"
+"        % endif\n"
+"        por un monto de <strong>${format_amount(object.amount_total, object.currency_id)}</strong>\n"
+"        de ${object.company_id.name}.\n"
+"    </p>\n"
+"\n"
+"    <br/>\n"
+"    <strong>Número Electrónico: </strong> ${object.number_electronic}\n"
+"    <br/>\n"
+"    <strong>Fecha de Confirmación: </strong> ${object.date_issuance}\n"
+"    <br/>\n"
+"    <strong>Mensaje de Confirmación: </strong> ${object.state_invoice_partner}\n"
+"    <br/>\n"
+"    <strong>Estado ante \"Hacienda\": </strong> ${object.state_tributacion}\n"
+"\n"
+"    <br/><br/>\n"
+"    <strong>Emisor</strong>\n"
+"    <br/>\n"
+"    <strong>Nombre: </strong>${object.partner_id.name}\n"
+"    <br/>\n"
+"    <strong>Identificación: </strong>${object.partner_id.vat}\n"
+"\n"
+"    <br/><br/>\n"
+"    <strong>Receptor </strong>\n"
+"    <br/>\n"
+"    <strong>Nombre: </strong>${object.company_id.name}\n"
+"    <br/>\n"
+"    <strong>Identificación: </strong>${object.company_id.vat}\n"
+"    <br/><br/>\n"
+"    Adjunto encontrará los XMLs con el mensaje enviado a \"Hacienda\" y la respuesta para su respaldo\n"
+"    <br/><br/>\n"
+"    <p>Gracias,</p>\n"
+"    <p style=\"color:#888888\">\n"
+"        % if object.user_id and object.user_id.signature:\n"
+"        ${object.user_id.signature | safe}\n"
+"        % endif\n"
+"    </p>\n"
+"</div>\n"
+"            "
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "<p><b>Enviando Mensaje Receptor</b></p>"
+msgstr ""
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "<p><b>Ha enviado Mensaje de Receptor</b>"
 msgstr ""
 
 #. module: cr_electronic_invoice
@@ -268,63 +369,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Aviso!.\n"
-" Error en _check_hacienda_for_invoices: "
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Aviso!.\n"
 " Error en carga del XML del proveedor"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Aviso!.\n"
-" Error en generate_and_send_invoice: "
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Aviso!.\n"
-" La factura de proveedor ya fue confirmada"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Aviso!.\n"
-" Monto total no concuerda con monto del XML"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Aviso!.\n"
-" No se ha cargado archivo XML"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Aviso!.\n"
-"Debe primero seleccionar el tipo de respuesta para el archivo cargado."
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Aviso!.\n"
-"Por favor configure el diario de compras, terminal y sucursal"
 msgstr ""
 
 #. module: cr_electronic_invoice
@@ -443,6 +488,12 @@ msgid "Consecutive Receiver Number"
 msgstr "Número consecutivo del Receptor"
 
 #. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Consecutive Switching of Receiver Message</b><br/>"
+msgstr "Cambiando Consecutivo del Mensaje Receptor"
+
+#. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
 msgid "Consult Document"
 msgstr "Consultar Documento"
@@ -520,17 +571,17 @@ msgstr ""
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,help:cr_electronic_invoice.field_resolution__date_resolution
 msgid "DGT expiration resolution date."
-msgstr ""
+msgstr "Fecha de resolución de vencimiento de la DGT."
 
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,help:cr_electronic_invoice.field_resolution__name
 msgid "DGT resolution name."
-msgstr ""
+msgstr "Nombre resolución DGT"
 
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_resolution__date_resolution
 msgid "Date Resolution"
-msgstr ""
+msgstr "Resolución de fecha"
 
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__date_issuance
@@ -543,18 +594,6 @@ msgstr "Fecha de emisión"
 #: code:addons/cr_electronic_invoice/models/res_company.py:0
 #, python-format
 msgid "Datos Incorrectos"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "Datos incompletos de referencia para nota de crédito"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "Datos incompletos de referencia para nota de crédito no cargada"
 msgstr ""
 
 #. module: cr_electronic_invoice
@@ -623,7 +662,7 @@ msgstr "Producto por defecto para gastos al importar factura electrónica"
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_journal__expense_product_id
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_config_settings__expense_product_id
 msgid "Default product for expenses when loading data from XML"
-msgstr ""
+msgstr "Producto por defecto para gastos al cargar datos desde XML"
 
 #. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
@@ -689,6 +728,18 @@ msgstr ""
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__date_expiration_sign
 msgid "Due date"
 msgstr "Fecha de Vencimiento"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "E-INV CR - Send Acceptance Message - HALTED - Failed to get token"
+msgstr "E-INV CR - Enviar mensaje de aceptación - DETENIDO - No se pudo obtener el token"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "E-INV CR - send_mrs_to_hacienda - 013"
+msgstr ""
 
 #. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_company_form_inherit
@@ -863,20 +914,6 @@ msgstr "Ambiente"
 
 #. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "Envío de una segunda FEC"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
 #: code:addons/cr_electronic_invoice/models/account_move.py:0
 #: code:addons/cr_electronic_invoice/models/account_move.py:0
 #: code:addons/cr_electronic_invoice/models/account_move.py:0
@@ -1050,12 +1087,6 @@ msgstr "Documentos generados"
 #: model:ir.model.fields.selection,name:cr_electronic_invoice.selection__economic_activity__sale_type__goods
 msgid "Goods"
 msgstr "Bienes"
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "Hacienda API is disabled in company"
-msgstr "Hacienda API está deshabilitada en la empresa"
 
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_bank_statement_line__electronic_invoice_return_message
@@ -1365,32 +1396,14 @@ msgid "La Cédula Física del emisor debe de tener 9 dígitos"
 msgstr ""
 
 #. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "La Cédula Física del receptor debe de tener 9 dígitos"
-msgstr ""
-
-#. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/api_facturae.py:0
 #, python-format
 msgid "La Cédula Jurídica del emisor debe de tener 10 dígitos"
 msgstr ""
 
 #. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "La Cédula Jurídica del receptor debe de tener 10 dígitos"
-msgstr ""
-
-#. module: cr_electronic_invoice
 #: model:ir.model.constraint,message:cr_electronic_invoice.constraint_account_move_number_electronic_uniq
 msgid "La clave de comprobante debe ser única"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "La exoneración de este cliente se encuentra vencida"
 msgstr ""
 
 #. module: cr_electronic_invoice
@@ -1400,21 +1413,9 @@ msgid "La identificación DIMEX del emisor debe de tener 11 o 12 dígitos"
 msgstr ""
 
 #. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "La identificación DIMEX del receptor debe de tener 11 o 12 dígitos"
-msgstr ""
-
-#. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/api_facturae.py:0
 #, python-format
 msgid "La identificación NITE del emisor debe de tener 10 dígitos"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "La identificación NITE del receptor debe de tener 10 dígitos"
 msgstr ""
 
 #. module: cr_electronic_invoice
@@ -1462,14 +1463,6 @@ msgid "La numeración debe de tener 10 dígitos"
 msgstr ""
 
 #. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Las facturas FEC requieren que el proveedor tenga definida la actividad "
-"económica"
-msgstr ""
-
-#. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__ultima_respuesta_exo
 msgid "Last API EXONET Response"
 msgstr "Última respuesta API EXONET"
@@ -1477,7 +1470,8 @@ msgstr "Última respuesta API EXONET"
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,help:cr_electronic_invoice.field_res_company__ultima_respuesta_exo
 msgid "Last API EXONET Response, this allows debugging errors if they exist"
-msgstr "Última respuesta API EXONET, esto permite errores de depuración si existen"
+msgstr ""
+"Última respuesta API EXONET, esto permite errores de depuración si existen"
 
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_invoice_send____last_update
@@ -1588,19 +1582,7 @@ msgid "Metro Cubico"
 msgstr ""
 
 #. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Monto factura no concuerda con monto para XML. Factura: %s XML:%s base:%s "
-"impuestos:%s otros_cargos:%s iva_devuelto:%s"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
 #: model:mail.template,subject:cr_electronic_invoice.email_template_edi_expiration_notice
-#, python-format
 msgid "NOTIFICACIÓN IMPORTANTE!!"
 msgstr ""
 
@@ -1637,23 +1619,9 @@ msgid "No attachment was provided"
 msgstr ""
 
 #. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "No hay tipo de cambio registrado para la moneda %s"
-msgstr ""
-
-#. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/api_facturae.py:0
 #, python-format
 msgid "No se ha proporcionado un ID válido para el MR."
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"No se pudo Crear la factura electrónica: \n"
-" Debe configurar condiciones de pago para %s"
 msgstr ""
 
 #. module: cr_electronic_invoice
@@ -1931,14 +1899,6 @@ msgid "Respuesta del Cliente"
 msgstr ""
 
 #. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Revisar definición de impuesto con exoneración, está en base 100 y debe ser "
-"base 13"
-msgstr ""
-
-#. module: cr_electronic_invoice
 #: model:account.tax.group,name:cr_electronic_invoice.tax_group_SC
 msgid "SC"
 msgstr ""
@@ -1964,7 +1924,7 @@ msgstr "Tpo de Venta"
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_sale_conditions_form
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_sale_conditions_tree
 msgid "Sale terms"
-msgstr ""
+msgstr "Términos de Venta"
 
 #. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_economic_activity_filter
@@ -2010,19 +1970,6 @@ msgstr ""
 msgid ""
 "Secuencia de confirmación de rechazo de comprobante electrónico. Dejar en "
 "blanco y el sistema automáticamente se lo creará."
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "Seleccione el tipo de identificación del cliente en su perfil"
-msgstr ""
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid ""
-"Seleccione el tipo de identificación del emisor en el perfil de la compañía"
 msgstr ""
 
 #. module: cr_electronic_invoice
@@ -2114,12 +2061,12 @@ msgstr ""
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,help:cr_electronic_invoice.field_resolution__active
 msgid "Set active or inactive DGT resolutions."
-msgstr ""
+msgstr "Establecer resoluciones DGT activas o inactivas."
 
 #. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.res_config_settings_view_form
 msgid "Set product attributes (e.g. color, size) to sell variants"
-msgstr ""
+msgstr "Establezca los atributos del producto (por ejemplo, color, tamaño) para vender variantes"
 
 #. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/res_company.py:0
@@ -2191,16 +2138,22 @@ msgid "The Parnter Tax Identification Number."
 msgstr "El número de identificación fiscal del socio de negocio."
 
 #. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "The Total amount of the Invoice for the Message Receiver is invalid"
+msgstr "El monto total de la factura para el receptor del mensaje no es válido"
+
+#. module: cr_electronic_invoice
 #: model:ir.model.fields,help:cr_electronic_invoice.field_account_journal__expense_analytic_account_id
 #: model:ir.model.fields,help:cr_electronic_invoice.field_res_config_settings__expense_analytic_account_id
 msgid "The analytic account used when loading Costa Rican digital invoice"
-msgstr ""
+msgstr "La cuenta analítica utilizada al cargar la factura digital costarricense"
 
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,help:cr_electronic_invoice.field_account_journal__expense_product_id
 #: model:ir.model.fields,help:cr_electronic_invoice.field_res_config_settings__expense_product_id
 msgid "The default product used when loading Costa Rican digital invoice"
-msgstr ""
+msgstr "El producto predeterminado utilizado al cargar la factura digital costarricense"
 
 #. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_move_form_inherit
@@ -2226,7 +2179,7 @@ msgstr ""
 #: model:ir.model.fields,help:cr_electronic_invoice.field_account_journal__expense_account_id
 #: model:ir.model.fields,help:cr_electronic_invoice.field_res_config_settings__expense_account_id
 msgid "The expense account used when loading Costa Rican digital invoice"
-msgstr ""
+msgstr "La cuenta de gastos utilizada al cargar factura digital costarricense"
 
 #. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/account_move.py:0
@@ -2257,13 +2210,13 @@ msgstr "Tercero - otros cargos"
 #: code:addons/cr_electronic_invoice/models/account_journal.py:0
 #, python-format
 msgid "This XML file is not XML-compliant. Error: %s"
-msgstr ""
+msgstr "Este archivo XML no es compatible con XML. Error: %s"
 
 #. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/account_journal.py:0
 #, python-format
 msgid "This is a TICKET only invoices are valid for taxes"
-msgstr ""
+msgstr "Este es un TIQUETE solo las facturas son validas para impuestos"
 
 #. module: cr_electronic_invoice
 #: model:product.template,name:cr_electronic_invoice.product_bomberos
@@ -2308,7 +2261,7 @@ msgstr "Total Impuestos FE"
 #. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_move_line__total_tax
 msgid "Total Tax"
-msgstr ""
+msgstr "Total Impuestos"
 
 #. module: cr_electronic_invoice
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice.view_company_form_inherit
@@ -2396,6 +2349,52 @@ msgid "Voucher Type"
 msgstr "Tipo de Comprobante"
 
 #. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid ""
+"Warning!\n"
+"You must first select the response type for the uploaded file."
+msgstr ""
+"¡Advertencia!\n"
+"Primero debe seleccionar el tipo de respuesta para el archivo cargado".
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid ""
+"Warning!.\n"
+" The supplier invoice has already been confirmed"
+msgstr ""
+"¡Advertencia!.\n"
+"La factura del proveedor ya ha sido confirmada"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid ""
+"Warning!.\n"
+" Total amount does not match XML amount"
+msgstr ""
+"¡Advertencia!.\n"
+"La cantidad total no coincide con la cantidad XML"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid ""
+"Warning!.\n"
+" XML file not loaded"
+msgstr ""
+"¡Advertencia!.\n"
+"Archivo XML no cargado"
+
+#. module: cr_electronic_invoice
+#: code:addons/cr_electronic_invoice/models/account_move.py:0
+#, python-format
+msgid "Warning!.\n Please configure the purchase journal, terminal and branch"
+msgstr "¡Advertencia!.\n Configure el diario de compras, el terminal y la sucursal"
+
+#. module: cr_electronic_invoice
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_res_company__website_message_ids
 msgid "Website Messages"
 msgstr "Mensajes del Sitio Web"
@@ -2425,12 +2424,6 @@ msgstr "XML Respuesta Tributación"
 #: model:ir.model.fields,field_description:cr_electronic_invoice.field_account_payment__xml_comprobante
 msgid "XML voucher"
 msgstr "Comprobante XML"
-
-#. module: cr_electronic_invoice
-#: code:addons/cr_electronic_invoice/models/account_move.py:0
-#, python-format
-msgid "Ya recibido anteriormente, se pasa a consultar"
-msgstr ""
 
 #. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/account_move.py:0
