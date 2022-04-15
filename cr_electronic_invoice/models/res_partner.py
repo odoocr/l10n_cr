@@ -5,7 +5,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import phonenumbers
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from . import api_facturae
 
 _logger = logging.getLogger(__name__)
