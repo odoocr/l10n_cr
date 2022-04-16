@@ -26,7 +26,7 @@ class CompanyElectronic(models.Model):
     _name = 'res.company'
     _inherit = ['res.company', 'mail.thread', ]
 
-    commercial_name = fields.Char(string="Commercial Name")
+    commercial_name = fields.Char()
     legal_name = fields.Char(string="Nombre Legal")
     activity_id = fields.Many2one("economic.activity",
                                   string="Default economic activity",
@@ -51,17 +51,11 @@ class CompanyElectronic(models.Model):
                                        'Para el ambiente de calidad (stag), para el ambiente de producción (prod). '
                                        'Requerido.')
 
-    frm_pin = fields.Char(string="Pin",
-                          required=False,
-                          help='Es el pin correspondiente al certificado. Requerido')
+    frm_pin = fields.Char(string="Pin", help='Es el pin correspondiente al certificado. Requerido')
 
-    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs",
-                                 required=False,
-                                 default="1")
+    sucursal_MR = fields.Integer(string="Sucursal para secuencias de MRs", default="1")
 
-    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs",
-                                 required=False,
-                                 default="1")
+    terminal_MR = fields.Integer(string="Terminal para secuencias de MRs", default="1")
 
     CCE_sequence_id = fields.Many2one(
         'ir.sequence',

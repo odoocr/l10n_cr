@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 14.0-20210913\n"
+"Project-Id-Version: Odoo Server 14.0-20220204\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-09 00:24+0000\n"
-"PO-Revision-Date: 2021-10-09 00:24+0000\n"
+"POT-Creation-Date: 2022-04-11 20:53+0000\n"
+"PO-Revision-Date: 2022-04-11 20:53+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -46,6 +46,13 @@ msgid "Config Settings"
 msgstr "Opciones de configuración"
 
 #. module: res_currency_cr_adapter
+#: model:ir.actions.server,name:res_currency_cr_adapter.create_missing_exchange_rate_cron_ir_actions_server
+#: model:ir.cron,cron_name:res_currency_cr_adapter.create_missing_exchange_rate_cron
+#: model:ir.cron,name:res_currency_cr_adapter.create_missing_exchange_rate_cron
+msgid "Create Missing Exchange Rate"
+msgstr "Crear tipo de cambio faltante"
+
+#. module: res_currency_cr_adapter
 #: model:ir.model,name:res_currency_cr_adapter.model_res_currency
 msgid "Currency"
 msgstr "Moneda"
@@ -77,7 +84,7 @@ msgstr "Desactivado"
 #: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency__display_name
 #: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__display_name
 msgid "Display Name"
-msgstr "Nombre mostrado"
+msgstr "Mostrar nombre"
 
 #. module: res_currency_cr_adapter
 #: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
@@ -99,7 +106,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency__id
 #: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__id
 msgid "ID"
-msgstr ""
+msgstr "Identificación"
 
 #. module: res_currency_cr_adapter
 #: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings____last_update
@@ -157,6 +164,11 @@ msgstr "El tipo de cambio de venta de CRC a USD tal como se envía desde BCCR"
 #: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_config_settings__bccr_token
 msgid "Token to use in the BCCR"
 msgstr "Token para usar en el BCCR"
+
+#. module: res_currency_cr_adapter
+#: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.view_currency_form
+msgid "Update"
+msgstr "Actualizar"
 
 #. module: res_currency_cr_adapter
 #: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form

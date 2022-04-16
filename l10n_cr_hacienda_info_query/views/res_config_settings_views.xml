@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.base.setup</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="0"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='companies']" position="after">
+                <div id="electronic_invoice">
+                    <h2>Electronic Invoicing Costa Rica</h2>
+                    <div class="row mt16 o_settings_container" name="users_setting_container">
+                        <div class="col-12 col-lg-6 o_setting_box" id="YO Contribuyo">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="url_base_yo_contribuyo"/>
+                                <br/>
+                                <field name="url_base_yo_contribuyo" value="https://api.hacienda.go.cr/fe/mifacturacorreo?"/>
+                                <br/><br/>
+                                <label for="usuario_yo_contribuyo"/>
+                                <br/>
+                                <field name="usuario_yo_contribuyo"/>
+                                <br/><br/>
+                                <label for="token_yo_contribuyo"/>
+                                <br/>
+                                <field name="token_yo_contribuyo"/>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box" id="companies_setting">
+                            <div class="o_setting_right_pane">
+                                <label for="url_base"/>
+                                <br/>
+                                <field name="url_base" value="https://api.hacienda.go.cr/fe/ae?"/>
+                                <br/><br/>
+                                <label for="ultima_respuesta"/>
+                                <br/>
+                                <field name="ultima_respuesta" readonly="1"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

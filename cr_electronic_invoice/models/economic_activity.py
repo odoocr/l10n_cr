@@ -12,7 +12,6 @@ class EconomicActivity(models.Model):
     name = fields.Char()
     description = fields.Char()
 
-    sale_type = fields.Selection(string='Sale Type',
-                                 selection=[('goods', 'Goods'), ('services', 'Services')],
+    sale_type = fields.Selection(selection=[('goods', 'Goods'), ('services', 'Services')],
                                  default='goods',
                                  required=True)

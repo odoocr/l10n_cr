@@ -1,63 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="account.portal_my_invoices" name="My Invoices and Payments">
-      <t t-call="portal.portal_layout">
-        <t t-set="breadcrumbs_searchbar" t-value="True"/>
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
 
-        <t t-call="portal.portal_searchbar">
-            <t t-set="title">Invoices</t>
-        </t>
-        <t t-if="not invoices">
-            <p>There are currently no invoices and payments for your account.</p>
-        </t>
-        <t t-if="invoices" t-call="portal.portal_table">
-            <thead>
-                <tr class="active">
-                    <th>Invoice #</th>
-                    <th>Invoice Date</th>
-                    <th class='d-none d-md-table-cell'>Due Date</th>
-                    <th/>
-                    <th class="text-right">Doc. Elect.</th>
-                    <th class="text-right">Estado Tributación</th>
-                    <th class="text-right">Amount Due</th>
-                </tr>
-            </thead>
-            <tbody>
-                <t t-foreach="invoices" t-as="invoice">
-                    <tr>
-                        <td>
-                            <a t-att-href="invoice.get_portal_url()" t-att-title="invoice.name">
-                                <t t-esc="invoice.name" t-if="invoice.name != '/'"/>
-                                <em t-else="">Draft Invoice</em>
-                            </a>
-                        </td>
-                        <td><span t-field="invoice.invoice_date"/></td>
-                        <td class='d-none d-md-table-cell'><span t-field="invoice.invoice_date_due"/></td>
-                        <td class="tx_status">
-                            <t t-if="invoice.state == 'posted' and invoice.payment_state not in ('in_payment', 'paid', 'reversed')">
-                                <span class="badge badge-pill badge-info"><i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img"></i><span class="d-none d-md-inline"> Waiting for Payment</span></span>
-                            </t>
-                            <t t-if="invoice.state == 'posted' and invoice.payment_state in ('paid', 'in_payment')">
-                                <span class="badge badge-pill badge-success"><i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img"></i><span class="d-none d-md-inline"> Paid</span></span>
-                            </t>
-                            <t t-if="invoice.state == 'posted' and invoice.payment_state == 'reversed'">
-                                <span class="badge badge-pill badge-success"><i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img"></i><span class="d-none d-md-inline"> Reversed</span></span>
-                            </t>
-                            <t t-if="invoice.state == 'cancel'">
-                                <span class="badge badge-pill badge-warning"><i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img"></i><span class="d-none d-md-inline"> Cancelled</span></span>
-                            </t>
-                        </td>
-                        <td class="text-right"><span t-field="invoice.tipo_documento"/></td>
-                        <td class="text-right"><span t-field="invoice.state_tributacion"/></td>
-                        <td class="text-right"><span t-esc="-invoice.amount_residual if invoice.move_type == 'out_refund' else invoice.amount_residual" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/></td>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Invoices</t>
+            </t>
+            <t t-if="not invoices">
+                <p>There are currently no invoices and payments for your account.</p>
+            </t>
+            <t t-if="invoices" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Invoice #</th>
+                        <th>Invoice Date</th>
+                        <th class='d-none d-md-table-cell'>Due Date</th>
+                        <th/>
+                        <th class="text-right">Doc. Elect.</th>
+                        <th class="text-right">Estado Tributación</th>
+                        <th class="text-right">Amount Due</th>
                     </tr>
-                </t>
-            </tbody>
+                </thead>
+                <tbody>
+                    <t t-foreach="invoices" t-as="invoice">
+                        <tr>
+                            <td>
+                                <a t-att-href="invoice.get_portal_url()" t-att-title="invoice.name">
+                                    <t t-esc="invoice.name" t-if="invoice.name != '/'"/>
+                                    <em t-else="">Draft Invoice</em>
+                                </a>
+                            </td>
+                            <td>
+                                <span t-field="invoice.invoice_date"/>
+                            </td>
+                            <td class='d-none d-md-table-cell'>
+                                <span t-field="invoice.invoice_date_due"/>
+                            </td>
+                            <td class="tx_status">
+                                <t t-if="invoice.state == 'posted' and invoice.payment_state not in ('in_payment', 'paid', 'reversed')">
+                                    <span class="badge badge-pill badge-info">
+                                        <i class="fa fa-fw fa-clock-o" aria-label="Opened" title="Opened" role="img"></i>
+                                        <span class="d-none d-md-inline"> Waiting for Payment</span>
+                                    </span>
+                                </t>
+                                <t t-if="invoice.state == 'posted' and invoice.payment_state in ('paid', 'in_payment')">
+                                    <span class="badge badge-pill badge-success">
+                                        <i class="fa fa-fw fa-check" aria-label="Paid" title="Paid" role="img"></i>
+                                        <span class="d-none d-md-inline"> Paid</span>
+                                    </span>
+                                </t>
+                                <t t-if="invoice.state == 'posted' and invoice.payment_state == 'reversed'">
+                                    <span class="badge badge-pill badge-success">
+                                        <i class="fa fa-fw fa-check" aria-label="Reversed" title="Reversed" role="img"></i>
+                                        <span class="d-none d-md-inline"> Reversed</span>
+                                    </span>
+                                </t>
+                                <t t-if="invoice.state == 'cancel'">
+                                    <span class="badge badge-pill badge-warning">
+                                        <i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled" role="img"></i>
+                                        <span class="d-none d-md-inline"> Cancelled</span>
+                                    </span>
+                                </t>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="invoice.tipo_documento"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="invoice.state_tributacion"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc="-invoice.amount_residual if invoice.move_type == 'out_refund' else invoice.amount_residual" t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
         </t>
-      </t>
     </template>
-    
-     <template id="account.portal_invoice_page" name="Invoice Portal Template" inherit_id="portal.portal_sidebar" primary="True">
+
+    <template id="account.portal_invoice_page" name="Invoice Portal Template" inherit_id="portal.portal_sidebar" primary="True">
         <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
             <t t-set="o_portal_fullwidth_alert" groups="sales_team.group_sale_salesman,account.group_account_invoice,account.group_account_readonly">
                 <t t-call="portal.portal_back_in_edit_mode">
@@ -74,7 +96,10 @@
                             <b t-if="invoice.amount_residual > 0" t-field="invoice.amount_residual"/>
                             <b t-else="1" t-field="invoice.amount_total"/>
                         </h2>
-                        <div class="small" t-if="invoice.payment_state not in ('paid', 'in_payment') and invoice.move_type == 'out_invoice'"><i class="fa fa-clock-o"/><span class="o_portal_sidebar_timeago ml4" t-att-datetime="invoice.invoice_date_due"/></div>
+                        <div class="small" t-if="invoice.payment_state not in ('paid', 'in_payment') and invoice.move_type == 'out_invoice'">
+                            <i class="fa fa-clock-o"/>
+                            <span class="o_portal_sidebar_timeago ml4" t-att-datetime="invoice.invoice_date_due"/>
+                        </div>
                     </t>
 
                     <t t-set="entries">
@@ -82,52 +107,40 @@
                             <li class="list-group-item flex-grow-1">
                                 <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
                                     <div class="btn-group  flex-grow-1 mr-1 mb-1">
-                                        <a class="btn btn-secondary btn-block o_download_btn" t-att-href="invoice.get_portal_url(report_type='pdf', download=True)" title="Download"><i class="fa fa-download"/> Download</a>
+                                        <a class="btn btn-secondary btn-block o_download_btn" t-att-href="invoice.get_portal_url(report_type='pdf', download=True)" title="Download">
+                                            <i class="fa fa-download"/>
+ Download</a>
                                     </div>
                                     <div class="btn-group flex-grow-1 mb-1">
-                                        <a class="btn btn-secondary btn-block o_print_btn o_portal_invoice_print" t-att-href="invoice.get_portal_url(report_type='pdf')" id="print_invoice_report" title="Print" target="_blank"><i class="fa fa-print"/> Print</a>
+                                        <a class="btn btn-secondary btn-block o_print_btn o_portal_invoice_print" t-att-href="invoice.get_portal_url(report_type='pdf')" id="print_invoice_report" title="Print" target="_blank">
+                                            <i class="fa fa-print"/>
+ Print</a>
                                     </div>
                                 </div>
                             </li>
                             <li class="list-group-item flex-grow-1">
-                                <div class="small mb-1"><strong class="text-muted">
-                                    XML Document Issued
-                                </strong></div>
                                 <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
-                                    <t t-if="xml_documento">
-                                        <div class="btn-group flex-grow-1 mb-1">
-                                            <a t-attf-href="/web/content/#{xml_documento.id}?download=true" target="_blank">
-                                                <div class='oe_attachment_embedded o_image' t-att-title="xml_documento.name" t-att-data-mimetype="xml_documento.mimetype" t-attf-data-src="/web/image/#{xml_documento.id}/50x50"/>
-                                                <span>DOC_</span><span t-field="invoice.name"/><span>.xml</span>
-                                            </a>
-                                        </div>
-                                    </t>
-                                </div>
-                            </li>
-                            <li class="list-group-item flex-grow-1">
-                                <div class="small mb-1"><strong class="text-muted">
-                                    XML Response MH
-                                </strong></div>
-                                <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
-                                    <t t-if="xml_AHC">
-                                        <div class="btn-group flex-grow-1 mb-1">
-                                            <a t-attf-href="/web/content/#{xml_AHC.id}?download=true" target="_blank">
-                                                <div class='oe_attachment_embedded o_image' t-att-title="xml_AHC.name" t-att-data-mimetype="xml_AHC.mimetype" t-attf-data-src="/web/image/#{xml_AHC.id}/50x50"/>
-                                                <span>AHC_</span><span t-field="invoice.name"/><span>.xml</span>
-                                            </a>
-                                        </div>
-                                    </t>
+                                    <div class="btn-group flex-grow-1 mr-1 mb-1">
+                                        <a class="btn btn-secondary btn-block o_download_btn" t-att-href="invoice.get_xml_document(invoice.id)" id="get_xml" title="Get XML">
+                                            <!-- SVG Source: https://icons.getbootstrap.com/icons/filetype-xml/ -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filetype-xml" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM3.527 11.85h-.893l-.823 1.439h-.036L.943 11.85H.012l1.227 1.983L0 15.85h.861l.853-1.415h.035l.85 1.415h.908l-1.254-1.992 1.274-2.007Zm.954 3.999v-2.66h.038l.952 2.159h.516l.946-2.16h.038v2.661h.715V11.85h-.8l-1.14 2.596h-.025L4.58 11.85h-.806v3.999h.706Zm4.71-.674h1.696v.674H8.4V11.85h.791v3.325Z"/>
+                                            </svg>
+ Get XMLs</a>
+                                    </div>
                                 </div>
                             </li>
                             <li t-if="invoice.invoice_user_id" class="list-group-item flex-grow-1">
-                                <div class="small mb-1"><strong class="text-muted">
-                                    <t t-if="invoice.move_type == 'out_invoice'">
+                                <div class="small mb-1">
+                                    <strong class="text-muted">
+                                        <t t-if="invoice.move_type == 'out_invoice'">
                                         Salesperson
-                                    </t>
-                                    <t t-if="invoice.move_type == 'in_invoice'">
+                                        </t>
+                                        <t t-if="invoice.move_type == 'in_invoice'">
                                         Purchase Representative
-                                    </t>
-                                </strong></div>
+                                        </t>
+                                    </strong>
+                                </div>
                                 <div class="row">
                                     <div class="col flex-grow-0 pr-2">
                                         <img t-if="invoice.invoice_user_id.image_1024" class="rounded-circle mt-1 o_portal_contact_img" t-att-src="image_data_uri(invoice.invoice_user_id.image_1024)" alt="Contact"/>
@@ -135,7 +148,10 @@
                                     </div>
                                     <div class="col pl-0">
                                         <span t-field="invoice.invoice_user_id" t-options='{"widget": "contact", "fields": ["name", "phone"], "no_marker": True}'/>
-                                        <a href="#discussion" class="small"><i class="fa fa-fw fa-comments"/><b>Send message</b></a>
+                                        <a href="#discussion" class="small">
+                                            <i class="fa fa-fw fa-comments"/>
+                                            <b>Send message</b>
+                                        </a>
                                     </div>
                                 </div>
                             </li>

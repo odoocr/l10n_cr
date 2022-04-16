@@ -85,8 +85,7 @@ def number_to_text_es(number_in, join_dec=' Y ', separator=',', decimal_point='.
     try:
         number = number.replace(separator, '')
     except ValueError:
-        _logger.info(
-            "An error occurred while replacing the separator an error may occur.")
+        _logger.info("An error occurred while replacing the separator an error may occur.")
 
     # Get the integer and decimal part of the numbers
     try:
@@ -105,28 +104,26 @@ def number_to_text_es(number_in, join_dec=' Y ', separator=',', decimal_point='.
         if millions == '001':
             converted += 'UN MILLON '
         elif int(millions) > 0:
-            converted += '%sMILLONES ' % _convert_number(millions)
+            converted += f'{_convert_number(millions)}MILLONES '
 
     if thoudsands:
         if thoudsands == '001':
             converted += 'MIL '
         elif int(thoudsands) > 0:
-            converted += '%sMIL ' % _convert_number(thoudsands)
+            converted += f'{_convert_number(thoudsands)}MIL'
 
     if hundreds:
         if hundreds == '001':
             converted += 'UN '
         elif int(hundreds) > 0:
-            converted += '%s ' % _convert_number(hundreds)
+            converted += f'{_convert_number(hundreds)} '
 
     if number_dec == "":
         number_dec = "00"
     if len(number_dec) < 2:
         number_dec += '0'
 
-    # TODO: Check currency inclusion
-    has_decimal = float(number_dec) != 0 and join_dec + \
-        number_dec + "/100" or ' EXACTOS'
+    has_decimal = (join_dec + number_dec + '/100' if float(number_dec) != 0 else ' EXACTOS')
     converted += has_decimal
 
     return converted
@@ -145,8 +142,8 @@ def _convert_number(number):
         output += UNITS[k]
     else:
         if (k > 30) & (number[2] != '0'):
-            output += '%sY %s' % (TENS[int(number[1])-2], UNITS[int(number[2])])
+            output += f'{TENS[int(number[1])-2]}Y {UNITS[int(number[2])]}'
         else:
-            output += '%s%s' % (TENS[int(number[1])-2], UNITS[int(number[2])])
+            output += f'{TENS[int(number[1])-2]}{UNITS[int(number[2])]}'
 
     return output

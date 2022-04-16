@@ -25,7 +25,7 @@ class ProductElectronic(models.Model):
                                            string="Economic Activity",
                                            help='Economic activity code from Ministerio de Hacienda')
 
-    non_tax_deductible = fields.Boolean(string='Non Tax Deductible',
+    non_tax_deductible = fields.Boolean(string='Is Non Tax Deductible',
                                         help='Indicates if this product is non-tax deductible')
 
 
