@@ -926,7 +926,7 @@ class AccountInvoiceElectronic(models.Model):
 
     def generate_and_send_invoices(self, invoices):
         def cleanhtml(raw_html):
-            CLEANR = re.compile('<.*?>') 
+            CLEANR = re.compile('<.*?>')
             cleantext = re.sub(CLEANR, '', raw_html)
             return cleantext
         total_invoices = len(invoices)
@@ -1125,7 +1125,7 @@ class AccountInvoiceElectronic(models.Model):
                                     _no_cabys_code = _(f'Warning!.\nLine without CABYS code: {inv_line.name}')
                                     continue
                             else:
-                                _no_cabys_code =  _(f'Warning!.\nLine without CABYS code: {inv_line.name}')
+                                _no_cabys_code = _(f'Warning!.\nLine without CABYS code: {inv_line.name}')
                                 continue
 
                             if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
