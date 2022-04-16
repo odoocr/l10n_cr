@@ -23,7 +23,7 @@
         <field name="model">res.currency</field>
         <field name="inherit_id" ref="base.view_currency_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='65']" position="before">
+            <xpath expr="//button[@name='69']" position="before">
                 <button class="oe_stat_button" string="Update" type="object" icon="fa-refresh" name="action_create_missing_exchange_rates" attrs="{'invisible': [('active', '=', False)]}"/>
             </xpath>
             <xpath expr="//sheet" position="inside">

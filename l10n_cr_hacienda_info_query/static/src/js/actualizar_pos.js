@@ -16,6 +16,7 @@ function httpGet(theUrl)
             var obj = JSON.parse(xmlhttp.responseText);
             document.getElementsByName("name")[0].value = obj.nombre
             document.getElementsByName("identification_id")[0].value = parseInt(obj.identification_id)
+            document.getElementsByName("email")[0].value = obj.email
         }
     }
     xmlhttp.open("GET", theUrl, false);
