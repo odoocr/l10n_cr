@@ -89,5 +89,7 @@ class ActualizarPosApi(http.Controller):
                                        "email": str(all_emails_yo_contribuyo),
                                        "activity": act}
                         else:
-                            retorno = {"nombre": str(name)}
+                            retorno = {"nombre": str(name),
+                                       "identification_id": str(identification_id),
+                                       "email": str(all_emails_yo_contribuyo)}
                         return '%s' % str(retorno).replace("'", "\"")
