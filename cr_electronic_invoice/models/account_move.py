@@ -945,7 +945,7 @@ class AccountInvoiceElectronic(models.Model):
 
                 if not inv.sequence or not inv.sequence.isdigit():  # or (len(inv.number) == 10):
                     inv.state_tributacion = 'na'
-                    _logger.info('E-INV CR - Ignored invoice:%s', inv.number)
+                    _logger.info('E-INV CR - Ignored invoice:%s', inv.name)
                     continue
 
                 _logger.debug('generate_and_send_invoices - Invoice %s / %s  -  number:%s',
