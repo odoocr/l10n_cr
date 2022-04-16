@@ -203,7 +203,7 @@ class AccountInvoiceElectronic(models.Model):
                     inv.economic_activity_id = inv.partner_id.activity_id
             else:
                 inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
-                inv.economic_activity_id = inv.company_id.activity_id
+                inv.economic_activity_id = inv.company_id.activity_id.id
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -603,13 +603,13 @@ class AccountInvoiceElectronic(models.Model):
                             inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
                             self.env['ir.attachment'].sudo().create({'name': inv.fname_xml_comprobante,
                                                                      'type': 'binary',
-                                                                     'datas': base64.encodestring(xml_firmado),
+                                                                     'datas': base64.b64encode(xml_firmado),
                                                                      'res_model': inv._name,
                                                                      'res_id': inv.id,
                                                                      'res_field': 'xml_comprobante',
                                                                      'res_name': inv.fname_xml_comprobante,
                                                                      'mimetype': 'text/xml'})
-                            # inv.xml_comprobante = base64.encodestring(xml_firmado)
+                            # inv.xml_comprobante = base64.b64encode(xml_firmado)
                             inv.tipo_documento = tipo_documento
 
                             if inv.state_tributacion != 'procesando':
@@ -925,6 +925,10 @@ class AccountInvoiceElectronic(models.Model):
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Completed Successfully')
 
     def generate_and_send_invoices(self, invoices):
+        def cleanhtml(raw_html):
+            CLEANR = re.compile('<.*?>')
+            cleantext = re.sub(CLEANR, '', raw_html)
+            return cleantext
         total_invoices = len(invoices)
         current_invoice = 0
 
@@ -945,7 +949,7 @@ class AccountInvoiceElectronic(models.Model):
 
                 if not inv.sequence or not inv.sequence.isdigit():  # or (len(inv.number) == 10):
                     inv.state_tributacion = 'na'
-                    _logger.info('E-INV CR - Ignored invoice:%s', inv.number)
+                    _logger.info('E-INV CR - Ignored invoice:%s', inv.number_electronic)
                     continue
 
                 _logger.debug('generate_and_send_invoices - Invoice %s / %s  -  number:%s',
@@ -992,7 +996,7 @@ class AccountInvoiceElectronic(models.Model):
                     tipo_documento_referencia = False
                     razon_referencia = False
                     currency = inv.currency_id
-                    invoice_comments = escape(inv.narration) if inv.narration else ''
+                    invoice_comments = escape(cleanhtml(inv.narration)) if inv.narration else ''
 
                     if (inv.invoice_id or inv.not_loaded_invoice) and \
                        inv.reference_code_id and inv.reference_document_id:
@@ -1121,7 +1125,7 @@ class AccountInvoiceElectronic(models.Model):
                                     _no_cabys_code = _(f'Warning!.\nLine without CABYS code: {inv_line.name}')
                                     continue
                             else:
-                                _no_cabys_code =  _(f'Warning!.\nLine without CABYS code: {inv_line.name}')
+                                _no_cabys_code = _(f'Warning!.\nLine without CABYS code: {inv_line.name}')
                                 continue
 
                             if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
@@ -1296,11 +1300,11 @@ class AccountInvoiceElectronic(models.Model):
                         inv.company_id.frm_pin,
                         xml_to_sign)
 
-                    # inv.xml_comprobante = base64.encodestring(xml_firmado)
+                    # inv.xml_comprobante = base64.b64encode(xml_firmado)
                     inv.fname_xml_comprobante = inv.tipo_documento + '_' + inv.number_electronic + '.xml'
                     self.env['ir.attachment'].sudo().create({'name': inv.fname_xml_comprobante,
                                                              'type': 'binary',
-                                                             'datas': base64.encodestring(xml_firmado),
+                                                             'datas': base64.b64encode(xml_firmado),
                                                              'res_model': self._name,
                                                              'res_id': inv.id,
                                                              'res_field': 'xml_comprobante',
@@ -1504,18 +1508,32 @@ class AccountInvoiceElectronic(models.Model):
             inv.name = inv.sequence
             inv.state_tributacion = False
 
-    @api.onchange('amount_total')
-    def update_text_amount(self):
-        for inv in self:
-            inv.invoice_amount_text = extensions.text_converter.number_to_text_es(inv.amount_total)
+    def _compute_amount(self):
+        for move in self:
+            if move.payment_state == 'invoicing_legacy':
+                move.payment_state = move.payment_state
+                continue
+            total = 0.0
+            total_currency = 0.0
+            currencies = move._get_lines_onchange_currency().currency_id
+            for line in move.line_ids:
+                if move._payment_state_matters():
+                    if not line.exclude_from_invoice_tab:
+                        total_currency += line.amount_currency
+                    elif line.tax_line_id:
+                        total_currency += line.amount_currency
+                else:
+                    if line.debit:
+                        total_currency += line.amount_currency
+            if move.move_type == 'entry' or move.is_outbound():
+                sign = 1
+            else:
+                sign = -1
+            amount_total = sign * (total_currency if len(currencies) == 1 else total)
+            move.invoice_amount_text = extensions.text_converter.number_to_text_es(amount_total)
 
-    def _reverse_move_vals(self, default_values, cancel=True):
-        move_vals = super()._reverse_move_vals(default_values, cancel)
-        type_override = move_vals.get('type_override')
-        if type_override:
-            move_vals['move_type'] = type_override
-
-        return move_vals
+        res = super()._compute_amount()
+        return res
 
     def _reverse_moves(self, default_values_list=None, cancel=False):
         """ Reverse a recordset of account.move.

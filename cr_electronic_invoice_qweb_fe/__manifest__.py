@@ -21,21 +21,18 @@
 
 {
     'name': 'Costa Rica Electronic Invoice QWEB template',
-    'version': '14.0.1.0.0',
+    'version': '15.0.1.0.0',
     'author': 'Odoo CR, CYSFuturo',
     'summary': 'Update Invoice QWEB template to meet DGT requirements for Costa Rica',
     'description': """Update Invoice QWEB template to meet DGT requirements for Costa Rica""",
     'category': 'Accounting & Finance',
     'sequence': 4,
     'website': 'http://cysfuturo.com',
-    'depends': ['cr_electronic_invoice', 'sale_stock'],
-    'demo': [
-    ],
+    'depends': ['cr_electronic_invoice', 'sale_stock', 'base'],
     'data': [
+        'data/report_paperformat_data.xml',
         'views/res_company_view.xml',
         'views/report_sales_invoice_qweb.xml',
-    ],
-    'test': [
     ],
     'auto_install': False,
     'application': True,

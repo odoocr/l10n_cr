@@ -188,7 +188,7 @@ class PartnerElectronic(models.Model):
         clients = self.env["res.partner"].search([("has_exoneration", "=", True),
                                                   ("date_expiration", "<", datetime.today())])
         for client in clients:
-            if client.date_notification == False or (client.date_notification + timedelta(days=8)) < date.today():
+            if not client.date_notification or (client.date_notification + timedelta(days=8)) < date.today():
                 email_template = client.env.ref("cr_electronic_invoice.email_template_client_exoneration_expired")
                 if email_template:
                     email_template.send_mail(client.id)

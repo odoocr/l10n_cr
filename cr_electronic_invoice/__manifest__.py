@@ -17,8 +17,10 @@
         'uom',
         'sale_management',
         'sales_team',
+        'sale_stock',
         'account',
         'l10n_cr_country_codes',
+        'l10n_cr_hacienda_info_query',
         'res_currency_cr_adapter',
         ],
     'data': [

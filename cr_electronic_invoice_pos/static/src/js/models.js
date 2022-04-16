@@ -43,7 +43,7 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
         };
         function pad(n, width, z) {
             z = z || '0';
-            n += '';
+            n = n + '';
             if (n.length < width) {
                 n = new Array(width - n.length + 1).join(z) + n;
             }
@@ -91,17 +91,14 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
             }
             const order_id = self.db.add_order(order.export_as_JSON());
     
-            return new Promise(function (resolve, reject) {
-                self.flush_mutex.exec(function () {
-                    var order = self.db.get_order(order_id);
-                    if (order){
-                        var flushed = self._flush_orders([order], opts);
-                    } else {
-                        var flushed = Promise.resolve([]);
+            return new Promise((resolve, reject) => {
+                self.flush_mutex.exec(async () => {
+                    const order = self.db.get_order(order_id);
+                    try {
+                        resolve(await self._flush_orders([order], opts));
+                    } catch (error) {
+                        reject(error);
                     }
-                    flushed.then(resolve, reject);
-    
-                    return flushed;
                 });
             });
         }
@@ -125,10 +122,14 @@ odoo.define('cr_electronic_invoice_pos.models', function (require) {
         },
         export_for_printing: function(){
             var result = _super.prototype.export_for_printing.call(this, arguments);
-            if (this.sequence && this.number_electronic && this.tipo_documento) {
-                result.sequence = this.sequence;
-                result.number_electronic = this.number_electronic;
-                result.tipo_documento = this.tipo_documento;
+            var sequence = this.get_sequence();
+            var number_electronic = this.get_number_electronic();
+            var tipo_documento = this.get_tipo_documento();
+
+            if (sequence && number_electronic && tipo_documento) {
+                result.sequence = sequence;
+                result.number_electronic = number_electronic;
+                result.tipo_documento = tipo_documento;
             }
 
             return result;

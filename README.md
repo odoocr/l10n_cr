@@ -16,7 +16,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-**¡ESTA VERSIÓN NO ESTÁ FUNCIONAL. ESTÁ EN PROCESO LA MIGRACIÓN DE 12.0 A 15.0!**
+**¡ESTA VERSIÓN NO ESTÁ FUNCIONAL. ESTÁ EN PROCESO LA MIGRACIÓN DE 14.0 A 15.0!**
 
 Para ayuda y soporte la comunidad de Odoo CR cuenta con un grupo en Telegram: https://t.me/OdooCR
 

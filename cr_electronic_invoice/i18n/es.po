@@ -2356,7 +2356,7 @@ msgid ""
 "You must first select the response type for the uploaded file."
 msgstr ""
 "¡Advertencia!\n"
-"Primero debe seleccionar el tipo de respuesta para el archivo cargado".
+"Primero debe seleccionar el tipo de respuesta para el archivo cargado."
 
 #. module: cr_electronic_invoice
 #: code:addons/cr_electronic_invoice/models/account_move.py:0

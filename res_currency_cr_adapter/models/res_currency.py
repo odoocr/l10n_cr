@@ -23,8 +23,8 @@ class ResCurrency(models.Model):
     def action_create_missing_exchange_rates(self):
         currency_rate_obj = self.env['res.currency.rate']
         # A day is added to fix the loss of the current day
-        today = datetime.date.today()
-        last_day = today + datetime.timedelta(days=1)
+        today = datetime.today()
+        last_day = today + timedelta(days=1)
 
         first_day = currency_rate_obj.search([
             ('company_id', '=', self.env.user.company_id.id),
@@ -137,8 +137,10 @@ class ResCurrencyRate(models.Model):
                         if len(rates_ids) > 0:
                             rates_ids.write(
                                 {'rate': selling_rate,
+                                 'inverse_company_rate': selling_original_rate,
                                  'original_rate': selling_original_rate,
                                  'rate_2': buying_rate,
+                                 # 'inverse_company_rate_2': buying_original_rate,
                                  'original_rate_2': buying_original_rate,
                                  'currency_id': currency_id.id}
                                 )
@@ -146,16 +148,20 @@ class ResCurrencyRate(models.Model):
                             self.create(
                                 {'name': current_date_str,
                                  'rate': selling_rate,
+                                 'inverse_company_rate': selling_original_rate,
                                  'original_rate': selling_original_rate,
                                  'rate_2': buying_rate,
                                  'original_rate_2': buying_original_rate,
+                                 # 'inverse_company_rate_2': buying_original_rate,
                                  'currency_id': currency_id.id})
 
                         _logger.info({'name': current_date_str,
                                       'rate': selling_rate,
+                                      'inverse_company_rate': selling_original_rate,
                                       'original_rate': selling_original_rate,
                                       'rate_2': buying_rate,
                                       'original_rate_2': buying_original_rate,
+                                      # 'inverse_company_rate_2': buying_original_rate,
                                       'currency_id': currency_id.id})
                     else:
                         buy_des_fecha = buying_rate_nodes[node_index].find("DES_FECHA").text
@@ -192,11 +198,13 @@ class ResCurrencyRate(models.Model):
                             today = datetime.strptime(rate_line['fecha'], '%Y-%m-%d %H:%M:%S')
                             vals = {}
                             vals['original_rate'] = rate_line['venta']
+                            vals['inverse_company_rate'] = rate_line['venta']
                             # Odoo utiliza un valor inverso,
                             # a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                            vals['rate'] = 1 / vals['original_rate']
+                            vals['rate'] = 1 / rate_line['original_rate']
                             vals['original_rate_2'] = rate_line['compra']
-                            vals['rate_2'] = 1 / vals['original_rate_2']
+                            # vals['inverse_company_rate_2'] = rate_line['compra']
+                            vals['rate_2'] = 1 / rate_line['original_rate_2']
                             vals['currency_id'] = self.env.ref('base.USD').id
 
                             rate_id = self.env['res.currency.rate'].search([('name', '=', today.date())], limit=1)
@@ -224,12 +232,14 @@ class ResCurrencyRate(models.Model):
                         _logger.error(company.id)
                         vals = {}
                         vals['original_rate'] = data['dolar']['venta']['valor']
+                        vals['inverse_company_rate'] = data['dolar']['venta']['valor']
 
                         # Odoo utiliza un valor inverso,
                         # a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
 
                         vals['rate'] = 1 / vals['original_rate']
                         vals['original_rate_2'] = data['dolar']['compra']['valor']
+                        # vals['inverse_company_rate_2'] = data['dolar']['compra']['valor']
                         vals['rate_2'] = 1 / vals['original_rate_2']
                         vals['currency_id'] = self.env.ref('base.USD').id
 
@@ -259,9 +269,11 @@ class ResCurrencyRate(models.Model):
         self.create({
             'name': name,
             'rate': currency_rate_obj.rate,
+            'inverse_company_rate': currency_rate_obj.inverse_company_rate,
             'original_rate': currency_rate_obj.original_rate,
             'rate_2': currency_rate_obj.rate_2,
             'original_rate_2': currency_rate_obj.original_rate_2,
+            # 'inverse_company_rate_2': currency_rate_obj.inverse_company_rate_2,
             'currency_id': currency_rate_obj.currency_id.id,
             'company_id': currency_rate_obj.company_id.id,
         })
