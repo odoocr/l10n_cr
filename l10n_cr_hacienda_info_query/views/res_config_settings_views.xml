@@ -14,6 +14,7 @@
                             <div class="o_setting_left_pane">
                             </div>
                             <div class="o_setting_right_pane">
+                                <separator string="YO Contribuyo"/>
                                 <label for="url_base_yo_contribuyo"/>
                                 <br/>
                                 <field name="url_base_yo_contribuyo" value="https://api.hacienda.go.cr/fe/mifacturacorreo?"/>
@@ -29,6 +30,7 @@
                         </div>
                         <div class="col-12 col-lg-6 o_setting_box" id="companies_setting">
                             <div class="o_setting_right_pane">
+                                <separator string="Tributary information"/>
                                 <label for="url_base"/>
                                 <br/>
                                 <field name="url_base" value="https://api.hacienda.go.cr/fe/ae?"/>
