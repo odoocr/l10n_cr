@@ -15,161 +15,193 @@
         <field name="name">CULTIVO DE PALMA AFRICANA Y OTROS FRUTOS OLEAGINOSOS</field>
         <field name="description">ESTA CLASE COMPRENDE EL CULTIVO DE FRUTOS OLEAGINOSOS COMO: PALMAS DE ACEITES, OLIVOS (ACEITUNAS), COCOS Y OTROS FRUTOS OLEAGINOSOS. NO SE INCLUYE EL CULTIVO DE SEMILLAS OLEAGINOSAS, VEASE EL CODIGO 11322</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11102" model="economic.activity">
         <field name="code">011102</field>
         <field name="name">CULTIVO DE PALMA AFRICANA Y OTROS FRUTOS OLEAGINOSOS</field>
         <field name="description">ESTA CLASE COMPRENDE EL CULTIVO DE FRUTOS OLEAGINOSOS COMO: PALMAS DE ACEITES, OLIVOS (ACEITUNAS), COCOS Y OTROS FRUTOS OLEAGINOSOS. NO SE INCLUYE EL CULTIVO DE SEMILLAS OLEAGINOSAS, VEASE EL CODIGO 11322</field>
     </record>
+    -->
     <record id="activity_11103" model="economic.activity">
         <field name="code">011103</field>
         <field name="name">CULTIVO Y COMERCIALIZACION DE CESPED</field>
         <field name="description">EN ESTA CLASESE INCLUYE EL CULTIVO Y COMERCIALIZACION DE TODA VARIEDAD DE CESPED O ZACATE DECORATIVO</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11103" model="economic.activity">
         <field name="code">011103</field>
         <field name="name">CULTIVO Y COMERCIALIZACION DE CESPED</field>
         <field name="description">EN ESTA CLASESE INCLUYE EL CULTIVO Y COMERCIALIZACION DE TODA VARIEDAD DE CESPED O ZACATE DECORATIVO</field>
     </record>
+    -->
     <record id="activity_11201" model="economic.activity">
         <field name="code">011201</field>
         <field name="name">CULTIVO HORTALIZAS LEGUMBRES ESPECIALIDADES HORTICOLAS PRODUCTOS DE VIVERO EXCENTO DE VENTAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYEN LOS CULTIVOS AL AIRE LIBRE Y BAJO TECHADO DE: HORTALIZAS Y LEGUMBRES;COMO POR EJEMPLO MELONES, MAIZ DULCE; CALABAZAS; PEPINOS, TOMATES,PRODUCCION DE ESPECIALIDADES HORTICOLAS, INCLUSO SEMILLAS DE FLORES, FRUTAS Y HORTALIZAS; ESQUEJES SIN RAICES; BULBOS, TUBERCULOS, RAICES TUBEROSAS, CEBOLLAS, BROTES Y RIZOMAS; TODO LO ANTERIOR INCLUIDOS EN LA NUEVA CANASTA BASICA (DECRETO NO. 37132-H)</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11201" model="economic.activity">
         <field name="code">011201</field>
         <field name="name">CULTIVO HORTALIZAS LEGUMBRES ESPECIALIDADES HORTICOLAS PRODUCTOS DE VIVERO EXCENTO DE VENTAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYEN LOS CULTIVOS AL AIRE LIBRE Y BAJO TECHADO DE: HORTALIZAS Y LEGUMBRES;COMO POR EJEMPLO MELONES, MAIZ DULCE; CALABAZAS; PEPINOS, TOMATES,PRODUCCION DE ESPECIALIDADES HORTICOLAS, INCLUSO SEMILLAS DE FLORES, FRUTAS Y HORTALIZAS; ESQUEJES SIN RAICES; BULBOS, TUBERCULOS, RAICES TUBEROSAS, CEBOLLAS, BROTES Y RIZOMAS; TODO LO ANTERIOR INCLUIDOS EN LA NUEVA CANASTA BASICA (DECRETO NO. 37132-H)</field>
     </record>
+    -->
     <record id="activity_11218" model="economic.activity">
         <field name="code">011218</field>
         <field name="name">PRODUCCION DE MINIVEGETALES</field>
         <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE MINIVEGETALES</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11218" model="economic.activity">
         <field name="code">011218</field>
         <field name="name">PRODUCCION DE MINIVEGETALES</field>
         <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE MINIVEGETALES</field>
     </record>
+    -->
     <record id="activity_11231" model="economic.activity">
         <field name="code">011231</field>
         <field name="name">CULTIVO HORTALIZAS LEGUMBRES ESPECIALIDADES HORTICOLAS PRODUCTOS VIVERO GRABADOS VENTAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYEN LOS CULTIVOS AL AIRE LIBRE Y BAJO TECHADO DE HORTALIZAS Y LEGUMBRES NO INCLUIDOS EN LA NUEVA CANASTA BASICA (DECRETO NO. 37132-H) ASI COMO EL CULTIVO Y RECOLECCION DE HONGOS, TRUFAS, ACEITUNAS, ALCAPARRAS, PEREJIL. CULTIVO DE PLANTAS QUE DAN FLORES Y CAPULLOS.CULTIVO DE PLANTAS PARA TRASPLANTE Y PARA ORNAMENTACION</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11231" model="economic.activity">
         <field name="code">011231</field>
         <field name="name">CULTIVO HORTALIZAS LEGUMBRES ESPECIALIDADES HORTICOLAS PRODUCTOS VIVERO GRABADOS VENTAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYEN LOS CULTIVOS AL AIRE LIBRE Y BAJO TECHADO DE HORTALIZAS Y LEGUMBRES NO INCLUIDOS EN LA NUEVA CANASTA BASICA (DECRETO NO. 37132-H) ASI COMO EL CULTIVO Y RECOLECCION DE HONGOS, TRUFAS, ACEITUNAS, ALCAPARRAS, PEREJIL. CULTIVO DE PLANTAS QUE DAN FLORES Y CAPULLOS.CULTIVO DE PLANTAS PARA TRASPLANTE Y PARA ORNAMENTACION</field>
     </record>
+    -->
     <record id="activity_11301" model="economic.activity">
         <field name="code">011301</field>
         <field name="name">CULTIVO DE ESPECIAS DE TODO TIPO</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE ESPECIAS DE HOJA COMO LAUREL, TOMILLO, ALBAHACA, OREGANO, ETC., ESPECIAS DE SEMILLA COMO ANIS Y COMINO Y ESPECIAS DE FLOR COMO CANELA, CLAVO DE OLOR Y OTRAS ESPECIES COMO NUEZ MOSCADA Y JENGIBRE, ACHIOTE Y PIMIENTA.</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11301" model="economic.activity">
         <field name="code">011301</field>
         <field name="name">CULTIVO DE ESPECIAS DE TODO TIPO</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE ESPECIAS DE HOJA COMO LAUREL, TOMILLO, ALBAHACA, OREGANO, ETC., ESPECIAS DE SEMILLA COMO ANIS Y COMINO Y ESPECIAS DE FLOR COMO CANELA, CLAVO DE OLOR Y OTRAS ESPECIES COMO NUEZ MOSCADA Y JENGIBRE, ACHIOTE Y PIMIENTA.</field>
     </record>
+    -->
     <record id="activity_11302" model="economic.activity">
         <field name="code">011302</field>
         <field name="name">CULTIVO DE FRUTAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE FRUTAS N.C.P. TALES COMO AGUACATE, ANONA, CAIMITO, CARAMBOLA, CAS, GUANABANA, GUAYABA, LIMO DE TODO TIPO, MANZANA(SOLO DE AGUA Y ROSA), SANDIA, TAMARINDO, ETC</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11302" model="economic.activity">
         <field name="code">011302</field>
         <field name="name">CULTIVO DE FRUTAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE FRUTAS N.C.P. TALES COMO AGUACATE, ANONA, CAIMITO, CARAMBOLA, CAS, GUANABANA, GUAYABA, LIMO DE TODO TIPO, MANZANA(SOLO DE AGUA Y ROSA), SANDIA, TAMARINDO, ETC</field>
     </record>
+    -->
     <record id="activity_11322" model="economic.activity">
         <field name="code">011322</field>
         <field name="name">CULTIVO DE SEMILLAS COMESTIBLES Y GERMINACION DE SEMILLAS OLEAGINOSAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE NUECES Y SEMILLAS COMESTIBLES COMO EL MANI, MACADAMIA Y ALMENDRAS ENTRE OTROS. ADEMAS, LA GERMINACION DE SEMILLAS OLEAGINOSAS (PALMA ACEITERA).</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11322" model="economic.activity">
         <field name="code">011322</field>
         <field name="name">CULTIVO DE SEMILLAS COMESTIBLES Y GERMINACION DE SEMILLAS OLEAGINOSAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE NUECES Y SEMILLAS COMESTIBLES COMO EL MANI, MACADAMIA Y ALMENDRAS ENTRE OTROS. ADEMAS, LA GERMINACION DE SEMILLAS OLEAGINOSAS (PALMA ACEITERA).</field>
     </record>
+    -->
     <record id="activity_11329" model="economic.activity">
         <field name="code">011329</field>
         <field name="name">CULTIVO DE PLANTAS PARA PREPARAR BEBIDAS Y MEDICINAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE PLANTAS DE CUYAS HOJAS SE PREPARAN BEBIDAS COMO TE, MANZANILLA, MENTA, HIERBABUENA. SE INCLUYE TAMBIEN EL CULTIVO DE PLANTAS MEDICINALES.</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11329" model="economic.activity">
         <field name="code">011329</field>
         <field name="name">CULTIVO DE PLANTAS PARA PREPARAR BEBIDAS Y MEDICINAS</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE PLANTAS DE CUYAS HOJAS SE PREPARAN BEBIDAS COMO TE, MANZANILLA, MENTA, HIERBABUENA. SE INCLUYE TAMBIEN EL CULTIVO DE PLANTAS MEDICINALES.</field>
     </record>
+    -->
     <record id="activity_11340" model="economic.activity">
         <field name="code">011340</field>
         <field name="name">CULTIVO DE PIÑA</field>
         <field name="description">ESTA ACTIVIDAD INCLUYE EL CULTIVO DE DIVERSAS CLASES DE PIÑA</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11340" model="economic.activity">
         <field name="code">011340</field>
         <field name="name">CULTIVO DE PIÑA</field>
         <field name="description">ESTA ACTIVIDAD INCLUYE EL CULTIVO DE DIVERSAS CLASES DE PIÑA</field>
     </record>
+    -->
     <record id="activity_11349" model="economic.activity">
         <field name="code">011349</field>
         <field name="name">CULTIVO DE CACAO</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CACAO</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11349" model="economic.activity">
         <field name="code">011349</field>
         <field name="name">CULTIVO DE CACAO</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CACAO</field>
     </record>
+    -->
     <record id="activity_11401" model="economic.activity">
         <field name="code">011401</field>
         <field name="name">CULTIVO DE CAFE</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DEL CAFE</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11401" model="economic.activity">
         <field name="code">011401</field>
         <field name="name">CULTIVO DE CAFE</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DEL CAFE</field>
     </record>
+    -->
     <record id="activity_11501" model="economic.activity">
         <field name="code">011501</field>
         <field name="name">CULTIVO DE BANANO</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DEL BANANO DE TODO TIPO, YA SEA PARA EXPORTACION O CONSUMO LOCAL.</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11501" model="economic.activity">
         <field name="code">011501</field>
         <field name="name">CULTIVO DE BANANO</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DEL BANANO DE TODO TIPO, YA SEA PARA EXPORTACION O CONSUMO LOCAL.</field>
     </record>
+    -->
     <record id="activity_11701" model="economic.activity">
         <field name="code">011701</field>
         <field name="name">CULTIVO DE CAÑA DE AZUCAR</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CAÑA DE AZUCAR.</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11701" model="economic.activity">
         <field name="code">011701</field>
         <field name="name">CULTIVO DE CAÑA DE AZUCAR</field>
         <field name="description">EN ESTA CLASE SE INCLUYE EL CULTIVO DE CAÑA DE AZUCAR.</field>
     </record>
+    -->
     <record id="activity_11802" model="economic.activity">
         <field name="code">011802</field>
         <field name="name">CULTIVO DE CEREALES (INCLUSIVE EL ARROZ), LEGUMBRES Y GRANOS BASICOS</field>
         <field name="description">EN ESTA CLASE SE INCLUYEN LOS SIGUIENTES CEREALES: ARROZ, TRIGO, MAIZ, SORGO, CEBADA, AVENA, MIJO, OTROS CEREALES N.C.P; LEGUMINOSAS: FRIJOLES, GARBANZOS, LENTEJAS, HABAS, GUISANTES, OTRAS LEGUMINOSAS; SEMILLAS: LINAZA, MOSTAZA, NIGER, COLZA, CARTAMO, SESAMO, GIRASOL, OTRAS SEMILLAS.</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11802" model="economic.activity">
         <field name="code">011802</field>
         <field name="name">CULTIVO DE CEREALES (INCLUSIVE EL ARROZ), LEGUMBRES Y GRANOS BASICOS</field>
         <field name="description">EN ESTA CLASE SE INCLUYEN LOS SIGUIENTES CEREALES: ARROZ, TRIGO, MAIZ, SORGO, CEBADA, AVENA, MIJO, OTROS CEREALES N.C.P; LEGUMINOSAS: FRIJOLES, GARBANZOS, LENTEJAS, HABAS, GUISANTES, OTRAS LEGUMINOSAS; SEMILLAS: LINAZA, MOSTAZA, NIGER, COLZA, CARTAMO, SESAMO, GIRASOL, OTRAS SEMILLAS.</field>
     </record>
+    -->
     <record id="activity_11901" model="economic.activity">
         <field name="code">011901</field>
         <field name="name">CULTIVO DE FLORES DE TODO TIPO</field>
         <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE FLORES VIVAS PARA VENDER O COMERCIALIZAR SIN NINGUN TIPO DE PROCESAMIENTO; POR EJEMPLO: EL CULTIVO DE AMAPOLAS, FLORESTROPICALES EXOTICAS, ANTURIOS, ORQUIDEAS, HELECHOS, AVES DEL PARAISO, AZALIAS,CACTUS ORNAMENTALES, CALAS, CLAVELES, MARGINATA, ESPARRAGO,GERANIOS ENTRE OTRAS;ESTA GRAVADA EN EL IMPUESTO DE VENTAS SEGUN EL ARTICULO 4 DE LA LEY DEL IMPUESTOGENERAL SOBRE LAS VENTAS Y SUS REFORMAS Y EL ARTICULO 5 DE SU REGLAMENTO Y SUSREFORMAS. TAMBIEN EN CONCORDANCIA CON EL DECRETO EJECUTIVO 37132-H DE 17/05/2012</field>
     </record>
+    <!-- W7902(duplicate-xml-record-id), ]
     <record id="activity_11901" model="economic.activity">
         <field name="code">011901</field>
         <field name="name">CULTIVO DE FLORES DE TODO TIPO</field>
         <field name="description">EN ESTA CLASE SE INCLUYE LA PRODUCCION DE FLORES VIVAS PARA VENDER O COMERCIALIZAR SIN NINGUN TIPO DE PROCESAMIENTO; POR EJEMPLO: EL CULTIVO DE AMAPOLAS, FLORESTROPICALES EXOTICAS, ANTURIOS, ORQUIDEAS, HELECHOS, AVES DEL PARAISO, AZALIAS,CACTUS ORNAMENTALES, CALAS, CLAVELES, MARGINATA, ESPARRAGO,GERANIOS ENTRE OTRAS;ESTA GRAVADA EN EL IMPUESTO DE VENTAS SEGUN EL ARTICULO 4 DE LA LEY DEL IMPUESTOGENERAL SOBRE LAS VENTAS Y SUS REFORMAS Y EL ARTICULO 5 DE SU REGLAMENTO Y SUSREFORMAS. TAMBIEN EN CONCORDANCIA CON EL DECRETO EJECUTIVO 37132-H DE 17/05/2012</field>
     </record>
+    -->
     <record id="activity_11903" model="economic.activity">
         <field name="code">011903</field>
         <field name="name">VIVEROS</field>
@@ -420,11 +452,13 @@
         <field name="name">ELABORACION DE CHOCOLATE</field>
         <field name="description">ELABORACION DE CHOCOLATE Y PRODUCTOS PREPARADOS CON CHOCOLATE.</field>
     </record>
+    <!-- [W7902(duplicate-xml-record-id), ] 
     <record id="activity_154302" model="economic.activity">
         <field name="code">154302</field>
         <field name="name">ELABORACION DE CHOCOLATE</field>
         <field name="description">ELABORACION DE CHOCOLATE Y PRODUCTOS PREPARADOS CON CHOCOLATE.</field>
     </record>
+    -->
     <record id="activity_154303" model="economic.activity">
         <field name="code">154303</field>
         <field name="name">ELABORACION DE DULCES, GOLOSINAS Y CONSERVAS EN AZUCAR</field>

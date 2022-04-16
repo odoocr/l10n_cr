@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 14.0-20210913\n"
+"Project-Id-Version: Odoo Server 14.0-20220204\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-16 23:09+0000\n"
-"PO-Revision-Date: 2022-01-16 23:09+0000\n"
+"POT-Creation-Date: 2022-04-11 21:19+0000\n"
+"PO-Revision-Date: 2022-04-11 21:19+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -130,9 +130,6 @@ msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
-#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
-#: code:addons/l10n_cr/cr_electronic_invoice_pos/models/electronic_invoice.py:0
-#: code:addons/l10n_cr/cr_electronic_invoice_pos/models/electronic_invoice.py:0
 #, python-format
 msgid " REFUND"
 msgstr "REEMBOLSO"
@@ -140,7 +137,8 @@ msgstr "REEMBOLSO"
 #. module: cr_electronic_invoice_pos
 #: model:mail.template,subject:cr_electronic_invoice_pos.email_template_pos_invoice
 msgid "${object.company_id.name|safe} Invoice (Ref ${object.number or 'n/a'})"
-msgstr "${object.company_id.name|safe} Factura (Ref ${object.number or 'n/a'})"
+msgstr ""
+"${object.company_id.name|safe} Factura (Ref ${object.number or 'n/a'})"
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
@@ -221,7 +219,6 @@ msgstr ""
 #. module: cr_electronic_invoice_pos
 #. openerp-web
 #: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
-#: code:addons/l10n_cr/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
 #, python-format
 msgid "Clave:"
 msgstr ""
@@ -239,7 +236,6 @@ msgstr "Consecutivo"
 #. module: cr_electronic_invoice_pos
 #. openerp-web
 #: code:addons/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
-#: code:addons/l10n_cr/cr_electronic_invoice_pos/static/src/xml/pos.xml:0
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
 #, python-format
 msgid "Consecutivo:"
@@ -272,7 +268,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__display_name
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__display_name
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_payment_method__display_name
-#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_stock_picking__display_name
 msgid "Display Name"
 msgstr "Mostrar nombre"
 
@@ -328,7 +323,12 @@ msgid "Email state"
 msgstr "Estado del correo electrónico"
 
 #. module: cr_electronic_invoice_pos
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
 #: model:ir.model.fields.selection,name:cr_electronic_invoice_pos.selection__pos_order__state_tributacion__error
+#, python-format
 msgid "Error"
 msgstr ""
 
@@ -384,9 +384,8 @@ msgstr "Seguidores (Socios)"
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config__id
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__id
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_payment_method__id
-#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_stock_picking__id
 msgid "ID"
-msgstr ""
+msgstr "Identificación"
 
 #. module: cr_electronic_invoice_pos
 #: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_order__message_needaction
@@ -430,7 +429,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_config____last_update
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order____last_update
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_payment_method____last_update
-#: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_stock_picking____last_update
 msgid "Last Modified on"
 msgstr "Última modificación el"
 
@@ -527,7 +525,7 @@ msgstr "Pedidos del TPV"
 #. module: cr_electronic_invoice_pos
 #: model:ir.actions.report,name:cr_electronic_invoice_pos.pos_orders
 msgid "PosOrders"
-msgstr ""
+msgstr "Ordenes del PdV"
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.pos_order_report
@@ -593,7 +591,6 @@ msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
-#: code:addons/l10n_cr/cr_electronic_invoice_pos/models/electronic_invoice.py:0
 #, python-format
 msgid "Return Products"
 msgstr "Devolver productos"
@@ -668,18 +665,17 @@ msgid "Terminal"
 msgstr ""
 
 #. module: cr_electronic_invoice_pos
+#: model:ir.model.fields,help:cr_electronic_invoice_pos.field_pos_config__terminal
+msgid "Terminal number"
+msgstr ""
+
+#. module: cr_electronic_invoice_pos
 #: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
-#: code:addons/l10n_cr/cr_electronic_invoice_pos/models/electronic_invoice.py:0
 #, python-format
 msgid ""
 "To return product(s), you need to open a session that will be used to "
 "register the refund."
 msgstr ""
-
-#. module: cr_electronic_invoice_pos
-#: model:ir.model,name:cr_electronic_invoice_pos.model_stock_picking
-msgid "Transfer"
-msgstr "Transferencia"
 
 #. module: cr_electronic_invoice_pos
 #: model:pos.payment.method,name:cr_electronic_invoice_pos.PaymentMethods_4
@@ -727,6 +723,12 @@ msgstr "Comprobante XML"
 #: model:ir.model.fields,field_description:cr_electronic_invoice_pos.field_pos_order__fname_xml_comprobante
 msgid "XML receipt filename"
 msgstr "Nombre del comprobante XML"
+
+#. module: cr_electronic_invoice_pos
+#: code:addons/cr_electronic_invoice_pos/models/electronic_invoice.py:0
+#, python-format
+msgid "Ya recibido anteriormente, se pasa a consultar"
+msgstr ""
 
 #. module: cr_electronic_invoice_pos
 #: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_pos.view_pos_config_electronic_invoice_form

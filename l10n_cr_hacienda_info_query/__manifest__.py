@@ -6,8 +6,19 @@
     "website": "https://github.com/odoocr/l10n_cr",
     "category": "API",
     "summary": """Consultar Nombre de Clientes en Hacienda Costa Rica""",
-    "depends": ['base', 'contacts', 'point_of_sale'],
-    "data": ['views/res_company.xml', 'views/assets.xml'],
-    "qweb": ['static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml'],
+    "depends": [
+        'base',
+        'contacts',
+        'point_of_sale',
+        'base_setup'
+    ],
+    "data": [
+        'data/res_config_settings.xml',
+        'views/assets.xml',
+        'views/res_config_settings_views.xml'
+    ],
+    "qweb": [
+        'static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml'
+    ],
     "installable": True
 }

@@ -165,7 +165,7 @@ class PosOrder(models.Model):
             ('NC', 'Electronic Credit Note')
             ],
         string="Receipt Type",
-        required=False, default='FE',
+        default='FE',
         help='Show document type in concordance with Ministerio de Hacienda classification')
 
     sequence = fields.Char(string='Consecutive', readonly=True, )
@@ -416,11 +416,6 @@ class PosOrder(models.Model):
         _logger.info('E-INV CR - Reenvia Correos - Finalizado')
 
     def _validahacienda_pos(self, max_orders=10, no_partner=True):
-        """
-            TODO: [R1260(too-complex), PosOrder._validahacienda_pos] '_validahacienda_pos' is too complex.
-            The McCabe rating is 26
-            Se debe intentar mejorar la puntuación
-        """
         pos_orders = self.env['pos.order'].search([('state', 'in', ('paid', 'done', 'invoiced')),
                                                    '|', (no_partner, '=', True),
                                                    '&', ('partner_id', '!=', False), ('partner_id.vat', '!=', False),
