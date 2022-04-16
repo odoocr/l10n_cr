@@ -18,6 +18,30 @@ class actualizar_pos_api(http.Controller):
     def index(self,vat):
 
         company_id = http.request.env['res.company'].sudo().search([],limit=1)
+
+        url_base_yo_contribuyo = company_id.url_base_yo_contribuyo
+        usuario_yo_contribuyo = company_id.usuario_yo_contribuyo
+        token_yo_contribuyo = company_id.token_yo_contribuyo
+        if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
+            url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
+
+            if url_base_yo_contribuyo[-1:] == '/':
+                url_base_yo_contribuyo = url_base_yo_contribuyo[:-1]
+
+            end_point = url_base_yo_contribuyo + 'identificacion=' + vat
+
+            headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo }
+
+            peticion = requests.get(end_point, headers=headers, timeout=10)
+            all_emails_yo_contribuyo = ''
+
+            if peticion.status_code in (200, 202) and len(peticion._content) > 0:
+                contenido = json.loads(str(peticion._content, 'utf-8'))
+                emails_yo_contribuyo = contenido['Resultado']['Correos']
+                for email_yo_contribuyo in emails_yo_contribuyo:
+                    all_emails_yo_contribuyo = all_emails_yo_contribuyo + email_yo_contribuyo['Correo'] + ','
+                all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
+
         url_base = company_id.url_base
 
         if url_base:
@@ -64,7 +88,7 @@ class actualizar_pos_api(http.Controller):
                                     identification_id = id_type.search([('code', '=', '05')], limit=1).id
                     if contenido.get('nombre') != None:
                         name = contenido.get('nombre')
-                        retorno = {"nombre":str(name),"identification_id":str(identification_id)}
+                        retorno = {"nombre":str(name),"identification_id":str(identification_id),"email": str(all_emails_yo_contribuyo)}
                         return '%s' % str(retorno).replace("'","\"")
 
             #Si la petición arroja error se almacena en el campo ultima_respuesta de res_company. Nota: se usa execute ya que el metodo por objeto no funciono
