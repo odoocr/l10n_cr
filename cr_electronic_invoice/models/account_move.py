@@ -684,6 +684,10 @@ class AccountInvoiceElectronic(models.Model):
                     i.state_tributacion = estado_m_h
                     i.fname_xml_respuesta_tributacion = 'AHC_' + i.number_electronic + '.xml'
                     i.xml_respuesta_tributacion = response_json.get('respuesta-xml')
+                    decoded_xml=base64.b64decode(response_json.get('respuesta-xml')).decode('utf-8')
+                    xml_errors=decoded_xml.partition('<DetalleMensaje>')[2].partition('</DetalleMensaje>')[0]
+                    #_logger.error(xml_errors)
+                    i.message_post(subject='Error',body=xml_errors)
                 else:
                     if i.error_count > 10:
                         i.state_tributacion = 'error'

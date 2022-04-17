@@ -541,14 +541,21 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
 
                     if inv.tipo_documento != 'FEE':
                         if b.get('exoneracion'):
-                            sb.Append('<Exoneracion>')
-                            sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
-                            sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
-                            sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
-                            sb.Append('<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
-                            sb.Append('<PorcentajeExoneracion>' + str(b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
-                            sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
-                            sb.Append('</Exoneracion>')
+                            if ( receiver_company.type_exoneration.code and receiver_company.exoneration_number and receiver_company.institution_name and receiver_company.date_issue ):
+                                sb.Append('<Exoneracion>')
+                                sb.Append('<TipoDocumento>' + receiver_company.type_exoneration.code + '</TipoDocumento>')
+                                sb.Append('<NumeroDocumento>' + receiver_company.exoneration_number + '</NumeroDocumento>')
+                                sb.Append('<NombreInstitucion>' + receiver_company.institution_name + '</NombreInstitucion>')
+                                sb.Append(
+                                    '<FechaEmision>' + str(receiver_company.date_issue) + 'T00:00:00-06:00' + '</FechaEmision>')
+                                sb.Append('<PorcentajeExoneracion>' + str(
+                                    b['exoneracion']['porcentajeCompra']) + '</PorcentajeExoneracion>')
+                                sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
+                                sb.Append('</Exoneracion>')
+                            else:
+                                inv.message_post(subject='Error',body='The invoice was sent but some information is missing. Please check the customer exoneration information.')
+                                sb.Append('<Exoneracion>')
+                                sb.Append('</Exoneracion>')
                     sb.Append('</Impuesto>')
 
                 sb.Append('<ImpuestoNeto>' + str(v['impuestoNeto']) + '</ImpuestoNeto>')
