@@ -567,7 +567,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                                 sb.Append('<MontoExoneracion>' + str(b['exoneracion']['montoImpuesto']) + '</MontoExoneracion>')
                                 sb.Append('</Exoneracion>')
                             else:
-                                inv.message_post(subject='Error',body='The invoice was sent but some information is missing. Please check the customer exoneration information')
+                                inv.message_post(subject='Error',body='The invoice was sent but some information is missing. Please check the customer exoneration information.')
                                 sb.Append('<Exoneracion>')
                                 sb.Append('</Exoneracion>')
                     sb.Append('</Impuesto>')
