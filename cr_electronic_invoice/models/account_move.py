@@ -603,7 +603,8 @@ class AccountInvoiceElectronic(models.Model):
                             inv.fname_xml_comprobante = tipo_documento + '_' + inv.number_electronic + '.xml'
                             self.env['ir.attachment'].sudo().create({'name': inv.fname_xml_comprobante,
                                                                      'type': 'binary',
-                                                                     'datas': base64.encodestring(xml_firmado),
+                                                                     #'datas': base64.encodestring(xml_firmado),
+                                                                     'datas': base64.b64encode(xml_firmado),
                                                                      'res_model': inv._name,
                                                                      'res_id': inv.id,
                                                                      'res_field': 'xml_comprobante',
@@ -681,9 +682,9 @@ class AccountInvoiceElectronic(models.Model):
                                                                + detalle_mensaje + '</p>'
 
                                         self.message_post(
-                                            body=message_description,
-                                            subtype='mail.mt_note',
-                                            content_subtype='html')
+                                            body=message_description)
+                                            #subtype='mail.mt_note',
+                                            #content_subtype='html')
 
                                         _logger.info(_(f'E-INV CR - Document Status:{inv.state_tributacion}'))
 
@@ -833,6 +834,10 @@ class AccountInvoiceElectronic(models.Model):
                                                       'res_field': 'xml_respuesta_tributacion',
                                                       'res_name': i.fname_xml_respuesta_tributacion,
                                                       'mimetype': 'text/xml'})
+                    decoded_xml=base64.b64decode(response_json.get('respuesta-xml')).decode('utf-8')
+                    xml_errors=decoded_xml.partition('<DetalleMensaje>')[2].partition('</DetalleMensaje>')[0]
+                    #_logger.error(xml_errors)
+                    i.message_post(subject='Error',body=xml_errors)
                 else:
                     if i.error_count > 10:
                         i.state_tributacion = 'error'
@@ -905,7 +910,7 @@ class AccountInvoiceElectronic(models.Model):
                     body=message,
                     subject=_('IMPORTANT NOTICE!!'),
                     message_type='notification',
-                    subtype=None,
+                    #subtype=None,
                     parent_id=False,
                 )
                 inv.state_tributacion = 'error'
@@ -920,7 +925,7 @@ class AccountInvoiceElectronic(models.Model):
             self.message_post(body=message,
                               subject=_('IMPORTANT NOTICE!!'),
                               message_type='notification',
-                              subtype=None,
+                              #subtype=None,
                               parent_id=False)
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Completed Successfully')
 
@@ -939,7 +944,7 @@ class AccountInvoiceElectronic(models.Model):
                         body=message,
                         subject=_('IMPORTANT NOTICE!!'),
                         message_type='notification',
-                        subtype=None,
+                        #subtype=None,
                         parent_id=False,
                     )
 
@@ -959,7 +964,7 @@ class AccountInvoiceElectronic(models.Model):
                         inv.message_post(body=msg_body + inv.number_electronic,
                                          subject=_('Sending a second FEC'),
                                          message_type='notification',
-                                         subtype=None,
+                                         #subtype=None,
                                          parent_id=False,
                                          attachments=[[inv.fname_xml_respuesta_tributacion,
                                                        inv.fname_xml_respuesta_tributacion],
@@ -1300,7 +1305,8 @@ class AccountInvoiceElectronic(models.Model):
                     inv.fname_xml_comprobante = inv.tipo_documento + '_' + inv.number_electronic + '.xml'
                     self.env['ir.attachment'].sudo().create({'name': inv.fname_xml_comprobante,
                                                              'type': 'binary',
-                                                             'datas': base64.encodestring(xml_firmado),
+                                                             #'datas': base64.encodestring(xml_firmado),
+                                                             'datas': base64.b64encode(xml_firmado),
                                                              'res_model': self._name,
                                                              'res_id': inv.id,
                                                              'res_field': 'xml_comprobante',
