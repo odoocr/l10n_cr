@@ -32,9 +32,10 @@
                 <button name="create_partner_from_xml" class="oe_highlight" type="object" string="Create Provider" attrs="{'invisible':['|','|',('move_type','in',('entry', 'out_invoice', 'out_refund')),('partner_id','!=', False),('xml_supplier_approval','=', False)]}"/>
             </xpath>
 
-            <field name="narration" position="before">
-                <field name="invoice_amount_text"/>
-            </field>
+            <xpath expr="//field[@name='narration']/.." position="inside">
+                <br/>
+                <field name="invoice_amount_text"  class="oe_inline" nolabel="1"/>
+            </xpath>
 
             <field name="partner_id" position="after">
                 <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": [("type","in", ("in_invoice", "in_refund"))]}'/>
@@ -68,7 +69,8 @@
                 <attribute name="invisible">False</attribute>
             </xpath>
 
-            <xpath expr="(//field[@name='amount_total'])[last()]" position="after">
+            <xpath expr="(//field[@name='tax_totals_json'])[last()]" position="after">
+                <field name="amount_total_iva_devuelto" attrs="{'invisible': [('amount_total_iva_devuelto', '=', 0)]}"/>
                 <field name="amount_tax_electronic_invoice" attrs="{'invisible':[('move_type','in', ('out_invoice', 'out_refund'))]}"/>
                 <field name="amount_total_electronic_invoice" attrs="{'invisible':[('move_type','in', ('out_invoice', 'out_refund'))]}"/>
             </xpath>

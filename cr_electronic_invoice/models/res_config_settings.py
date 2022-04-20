@@ -38,15 +38,15 @@ class ResConfigSettings(models.TransientModel):
             expense_account_id=int(get_param('expense_account_id')),
             load_lines=get_param('load_lines'),
             expense_product_id=int(get_param('expense_product_id')),
-            expense_analytic_account_id=int(get_param('expense_analytic_account_id')),
+            expense_analytic_account_id=int(get_param('expense_analytic_account_id'))
         )
         return res
 
+    @api.model
     def set_values(self):
-        res = super().set_values()
+        super().set_values()
         set_param = self.env['ir.config_parameter'].sudo().set_param
         set_param('expense_account_id', self.expense_account_id.id)
         set_param('load_lines', self.load_lines)
         set_param('expense_product_id', self.expense_product_id.id)
         set_param('expense_analytic_account_id', self.expense_analytic_account_id.id)
-        return res

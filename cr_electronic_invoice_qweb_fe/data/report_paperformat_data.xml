@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'base'), ('name', '=', 'paperformat_us'), ('model', '=', 'report.paperformat')]" />
+        </function>
+        <value eval="{'noupdate': False}" />
+    </function>
+
+    <!-- MODIFICAMOS LOS DATOS -->
+
+    <record id="base.paperformat_us" model="report.paperformat">
+        <field name="name">US Letter</field>
+        <field name="default" eval="True" />
+        <field name="format">Letter</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">50</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">68</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- AL FINAL ATIVAMOS EL NO UPDATE -->
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'base'), ('name', '=', 'paperformat_us'), ('model', '=', 'report.paperformat')]" />
+        </function>
+        <value eval="{'noupdate': True}" />
+    </function>
+
+</odoo>
