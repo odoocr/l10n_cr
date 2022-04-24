@@ -10,7 +10,8 @@
         'base',
         'contacts',
         'point_of_sale',
-        'base_setup'
+        'base_setup',
+        'web_notify'
     ],
     "data": [
         'data/res_config_settings.xml',
