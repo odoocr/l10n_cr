@@ -8,7 +8,7 @@
         "category" : "API",
         "summary": """Consultar Nombre de Clientes en Hacienda Costa Rica""",
         "description": """Actualización automática de nombre de clientes a partir del API de Hacienda""",
-        "depends" : ['base','contacts', 'point_of_sale'],
+        "depends" : ['base','contacts', 'point_of_sale', 'web_notify'],
         "data" : [
                 'views/actualizar_clientes_view.xml',
                 'views/pos_templates.xml',
