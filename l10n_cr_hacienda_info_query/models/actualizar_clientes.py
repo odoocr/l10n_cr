@@ -49,16 +49,19 @@ class res_partner(models.Model):
 
             headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo }
 
-            peticion = requests.get(end_point, headers=headers, timeout=10)
-            all_emails_yo_contribuyo = ''
+            try:
+                peticion = requests.get(end_point, headers=headers, timeout=10)
+                all_emails_yo_contribuyo = ''
 
-            if peticion.status_code in (200, 202) and len(peticion._content) > 0:
-                contenido = json.loads(str(peticion._content, 'utf-8'))
-                emails_yo_contribuyo = contenido['Resultado']['Correos']
-                for email_yo_contribuyo in emails_yo_contribuyo:
-                    all_emails_yo_contribuyo = all_emails_yo_contribuyo + email_yo_contribuyo['Correo'] + ','
-                all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
-                self.email = all_emails_yo_contribuyo 
+                if peticion.status_code in (200, 202) and len(peticion._content) > 0:
+                    contenido = json.loads(str(peticion._content, 'utf-8'))
+                    emails_yo_contribuyo = contenido['Resultado']['Correos']
+                    for email_yo_contribuyo in emails_yo_contribuyo:
+                        all_emails_yo_contribuyo = all_emails_yo_contribuyo + email_yo_contribuyo['Correo'] + ','
+                    all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
+                    self.email = all_emails_yo_contribuyo
+            except:
+                self.env.user.notify_default(message='The email query service is unavailable at this moment', title='Query service')
 
         url_base = self.env.company.url_base
         if url_base:
@@ -74,40 +77,41 @@ class res_partner(models.Model):
                           'content-type': 'application/json',
                             }
 
-            peticion = requests.get(end_point, headers=headers, timeout=10)
+            try:
+                peticion = requests.get(end_point, headers=headers, timeout=10)
 
-            ultimo_mensaje = 'Fecha/Hora: ' + str(datetime.now()) + ', Codigo: ' + str(peticion.status_code) + ', Mensaje: ' + str(peticion._content.decode())
+                ultimo_mensaje = 'Fecha/Hora: ' + str(datetime.now()) + ', Codigo: ' + str(peticion.status_code) + ', Mensaje: ' + str(peticion._content.decode())
 
-            if peticion.status_code in (200,202) and len(peticion._content) > 0:
-                contenido = json.loads(str(peticion._content,'utf-8'))
-                actividades = contenido.get('actividades')
-#                _logger.info(contenido)
-                self.env.company.ultima_respuesta = ultimo_mensaje
+                if peticion.status_code in (200,202) and len(peticion._content) > 0:
+                    contenido = json.loads(str(peticion._content,'utf-8'))
+                    actividades = contenido.get('actividades')
+                    self.env.company.ultima_respuesta = ultimo_mensaje
 
-                if 'nombre' in contenido:
-                    if 'identification_id' in self._fields:
-                        if 'tipoIdentificacion' in contenido:
-                            clasificacion = contenido.get('tipoIdentificacion')
-                            if clasificacion == '01':#Cedula Fisica
-                                self.identification_id = self.env['identification.type'].search([('code', '=', '01')], limit=1).id
-                            elif clasificacion == '02':#Cedula Juridica
-                                self.identification_id = self.env['identification.type'].search([('code', '=', '02')], limit=1).id
-                            elif clasificacion == '03':#Cedula Juridica
-                                self.identification_id = self.env['identification.type'].search([('code', '=', '03')], limit=1).id
-                            elif clasificacion == '04':#Cedula Juridica
-                                self.identification_id = self.env['identification.type'].search([('code', '=', '04')], limit=1).id
-                            elif clasificacion == '05':#Cedula Juridica
-                                self.identification_id = self.env['identification.type'].search([('code', '=', '05')], limit=1).id
+                    if 'nombre' in contenido:
+                        if 'identification_id' in self._fields:
+                            if 'tipoIdentificacion' in contenido:
+                                clasificacion = contenido.get('tipoIdentificacion')
+                                if clasificacion == '01':#Cedula Fisica
+                                    self.identification_id = self.env['identification.type'].search([('code', '=', '01')], limit=1).id
+                                elif clasificacion == '02':#Cedula Juridica
+                                    self.identification_id = self.env['identification.type'].search([('code', '=', '02')], limit=1).id
+                                elif clasificacion == '03':#Cedula Juridica
+                                    self.identification_id = self.env['identification.type'].search([('code', '=', '03')], limit=1).id
+                                elif clasificacion == '04':#Cedula Juridica
+                                    self.identification_id = self.env['identification.type'].search([('code', '=', '04')], limit=1).id
+                                elif clasificacion == '05':#Cedula Juridica
+                                    self.identification_id = self.env['identification.type'].search([('code', '=', '05')], limit=1).id
 
-                    if contenido.get('nombre') != None:
-                       name = contenido.get('nombre')
-                       self.name = name
-                       for act in actividades:
-                          if act.get('estado') == 'A':
-                                  self.activity_id = self.env['economic.activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
-            else:
-                self.activity_id = self.env['economic.activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
-
+                        if contenido.get('nombre') != None:
+                           name = contenido.get('nombre')
+                           self.name = name
+                           for act in actividades:
+                               if act.get('estado') == 'A':
+                                   self.activity_id = self.env['economic.activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
+                else:
+                    self.activity_id = self.env['economic.activity'].search([('code', '=', str(act.get('codigo')))], limit=1).id
+            except:
+                self.env.user.notify_default(message='The name query service is unavailable at this moment', title='Query service')
     @api.onchange('vat')
     def onchange_vat(self):
         if not self.vat:
