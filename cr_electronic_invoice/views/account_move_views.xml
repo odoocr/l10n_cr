@@ -23,8 +23,8 @@
                 <field name="economic_activities_ids" invisible="1" readonly="1" options='{"active_test": [("type","in", ("in_invoice", "in_refund"))]}'/>
                 <field name="economic_activity_id" attrs="{'required':['|', ('type','in', ('out_invoice', 'out_refund')), ('tipo_documento','=', 'FEC')], 'invisible':[('type','=', 'entry')]}" domain="[('id', 'in', economic_activities_ids),]"
                        options='{"no_open": True, "no_create": True, "active_test": [("type","in", ("in_invoice", "in_refund"))]}'/>
-                <field name="number_electronic" readonly="1" attrs="{'invisible':[('move_type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))]}"/>
-                <field name="sequence" readonly="1"  attrs="{'invisible':[('move_type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))]}"/>
+                <field name="number_electronic" readonly="1" attrs="{'invisible':[('type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))]}"/>
+                <field name="sequence" readonly="1"  attrs="{'invisible':[('type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))]}"/>
             </field>
 
             <field name="invoice_date" position="attributes">
