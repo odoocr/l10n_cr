@@ -7,7 +7,6 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='main_currency_setting_container']" position="inside">
                 <div class="col-12 col-lg-6 o_setting_box" id="main_currency_l10n_cr">
-                    <div class="o_setting_left_pane"/>
                     <div class="o_setting_right_pane">
                         <span class="o_form_label">Costa Rica Currency Adapter</span>
                         <div class="text-muted">
