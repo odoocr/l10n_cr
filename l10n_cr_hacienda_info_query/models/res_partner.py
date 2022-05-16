@@ -20,7 +20,10 @@ class ResPartner(models.Model):
         token_yo_contribuyo = get_param('token_yo_contribuyo')
         url_base = get_param('url_base')
 
-        if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
+        get_tributary_information = get_param('get_tributary_information')
+        get_yo_contribuyo_information = get_param('get_yo_contribuyo_information')
+
+        if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo and get_yo_contribuyo_information:
             url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
 
             if url_base_yo_contribuyo[-1:] == '/':
@@ -41,7 +44,7 @@ class ResPartner(models.Model):
                 all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
                 self.email = all_emails_yo_contribuyo
 
-        if url_base:
+        if url_base and get_tributary_information:
             url_base = url_base.strip()
 
             if url_base[-1:] == '/':
