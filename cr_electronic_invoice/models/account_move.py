@@ -672,7 +672,7 @@ class AccountInvoiceElectronic(models.Model):
 
                                         self.message_post(
                                             body=message_description,
-                                            subtype='mail.mt_note',
+                                            subtype_xmlid='mail.mt_note',
                                             content_subtype='html')
 
                                         _logger.info(
@@ -897,7 +897,7 @@ class AccountInvoiceElectronic(models.Model):
                     body=message,
                     subject='NOTIFICACIÓN IMPORTANTE!!',
                     message_type='notification',
-                    subtype=None,
+                    subtype_xmlid=None,
                     parent_id=False,
                 )
                 inv.state_tributacion = 'error'
@@ -912,7 +912,7 @@ class AccountInvoiceElectronic(models.Model):
             self.message_post(body=message,
                               subject='NOTIFICACIÓN IMPORTANTE!!',
                               message_type='notification',
-                              subtype=None,
+                              subtype_xmlid=None,
                               parent_id=False)
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Finalizado Exitosamente')
 
@@ -931,7 +931,7 @@ class AccountInvoiceElectronic(models.Model):
                         body=message,
                         subject='NOTIFICACIÓN IMPORTANTE!!',
                         message_type='notification',
-                        subtype=None,
+                        subtype_xmlid=None,
                         parent_id=False,
                     )
 
@@ -951,7 +951,7 @@ class AccountInvoiceElectronic(models.Model):
                         inv.message_post(body=msg_body + inv.number_electronic,
                                          subject='Envío de una segunda FEC',
                                          message_type='notification',
-                                         subtype=None,
+                                         subtype_xmlid=None,
                                          parent_id=False,
                                          attachments=[[inv.fname_xml_respuesta_tributacion,
                                                        inv.fname_xml_respuesta_tributacion],
