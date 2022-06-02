@@ -68,6 +68,7 @@
             'OpenSSL',
             'phonenumbers',
             'jsonschema',
+            'qrcode',
         ],
     },
     'installable': True,
