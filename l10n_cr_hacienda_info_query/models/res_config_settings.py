@@ -24,6 +24,9 @@ class ResConfigSettings(models.TransientModel):
                            help="URL Base of the END POINT",
                            default="https://api.hacienda.go.cr/fe/ae?")
 
+    get_tributary_information = fields.Boolean(default=True)
+    get_yo_contribuyo_information = fields.Boolean(default=True)
+
     @api.model
     def get_values(self):
         res = super().get_values()
@@ -33,7 +36,9 @@ class ResConfigSettings(models.TransientModel):
             url_base=get_param('url_base'),
             url_base_yo_contribuyo=get_param('url_base_yo_contribuyo'),
             usuario_yo_contribuyo=get_param('usuario_yo_contribuyo'),
-            token_yo_contribuyo=get_param('token_yo_contribuyo')
+            token_yo_contribuyo=get_param('token_yo_contribuyo'),
+            get_tributary_information=bool(get_param('get_tributary_information')),
+            get_yo_contribuyo_information=bool(get_param('get_yo_contribuyo_information'))
         )
         return res
 
@@ -46,3 +51,5 @@ class ResConfigSettings(models.TransientModel):
         set_param('url_base_yo_contribuyo', self.url_base_yo_contribuyo)
         set_param('usuario_yo_contribuyo', self.usuario_yo_contribuyo)
         set_param('token_yo_contribuyo', self.token_yo_contribuyo)
+        set_param('get_tributary_information', self.get_tributary_information)
+        set_param('get_yo_contribuyo_information', self.get_yo_contribuyo_information)
