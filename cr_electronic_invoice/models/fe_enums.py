@@ -7,7 +7,7 @@ UrlHaciendaToken = {
 }
 
 UrlHaciendaRecepcion = {
-    'api-stag' : 'https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1/recepcion/',
+    'api-stag' : 'https://api-sandbox.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/',
     'api-prod' : 'https://api.comprobanteselectronicos.go.cr/recepcion/v1/recepcion/',
 }
 
