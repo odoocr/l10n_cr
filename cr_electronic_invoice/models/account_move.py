@@ -130,6 +130,7 @@ class AccountInvoiceElectronic(models.Model):
                    ('CPCE', 'MR Aceptación Parcial'),
                    ('RCE', 'MR Rechazo'),
                    ('FEC', 'Factura Electrónica de Compra'),
+                   ('CONT', 'Factura de Contingencia'),
                    ('disabled', 'Electronic Documents Disabled')],
         string="Voucher Type",
         default='FE',
@@ -685,6 +686,7 @@ class AccountInvoiceElectronic(models.Model):
                                             body=message_description)
                                             #subtype='mail.mt_note',
                                             #content_subtype='html')
+
 
                                         _logger.info(_(f'E-INV CR - Document Status:{inv.state_tributacion}'))
 
@@ -1390,7 +1392,7 @@ class AccountInvoiceElectronic(models.Model):
         # Digital Supplier Invoice
         elif self.move_type == 'in_invoice' and self.partner_id.country_id and \
             self.partner_id.country_id.code == 'CR' and self.partner_id.identification_id and \
-                self.partner_id.vat and self.xml_supplier_approval is False:
+                self.partner_id.vat and self.xml_supplier_approval is False and self.tipo_documento != 'CONT':
             tipo_documento = 'FEC'
             sequence = self.company_id.FEC_sequence_id.next_by_id()
 
