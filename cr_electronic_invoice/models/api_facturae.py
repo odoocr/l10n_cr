@@ -880,7 +880,8 @@ def consulta_documentos(self, inv, env, token_m_h, date_cr, xml_firmado):
         # Se actualiza el estado con el que devuelve Hacienda
         last_state = inv.state_tributacion
         inv.state_tributacion = estado_m_h
-        inv.date_issuance = date_cr
+        if date_cr:
+            inv.date_issuance = date_cr
         if xml_firmado:
             inv.fname_xml_comprobante = inv.tipo_documento + inv.number_electronic + '.xml'
 
