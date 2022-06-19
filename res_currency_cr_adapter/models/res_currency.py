@@ -23,7 +23,7 @@ class ResCurrency(models.Model):
     def action_create_missing_exchange_rates(self):
         currency_rate_obj = self.env['res.currency.rate']
         # A day is added to fix the loss of the current day
-        today = datetime.today()
+        today = datetime.today().date()
         last_day = today + timedelta(days=1)
 
         first_day = currency_rate_obj.search([
