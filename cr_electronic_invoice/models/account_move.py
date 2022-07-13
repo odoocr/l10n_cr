@@ -199,8 +199,11 @@ class AccountInvoiceElectronic(models.Model):
         for inv in self:
             if inv.move_type in ('in_invoice', 'in_refund'):
                 if inv.partner_id:
-                    inv.economic_activities_ids = inv.partner_id.economic_activities_ids
+                    inv.economic_activities_ids = inv.partner_id.economic_activities_ids if inv.partner_id.economic_activities_ids else False
                     inv.economic_activity_id = inv.partner_id.activity_id
+                else:
+                    inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
+                    inv.economic_activity_id = inv.company_id.activity_id.id
             else:
                 inv.economic_activities_ids = self.env['economic.activity'].search([('active', '=', False)])
                 inv.economic_activity_id = inv.company_id.activity_id.id
@@ -1611,7 +1614,7 @@ class AccountInvoiceElectronic(models.Model):
 
             info['vat'] = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Numero", namespaces=namespaces)[0].text
 
-            partner = self.env['res.partner'].search([('vat', '=', info['vat']), ('type', '=', 'contact')], limit=1)
+            partner = self.env['res.partner'].search([('vat', '=', info['vat'])], limit=1)
             if len(partner) > 0:
                 self.partner_id = partner.id
             else:

@@ -1,7 +1,0 @@
-# Esteblece el comportamiento predeterminado, en caso de que las personas no tengan configurado core.autocrlf.
-
-* text  eol=lf
-
-*.py    eol=lf
-*.js    eol=lf
-*.xml   eol=lf

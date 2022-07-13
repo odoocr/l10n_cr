@@ -8,4 +8,12 @@
         <field name="key">url_base</field>
         <field name="value">https://api.hacienda.go.cr/fe/ae?</field>
     </record>
+    <record id="get_tributary_information" model="ir.config_parameter">
+        <field name="key">get_tributary_information</field>
+        <field name="value">True</field>
+    </record>
+    <record id="get_yo_contribuyo_information" model="ir.config_parameter">
+        <field name="key">get_yo_contribuyo_information</field>
+        <field name="value">True</field>
+    </record>
 </odoo>

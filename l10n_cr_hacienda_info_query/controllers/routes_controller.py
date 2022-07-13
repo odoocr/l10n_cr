@@ -18,7 +18,10 @@ class ActualizarPosApi(http.Controller):
         usuario_yo_contribuyo = get_param('usuario_yo_contribuyo')
         token_yo_contribuyo = get_param('token_yo_contribuyo')
 
-        if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
+        get_tributary_information = get_param('get_tributary_information')
+        get_yo_contribuyo_information = get_param('get_yo_contribuyo_information')
+
+        if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo and get_yo_contribuyo_information:
             url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
 
             if url_base_yo_contribuyo[-1:] == '/':
@@ -39,7 +42,7 @@ class ActualizarPosApi(http.Controller):
                     all_emails_yo_contribuyo = all_emails_yo_contribuyo + email_yo_contribuyo['Correo'] + ','
                 all_emails_yo_contribuyo = all_emails_yo_contribuyo[:-1]
 
-        if url_base:
+        if url_base and get_tributary_information:
             # Elimina la barra al final de la URL para prevenir error al conectarse
             if url_base[-1:] == '/':
                 url_base = url_base[:-1]
