@@ -64,11 +64,11 @@ def limit(texto, limit):
 
 
 def get_mr_sequencevalue(inv):
-    # '''Verificamos si el ID del mensaje receptor es válido'''
+    # Verificamos si el ID del mensaje receptor es válido
     mr_mensaje_id = int(inv.state_invoice_partner)
     if mr_mensaje_id is None:
         raise UserError(_('No se ha proporcionado un ID válido para el MR.'))
-    if mr_mensaje_id < 1 or mr_mensaje_id > 3:
+    elif mr_mensaje_id < 1 or mr_mensaje_id > 3:
         raise UserError(_('El ID del mensaje receptor es inválido.'))
 
     if inv.state_invoice_partner == '1':
@@ -111,25 +111,25 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
 
     tipo_doc = fe_enums.TipoDocumento[tipo_documento]
 
-    # '''Verificamos si el consecutivo indicado corresponde a un numero'''
+    # Verificamos si el consecutivo indicado corresponde a un numero
     inv_consecutivo = re.sub('[^0-9]', '', consecutivo)
     if len(inv_consecutivo) != 10:
         raise UserError(_('La numeración debe de tener 10 dígitos'))
 
-    # '''Verificamos la sucursal y terminal'''
+    # Verificamos la sucursal y terminal
     inv_sucursal = re.sub('[^0-9]', '', str(sucursal_id)).zfill(3)
     inv_terminal = re.sub('[^0-9]', '', str(terminal_id)).zfill(5)
 
-    # '''Armamos el consecutivo pues ya tenemos los datos necesarios'''
+    # Armamos el consecutivo pues ya tenemos los datos necesarios
     consecutivo_mh = inv_sucursal + inv_terminal + tipo_doc + inv_consecutivo
 
     if not doc.company_id.identification_id:
         raise UserError(_('Seleccione el tipo de identificación del emisor en el pérfil de la compañía'))
 
-    # '''Obtenemos el número de identificación del Emisor y lo validamos númericamente'''
+    # Obtenemos el número de identificación del Emisor y lo validamos númericamente
     inv_cedula = re.sub('[^0-9]', '', doc.company_id.vat)
 
-    # '''Validamos el largo de la cadena númerica de la cédula del emisor'''
+    # Validamos el largo de la cadena númerica de la cédula del emisor
     if doc.company_id.identification_id.code == '01' and len(inv_cedula) != 9:
         raise UserError(_('La Cédula Física del emisor debe de tener 9 dígitos'))
     elif doc.company_id.identification_id.code == '02' and len(inv_cedula) != 10:
@@ -141,15 +141,15 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
 
     inv_cedula = str(inv_cedula).zfill(12)
 
-    # '''Limitamos la cedula del emisor a 20 caracteres o nos dará error'''
+    # Limitamos la cedula del emisor a 20 caracteres o nos dará error
     cedula_emisor = limit(inv_cedula, 20)
 
-    # '''Validamos la situación del comprobante electrónico'''
+    # Validamos la situación del comprobante electrónico
     situacion_comprobante = fe_enums.SituacionComprobante.get(situacion)
     if not situacion_comprobante:
         raise UserError(_(f'La situación indicada para el comprobante electŕonico es inválida: {situacion}'))
 
-    # '''Creamos la fecha para la clave'''
+    # Creamos la fecha para la clave
     dia = str(doc.invoice_date.day).zfill(2)
     mes = str(doc.invoice_date.month).zfill(2)
     anno = str(doc.invoice_date.year)[2:]
@@ -159,7 +159,7 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
                                doc.company_id.country_id and doc.company_id.country_id.code or 'CR')
     codigo_pais = str(phone and phone.country_code or 506)
 
-    # '''Creamos un código de seguridad random'''
+    # Creamos un código de seguridad random
     codigo_seguridad = str(random.randint(1, 99999999)).zfill(8)
 
     clave_hacienda = codigo_pais + cur_date + cedula_emisor + \
@@ -168,7 +168,7 @@ def get_clave_hacienda(doc, tipo_documento, consecutivo, sucursal_id, terminal_i
     return {'length': len(clave_hacienda), 'clave': clave_hacienda, 'consecutivo': consecutivo_mh}
 
 
-'''Variables para poder manejar el Refrescar del Token'''
+# Variables para poder manejar el Refrescar del Token
 last_tokens = {}
 last_tokens_time = {}
 last_tokens_expire = {}
@@ -252,7 +252,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
                   condicion_impuesto=False,
                   monto_total_impuesto_acreditar=False,
                   monto_total_gasto_aplicable=False):
-    # '''Verificamos si la clave indicada corresponde a un numeros'''
+    # Verificamos si la clave indicada corresponde a un numeros
     if clave:
         mr_clave = re.sub('[^0-9]', '', clave)
     else:
@@ -260,7 +260,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     if len(mr_clave) != 50:
         raise UserError(_('La clave a utilizar es inválida. Debe contener al menos 50 digitos'))
 
-    # '''Obtenemos el número de identificación del Emisor y lo validamos númericamente'''
+    # Obtenemos el número de identificación del Emisor y lo validamos númericamente
     mr_cedula_emisor = re.sub('[^0-9]', '', cedula_emisor)
     if len(mr_cedula_emisor) != 12:
         mr_cedula_emisor = str(mr_cedula_emisor).zfill(12)
@@ -271,7 +271,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     if mr_fecha_emision is None:
         raise UserError(_('La fecha de emisión en el MR es inválida.'))
 
-    # '''Verificamos si el ID del mensaje receptor es válido'''
+    # Verificamos si el ID del mensaje receptor es válido
     mr_mensaje_id = int(id_mensaje)
     if mr_mensaje_id < 1 and mr_mensaje_id > 3:
         raise UserError(_('El ID del mensaje receptor es inválido.'))
@@ -284,7 +284,7 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     elif mr_cedula_receptor is None:
         raise UserError(_('No se ha proporcionado una cédula de receptor válida para el MR.'))
 
-    # '''Verificamos si el consecutivo indicado para el mensaje receptor corresponde a numeros'''
+    # Verificamos si el consecutivo indicado para el mensaje receptor corresponde a numeros
     mr_consecutivo_receptor = re.sub('[^0-9]', '', consecutivo_receptor)
     if len(mr_consecutivo_receptor) != 20:
         raise UserError(_('La clave del consecutivo para el mensaje receptor es inválida. '
@@ -294,12 +294,11 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
     mr_detalle_mensaje = detalle_mensaje
     mr_total_factura = total_factura
 
-    # '''Iniciamos con la creación del mensaje Receptor'''
+    # Iniciamos con la creación del mensaje Receptor
     sb = StringBuilder()
     sb.append('<MensajeReceptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ')
     sb.append('xmlns="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/mensajeReceptor" ')
     sb.append('xsi:schemaLocation="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/mensajeReceptor ')
-    # E501 line too long
     sb.append('https://www.hacienda.go.cr/ATV/ComprobanteElectronico/' +
               'docs/esquemas/2016/v4.3/MensajeReceptor_V4.3.xsd">')
     sb.append('<Clave>' + mr_clave + '</Clave>')
@@ -339,7 +338,6 @@ def gen_xml_mr_43(clave, cedula_emisor, fecha_emision, id_mensaje,
 
     return str(sb)
 
-
 def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 total_servicio_exento, totalServExonerado,
                 total_mercaderia_gravado, total_mercaderia_exento,
@@ -362,17 +360,21 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 # Se agrega el campo code en los métodos de pago de Odoo POS
                 payment_methods_id.append(str(payment.payment_method_id.sequence))
         cod_moneda = str(inv.company_id.currency_id.name)
+        invoice_ref = False
     else:
         payment_methods_id.append(str(inv.payment_methods_id.sequence))
         plazo_credito = str(inv.invoice_payment_term_id and inv.invoice_payment_term_id.line_ids[0].days or 0)
         cod_moneda = str(inv.currency_id.name)
+        invoice_ref = inv.ref
 
     if inv.tipo_documento == 'FEC':
         issuing_company = inv.partner_id
         receiver_company = inv.company_id
+        issuing_company_name = issuing_company.name
     else:
         issuing_company = inv.company_id
         receiver_company = inv.partner_id
+        issuing_company_name = issuing_company.legal_name or issuing_company.name
 
     sb = StringBuilder()
     sb.append('<' + fe_enums.tagName[inv.tipo_documento] +
@@ -387,7 +389,7 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.append('<Emisor>')
-    sb.append('<Nombre>' + escape(issuing_company.legal_name or issuing_company.name) + '</Nombre>')
+    sb.append('<Nombre>' + escape(issuing_company_name) + '</Nombre>')
     sb.append('<Identificacion>')
     sb.append('<Tipo>' + issuing_company.identification_id.code + '</Tipo>')
     sb.append('<Numero>' + issuing_company.vat + '</Numero>')
@@ -459,12 +461,15 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                     sb.append('</Ubicacion>')
 
                 if receiver_company.phone:
-                    phone = phonenumbers.parse(receiver_company.phone, (receiver_company.country_id.code or 'CR'))
-                    sb.append('<Telefono>')
-                    sb.append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
-                    sb.append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
-                    sb.append('</Telefono>')
-                # E501 line too long
+                    try:
+                        phone = phonenumbers.parse(receiver_company.phone, (receiver_company.country_id.code or 'CR'))
+                        sb.append('<Telefono>')
+                        sb.append('<CodigoPais>' + str(phone.country_code) + '</CodigoPais>')
+                        sb.append('<NumTelefono>' + str(phone.national_number) + '</NumTelefono>')
+                        sb.append('</Telefono>')
+                    except:
+                        pass
+
                 re_match = r'^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$'
                 match = receiver_company.email and re.match(re_match, receiver_company.email.lower())
                 if match:
@@ -638,9 +643,16 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         sb.append('<Codigo>' + str(codigo_referencia) + '</Codigo>')
         sb.append('<Razon>' + str(razon_referencia) + '</Razon>')
         sb.append('</InformacionReferencia>')
-    if invoice_comments:
+    if invoice_comments or invoice_ref:
         sb.append('<Otros>')
-        sb.append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        if invoice_comments:
+            sb.append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
+        if invoice_ref:
+            sb.append('<OtroContenido>')
+            sb.append('<InformacionAdicional xmlns="https://FE-CR/DataInfo.xsd">')
+            sb.append('<OrdenCompra>' + invoice_ref + '</OrdenCompra>')
+            sb.append('</InformacionAdicional>')
+            sb.append('</OtroContenido>')
         sb.append('</Otros>')
 
     sb.append('</' + fe_enums.tagName[inv.tipo_documento] + '>')
@@ -728,8 +740,7 @@ def get_invoice_attachments(invoice, record_id):
 
     domain = [('res_model', '=', invoice._name),
               ('res_id', '=', invoice.id),
-              ('res_field', '=', 'xml_comprobante'),
-              ('name', '=', invoice.tipo_documento + '_' + invoice.number_electronic + '.xml')]
+              ('res_field', '=', 'xml_comprobante')]
     attachment = invoice.env['ir.attachment'].sudo().search(domain, limit=1)
 
     if attachment.id:
@@ -744,13 +755,10 @@ def get_invoice_attachments(invoice, record_id):
 
     domain_resp = [('res_model', '=', invoice._name),
                    ('res_id', '=', invoice.id),
-                   ('res_field', '=', 'xml_respuesta_tributacion'),
-                   ('name', '=', 'AHC_' + invoice.number_electronic + '.xml')]
+                   ('res_field', '=', 'xml_respuesta_tributacion')]
     attachment_resp = invoice.env['ir.attachment'].sudo().search(domain_resp, limit=1)
 
     if attachment_resp.id:
-        # attachment_resp.name = invoice.fname_xml_respuesta_tributacion
-        # attachment_resp.datas_fname = invoice.fname_xml_respuesta_tributacion
         attach_resp_copy = invoice.env['ir.attachment'].create({'name': invoice.fname_xml_respuesta_tributacion,
                                                                 'type': 'binary',
                                                                 'datas': invoice.xml_respuesta_tributacion,
@@ -1016,14 +1024,16 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
     tipo_emisor = invoice_xml.xpath("inv:Emisor/inv:Identificacion/inv:Tipo", namespaces=namespaces)[0].text
     nombre_emisor = invoice_xml.xpath("inv:Emisor/inv:Nombre", namespaces=namespaces)[0].text
     pais_emisor = invoice.env['res.country'].search([('name', '=', 'Costa Rica')], limit=1).id
-
-    try:
-        telefono_emisor = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)[0].text
-    except IndexError:
+    telefono_emisor_node = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)
+    if telefono_emisor_node:
+        telefono_emisor = telefono_emisor_node[0].text
+    else:
         telefono_emisor = ''
-    try:
-        otrassenas_emisor = invoice_xml.xpath("inv:Emisor/inv:Telefono/inv:NumTelefono", namespaces=namespaces)[0].text
-    except IndexError:
+
+    otrassenas_emisor_node = invoice_xml.xpath("inv:Emisor/inv:Ubicacion/inv:OtrasSenas", namespaces=namespaces)
+    if otrassenas_emisor_node:
+        otrassenas_emisor = otrassenas_emisor_node[0].text
+    else:
         otrassenas_emisor = ''
 
     correo_emisor = invoice_xml.xpath("inv:Emisor/inv:CorreoElectronico", namespaces=namespaces)[0].text
@@ -1188,7 +1198,6 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
     if tax_node:
         invoice.amount_tax_electronic_invoice = tax_node[0].text
     invoice._compute_amount()
-
 
 def p12_expiration_date(p12file, password):
     try:

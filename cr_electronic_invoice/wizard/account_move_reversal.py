@@ -21,17 +21,25 @@ class AccountMoveReversal(models.TransientModel):
         # R1705(no-else-return)
         tipo_doc = False
         if move.tipo_documento in ('FE', 'TE') and move.state_tributacion == 'rechazado':
-            tipo_doc = 'NC'
+            type_override = 'out_invoice'
+            tipo_doc = move.tipo_documento
         elif move.move_type == 'out_refund':
+            type_override = 'out_invoice'
             tipo_doc = 'ND'
         elif move.move_type == 'out_invoice':
+            type_override = 'out_refund'
             tipo_doc = 'NC'
         elif move.move_type == 'in_invoice':
+            type_override = 'in_refund'
             tipo_doc = 'NC'
         elif move.move_type == 'in_refund':
             tipo_doc = 'ND'
+            type_override = 'in_invoice'
+        else:
+            return {**default_values}
 
         fe_values = {'invoice_id': move.id,
+                       'type_override': type_override,
                      'tipo_documento': tipo_doc,
                      'reference_code_id': self.reference_code_id.id,
                      'reference_document_id': self.reference_document_id.id,
