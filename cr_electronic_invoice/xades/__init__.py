@@ -17,10 +17,11 @@ def get_reversed_rdns_name(rdns):
         for attr in rdn._attributes:
             if len(name) > 0:
                 name = name + ','
-            if attr.oid in xmlsig.utils.OID_NAMES:
-                name = name + xmlsig.utils.OID_NAMES[attr.oid]
-            else:
-                name = name + attr.oid._name
+            #if attr.oid in xmlsig.utils.OID_NAMES:
+            #    name = name + xmlsig.utils.OID_NAMES[attr.oid]
+            #else:
+            #    name = name + attr.oid._name
+            name = name + attr.oid._name
             name = name + '=' + attr.value
     return name
 

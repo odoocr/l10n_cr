@@ -28,7 +28,7 @@
     'category': 'Accounting & Finance',
     'sequence': 4,
     'website': 'http://cysfuturo.com',
-    'depends': ['cr_electronic_invoice', 'sale_stock', 'base'],
+    'depends': ['cr_electronic_invoice', 'sale_stock'],
     'data': [
         'data/report_paperformat_data.xml',
         'views/res_company_view.xml',
