@@ -97,7 +97,7 @@ def number_to_text_es(number_in, join_dec=' Y ', separator=',', decimal_point='.
 
     number = number_int.zfill(9)
     millions = number[:3]
-    thoudsands = number[3:6]
+    thousands = number[3:6]
     hundreds = number[6:]
 
     if millions:
@@ -106,11 +106,11 @@ def number_to_text_es(number_in, join_dec=' Y ', separator=',', decimal_point='.
         elif int(millions) > 0:
             converted += f'{_convert_number(millions)}MILLONES '
 
-    if thoudsands:
-        if thoudsands == '001':
+    if thousands:
+        if thousands == '001':
             converted += 'MIL '
-        elif int(thoudsands) > 0:
-            converted += f'{_convert_number(thoudsands)}MIL'
+        elif int(thousands) > 0:
+            converted += f'{_convert_number(thousands)}MIL'
 
     if hundreds:
         if hundreds == '001':
