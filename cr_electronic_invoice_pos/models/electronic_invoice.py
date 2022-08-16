@@ -245,6 +245,14 @@ class PosOrder(models.Model):
                 'amount_total': -order.amount_total,
                 'amount_paid': 0,
             })
+            for line in order.lines:
+                clone_line = line.copy({
+                    'name': line.name + _(' REFUND'),
+                    'order_id': clone.id,
+                    'qty': -line.qty,
+                    'price_subtotal': -line.price_subtotal,
+                    'price_subtotal_incl': -line.price_subtotal_incl,
+                })
 
             pos_order += clone
         return {
