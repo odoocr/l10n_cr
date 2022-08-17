@@ -14,12 +14,12 @@
     ],
     'assets': {
         'point_of_sale.assets': [
-            'l10n_cr_hacienda_info_query/static/src/js/actualizar_pos.js',
-            'l10n_cr_hacienda_info_query/static/src/js/models.js',
-            'l10n_cr_hacienda_info_query/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js'
+            #'l10n_cr_hacienda_info_query/static/src/js/actualizar_pos.js',
+            #'l10n_cr_hacienda_info_query/static/src/js/models.js',
+            #'l10n_cr_hacienda_info_query/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js'
         ],
         'web.assets_qweb': [
-            'l10n_cr_hacienda_info_query/static/src/xml/**/*',
+            #'l10n_cr_hacienda_info_query/static/src/xml/**/*',
         ]
     },
     "installable": True
