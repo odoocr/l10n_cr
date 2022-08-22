@@ -4,6 +4,9 @@ import requests
 
 from odoo import http
 from odoo.http import request
+import requests
+
+_logger = logging.getLogger(__name__)
 
 
 class ActualizarPosApi(http.Controller):
