@@ -11,7 +11,8 @@
     ''',
     'depends': [
         'cr_electronic_invoice',
-        'point_of_sale'
+        'point_of_sale',
+        'l10n_cr_hacienda_info_query_pos',
     ],
     'data': [
         'views/electronic_invoice_views.xml',
