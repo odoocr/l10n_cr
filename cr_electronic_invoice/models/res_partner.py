@@ -36,26 +36,28 @@ class PartnerElectronic(models.Model):
     @api.onchange('phone')
     def _onchange_phone(self):
         if self.phone:
-            phone = phonenumbers.parse(self.phone, self.country_id and self.country_id.code or 'CR')
-            valid = phonenumbers.is_valid_number(phone)
-            if not valid:
-                alert = {
-                    'title': 'Atención',
-                    'message': _('Número de teléfono inválido')
-                }
-                return {'value': {'phone': ''}, 'warning': alert}
+            if self.country_id.code == 'CR':
+                phone = phonenumbers.parse(self.phone, self.country_id and self.country_id.code or 'CR')
+                valid = phonenumbers.is_valid_number(phone)
+                if not valid:
+                    alert = {
+                        'title': 'Atención',
+                        'message': _('Número de teléfono inválido')
+                    }
+                    return {'value': {'phone': ''}, 'warning': alert}
 
     @api.onchange('mobile')
     def _onchange_mobile(self):
         if self.mobile:
-            mobile = phonenumbers.parse(self.mobile, self.country_id and self.country_id.code or 'CR')
-            valid = phonenumbers.is_valid_number(mobile)
-            if not valid:
-                alert = {
-                    'title': 'Atención',
-                    'message': 'Número de teléfono inválido'
-                }
-                return {'value': {'mobile': ''}, 'warning': alert}
+            if self.country_id.code == 'CR':
+                mobile = phonenumbers.parse(self.mobile, self.country_id and self.country_id.code or 'CR')
+                valid = phonenumbers.is_valid_number(mobile)
+                if not valid:
+                    alert = {
+                        'title': 'Atención',
+                        'message': 'Número de teléfono inválido'
+                    }
+                    return {'value': {'mobile': ''}, 'warning': alert}
 
     @api.onchange('email')
     def _onchange_email(self):
