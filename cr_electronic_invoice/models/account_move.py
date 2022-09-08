@@ -915,6 +915,7 @@ class AccountInvoiceElectronic(models.Model):
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Completed Successfully')
 
     def generate_and_send_invoice(self):
+        #TODO: Change the company to active company instead user company
         days_left = self.env.user.company_id.get_days_left()
         if days_left >= 0:
             self.generate_and_send_invoices(self)
@@ -938,7 +939,7 @@ class AccountInvoiceElectronic(models.Model):
         days_left = self.env.user.company_id.get_days_left()
         message = self.env.user.company_id.get_message_to_send()
         for inv in invoices:
-            try:
+            #try:
                 current_invoice += 1
 
                 if days_left <= self.env.user.company_id.range_days:
@@ -1356,11 +1357,11 @@ class AccountInvoiceElectronic(models.Model):
                         inv.message_post(subject=_('Error'), body=response_text)
                         _logger.error(_('E-INV CR  - Invoice: %s  Status: %s Error '
                                       'sending XML: %s' % (inv.number_electronic, response_status, response_text)))
-            except Exception as error:
-                inv.state_tributacion = 'error'
-                inv.message_post(subject=_('Error'),
-                                 body=_('Warning!.\n Error in generate_and_send_invoice: ') + str(error))
-                continue
+            #except Exception as error:
+            #    inv.state_tributacion = 'error'
+            #    inv.message_post(subject=_('Error'),
+            #                     body=_('Warning!.\n Error in generate_and_send_invoice: ') + str(error))
+            #    continue
 
     def get_invoice_sequence(self):
         tipo_documento = self.tipo_documento
