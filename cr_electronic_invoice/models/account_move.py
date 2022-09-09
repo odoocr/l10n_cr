@@ -889,7 +889,7 @@ class AccountInvoiceElectronic(models.Model):
         raise UserError(_('Hacienda API is disabled in company'))
 
     @api.model
-    def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
+    def _send_invoices_to_hacienda(self, max_invoices=200):  # cron
         company = False
         for c in self.env.companies:
             if c.country_id.name == 'Costa Rica':
