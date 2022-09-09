@@ -890,7 +890,11 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
-        days_left = self.env.user.company_id.get_days_left()
+        company = False
+        for c in self.env.companies:
+            if c.country_id.name == 'Costa Rica':
+                company = c
+        days_left = company.get_days_left()
         _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
         invoices = self.env['account.move'].search([('move_type', 'in', ['out_invoice', 'out_refund']),
                                                     ('state', '=', 'posted'),
@@ -902,11 +906,8 @@ class AccountInvoiceElectronic(models.Model):
         if days_left >= 0:
             self.generate_and_send_invoices(invoices)
         else:
-            # multicompany active company Costa Rica
-            company = False
-            for c in self.env.companies:
-                if c.country_id.name == 'Costa Rica':
-                    company = c
+            #multicompany active company Costa Rica
+
             if company:
                 message = company.get_message_to_send()
             for inv in invoices:
