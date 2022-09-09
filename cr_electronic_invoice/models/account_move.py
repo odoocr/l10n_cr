@@ -685,7 +685,7 @@ class AccountInvoiceElectronic(models.Model):
 
                                         self.message_post(
                                             body=message_description,
-                                            subtype='mail.mt_note',
+                                            #subtype='mail.mt_note',
                                             content_subtype='html')
 
                                         _logger.info(_(f'E-INV CR - Document Status:{inv.state_tributacion}'))
@@ -702,7 +702,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     # cron Job that verifies if the invoices are Validated at Tributación
-    def _check_hacienda_for_invoices(self, max_invoices=10):
+    def _check_hacienda_for_invoices(self, max_invoices=200):
         out_invoices = self.env['account.move'].search(
             [('move_type', 'in', ('out_invoice', 'out_refund')),
              ('state', '=', 'posted'),
@@ -889,8 +889,12 @@ class AccountInvoiceElectronic(models.Model):
         raise UserError(_('Hacienda API is disabled in company'))
 
     @api.model
-    def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
-        days_left = self.env.user.company_id.get_days_left()
+    def _send_invoices_to_hacienda(self, max_invoices=100):  # cron
+        company = False
+        for c in self.env.companies:
+            if c.country_id.name == 'Costa Rica':
+                company = c
+        days_left = company.get_days_left()
         _logger.debug('E-INV CR - Ejecutando _send_invoices_to_hacienda')
         invoices = self.env['account.move'].search([('move_type', 'in', ['out_invoice', 'out_refund']),
                                                     ('state', '=', 'posted'),
@@ -902,20 +906,27 @@ class AccountInvoiceElectronic(models.Model):
         if days_left >= 0:
             self.generate_and_send_invoices(invoices)
         else:
-            message = self.env.user.company_id.get_message_to_send()
+            #multicompany active company Costa Rica
+
+            if company:
+                message = company.get_message_to_send()
             for inv in invoices:
                 inv.message_post(
                     body=message,
                     subject=_('IMPORTANT NOTICE!!'),
                     message_type='notification',
-                    subtype=None,
                     parent_id=False,
                 )
                 inv.state_tributacion = 'error'
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Completed Successfully')
 
     def generate_and_send_invoice(self):
-        days_left = self.env.user.company_id.get_days_left()
+        #TODO: Change the company to active company instead user company
+        company = False
+        for c in self.env.companies:
+            if c.country_id.name == 'Costa Rica':
+                company = c
+        days_left = company.get_days_left()
         if days_left >= 0:
             self.generate_and_send_invoices(self)
         else:
@@ -923,7 +934,6 @@ class AccountInvoiceElectronic(models.Model):
             self.message_post(body=message,
                               subject=_('IMPORTANT NOTICE!!'),
                               message_type='notification',
-                              subtype=None,
                               parent_id=False)
         _logger.info('E-INV CR - _send_invoices_to_hacienda - Completed Successfully')
 
@@ -934,19 +944,21 @@ class AccountInvoiceElectronic(models.Model):
             return cleantext
         total_invoices = len(invoices)
         current_invoice = 0
-
-        days_left = self.env.user.company_id.get_days_left()
-        message = self.env.user.company_id.get_message_to_send()
+        company = False
+        for c in self.env.companies:
+            if c.country_id.name == 'Costa Rica':
+                company = c
+        days_left = company.get_days_left()
+        message = company.get_message_to_send()
         for inv in invoices:
-            try:
+            #try:
                 current_invoice += 1
 
-                if days_left <= self.env.user.company_id.range_days:
+                if days_left <= company.range_days:
                     inv.message_post(
                         body=message,
                         subject=_('IMPORTANT NOTICE!!'),
                         message_type='notification',
-                        subtype=None,
                         parent_id=False,
                     )
 
@@ -966,7 +978,6 @@ class AccountInvoiceElectronic(models.Model):
                         inv.message_post(body=msg_body + inv.number_electronic,
                                          subject=_('Sending a second FEC'),
                                          message_type='notification',
-                                         subtype=None,
                                          parent_id=False,
                                          attachments=[[inv.fname_xml_respuesta_tributacion,
                                                        inv.fname_xml_respuesta_tributacion],
@@ -1356,11 +1367,11 @@ class AccountInvoiceElectronic(models.Model):
                         inv.message_post(subject=_('Error'), body=response_text)
                         _logger.error(_('E-INV CR  - Invoice: %s  Status: %s Error '
                                       'sending XML: %s' % (inv.number_electronic, response_status, response_text)))
-            except Exception as error:
-                inv.state_tributacion = 'error'
-                inv.message_post(subject=_('Error'),
-                                 body=_('Warning!.\n Error in generate_and_send_invoice: ') + str(error))
-                continue
+            #except Exception as error:
+            #    inv.state_tributacion = 'error'
+            #    inv.message_post(subject=_('Error'),
+            #                     body=_('Warning!.\n Error in generate_and_send_invoice: ') + str(error))
+            #    continue
 
     def get_invoice_sequence(self):
         tipo_documento = self.tipo_documento

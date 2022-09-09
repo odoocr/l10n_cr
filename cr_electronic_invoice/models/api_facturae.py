@@ -383,7 +383,11 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.append('xsi:schemaLocation="' + fe_enums.schemaLocation[inv.tipo_documento] + '">')
 
     sb.append('<Clave>' + inv.number_electronic + '</Clave>')
-    sb.append('<CodigoActividad>' + inv.economic_activity_id.code + '</CodigoActividad>')
+    _logger.error('HOLA ESTA ES LA FACTURA --------------------- QUE NO TIENE ACTIVIDAD ECONOMICA ------ %s',inv.name)
+    try:
+        sb.append('<CodigoActividad>' + inv.economic_activity_id.code + '</CodigoActividad>')
+    except:
+        sb.append('<CodigoActividad>' + inv.company_id.activity_id.code + '</CodigoActividad>')
     sb.append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
     sb.append('<Emisor>')
@@ -1060,8 +1064,9 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                                                          'country_id': pais_emisor,
                                                          'phone': telefono_emisor,
                                                          'email': correo_emisor,
-                                                         'street': otrassenas_emisor,
-                                                         'supplier': 'True'})
+                                                         'street': otrassenas_emisor
+                                                         })
+                                                         #'supplier': 'True'})
         if new_partner:
             invoice.partner_id = new_partner
         else:
