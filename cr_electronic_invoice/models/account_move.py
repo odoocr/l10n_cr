@@ -702,7 +702,7 @@ class AccountInvoiceElectronic(models.Model):
 
     @api.model
     # cron Job that verifies if the invoices are Validated at Tributación
-    def _check_hacienda_for_invoices(self, max_invoices=10):
+    def _check_hacienda_for_invoices(self, max_invoices=200):
         out_invoices = self.env['account.move'].search(
             [('move_type', 'in', ('out_invoice', 'out_refund')),
              ('state', '=', 'posted'),
