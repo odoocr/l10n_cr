@@ -902,13 +902,18 @@ class AccountInvoiceElectronic(models.Model):
         if days_left >= 0:
             self.generate_and_send_invoices(invoices)
         else:
-            message = self.env.user.company_id.get_message_to_send()
+            # multicompany active company Costa Rica
+            company = False
+            for c in self.env.companies:
+                if c.country_id.name == 'Costa Rica':
+                    company = c
+            if company:
+                message = company.get_message_to_send()
             for inv in invoices:
                 inv.message_post(
                     body=message,
                     subject=_('IMPORTANT NOTICE!!'),
                     message_type='notification',
-                    subtype=None,
                     parent_id=False,
                 )
                 inv.state_tributacion = 'error'
