@@ -922,7 +922,11 @@ class AccountInvoiceElectronic(models.Model):
 
     def generate_and_send_invoice(self):
         #TODO: Change the company to active company instead user company
-        days_left = self.env.user.company_id.get_days_left()
+        company = False
+        for c in self.env.companies:
+            if c.country_id.name == 'Costa Rica':
+                company = c
+        days_left = company.get_days_left()
         if days_left >= 0:
             self.generate_and_send_invoices(self)
         else:
@@ -940,14 +944,17 @@ class AccountInvoiceElectronic(models.Model):
             return cleantext
         total_invoices = len(invoices)
         current_invoice = 0
-
-        days_left = self.env.user.company_id.get_days_left()
-        message = self.env.user.company_id.get_message_to_send()
+        company = False
+        for c in self.env.companies:
+            if c.country_id.name == 'Costa Rica':
+                company = c
+        days_left = company.get_days_left()
+        message = company.get_message_to_send()
         for inv in invoices:
             #try:
                 current_invoice += 1
 
-                if days_left <= self.env.user.company_id.range_days:
+                if days_left <= company.range_days:
                     inv.message_post(
                         body=message,
                         subject=_('IMPORTANT NOTICE!!'),
