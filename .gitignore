@@ -50,9 +50,10 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# Backup files
+# Backup files and locks
 *~
 *.swp
+.~lock*
 
 # macOS filestore
 .DS_Store

@@ -54,7 +54,13 @@
                 <field name="payment_methods_id" attrs="{'readonly':[('state','!=','draft')],'invisible':[('move_type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))],'required':[('move_type','in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))]}"/>
             </field>
 
-            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+           <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
+                <field name="categ_name" invisible="1" readonly="1"/>
+                <field name="product_code" invisible="1" readonly="1"/>
+                <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
+            </xpath>
+            <!-- Move views -->
+            <xpath expr="//field[@name='line_ids']//tree//field[@name='name']" position="after">
                 <field name="categ_name" invisible="1" readonly="1"/>
                 <field name="product_code" invisible="1" readonly="1"/>
                 <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
@@ -64,13 +70,17 @@
                 <field name="discount_note"/>
                 <field name="tariff_head"/>
             </xpath>
+            <!-- Move views -->
+            <xpath expr="//field[@name='line_ids']//tree//field[@name='discount']" position="after">
+                <field name="discount_note"/>
+                <field name="tariff_head"/>
+            </xpath>
 
             <xpath expr="//button[@name='action_invoice_sent']" position="attributes">
                 <attribute name="invisible">False</attribute>
             </xpath>
 
             <xpath expr="(//field[@name='tax_totals_json'])[last()]" position="after">
-                <field name="amount_total_iva_devuelto" attrs="{'invisible': [('amount_total_iva_devuelto', '=', 0)]}"/>
                 <field name="amount_tax_electronic_invoice" attrs="{'invisible':[('move_type','in', ('out_invoice', 'out_refund'))]}"/>
                 <field name="amount_total_electronic_invoice" attrs="{'invisible':[('move_type','in', ('out_invoice', 'out_refund'))]}"/>
             </xpath>
@@ -89,6 +99,8 @@
                                 <field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                                 <field name="reference_document_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                                 <field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="not_loaded_invoice" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="not_loaded_invoice_date" attrs="{'readonly':[('state','!=','draft')]}"/>
                             </group>
                             <group string="Electronic Receipts" name="eref_info_group2" colspan="2">
                                 <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
@@ -139,26 +151,6 @@
         </field>
     </record> -->
 
-    <!--
-        [W7902(duplicate-xml-record-id), ]
-
-        l10n_cr/cr_electronic_invoice/views/account_move_views.xml:146
-
-        Duplicate xml record id "data/view_tax_form_inherit_noupdate_0" in
-
-        l10n_cr/cr_electronic_invoice/views/account_tax_views.xml:4
-
-    <record id="view_tax_form_inherit" model="ir.ui.view">
-        <field name="name">account.tax.form.inherit</field>
-        <field name="model">account.tax</field>
-        <field name="inherit_id" ref="account.view_tax_form"/>
-        <field name="arch" type="xml">
-            <field name="name" position="after">
-                <field name="tax_code"/>
-            </field>
-        </field>
-    </record>
-    -->
     <record id="view_account_invoice_filter" model="ir.ui.view">
         <field name="name">account.invoice.select.inherited</field>
         <field name="model">account.move</field>

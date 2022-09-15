@@ -53,5 +53,4 @@
         <field name="res_model">reference.code</field>
         <field name="view_mode">tree,form</field>
     </record>
-
 </odoo>

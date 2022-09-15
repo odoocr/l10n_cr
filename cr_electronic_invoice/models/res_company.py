@@ -125,7 +125,6 @@ class CompanyElectronic(models.Model):
             of the name or commercial name.
         """
         new_comp_id = super().create(vals)
-        # new_comp = self.browse(new_comp_id)
         new_comp_id.try_create_configuration_sequences()
         return new_comp_id
 

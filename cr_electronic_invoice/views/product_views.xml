@@ -22,6 +22,7 @@
             <field name="arch" type="xml">
                 <field name="name" position="after">
                     <field name="economic_activity_id" domain="[('active', '=', True)]" options='{"no_open": True, "no_create": True}'/>
+                    <field name="cabys_code" />
                 </field>
             </field>
         </record>
