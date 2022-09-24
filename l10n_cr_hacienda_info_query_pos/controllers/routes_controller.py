@@ -2,8 +2,12 @@ from datetime import datetime
 import json
 import requests
 
-from odoo import http
+from odoo import http, _
 from odoo.http import request
+import requests
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class ActualizarPosApi(http.Controller):
@@ -20,6 +24,7 @@ class ActualizarPosApi(http.Controller):
 
         get_tributary_information = get_param('get_tributary_information')
         get_yo_contribuyo_information = get_param('get_yo_contribuyo_information')
+        all_emails_yo_contribuyo = ''
 
         if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo and get_yo_contribuyo_information:
             url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
@@ -32,8 +37,6 @@ class ActualizarPosApi(http.Controller):
             headers = {'access-user': usuario_yo_contribuyo, 'access-token': token_yo_contribuyo}
             try:
                 peticion = requests.get(end_point, headers=headers, timeout=10)
-
-                all_emails_yo_contribuyo = ''
 
                 if peticion.status_code in (200, 202) and len(peticion._content) > 0:
                     contenido = json.loads(str(peticion._content, 'utf-8'))
