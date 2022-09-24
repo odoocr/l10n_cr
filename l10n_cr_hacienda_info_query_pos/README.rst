@@ -13,6 +13,8 @@ Consultar Información de Clientes en Hacienda Costa Rica - TPV
 
 Actualización automática de nombre de clientes a partir del API de Hacienda - TPV
 
-Authors:
+Autores:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Odoo CR, Factura Sempai, FSS Solutions
+* Odoo CR
+* Factura Sempai
+* FSS Solutions
