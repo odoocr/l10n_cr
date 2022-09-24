@@ -4,26 +4,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 15.0-20220506\n"
+"Project-Id-Version: Odoo Server 15.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-16 01:18+0000\n"
-"PO-Revision-Date: 2022-05-16 01:18+0000\n"
+"POT-Creation-Date: 2022-09-24 23:11+0000\n"
+"PO-Revision-Date: 2022-09-24 23:11+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model_terms:ir.ui.view,arch_db:l10n_cr_hacienda_info_query_pos.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Tributary information</span>"
-msgstr "<span class=\"o_form_label\">Información Tributaria</span>"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model_terms:ir.ui.view,arch_db:l10n_cr_hacienda_info_query_pos.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">YO Contribuyo</span>"
-msgstr ""
 
 #. module: l10n_cr_hacienda_info_query_pos
 #. openerp-web
@@ -39,16 +29,6 @@ msgstr "Código de Barras"
 #, python-format
 msgid "City"
 msgstr "Ciudad"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model,name:l10n_cr_hacienda_info_query_pos.model_res_config_settings
-msgid "Config Settings"
-msgstr "Opciones de configuración"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model,name:l10n_cr_hacienda_info_query_pos.model_res_partner
-msgid "Contact"
-msgstr "Contacto"
 
 #. module: l10n_cr_hacienda_info_query_pos
 #. openerp-web
@@ -72,33 +52,11 @@ msgid "District"
 msgstr "Distrito"
 
 #. module: l10n_cr_hacienda_info_query_pos
-#: model_terms:ir.ui.view,arch_db:l10n_cr_hacienda_info_query_pos.res_config_settings_view_form
-msgid "Electronic Invoicing Costa Rica"
-msgstr "Facturación Electrónica Costa Rica"
-
-#. module: l10n_cr_hacienda_info_query_pos
 #. openerp-web
 #: code:addons/l10n_cr_hacienda_info_query_pos/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
 #, python-format
 msgid "Email"
 msgstr "Correo Electrónico"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#. openerp-web
-#: code:addons/l10n_cr_hacienda_info_query_pos/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js:0
-#, python-format
-msgid "Encountered error when loading image. Please try again."
-msgstr "Error encontrado al cargar la imagen. Inténtalo de nuevo."
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query_pos.field_res_config_settings__get_tributary_information
-msgid "Get Tributary Information"
-msgstr "Obtener Información Tributaria"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query_pos.field_res_config_settings__get_yo_contribuyo_information
-msgid "Get Yo Contribuyo Information"
-msgstr "Obtener Información Yo Contribuyo"
 
 #. module: l10n_cr_hacienda_info_query_pos
 #. openerp-web
@@ -115,38 +73,14 @@ msgid "Language"
 msgstr "Idioma"
 
 #. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,help:l10n_cr_hacienda_info_query_pos.field_res_config_settings__ultima_respuesta
-msgid "Last API Response, this allows debugging errors if they exist"
-msgstr ""
-"Última respuesta de API, esto permite errores de depuración si existen"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query_pos.field_res_config_settings__ultima_respuesta
-msgid "Latest API response"
-msgstr "Última respuesta de la API"
-
-#. module: l10n_cr_hacienda_info_query_pos
 #. openerp-web
-#: code:addons/l10n_cr_hacienda_info_query_pos/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js:0
-#, python-format
-msgid "Loading Image Error"
-msgstr "Error al cargar la imagen"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#. openerp-web
+#: code:addons/l10n_cr_hacienda_info_query_pos/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
+#: code:addons/l10n_cr_hacienda_info_query_pos/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
+#: code:addons/l10n_cr_hacienda_info_query_pos/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
 #: code:addons/l10n_cr_hacienda_info_query_pos/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
 #, python-format
 msgid "None"
 msgstr "Ningúno"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#. openerp-web
-#: code:addons/l10n_cr_hacienda_info_query_pos/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js:0
-#, python-format
-msgid "Only web-compatible Image formats such as .png or .jpeg are supported."
-msgstr ""
-"Solo se admiten formatos de imagen compatibles con la web, como .png o "
-".jpeg."
 
 #. module: l10n_cr_hacienda_info_query_pos
 #. openerp-web
@@ -178,54 +112,13 @@ msgid "Street"
 msgstr "Calle"
 
 #. module: l10n_cr_hacienda_info_query_pos
-#: model_terms:ir.ui.view,arch_db:l10n_cr_hacienda_info_query_pos.res_config_settings_view_form
-msgid "Tributary information"
-msgstr "Información Tributaria"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query_pos.field_res_config_settings__url_base
-msgid "URL Base"
-msgstr ""
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query_pos.field_res_config_settings__url_base_yo_contribuyo
-#: model:ir.model.fields,help:l10n_cr_hacienda_info_query_pos.field_res_config_settings__url_base_yo_contribuyo
-msgid "URL Base Yo Contribuyo"
-msgstr ""
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,help:l10n_cr_hacienda_info_query_pos.field_res_config_settings__url_base
-msgid "URL Base of the END POINT"
-msgstr ""
-
-#. module: l10n_cr_hacienda_info_query_pos
-#. openerp-web
-#: code:addons/l10n_cr_hacienda_info_query_pos/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js:0
+#: code:addons/l10n_cr_hacienda_info_query_pos/controllers/routes_controller.py:0
 #, python-format
-msgid "Unsupported File Format"
-msgstr "Formato de archivo no soportado"
+msgid "The email query service is unavailable at this moment"
+msgstr "El servicio de consultas por correo electrónico no está disponible en este momento"
 
 #. module: l10n_cr_hacienda_info_query_pos
-#: model_terms:ir.ui.view,arch_db:l10n_cr_hacienda_info_query_pos.res_config_settings_view_form
-msgid "YO Contribuyo"
-msgstr ""
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,help:l10n_cr_hacienda_info_query_pos.field_res_config_settings__usuario_yo_contribuyo
-msgid "Yo Contribuyo Developer Identification"
-msgstr "Identificación del Desarrollador en Yo Contribuyo"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query_pos.field_res_config_settings__token_yo_contribuyo
-msgid "Yo Contribuyo Token"
-msgstr "Token - Yo Contribuyo"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,help:l10n_cr_hacienda_info_query_pos.field_res_config_settings__token_yo_contribuyo
-msgid "Yo Contribuyo Token provided by Ministerio de Hacienda"
-msgstr "Token Yo Contribuyo proporcionado por el Ministerio de Hacienda"
-
-#. module: l10n_cr_hacienda_info_query_pos
-#: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query_pos.field_res_config_settings__usuario_yo_contribuyo
-msgid "Yo Contribuyo User"
-msgstr "Usuario - Yo Contribuyo"
+#: code:addons/l10n_cr_hacienda_info_query_pos/controllers/routes_controller.py:0
+#, python-format
+msgid "The name query service is unavailable at this moment"
+msgstr "El servicio de consulta de nombres no está disponible en este momento"
