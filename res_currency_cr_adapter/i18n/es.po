@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-25 01:05+0000\n"
-"PO-Revision-Date: 2022-09-25 01:05+0000\n"
+"POT-Creation-Date: 2022-09-25 01:28+0000\n"
+"PO-Revision-Date: 2022-09-25 01:28+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -19,13 +19,13 @@ msgstr ""
 #: code:addons/res_currency_cr_adapter/models/res_currency_rate.py:0
 #, python-format
 msgid "%(company_currency_name)s per %(rate_currency_name)s - Buy"
-msgstr "%(company_currency_name)s per %(rate_currency_name)s - Compra"
+msgstr "%(company_currency_name)s por %(rate_currency_name)s - Compra"
 
 #. module: res_currency_cr_adapter
 #: code:addons/res_currency_cr_adapter/models/res_currency_rate.py:0
 #, python-format
 msgid "%(rate_currency_name)s per %(company_currency_name)s - Buy"
-msgstr "%(rate_currency_name)s per %(company_currency_name)s - Compra"
+msgstr "%(rate_currency_name)s por %(company_currency_name)s - Compra"
 
 #. module: res_currency_cr_adapter
 #: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
@@ -48,33 +48,14 @@ msgid "BCCR username"
 msgstr "Nombre de Usuario para BCCR"
 
 #. module: res_currency_cr_adapter
-#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__original_rate_2
-msgid "Buying Rate in Costa Rica"
-msgstr "Tipo de Cambio Compra en Costa Rica"
-
-#. module: res_currency_cr_adapter
 #: model:ir.model,name:res_currency_cr_adapter.model_res_config_settings
 msgid "Config Settings"
 msgstr "Opciones de configuración"
 
 #. module: res_currency_cr_adapter
-#: model:ir.actions.server,name:res_currency_cr_adapter.create_missing_exchange_rate_cron_ir_actions_server
-#: model:ir.cron,cron_name:res_currency_cr_adapter.create_missing_exchange_rate_cron
-#: model:ir.cron,name:res_currency_cr_adapter.create_missing_exchange_rate_cron
-msgid "Create Missing Exchange Rate"
-msgstr "Crear tipo de cambio faltante"
-
-#. module: res_currency_cr_adapter
 #: model:ir.model,name:res_currency_cr_adapter.model_res_currency
 msgid "Currency"
 msgstr "Moneda"
-
-#. module: res_currency_cr_adapter
-#: model:ir.actions.server,name:res_currency_cr_adapter.currency_crc_rate_cron_ir_actions_server
-#: model:ir.cron,cron_name:res_currency_cr_adapter.currency_crc_rate_cron
-#: model:ir.cron,name:res_currency_cr_adapter.currency_crc_rate_cron
-msgid "Currency CRC Rate Update"
-msgstr "Actualización de tipo de cambio de moneda CRC"
 
 #. module: res_currency_cr_adapter
 #: model:ir.model,name:res_currency_cr_adapter.model_res_currency_rate
@@ -112,14 +93,28 @@ msgid "Hacienda"
 msgstr ""
 
 #. module: res_currency_cr_adapter
-#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__inverse_original_rate_2
-msgid "Inverse Original Rate 2"
-msgstr "Tasa original inversa 2"
+#: model:ir.actions.server,name:res_currency_cr_adapter.create_missing_exchange_rate_cron_ir_actions_server
+#: model:ir.cron,cron_name:res_currency_cr_adapter.create_missing_exchange_rate_cron
+#: model:ir.cron,name:res_currency_cr_adapter.create_missing_exchange_rate_cron
+msgid "ODOOCR: Create Missing Exchange Rate"
+msgstr "ODOOCR: Crear tipo de cambio faltante"
 
 #. module: res_currency_cr_adapter
-#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__rate
-msgid "Selling Rate"
-msgstr "Tipo de cambio Venta"
+#: model:ir.actions.server,name:res_currency_cr_adapter.currency_crc_rate_cron_ir_actions_server
+#: model:ir.cron,cron_name:res_currency_cr_adapter.currency_crc_rate_cron
+#: model:ir.cron,name:res_currency_cr_adapter.currency_crc_rate_cron
+msgid "ODOOCR: Currency CRC Rate Update"
+msgstr "ODOOCR: Actualización de tipo de cambio de moneda CRC"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__original_rate_2
+msgid "Original Rate 2"
+msgstr "Tipo de Cambio - Compra"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__rate_2
+msgid "Rate 2"
+msgstr "Tipo de Cambio - Compra"
 
 #. module: res_currency_cr_adapter
 #: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__original_rate
@@ -127,9 +122,14 @@ msgid "Selling Rate in Costa Rica"
 msgstr "Tipo de cambio Venta en Costa Rica"
 
 #. module: res_currency_cr_adapter
-#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__rate_2
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__rate
+msgid "Technical Rate"
+msgstr "Tarifa Técnica"
+
+#. module: res_currency_cr_adapter
+#: model:ir.model.fields,field_description:res_currency_cr_adapter.field_res_currency_rate__inverse_original_rate_2
 msgid "Technical Rate - Buy"
-msgstr "Tasa Técnica - Compra"
+msgstr "Tarifa Técnica - Compra"
 
 #. module: res_currency_cr_adapter
 #: model:ir.model.fields,help:res_currency_cr_adapter.field_res_currency_rate__original_rate_2
@@ -192,7 +192,8 @@ msgstr "Actualizar"
 #. module: res_currency_cr_adapter
 #: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form
 msgid "Update the dollar exchange rate from Ministerio de Hacienda or BCCR"
-msgstr "Actualice el tipo de cambio del dólar desde el Ministerio de Hacienda o BCCR"
+msgstr ""
+"Actualice el tipo de cambio del dólar desde el Ministerio de Hacienda o BCCR"
 
 #. module: res_currency_cr_adapter
 #: model_terms:ir.ui.view,arch_db:res_currency_cr_adapter.res_config_settings_crc_view_form

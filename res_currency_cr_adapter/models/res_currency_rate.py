@@ -32,7 +32,6 @@ class ResCurrencyRate(models.Model):
 
     rate_2 = fields.Float(
         digits='Currency Rate Precision',
-        string='Technical Rate - Buy',
         group_operator="avg",
         help='The buying rate of the currency to the currency of rate 1.')
 
@@ -45,6 +44,7 @@ class ResCurrencyRate(models.Model):
 
     inverse_original_rate_2 = fields.Float(
         digits=0,
+        string='Technical Rate - Buy',
         compute="_compute_inverse_original_rate_2",
         inverse="_inverse_inverse_original_rate_2",
         group_operator="avg",

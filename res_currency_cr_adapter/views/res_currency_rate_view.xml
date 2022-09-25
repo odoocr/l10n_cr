@@ -8,9 +8,8 @@
         <field name="inherit_id" ref="base.view_currency_rate_tree"/>
         <field name="arch" type="xml">
             <field name="write_date" position="before">
-                <field name='rate_2' digits="[12,12]" optional="hide"/>
-                <field name='original_rate_2' digits="[12,12]" optional="show"/>
                 <field name='inverse_original_rate_2' digits="[12,12]" optional="show"/>
+                <field name='original_rate_2' digits="[12,12]" optional="show"/>
             </field>
         </field>
     </record>
