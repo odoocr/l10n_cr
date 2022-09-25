@@ -187,28 +187,30 @@ class ResCurrencyRate(models.Model):
                         currency_id = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
 
                         # Get the rate for this date to know it is already registered
-                        rates_ids = self.env['res.currency.rate'].search([('name', '=', current_date_str)], limit=1)
+                        companies = self.env['res.company'].search([])
+                        for company in companies:
+                            rates_ids = self.env['res.currency.rate'].search([('name', '=', current_date_str),
+                                                                              ('company_id', '=', company.id)],
+                                                                             limit=1)
 
-                        if len(rates_ids) > 0:
-                            rates_ids.write(
-                                {'rate': selling_rate,
-                                 'inverse_company_rate': selling_original_rate,
-                                 'original_rate': selling_original_rate,
-                                 'rate_2': buying_rate,
-                                 # 'inverse_company_rate_2': buying_original_rate,
-                                 'original_rate_2': buying_original_rate,
-                                 'currency_id': currency_id.id}
-                                )
-                        else:
-                            self.create(
-                                {'name': current_date_str,
-                                 'rate': selling_rate,
-                                 'inverse_company_rate': selling_original_rate,
-                                 'original_rate': selling_original_rate,
-                                 'rate_2': buying_rate,
-                                 'original_rate_2': buying_original_rate,
-                                 # 'inverse_company_rate_2': buying_original_rate,
-                                 'currency_id': currency_id.id})
+                            if len(rates_ids) > 0:
+                                rates_ids.sudo().write(
+                                    {'rate': selling_rate,
+                                    'inverse_company_rate': selling_original_rate,
+                                    'original_rate': selling_original_rate,
+                                    'rate_2': buying_rate,
+                                    'original_rate_2': buying_original_rate,
+                                    'currency_id': currency_id.id}
+                                    )
+                            else:
+                                self.sudo().create(
+                                    {'name': current_date_str,
+                                    'rate': selling_rate,
+                                    'inverse_company_rate': selling_original_rate,
+                                    'original_rate': selling_original_rate,
+                                    'rate_2': buying_rate,
+                                    'original_rate_2': buying_original_rate,
+                                    'currency_id': currency_id.id})
 
                         _logger.info({'name': current_date_str,
                                       'rate': selling_rate,
@@ -245,30 +247,31 @@ class ResCurrencyRate(models.Model):
                     return False
                 if response.status_code in (200,):
                     data = response.json()
-                    companies = self.env['res.company'].search([])
-                    for company in companies:
-                        _logger.error(company.id)
 
-                        for rate_line in data:
-                            today = datetime.strptime(rate_line['fecha'], '%Y-%m-%d %H:%M:%S')
-                            vals = {}
-                            vals['original_rate'] = rate_line['venta']
-                            vals['inverse_company_rate'] = rate_line['venta']
-                            # Odoo utiliza un valor inverso,
-                            # a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-                            vals['rate'] = 1 / rate_line['original_rate']
-                            vals['original_rate_2'] = rate_line['compra']
-                            # vals['inverse_company_rate_2'] = rate_line['compra']
-                            vals['rate_2'] = 1 / rate_line['original_rate_2']
-                            vals['currency_id'] = self.env.ref('base.USD').id
+                    for rate_line in data:
+                        today = datetime.strptime(rate_line['fecha'], '%Y-%m-%d %H:%M:%S')
+                        vals = {}
+                        vals['original_rate'] = rate_line['venta']
+                        vals['inverse_company_rate'] = rate_line['venta']
+                        # Odoo utiliza un valor inverso,
+                        # a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
+                        vals['rate'] = 1 / rate_line['original_rate']
+                        vals['original_rate_2'] = rate_line['compra']
+                        # vals['inverse_company_rate_2'] = rate_line['compra']
+                        vals['rate_2'] = 1 / rate_line['original_rate_2']
+                        vals['currency_id'] = self.env.ref('base.USD').id
 
-                            rate_id = self.env['res.currency.rate'].search([('name', '=', today.date())], limit=1)
-
+                        companies = self.env['res.company'].search([])
+                        for company in companies:
+                            _logger.error(company.id)
+                            rate_id = self.env['res.currency.rate'].search([('name', '=', today.date()),
+                                                                            ('company_id', '=', company.id)], limit=1)
+                            vals['company_id'] = company.id
                             if rate_id:
-                                rate_id.write(vals)
+                                rate_id.sudo().write(vals)
                             else:
                                 vals['name'] = today.date()
-                                self.create(vals)
+                                self.sudo().create(vals)
             else:
                 try:
                     url = 'https://api.hacienda.go.cr/indicadores/tc'
@@ -282,29 +285,30 @@ class ResCurrencyRate(models.Model):
                     # Save the exchange rate in database
                     today = datetime.now().strftime('%Y-%m-%d')
                     data = response.json()
+                    vals = {}
+                    vals['original_rate'] = data['dolar']['venta']['valor']
+                    vals['inverse_company_rate'] = data['dolar']['venta']['valor']
+
+                    # Odoo utiliza un valor inverso,
+                    # a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
+
+                    vals['rate'] = 1 / vals['original_rate']
+                    vals['original_rate_2'] = data['dolar']['compra']['valor']
+                    # vals['inverse_company_rate_2'] = data['dolar']['compra']['valor']
+                    vals['rate_2'] = 1 / vals['original_rate_2']
+                    vals['currency_id'] = self.env.ref('base.USD').id
+
                     companies = self.env['res.company'].search([])
                     for company in companies:
                         _logger.error(company.id)
-                        vals = {}
-                        vals['original_rate'] = data['dolar']['venta']['valor']
-                        vals['inverse_company_rate'] = data['dolar']['venta']['valor']
-
-                        # Odoo utiliza un valor inverso,
-                        # a cuantos dólares equivale 1 colón, por eso se divide 1 / tipo de cambio.
-
-                        vals['rate'] = 1 / vals['original_rate']
-                        vals['original_rate_2'] = data['dolar']['compra']['valor']
-                        # vals['inverse_company_rate_2'] = data['dolar']['compra']['valor']
-                        vals['rate_2'] = 1 / vals['original_rate_2']
-                        vals['currency_id'] = self.env.ref('base.USD').id
-
-                        rate_id = self.env['res.currency.rate'].search([('name', '=', today)], limit=1)
-
+                        rate_id = self.env['res.currency.rate'].search([('name', '=', today),
+                                                                        ('company_id', '=', company.id)], limit=1)
+                        vals['company_id'] = company.id
                         if rate_id:
-                            rate_id.write(vals)
+                            rate_id.sudo().write(vals)
                         else:
                             vals['name'] = today
-                            self.create(vals)
+                            self.sudo().create(vals)
 
                 _logger.info(vals)
 
