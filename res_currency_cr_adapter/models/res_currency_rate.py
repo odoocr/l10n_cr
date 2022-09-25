@@ -189,19 +189,21 @@ class ResCurrencyRate(models.Model):
                         # Get the rate for this date to know it is already registered
                         companies = self.env['res.company'].search([])
                         for company in companies:
+                            _logger.error(company.id)
                             rates_ids = self.env['res.currency.rate'].search([('name', '=', current_date_str),
                                                                               ('company_id', '=', company.id)],
                                                                              limit=1)
 
                             if len(rates_ids) > 0:
-                                rates_ids.sudo().write(
-                                    {'rate': selling_rate,
+                                rates_ids.sudo().write({
+                                    'rate': selling_rate,
                                     'inverse_company_rate': selling_original_rate,
                                     'original_rate': selling_original_rate,
                                     'rate_2': buying_rate,
                                     'original_rate_2': buying_original_rate,
-                                    'currency_id': currency_id.id}
-                                    )
+                                    'currency_id': currency_id.id,
+                                    'company_id': company.id
+                                    })
                             else:
                                 self.sudo().create(
                                     {'name': current_date_str,
@@ -210,7 +212,8 @@ class ResCurrencyRate(models.Model):
                                     'original_rate': selling_original_rate,
                                     'rate_2': buying_rate,
                                     'original_rate_2': buying_original_rate,
-                                    'currency_id': currency_id.id})
+                                    'currency_id': currency_id.id,
+                                    'company_id': company.id})
 
                         _logger.info({'name': current_date_str,
                                       'rate': selling_rate,
@@ -316,25 +319,27 @@ class ResCurrencyRate(models.Model):
 
     def _create_the_latest_exchange_rate_to_date(self, currency, date=None):
         name = date or datetime.now()
-        currency_rate_obj = self.env['res.currency.rate'].search([
-            ('company_id', '=', self.env.user.company_id.id),
-            ('currency_id', '=', currency.id),
-            ('name', '<=', name),
-        ], limit=1, order='name desc')
+        companies = self.env['res.company'].search([])
+        for company in companies:
+            currency_rate_obj = self.env['res.currency.rate'].search([
+                ('company_id', '=', company.id),
+                ('currency_id', '=', currency.id),
+                ('name', '<=', name),
+            ], limit=1, order='name desc')
 
-        if currency_rate_obj.name == name:
-            return
+            if currency_rate_obj.name == name:
+                return
 
-        self.create({
-            'name': name,
-            'rate': currency_rate_obj.rate,
-            'inverse_company_rate': currency_rate_obj.inverse_company_rate,
-            'original_rate': currency_rate_obj.original_rate,
-            'rate_2': currency_rate_obj.rate_2,
-            'original_rate_2': currency_rate_obj.original_rate_2,
-            'currency_id': currency_rate_obj.currency_id.id,
-            'company_id': currency_rate_obj.company_id.id,
-        })
+            self.create({
+                'name': name,
+                'rate': currency_rate_obj.rate,
+                'inverse_company_rate': currency_rate_obj.inverse_company_rate,
+                'original_rate': currency_rate_obj.original_rate,
+                'rate_2': currency_rate_obj.rate_2,
+                'original_rate_2': currency_rate_obj.original_rate_2,
+                'currency_id': currency_rate_obj.currency_id.id,
+                'company_id': company.id,
+            })
 
     # -------------------------------------------------------------------------
     # TOOLING
