@@ -7,26 +7,11 @@
         <field name="model">res.currency.rate</field>
         <field name="inherit_id" ref="base.view_currency_rate_tree"/>
         <field name="arch" type="xml">
-            <tree>
-                <field name='original_rate' optional="show"/>
-                <field name='rate_2' digits="[12,12]" optional="show"/>
-                <field name='original_rate_2' optional="show"/>
-                <field name="company_id" groups="base.group_multi_company"/>
-            </tree>
-        </field>
-    </record>
-    <!-- A preview of the last 25 exchange rates is added -->
-    
-    <record id="view_currency_form" model="ir.ui.view">
-        <field name="name">res.currency.form</field>
-        <field name="model">res.currency</field>
-        <field name="inherit_id" ref="base.view_currency_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']/../.." position="before">
-                <div class="oe_button_box" name="button_box">
-                    <button class="oe_stat_button" string="Update" type="object" icon="fa-refresh" name="action_create_missing_exchange_rates" attrs="{'invisible': [('active', '=', False)]}"/>
-                </div>
-            </xpath>
+            <field name="write_date" position="before">
+                <field name='rate_2' digits="[12,12]" optional="hide"/>
+                <field name='original_rate_2' digits="[12,12]" optional="show"/>
+                <field name='inverse_original_rate_2' digits="[12,12]" optional="show"/>
+            </field>
         </field>
     </record>
 </odoo>

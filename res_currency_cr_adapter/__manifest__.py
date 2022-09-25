@@ -14,6 +14,7 @@
     ],
     'data': [
         'data/currency_data.xml',
+        'views/res_currency_view.xml',
         'views/res_currency_rate_view.xml',
         'views/res_config_settings_views.xml',
     ],
