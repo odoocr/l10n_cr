@@ -22,13 +22,6 @@
                     <span class="label">District</span>
                     <select class="detail client-address-states needsclick" name="district_id" t-on-change="captureChange">
                         <option value="">None</option>
-                            <t t-foreach="env.pos.districts" t-as="district" t-key="district.id">
-                                <option t-if="props.partner.county_id[0] == district.county_id[0]"
-                                        t-att-value="district.id"
-                                        t-att-selected="props.partner.district_id ? ((district.id === props.partner.district_id[0]) ? true : undefined) : undefined">
-                                    <t t-esc="district.name" />
-                                </option>
-                            </t>
                     </select>
                 </div>
 

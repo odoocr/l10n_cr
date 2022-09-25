@@ -26,14 +26,14 @@ function(require) {
         {
             model: 'res.country.county',
             fields: ['name','code','state_id'],
-            loaded: function(self,counties){
+            loaded: function(self, counties){
                 self.counties = counties;
             },
         },
         {
             model: 'res.country.district',
             fields: ['name','code','county_id'],
-            loaded: function(self,districts){
+            loaded: function(self, districts){
                 self.districts = districts;
             },
         }

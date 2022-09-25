@@ -55,8 +55,8 @@ odoo.define('l10n_cr_hacienda_info_query_pos.ClientDetailsEdit', function (requi
                 let county_id = document.getElementsByName("county_id")[0];
                 // Reseteamos los otros combobox para que no se genere confusión
                 state_id.innerHTML = "";
-                district_id.innerHTML = "";
                 county_id.innerHTML = "";
+                district_id.innerHTML = "";
 
                 let states = this.env.pos.states;
 
@@ -84,7 +84,8 @@ odoo.define('l10n_cr_hacienda_info_query_pos.ClientDetailsEdit', function (requi
             obtener_nombre(event) {
                 let vat = event.target.value
                 let host = window.location.host
-                let end_point = "http://" + host + "/cedula/" + vat
+                let protocol = window.location.protocol
+                let end_point = protocol + "//" + host + "/cedula/" + vat
                 let result = httpGet(end_point);
                 this.changes[event.target.name] = event.target.value;
 

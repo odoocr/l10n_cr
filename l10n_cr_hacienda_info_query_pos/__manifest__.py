@@ -12,8 +12,7 @@
         'point_of_sale.assets': [
             'l10n_cr_hacienda_info_query_pos/static/src/js/actualizar_pos.js',
             'l10n_cr_hacienda_info_query_pos/static/src/js/models.js',
-            'l10n_cr_hacienda_info_query_pos/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js',
-            'l10n_cr_hacienda_info_query_pos/static/src/js/Screens/ClientListScreen/ClientScreen.js'
+            'l10n_cr_hacienda_info_query_pos/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js'
         ],
         'web.assets_qweb': [
             'l10n_cr_hacienda_info_query_pos/static/src/xml/**/*',
