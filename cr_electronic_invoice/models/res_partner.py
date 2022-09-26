@@ -14,24 +14,73 @@ _logger = logging.getLogger(__name__)
 class PartnerElectronic(models.Model):
     _inherit = "res.partner"
 
+    # ==============================================================================================
+    #                                          PARTNER
+    # ==============================================================================================
+
+    # === Partner fields === #
+
     commercial_name = fields.Char()
-    identification_id = fields.Many2one("identification.type")
-    payment_methods_id = fields.Many2one("payment.methods", string="Payment Method")
-    has_exoneration = fields.Boolean(string="Has Exoneration?", required=False)
-    type_exoneration = fields.Many2one("aut.ex", string="Authorization Type")
+    identification_id = fields.Many2one(
+        comodel_name="identification.type"
+    )
+    payment_methods_id = fields.Many2one(
+        comodel_name="payment.methods",
+        string="Payment Method"
+    )
+    export = fields.Boolean(
+        string="It's export",
+        default=False
+    )
+
+    # === Economic Activity fields === #
+
+    activity_id = fields.Many2one(
+        comodel_name="economic.activity",
+        string="Default Economic Activity",
+        context={
+            'active_test': False
+        }
+    )
+    economic_activities_ids = fields.Many2many(
+        comodel_name='economic.activity',
+        string='Economic Activities',
+        context={
+            'active_test': False
+        }
+    )
+
+    # === Exonerations fields === #
+
+    has_exoneration = fields.Boolean(
+        string="Has Exoneration?",
+        required=False
+    )
+    type_exoneration = fields.Many2one(
+        comodel_name="aut.ex",
+        string="Authorization Type"
+    )
     exoneration_number = fields.Char()
-    percentage_exoneration = fields.Float(string="Percentage of VAT Exoneration", required=False)
-    institution_name = fields.Char(string="Exoneration Issuer")
-    date_issue = fields.Date(string="Issue Date")
-    date_expiration = fields.Date(string="Expiration Date")
-    date_notification = fields.Date(string="Last notification date")
-    activity_id = fields.Many2one("economic.activity",
-                                  string="Default Economic Activity",
-                                  context={'active_test': False})
-    economic_activities_ids = fields.Many2many('economic.activity',
-                                               string='Economic Activities',
-                                               context={'active_test': False})
-    export = fields.Boolean(string="It's export", default=False)
+    percentage_exoneration = fields.Float(
+        string="Percentage of VAT Exoneration",
+        required=False
+    )
+    institution_name = fields.Char(
+        string="Exoneration Issuer"
+    )
+    date_issue = fields.Date(
+        string="Issue Date"
+    )
+    date_expiration = fields.Date(
+        string="Expiration Date"
+    )
+    date_notification = fields.Date(
+        string="Last notification date"
+    )
+
+    # -------------------------------------------------------------------------
+    # ONCHANGE METHODS
+    # -------------------------------------------------------------------------
 
     @api.onchange('phone')
     def _onchange_phone(self):
@@ -94,6 +143,15 @@ class PartnerElectronic(models.Model):
                         raise UserError(_('La identificación tipo NITE debe contener 10 dígitos, ' +
                                           'sin ceros al inicio y sin guiones.'))
 
+    @api.onchange('exoneration_number')
+    def _onchange_exoneration_number(self):
+        if self.exoneration_number:
+            self.definir_informacion_exo(self.exoneration_number)
+
+    # -------------------------------------------------------------------------
+    # TOOLING
+    # -------------------------------------------------------------------------
+
     def action_get_economic_activities(self):
         if self.vat:
             json_response = api_facturae.get_economic_activities(self)
@@ -126,11 +184,6 @@ class PartnerElectronic(models.Model):
                 'message': _('Company VAT is invalid')
             }
             return {'value': {'vat': ''}, 'warning': alert}
-
-    @api.onchange('exoneration_number')
-    def _onchange_exoneration_number(self):
-        if self.exoneration_number:
-            self.definir_informacion_exo(self.exoneration_number)
 
     def definir_informacion_exo(self, cedula):
         url_base = self.sudo().env.company.url_base_exo

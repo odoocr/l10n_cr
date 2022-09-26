@@ -1,15 +1,13 @@
 from odoo import models, fields
 
 
-class AutEx(models.Model):
-    _name = "aut.ex"
+class AccountPaymentTerm(models.Model):
+    _inherit = "account.payment.term"
 
     # ==============================================================================================
-    #                                          EXONERATIONS
+    #                                          SALE CONDITION
     # ==============================================================================================
 
-    active = fields.Boolean(
-        default=True
+    sale_conditions_id = fields.Many2one(
+        comodel_name="sale.conditions"
     )
-    code = fields.Char()
-    name = fields.Char()

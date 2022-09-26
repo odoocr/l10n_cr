@@ -1,6 +1,7 @@
 
 from odoo import models, fields
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class AccountMoveReversal(models.TransientModel):
     _inherit = "account.move.reversal"
@@ -20,9 +21,9 @@ class AccountMoveReversal(models.TransientModel):
             return {**default_values}
         # R1705(no-else-return)
         tipo_doc = False
-        if move.tipo_documento in ('FE', 'TE') and move.state_tributacion == 'rechazado':
-            type_override = 'out_invoice'
-            tipo_doc = move.tipo_documento
+        type_override = False
+        if move.state_tributacion == 'rechazado':
+            tipo_doc = 'disabled'
         elif move.move_type == 'out_refund':
             type_override = 'out_invoice'
             tipo_doc = 'ND'
@@ -39,12 +40,13 @@ class AccountMoveReversal(models.TransientModel):
             return {**default_values}
 
         fe_values = {'invoice_id': move.id,
-                       'type_override': type_override,
                      'tipo_documento': tipo_doc,
                      'reference_code_id': self.reference_code_id.id,
                      'reference_document_id': self.reference_document_id.id,
                      'economic_activity_id': move.economic_activity_id.id,
                      'payment_methods_id': move.payment_methods_id.id,
                      'state_tributacion': False}
+        if type_override:
+            fe_values['type_override'] = type_override
 
         return {**default_values, **fe_values}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="ir_cron_FECR_MR" model="ir.cron">
-        <field name="name">FECR: Envía Mensajes de Aceptación de Facturas</field>
+        <field name="name">ODOOCR: Envía Mensajes de Aceptación de Facturas</field>
         <field name="model_id" ref="model_account_move" />
         <field name="state">code</field>
         <field name="code">model._check_hacienda_for_mrs()</field>
@@ -12,7 +12,7 @@
     </record>
 
     <record id="ir_cron_FECR_Envia" model="ir.cron">
-        <field name="name">FECR: Envía Facturas a Hacienda</field>
+        <field name="name">ODOOCR: Envía Facturas a Hacienda</field>
         <field name="model_id" ref="model_account_move" />
         <field name="state">code</field>
         <field name="code">model._send_invoices_to_hacienda()</field>
@@ -23,7 +23,7 @@
     </record>
 
     <record id="ir_cron_FECR_Consulta" model="ir.cron">
-        <field name="name">FECR: Consulta Estado de Facturas</field>
+        <field name="name">ODOOCR: Consulta Estado de Facturas</field>
         <field name="model_id" ref="model_account_move" />
         <field name="state">code</field>
         <field name="code">model._check_hacienda_for_invoices()</field>
@@ -34,7 +34,7 @@
     </record>
 
     <record id="ir_cron_mr_hacienda_invoice" model="ir.cron">
-        <field name="name">Envio Mensaje Receptor</field>
+        <field name="name">ODOOCR: Envio Mensaje Receptor</field>
         <field name="model_id" ref="model_account_move" />
         <field name="state">code</field>
         <field name="code">model.send_mrs_to_hacienda()</field>
@@ -45,7 +45,7 @@
     </record>
 
     <record id="ir_cron_send_expiration_notice" model="ir.cron">
-        <field name="name">Enviar Aviso de Expiración de Llave Criptográfica</field>
+        <field name="name">ODOOCR: Enviar Aviso de Expiración de Llave Criptográfica</field>
         <field name="model_id" ref="base.model_res_company"/>
         <field name="state">code</field>
         <field name="code">model._cron_send_email_notifications()</field>
@@ -57,7 +57,7 @@
     </record>
 
     <record id="ir_cron_vat_exoneration_expired" model="ir.cron">
-        <field name="name">FECR: Check clients VAT exoneration expiration</field>
+        <field name="name">ODOOCR: Check clients VAT exoneration expiration</field>
         <field name="model_id" ref="model_res_partner" />
         <field name="state">code</field>
         <field name="code">model.check_exonerations()</field>

@@ -7,18 +7,6 @@
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
 
-            <xpath expr="//sheet" position="inside">
-                <group>
-                    <field name="invoice_qr_type"/>
-                    <field name="invoice_field_ids" attrs="{'required':[('invoice_qr_type','=','by_info')],'invisible':[('invoice_qr_type','!=','by_info')]}">
-                        <tree editable="bottom">
-                            <field name="sequence" widget="handle" />
-                            <field name="field_id" />
-                        </tree>
-                    </field>
-                </group>
-            </xpath>
-
             <xpath expr="//sheet[1]" position="after">
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
@@ -86,6 +74,15 @@
                             <field name="sucursal_MR"/>
                             <field name="terminal_MR"/>
                         </group>
+                    </group>
+                    <group>
+                        <field name="invoice_qr_type"/>
+                        <field name="invoice_field_ids" attrs="{'required':[('invoice_qr_type','=','by_info')],'invisible':[('invoice_qr_type','!=','by_info')]}">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle" />
+                                <field name="field_id" />
+                            </tree>
+                        </field>
                     </group>
                 </page>
             </xpath>

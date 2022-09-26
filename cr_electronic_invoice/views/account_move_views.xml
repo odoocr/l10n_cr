@@ -6,14 +6,14 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
 
-            <xpath expr="//div[@name='button_box']" position="after">
-                <group attrs="{'invisible':[('move_type','in', ('in_invoice', 'in_refund', 'entry'))]}">
+            <xpath expr="//sheet" position="before">
+                <group attrs="{'invisible':['|', ('move_type','in', ('in_invoice', 'in_refund', 'entry')), ('tipo_documento', '=', 'disabled')]}">
                     <div class="alert alert-danger" role="alert" attrs="{'invisible':['|', ('state_tributacion','not in', (False)), ('state', 'in', ('draft', 'cancel'))]}">
                         The document has not yet been issued, it will be sent automatically in 5 minutes, if you need to send it manually press 
                         <button class="btn btn-primary" name="generate_and_send_invoice" type="object" string="Send Document"/>
                     </div>
                 </group>
-                <group attrs="{'invisible':[('move_type','=', 'entry')]}">
+                <group attrs="{'invisible':['|', ('move_type','in', ('in_invoice', 'in_refund', 'entry')), ('tipo_documento', '=', 'disabled')]}">
                     <div class="alert alert-warning" role="alert" attrs="{'invisible':['|', ('state_tributacion','not in', ('procesando')), ('state', 'in', ('draft', 'cancel'))]}">
                         The document was issued successfully, however we still do not have the answer, it will be consulted in 10 minutes, if you wish to consult it manually press 
                         <button class="btn btn-primary" name="action_check_hacienda" type="object" string="Consult Document"/>
@@ -57,23 +57,23 @@
            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
                 <field name="categ_name" invisible="1" readonly="1"/>
                 <field name="product_code" invisible="1" readonly="1"/>
-                <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
+                <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}" optional="hide"/>
             </xpath>
             <!-- Move views -->
             <xpath expr="//field[@name='line_ids']//tree//field[@name='name']" position="after">
                 <field name="categ_name" invisible="1" readonly="1"/>
                 <field name="product_code" invisible="1" readonly="1"/>
-                <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}"/>
+                <field name="third_party_id" attrs="{'invisible':[('product_code', '!=', '04')]}" optional="hide"/>
             </xpath>
 
             <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='discount']" position="after">
-                <field name="discount_note"/>
-                <field name="tariff_head"/>
+                <field name="discount_note" optional="hide"/>
+                <field name="tariff_head" optional="hide"/>
             </xpath>
             <!-- Move views -->
             <xpath expr="//field[@name='line_ids']//tree//field[@name='discount']" position="after">
-                <field name="discount_note"/>
-                <field name="tariff_head"/>
+                <field name="discount_note" optional="hide"/>
+                <field name="tariff_head" optional="hide"/>
             </xpath>
 
             <xpath expr="//button[@name='action_invoice_sent']" position="attributes">
@@ -99,8 +99,8 @@
                                 <field name="reference_code_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                                 <field name="reference_document_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                                 <field name="invoice_id" domain="[('number_electronic', '!=', False)]" attrs="{'readonly':[('state','!=','draft')]}"/>
-                                <field name="not_loaded_invoice" attrs="{'readonly':[('state','!=','draft')]}"/>
-                                <field name="not_loaded_invoice_date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="not_loaded_invoice" attrs="{'readonly':[('state','!=','draft')], 'invisible': [('invoice_id', '!=', False)]}"/>
+                                <field name="not_loaded_invoice_date" attrs="{'readonly':[('state','!=','draft')], 'invisible': [('invoice_id', '!=', False)]}"/>
                             </group>
                             <group string="Electronic Receipts" name="eref_info_group2" colspan="2">
                                 <field name="fname_xml_comprobante" invisible="1" readonly="1"/>
