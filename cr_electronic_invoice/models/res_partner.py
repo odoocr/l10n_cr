@@ -204,14 +204,6 @@ class PartnerElectronic(models.Model):
             ultimo_mensaje = 'Fecha/Hora: ' + str(datetime.now()) + ', Codigo: ' + str(
                 peticion.status_code) + ', Mensaje: ' + str(peticion._content.decode())
 
-            if peticion.status_code == 404:
-                self.date_issue = False
-                self.date_expiration = False
-                self.percentage_exoneration = 0
-                self.institution_name = False
-                self.type_exoneration = False
-                # raise UserError(_('El documento de exoneración no existe.'))
-
             if peticion.status_code in (200, 202) and len(peticion._content) > 0:
                 contenido = json.loads(str(peticion._content, 'utf-8'))
 
