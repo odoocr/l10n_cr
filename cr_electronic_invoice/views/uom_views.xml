@@ -6,9 +6,20 @@
         <field name="model">uom.uom</field>
         <field name="inherit_id" ref="uom.product_uom_form_view"/>
         <field name="arch" type="xml">
-            <field name="name" position="after">
+            <group name="uom_details" position="inside">
                 <field name="code"/>
-            </field>
+            </group>
+        </field>
+    </record>
+
+    <record id="product_uom_categ_form_view_inherit" model="ir.ui.view">
+        <field name="name">uom.category.form.inherit</field>
+        <field name="model">uom.category</field>
+        <field name="inherit_id" ref="uom.product_uom_categ_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='uom_ids']//tree//field[@name='rounding']" position="after">
+                <field name="code"/>
+            </xpath>
         </field>
     </record>
 
