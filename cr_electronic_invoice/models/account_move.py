@@ -1074,20 +1074,162 @@ class AccountInvoiceElectronic(models.Model):
 
                         else:
                             line_number += 1
-                            electronic_line, _no_cabys_code, totales = inv_line._get_electronic_invoice_info()
-                            if electronic_line:
-                                lines[line_number] = electronic_line
-                            if totales:
-                                total_servicio_salon += totales.get('total_servicio_salon')
-                                total_servicio_gravado += totales.get('total_servicio_gravado')
-                                total_servicio_exento += totales.get('total_servicio_exento')
-                                total_servicio_exonerado += totales.get('total_servicio_exonerado')
-                                total_mercaderia_gravado += totales.get('total_mercaderia_gravado')
-                                total_mercaderia_exento += totales.get('total_mercaderia_exento')
-                                total_mercaderia_exonerado += totales.get('total_mercaderia_exonerado')
-                                total_descuento += totales.get('total_descuento')
-                                total_impuestos += totales.get('total_impuestos')
-                                base_subtotal += totales.get('base_subtotal')
+                            price = inv_line.price_unit
+                            quantity = inv_line.quantity
+                            if not quantity:
+                                continue
+
+                            line_taxes = inv_line.tax_ids.compute_all(
+                                price, currency, 1,
+                                product=inv_line.product_id,
+                                partner=inv_line.move_id.partner_id)
+
+                            price_unit = round(line_taxes['total_excluded'], 5)
+
+                            base_line = round(price_unit * quantity, 5)
+                            descuento = inv_line.discount and round(
+                                price_unit * quantity * inv_line.discount / 100.0,
+                                5) or 0.0
+
+                            subtotal_line = round(base_line - descuento, 5)
+
+                            # Corregir error cuando un producto trae en el nombre "", por ejemplo: "disco duro"
+                            # Esto no debería suceder, pero, si sucede, lo corregimos
+                            if inv_line.name[:156].find('"'):
+                                detalle_linea = inv_line.name[:160].replace(
+                                    '"', '')
+
+                            line = {
+                                "cantidad": quantity,
+                                "detalle": escape(detalle_linea),
+                                "precioUnitario": price_unit,
+                                "montoTotal": base_line,
+                                "subtotal": subtotal_line,
+                                "BaseImponible": subtotal_line,
+                                "unidadMedida": inv_line.product_uom_id and inv_line.product_uom_id.code or 'Sp'
+                            }
+
+                            if inv_line.product_id:
+                                line["codigo"] = inv_line.product_id.default_code or ''
+                                line["codigoProducto"] = inv_line.product_id.code or ''
+
+                                if inv_line.product_id.cabys_code:
+                                    line["codigoCabys"] = inv_line.product_id.cabys_code
+                                elif inv_line.product_id.categ_id and inv_line.product_id.categ_id.cabys_code:
+                                    line["codigoCabys"] = inv_line.product_id.categ_id.cabys_code
+                                else:
+                                    _no_cabys_code = _(f'Warning!.\nLine without CABYS code: {inv_line.name}')
+                                    continue
+                            else:
+                                _no_cabys_code = _(f'Warning!.\nLine without CABYS code: {inv_line.name}')
+                                continue
+
+                            if inv.tipo_documento == 'FEE' and inv_line.tariff_head:
+                                line["partidaArancelaria"] = inv_line.tariff_head
+
+                            if inv_line.discount and price_unit > 0:
+                                total_descuento += descuento
+                                line["montoDescuento"] = descuento
+                                line["naturalezaDescuento"] = inv_line.discount_note or 'Descuento Comercial'
+
+                            # Se generan los impuestos
+                            taxes = dict([])
+                            _line_tax = 0.0
+                            _tax_exoneration = False
+                            _percentage_exoneration = 0
+                            if inv_line.tax_ids:
+                                tax_index = 0
+
+                                taxes_lookup = {}
+                                for i in inv_line.tax_ids:
+                                    if i.has_exoneration:
+                                        _tax_exoneration = True
+                                        _tax_rate = i.tax_root.amount
+                                        _tax_exoneration_rate = min(i.percentage_exoneration, _tax_rate)
+                                        _percentage_exoneration = _tax_exoneration_rate / _tax_rate
+                                        taxes_lookup[i.id] = {'tax_code': i.tax_root.tax_code,
+                                                              'tarifa': _tax_rate,
+                                                              'iva_tax_desc': i.tax_root.iva_tax_desc,
+                                                              'iva_tax_code': i.tax_root.iva_tax_code,
+                                                              'exoneration_percentage': _tax_exoneration_rate,
+                                                              'amount_exoneration': i.amount}
+                                    else:
+                                        taxes_lookup[i.id] = {'tax_code': i.tax_code,
+                                                              'tarifa': i.amount,
+                                                              'iva_tax_desc': i.iva_tax_desc,
+                                                              'iva_tax_code': i.iva_tax_code}
+
+                                for i in line_taxes['taxes']:
+                                    if taxes_lookup[i['id']]['tax_code'] == 'service':
+                                        total_servicio_salon += round(
+                                            subtotal_line * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+
+                                    elif taxes_lookup[i['id']]['tax_code'] != '00':
+                                        tax_index += 1
+                                        tax_amount = round(subtotal_line * taxes_lookup[i['id']]['tarifa'] / 100, 5)
+                                        _line_tax += tax_amount
+                                        tax = {
+                                            'codigo': taxes_lookup[i['id']]['tax_code'],
+                                            'tarifa': taxes_lookup[i['id']]['tarifa'],
+                                            'monto': tax_amount,
+                                            'iva_tax_desc': taxes_lookup[i['id']]['iva_tax_desc'],
+                                            'iva_tax_code': taxes_lookup[i['id']]['iva_tax_code'],
+                                        }
+                                        # Se genera la exoneración si existe para este impuesto
+                                        if _tax_exoneration:
+                                            exoneration_percentage = taxes_lookup[i['id']]['exoneration_percentage']
+                                            _tax_amount_exoneration = round(subtotal_line *
+                                                                            exoneration_percentage / 100, 5)
+
+                                            _line_tax -= _tax_amount_exoneration
+
+                                            tax["exoneracion"] = {
+                                                "montoImpuesto": _tax_amount_exoneration,
+                                                "porcentajeCompra": int(exoneration_percentage)
+                                            }
+
+                                        taxes[tax_index] = tax
+
+                                line["impuesto"] = taxes
+                                line["impuestoNeto"] = round(_line_tax, 5)
+
+                            # Si no hay product_uom_id se asume como Servicio
+                            if not inv_line.product_uom_id or \
+                                inv_line.product_uom_id.category_id.name in ('Service',
+                                                                             'Services',
+                                                                             'Servicio',
+                                                                             'Servicios'):
+                                if taxes:
+                                    if _tax_exoneration:
+                                        if _percentage_exoneration < 1:
+                                            total_servicio_gravado += (base_line * (1 - _percentage_exoneration))
+                                        total_servicio_exonerado += (base_line * _percentage_exoneration)
+
+                                    else:
+                                        total_servicio_gravado += base_line
+
+                                    total_impuestos += _line_tax
+                                else:
+                                    total_servicio_exento += base_line
+                            else:
+                                if taxes:
+                                    if _tax_exoneration:
+                                        if _percentage_exoneration < 1:
+                                            total_mercaderia_gravado += (base_line * (1 - _percentage_exoneration))
+                                        total_mercaderia_exonerado += (base_line * _percentage_exoneration)
+
+                                    else:
+                                        total_mercaderia_gravado += base_line
+
+                                    total_impuestos += _line_tax
+                                else:
+                                    total_mercaderia_exento += base_line
+
+                            base_subtotal += subtotal_line
+
+                            line["montoTotalLinea"] = round(subtotal_line + _line_tax, 5)
+
+                            lines[line_number] = line
 
                     if total_servicio_salon:
                         total_servicio_salon = round(total_servicio_salon, 5)
