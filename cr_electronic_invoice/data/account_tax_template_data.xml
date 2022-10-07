@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- account tax -->
+    <record id="account_tax_template_IVA_0" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 0%</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA0"/>
+        <field name="description">IVA 0% </field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa 0%</field>
+        <field name="iva_tax_code">01</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_00" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 0% </field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA0"/>
+        <field name="description">IVA 0%</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa 0%</field>
+        <field name="iva_tax_code">01</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_00_ND" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 0% (No deducible)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA 0% (No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa 0% (No deducible)</field>
+        <field name="iva_tax_code">01</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_01" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA</field>
+        <field name="amount">13</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA13"/>
+        <field name="description">IVA General 13%</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa General 13%</field>
+        <field name="iva_tax_code">08</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_02" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA</field>
+        <field name="amount">13</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA13"/>
+        <field name="description">IVA General 13%</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa General 13%</field>
+        <field name="iva_tax_code">08</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_02_ND" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 13% (No deducible)</field>
+        <field name="amount">13</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA General 13% (No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa General 13% (No deducible)</field>
+        <field name="iva_tax_code">08</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_03" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 1% (Tarifa Reducida)</field>
+        <field name="amount">1</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA1"/>
+        <field name="description">IVA 1% (Tarifa Reducida)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 1%</field>
+        <field name="iva_tax_code">02</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_04" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 1% (Tarifa Reducida)</field>
+        <field name="amount">1</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA1"/>
+        <field name="description">IVA 1% (Tarifa Reducida)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 1%</field>
+        <field name="iva_tax_code">02</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_04_ND" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 1% (No deducible)</field>
+        <field name="amount">1</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA 1% (No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 1% (No deducible)</field>
+        <field name="iva_tax_code">02</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_05" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 2% (Tarifa Reducida)</field>
+        <field name="amount">2</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA2"/>
+        <field name="description">IVA 2% (Tarifa Reducida)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 2%</field>
+        <field name="iva_tax_code">03</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_06" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 2% (Tarifa Reducida)</field>
+        <field name="amount">2</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA2"/>
+        <field name="description">IVA 2% (Tarifa Reducida)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 2%</field>
+        <field name="iva_tax_code">03</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_06_ND" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 2% (No deducible)</field>
+        <field name="amount">2</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA 2% (No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 2% (No deducible)</field>
+        <field name="iva_tax_code">03</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_07" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 4% (Tarifa Reducida)</field>
+        <field name="amount">4</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA4"/>
+        <field name="description">IVA 4% (Tarifa Reducida)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 4%</field>
+        <field name="iva_tax_code">04</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_08" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 4% (Tarifa Reducida)</field>
+        <field name="amount">4</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA4"/>
+        <field name="description">IVA 4% (Tarifa Reducida)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 4%</field>
+        <field name="iva_tax_code">04</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_08_ND" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 4% (No deducible)</field>
+        <field name="amount">4</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA 4% (No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Tarifa reducida 4% (No deducible)</field>
+        <field name="iva_tax_code">04</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_09" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 0% (Transitorio)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA0"/>
+        <field name="description">IVA 0% (Transitorio)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 0%</field>
+        <field name="iva_tax_code">05</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_10" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 0% (Transitorio)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA0"/>
+        <field name="description">IVA 0% (Transitorio)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 0%</field>
+        <field name="iva_tax_code">05</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_10_ND" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 0% (Trans No deducible)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA 0% (Trans No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 0% (Trans No deducible)</field>
+        <field name="iva_tax_code">05</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_11" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 4% (Transitorio)</field>
+        <field name="amount">4</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA4"/>
+        <field name="description">IVA 4% (Transitorio)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 4%</field>
+        <field name="iva_tax_code">06</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_12" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 4% (Transitorio)</field>
+        <field name="amount">4</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA4"/>
+        <field name="description">IVA 4% (Transitorio)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 4%</field>
+        <field name="iva_tax_code">06</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_12_ND" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 4% (Trans No deducible)</field>
+        <field name="amount">4</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA 4% (Trans No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 4% (Trans No deducible)</field>
+        <field name="iva_tax_code">06</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_13" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 8% (Transitorio)</field>
+        <field name="amount">8</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA8"/>
+        <field name="description">IVA 8% (Transitorio)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 8%</field>
+        <field name="iva_tax_code">07</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_14" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 8% (Transitorio)</field>
+        <field name="amount">8</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA8"/>
+        <field name="description">IVA 8% (Transitorio)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 8%</field>
+        <field name="iva_tax_code">07</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_14_ND" model="account.tax.template">
+        <field name="tax_code">01</field>
+        <field name="name">IVA 8% (Trans No deducible)</field>
+        <field name="amount">8</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA 8% (Trans No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Transitorio 8% (Trans No deducible)</field>
+        <field name="iva_tax_code">07</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_15" model="account.tax.template">
+        <field name="tax_code">02</field>
+        <field name="name">Impuesto Selectivo de Consumo</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_SC"/>
+        <field name="description">Impuesto Selectivo de Consumo</field>
+        <field name="sequence">5</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_16" model="account.tax.template">
+        <field name="tax_code">02</field>
+        <field name="name">Impuesto Selectivo de Consumo</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_SC"/>
+        <field name="description">Impuesto Selectivo de Consumo</field>
+        <field name="sequence">5</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_16_ND" model="account.tax.template">
+        <field name="tax_code">02</field>
+        <field name="name">Impuesto Selectivo de Consumo (No deducible)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">Impuesto Selectivo de Consumo (No deducible)</field>
+        <field name="sequence">5</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_17" model="account.tax.template">
+        <field name="tax_code">03</field>
+        <field name="name">Impuesto Único a los Combustibles</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IUC"/>
+        <field name="description">Impuesto Único a los Combustibles</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_18" model="account.tax.template">
+        <field name="tax_code">03</field>
+        <field name="name">Impuesto Único a los Combustibles</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IUC"/>
+        <field name="description">Impuesto Único a los Combustibles</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_19" model="account.tax.template">
+        <field name="tax_code">04</field>
+        <field name="name">Impuesto específico de Bebidas Alcohólicas</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IEBA"/>
+        <field name="description">Impuesto específico de Bebidas Alcohólicas</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_20" 
+        model="account.tax.template">
+        <field name="tax_code">04</field>
+        <field name="name">Impuesto específico de Bebidas Alcohólicas</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IEBA"/>
+        <field name="description">Impuesto específico de Bebidas Alcohólicas</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_21" model="account.tax.template">
+        <field name="tax_code">05</field>
+        <field name="name">Impuesto Específico sobre las bebidas envasadas sin contenido alcohólico y jabones de tocador</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IEBE"/>
+        <field name="description">Impuesto Específico sobre las bebidas envasadas sin contenido alcohólico y jabones de tocador</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_22" model="account.tax.template">
+        <field name="tax_code">05</field>
+        <field name="name">Impuesto Específico sobre las bebidas envasadas sin contenido alcohólico y jabones de tocador</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IEBE"/>
+        <field name="description">Impuesto Específico sobre las bebidas envasadas sin contenido alcohólico y jabones de tocador</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_23" model="account.tax.template">
+        <field name="tax_code">06</field>
+        <field name="name">Impuesto a los Productos de Tabaco</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IPT"/>
+        <field name="description">Impuesto a los Productos de Tabaco</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_24" model="account.tax.template">
+        <field name="tax_code">06</field>
+        <field name="name">Impuesto a los Productos de Tabaco</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IPT"/>
+        <field name="description">Impuesto a los Productos de Tabaco</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_25" model="account.tax.template">
+        <field name="tax_code">07</field>
+        <field name="name">IVA (cálculo especial)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA13"/>
+        <field name="description">IVA (cálculo especial)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_26" model="account.tax.template">
+        <field name="tax_code">07</field>
+        <field name="name">IVA (cálculo especial)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA13"/>
+        <field name="description">IVA (cálculo especial)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_26_ND" model="account.tax.template">
+        <field name="tax_code">07</field>
+        <field name="name">IVA (cálculo especial - No deducible)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA (cálculo especial - No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_27" model="account.tax.template">
+        <field name="tax_code">08</field>
+        <field name="name">IVA Régimen de Bienes Usados (Factor)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IRBU"/>
+        <field name="description">IVA Régimen de Bienes Usados (Factor)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_28" model="account.tax.template">
+        <field name="tax_code">08</field>
+        <field name="name">IVA Régimen de Bienes Usados (Factor)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IRBU"/>
+        <field name="description">IVA Régimen de Bienes Usados (Factor)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_28_ND" model="account.tax.template">
+        <field name="tax_code">08</field>
+        <field name="name">IVA Régimen de Bienes Usados (Factor - No deducible)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">IVA Régimen de Bienes Usados (Factor - No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_29" model="account.tax.template">
+        <field name="tax_code">12</field>
+        <field name="name">Impuesto Específico al Cemento</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="description">Impuesto Específico al Cemento</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_30" model="account.tax.template">
+        <field name="tax_code">12</field>
+        <field name="name">Impuesto Específico al Cemento</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">Impuesto Específico al Cemento</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_31" model="account.tax.template">
+        <field name="tax_code">99</field>
+        <field name="name">Otros</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="description">Otros</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_32" model="account.tax.template">
+        <field name="tax_code">99</field>
+        <field name="name">Otros</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">Otros</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="account_tax_template_IVA_32_ND" model="account.tax.template">
+        <field name="tax_code">99</field>
+        <field name="name">Otros (No deducible)</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="description">Otros (No deducible)</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="non_tax_deductible">True</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="service_tax_sale" model="account.tax.template">
+        <field name="tax_code">service</field>
+        <field name="name">Impuesto de Servicio</field>
+        <field name="amount">10</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_Servicio"/>
+        <field name="description">Impuesto de servicio utilizado por los restaurantes</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">Impuesto Servicio 10%</field>
+        <field name="iva_tax_code">06</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="exempt_tax_sale" model="account.tax.template">
+        <field name="tax_code">00</field>
+        <field name="name">Exento</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">sale</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_Exento"/>
+        <field name="description">Exento</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+
+    <record id="exempt_tax_purchase" model="account.tax.template">
+        <field name="tax_code">00</field>
+        <field name="name">Exento</field>
+        <field name="amount">0</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_Exento"/>
+        <field name="description">Exento</field>
+        <field name="sequence">10</field>
+        <field name="iva_tax_desc">N/A</field>
+        <field name="iva_tax_code">N/A</field>
+        <field name="amount_type">percent</field>
+        <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
+    </record>
+</odoo>

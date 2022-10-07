@@ -1,0 +1,17 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<!-- Copyright 2018 Carlos Wong, Akurey S.A.
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_currency_form" model="ir.ui.view">
+        <field name="name">res.currency.form</field>
+        <field name="model">res.currency</field>
+        <field name="inherit_id" ref="base.view_currency_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']/../.." position="before">
+                <div class="oe_button_box" name="button_box" attrs="{'invisible': [('id', '!=', %(base.USD)d)]}">
+                    <button class="oe_stat_button" string="Update" type="object" icon="fa-refresh" name="action_create_missing_exchange_rates" attrs="{'invisible': [('active', '=', False)]}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

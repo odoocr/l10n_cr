@@ -2,8 +2,8 @@
 
 {
     'name': 'Facturación electrónica Costa Rica',
-    'version': '14.0.1.0.0',
-    'author': 'Odoo CR',
+    'version': '15.0.1.0.0',
+    'author': 'Odoo CR Community',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
     'category': 'Account',
@@ -19,12 +19,15 @@
         'sales_team',
         'sale_stock',
         'account',
+        'l10n_cr',
         'l10n_cr_country_codes',
         'l10n_cr_hacienda_info_query',
         'res_currency_cr_adapter',
         ],
     'data': [
+        'data/account_tax_group_data.xml',
         'data/account_tax_data.xml',
+        'data/account_tax_template_data.xml',
         'data/aut_ex_data.xml',
         'data/code_type_product_data.xml',
         'data/identification_type_data.xml',

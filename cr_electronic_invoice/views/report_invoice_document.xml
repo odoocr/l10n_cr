@@ -137,124 +137,125 @@
                                         <strong class="mr16">Subtotal</strong>
                                         <span t-esc="current_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'
                                             />
-</td>
-</tr>
-</t>
-</t>
-</tbody>
-</table>
-
-<div class="clearfix">
-                                            <div id="total" class="row">
-                                                <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
-                                                    <table class="table table-sm" style="page-break-inside: avoid;">
-
-                                                        <!--Tax totals-->
-                                                        <t t-set="tax_totals" t-value="json.loads(o.tax_totals_json)"/>
-                                                        <t t-call="account.document_tax_totals"/>
-
-                                                        <!--Payments-->
-                                                        <t t-if="print_with_payments">
-                                                            <t t-if="o.payment_state != 'invoicing_legacy'">
-                                                                <t t-set="payments_vals" t-value="o.sudo()._get_reconciled_info_JSON_values()"/>
-                                                                <t t-foreach="payments_vals" t-as="payment_vals">
-                                                                    <tr>
-                                                                        <td>
-                                                                            <i class="oe_form_field text-right oe_payment_label">Paid on <t t-esc="payment_vals['date']" t-options='{"widget": "date"}'/>
-                                                                            </i>
-                                                                        </td>
-                                                                        <td class="text-right">
-                                                                            <span t-esc="payment_vals['amount']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                                        </td>
-                                                                    </tr>
-                                                                </t>
-                                                                <t t-if="len(payments_vals) > 0">
-                                                                    <tr class="border-black">
-                                                                        <td>
-                                                                            <strong>Amount Due</strong>
-                                                                        </td>
-                                                                        <td class="text-right">
-                                                                            <span t-field="o.amount_residual"/>
-                                                                        </td>
-                                                                    </tr>
-                                                                </t>
-                                                            </t>
-                                                        </t>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p t-if="o.move_type in ('out_invoice', 'in_refund') and o.payment_reference" name="payment_communication">
-                        Please use the following communication for your payment : <b>
-                                            <span t-field="o.payment_reference"/>
-                                        </b>
-                                    </p>
-                                    <p t-if="o.invoice_payment_term_id" name="payment_term">
-                                        <span t-field="o.invoice_payment_term_id.note"/>
-                                    </p>
-                                    <div t-if="not is_html_empty(o.narration)" name="comment">
-                                        <span t-field="o.narration"/>
-                                    </div>
-                                    <p t-if="not is_html_empty(o.fiscal_position_id.note)" name="note">
-                                        <span t-field="o.fiscal_position_id.note"/>
-                                    </p>
-                                    <p t-if="o.invoice_incoterm_id" name="incoterm">
-                                        <strong>Incoterm: </strong>
-                                        <span t-field="o.invoice_incoterm_id.code"/>
- -                                        <span t-field="o.invoice_incoterm_id.name"/>
-                                    </p>
-                                    <div id="qrcode" t-if="o.display_qr_code">
-                                        <p t-if="qr_code_urls.get(o.id)">
-                                            <strong class="text-center">Scan me with your banking app.</strong>
-                                            <br/>
-                                            <br/>
-                                            <img class="border border-dark rounded" t-att-src="qr_code_urls[o.id]"/>
-                                        </p>
-                                    </div>
-                                    <p>
-                                        <span>Autorizada mediante resolución N° DGT-R-033-2019 del 20 de junio de 2019.</span>
-                                    </p>
-
-                                    <div style="width:700px; height:110px;">
-                                        <div style="width:100px;height:100px;float:left;">
-                                            <span t-field="o.qr_image" t-options='{"widget": "image"}' />
-                                        </div>
-                                    </div>
-
-                                    <div id="exoneration" t-if="o.partner_id.has_exoneration">
-                                        <table class="table table-sm o_main_table" name="invoice_line_table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Exoneration Number</th>
-                                                    <th>Authorization Type</th>
-                                                    <th>Exoneration Issuer</th>
-                                                    <th>Issue Date</th>
-                                                    <th>Expiration Date</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <span t-field="o.partner_id.exoneration_number"/>
-                                                    </td>
-                                                    <td>
-                                                        <span t-field="o.partner_id.type_exoneration"/>
-                                                    </td>
-                                                    <td>
-                                                        <span t-field="o.partner_id.institution_name"/>
-                                                    </td>
-                                                    <td>
-                                                        <span t-field="o.partner_id.date_issue"/>
-                                                    </td>
-                                                    <td>
-                                                        <span t-field="o.partner_id.date_expiration"/>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                    </td>
+                                </tr>
                             </t>
-                        </template>
-                </odoo>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div class="clearfix">
+                    <div id="total" class="row">
+                        <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
+                            <table class="table table-sm" style="page-break-inside: avoid;">
+
+                                <!--Tax totals-->
+                                <t t-set="tax_totals" t-value="json.loads(o.tax_totals_json)"/>
+                                <t t-call="account.document_tax_totals"/>
+
+                                <!--Payments-->
+                                <t t-if="print_with_payments">
+                                    <t t-if="o.payment_state != 'invoicing_legacy'">
+                                        <t t-set="payments_vals" t-value="o.sudo()._get_reconciled_info_JSON_values()"/>
+                                        <t t-foreach="payments_vals" t-as="payment_vals">
+                                            <tr>
+                                                <td>
+                                                    <i class="oe_form_field text-right oe_payment_label">Paid on <t t-esc="payment_vals['date']" t-options='{"widget": "date"}'/>
+                                                    </i>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="payment_vals['amount']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="len(payments_vals) > 0">
+                                            <tr class="border-black">
+                                                <td>
+                                                    <strong>Amount Due</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="o.amount_residual"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </t>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <p t-if="o.move_type in ('out_invoice', 'in_refund') and o.payment_reference" name="payment_communication">
+                    Please use the following communication for your payment : 
+                    <b>
+                        <span t-field="o.payment_reference"/>
+                    </b>
+                </p>
+                <p t-if="o.invoice_payment_term_id" name="payment_term">
+                        <span t-field="o.invoice_payment_term_id.note"/>
+                </p>
+                <div t-if="not is_html_empty(o.narration)" name="comment">
+                    <span t-field="o.narration"/>
+                </div>
+                <p t-if="not is_html_empty(o.fiscal_position_id.note)" name="note">
+                    <span t-field="o.fiscal_position_id.note"/>
+                </p>
+                <p t-if="o.invoice_incoterm_id" name="incoterm">
+                    <strong>Incoterm: </strong>
+                    <span t-field="o.invoice_incoterm_id.code"/>
+-                                        <span t-field="o.invoice_incoterm_id.name"/>
+                </p>
+                <div id="qrcode" t-if="o.display_qr_code">
+                    <p t-if="qr_code_urls.get(o.id)">
+                        <strong class="text-center">Scan me with your banking app.</strong>
+                        <br/>
+                        <br/>
+                        <img class="border border-dark rounded" t-att-src="qr_code_urls[o.id]"/>
+                    </p>
+                </div>
+                <p>
+                  <span>Autorizada mediante resolución N° DGT-R-033-2019 del 20 de junio de 2019.</span>
+                </p>
+
+                <div style="width:700px; height:110px;">
+                    <div style="width:100px;height:100px;float:left;">
+                        <span t-field="o.qr_image" t-options='{"widget": "image"}' />
+                    </div>
+                </div>
+
+                <div id="exoneration" t-if="o.partner_id.has_exoneration">
+                    <table class="table table-sm o_main_table" name="invoice_line_table">
+                        <thead>
+                            <tr>
+                                <th>Exoneration Number</th>
+                                <th>Authorization Type</th>
+                                <th>Exoneration Issuer</th>
+                                <th>Issue Date</th>
+                                <th>Expiration Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span t-field="o.partner_id.exoneration_number"/>
+                                </td>
+                                <td>
+                                    <span t-field="o.partner_id.type_exoneration"/>
+                                </td>
+                                <td>
+                                    <span t-field="o.partner_id.institution_name"/>
+                                </td>
+                                <td>
+                                    <span t-field="o.partner_id.date_issue"/>
+                                </td>
+                                <td>
+                                    <span t-field="o.partner_id.date_expiration"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+    </odoo>

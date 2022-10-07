@@ -5,13 +5,38 @@ from odoo.exceptions import UserError
 class IvaCodeType(models.Model):
     _inherit = "account.tax"
 
-    tax_code = fields.Char(string="Tax Code")
-    iva_tax_desc = fields.Char(string="VAT Tax Rate", default='N/A')
-    iva_tax_code = fields.Char(string="VAT Rate Code", default='N/A')
-    has_exoneration = fields.Boolean(string="Has Exoneration")
-    percentage_exoneration = fields.Integer(string="Percentage of VAT Exoneration")
-    tax_root = fields.Many2one("account.tax", string="Parent Tax")
-    non_tax_deductible = fields.Boolean(string='Indicates if this tax is no deductible for Rent and VAT',)
+    # ==============================================================================================
+    #                                          TAXES
+    # ==============================================================================================
+
+    tax_code = fields.Char(
+        string="Tax Code"
+    )
+    iva_tax_desc = fields.Char(
+        string="VAT Tax Rate",
+        default='N/A'
+    )
+    iva_tax_code = fields.Char(
+        string="VAT Rate Code",
+        default='N/A'
+    )
+    has_exoneration = fields.Boolean(
+        string="Has Exoneration"
+    )
+    percentage_exoneration = fields.Integer(
+        string="Percentage of VAT Exoneration"
+    )
+    tax_root = fields.Many2one(
+        comodel_name="account.tax",
+        string="Parent Tax"
+    )
+    non_tax_deductible = fields.Boolean(
+        string='Indicates if this tax is no deductible for Rent and VAT'
+    )
+
+    # -------------------------------------------------------------------------
+    # ONCHANGE METHODS
+    # -------------------------------------------------------------------------
 
     @api.onchange('percentage_exoneration')
     def _onchange_percentage_exoneration(self):
