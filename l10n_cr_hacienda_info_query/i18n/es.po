@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 15.0-20220506\n"
+"Project-Id-Version: Odoo Server 15.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-16 01:18+0000\n"
-"PO-Revision-Date: 2022-05-16 01:18+0000\n"
+"POT-Creation-Date: 2022-09-24 23:07+0000\n"
+"PO-Revision-Date: 2022-09-24 23:07+0000\n"
 "Last-Translator: Norlan Ruiz<ruiznorlan@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr ""
 #: code:addons/l10n_cr_hacienda_info_query/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
 #, python-format
 msgid "Barcode"
-msgstr "Código de Barras"
+msgstr "Código de Barra"
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web
@@ -81,14 +81,14 @@ msgstr "Facturación Electrónica Costa Rica"
 #: code:addons/l10n_cr_hacienda_info_query/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
 #, python-format
 msgid "Email"
-msgstr "Correo Electrónico"
+msgstr "Correo"
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web
 #: code:addons/l10n_cr_hacienda_info_query/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js:0
 #, python-format
 msgid "Encountered error when loading image. Please try again."
-msgstr "Error encontrado al cargar la imagen. Inténtalo de nuevo."
+msgstr "Se encontró un error al cargar la imagen. Inténtalo de nuevo."
 
 #. module: l10n_cr_hacienda_info_query
 #: model:ir.model.fields,field_description:l10n_cr_hacienda_info_query.field_res_config_settings__get_tributary_information
@@ -105,7 +105,7 @@ msgstr "Obtener Información Yo Contribuyo"
 #: code:addons/l10n_cr_hacienda_info_query/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
 #, python-format
 msgid "ID"
-msgstr "Identificación"
+msgstr ""
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web
@@ -130,23 +130,21 @@ msgstr "Última respuesta de la API"
 #: code:addons/l10n_cr_hacienda_info_query/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js:0
 #, python-format
 msgid "Loading Image Error"
-msgstr "Error al cargar la imagen"
+msgstr "Error al cargar imagen"
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web
 #: code:addons/l10n_cr_hacienda_info_query/static/src/xml/Screens/ClientListScreen/ClientDetailsEdit.xml:0
 #, python-format
 msgid "None"
-msgstr "Ningúno"
+msgstr "Ninguna"
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web
 #: code:addons/l10n_cr_hacienda_info_query/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js:0
 #, python-format
 msgid "Only web-compatible Image formats such as .png or .jpeg are supported."
-msgstr ""
-"Solo se admiten formatos de imagen compatibles con la web, como .png o "
-".jpeg."
+msgstr "Solo se admiten formatos de imagen compatibles con la web, como .png o .jpeg."
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web
@@ -178,6 +176,18 @@ msgid "Street"
 msgstr "Calle"
 
 #. module: l10n_cr_hacienda_info_query
+#: code:addons/l10n_cr_hacienda_info_query/models/res_partner.py:0
+#, python-format
+msgid "The email query service is unavailable at this moment"
+msgstr "El servicio de consultas por correo electrónico no está disponible en este momento"
+
+#. module: l10n_cr_hacienda_info_query
+#: code:addons/l10n_cr_hacienda_info_query/models/res_partner.py:0
+#, python-format
+msgid "The name query service is unavailable at this moment"
+msgstr "El servicio de consulta de nombres no está disponible en este momento"
+
+#. module: l10n_cr_hacienda_info_query
 #: model_terms:ir.ui.view,arch_db:l10n_cr_hacienda_info_query.res_config_settings_view_form
 msgid "Tributary information"
 msgstr "Información Tributaria"
@@ -196,7 +206,7 @@ msgstr ""
 #. module: l10n_cr_hacienda_info_query
 #: model:ir.model.fields,help:l10n_cr_hacienda_info_query.field_res_config_settings__url_base
 msgid "URL Base of the END POINT"
-msgstr ""
+msgstr "URL Base del ENDPOINT"
 
 #. module: l10n_cr_hacienda_info_query
 #. openerp-web

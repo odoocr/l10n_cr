@@ -11,6 +11,7 @@ import ast
 
 
 class Binary(http.Controller):
+
     @http.route('/web/binary/download_document', type='http', auth="public")
     def download_document(self, **kw):
         new_tab = ast.literal_eval(kw['tab_id'])

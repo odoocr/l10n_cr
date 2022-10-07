@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- VIEWS -->
+
+    <!-- res.country.county (County Subdivision) -->
+
+    <record id="view_res_country_county_form" model="ir.ui.view">
+        <field name="name">res.country.county.form</field>
+        <field name="model">res.country.county</field>
+        <field name="arch" type="xml">
+            <form string="County">
+                <sheet string="County">
+                    <group col="4">
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="state_id" options='{"no_open": True}'/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_res_country_county_tree" model="ir.ui.view">
+        <field name="name">res.country.county.tree</field>
+        <field name="model">res.country.county</field>
+        <field name="arch" type="xml">
+            <tree string="Counties">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="state_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ACTIONS -->
+
+    <record id="action_res_country_county" model="ir.actions.act_window">
+        <field name="name">Counties</field>
+        <field name="res_model">res.country.county</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- MENUITEM -->
+
+    <menuitem id="menu_res_country_county" name="Counties" parent="contacts.menu_localisation" sequence="2" action="action_res_country_county"/>
+
+</odoo>

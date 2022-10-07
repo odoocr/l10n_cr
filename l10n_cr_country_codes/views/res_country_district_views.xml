@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- VIEWS -->
+
+    <!-- res.country.district (District Subdivision) -->
+
+    <record id="view_res_country_district_form" model="ir.ui.view">
+        <field name="name">res.country.district.form</field>
+        <field name="model">res.country.district</field>
+        <field name="arch" type="xml">
+            <form string="District">
+                <sheet string="District">
+                    <group col="4">
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="county_id" options='{"no_open": True}'/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_res_country_district_tree" model="ir.ui.view">
+        <field name="name">res.country.district.tree</field>
+        <field name="model">res.country.district</field>
+        <field name="arch" type="xml">
+            <tree string="Districts">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="county_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ACTIONS -->
+
+    <record id="action_res_country_district" model="ir.actions.act_window">
+        <field name="name">Districts</field>
+        <field name="res_model">res.country.district</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- MENUITEM -->
+
+    <menuitem id="menu_res_country_district" name="Districts" parent="contacts.menu_localisation" sequence="2" action="action_res_country_district"/>
+
+</odoo>

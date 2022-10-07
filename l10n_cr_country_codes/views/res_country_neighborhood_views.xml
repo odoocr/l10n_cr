@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- VIEWS -->
+
+    <!-- res.country.neighborhood (neighborhood Subdivision) -->
+
+    <record id="view_res_country_neighborhood_form" model="ir.ui.view">
+        <field name="name">res.country.neighborhood.form</field>
+        <field name="model">res.country.neighborhood</field>
+        <field name="arch" type="xml">
+            <form string="Neighborhood">
+                <sheet string="Neighborhood">
+                    <group col="4">
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="district_id" options='{"no_open": True}'/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_res_country_neighborhood_tree" model="ir.ui.view">
+        <field name="name">res_country.neighborhood.tree</field>
+        <field name="model">res.country.neighborhood</field>
+        <field name="arch" type="xml">
+            <tree string="Neighborhoods">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="district_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ACTIONS -->
+
+    <record id="action_res_country_neighborhood" model="ir.actions.act_window">
+        <field name="name">Neighborhoods</field>
+        <field name="res_model">res.country.neighborhood</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- MENUITEM -->
+
+    <menuitem id="menu_res_country_neighborhood" name="Neighborhoods" parent="contacts.menu_localisation" sequence="2" action="action_res_country_neighborhood"/>
+
+</odoo>

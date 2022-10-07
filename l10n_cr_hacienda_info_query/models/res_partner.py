@@ -77,7 +77,8 @@ class ResPartner(models.Model):
 
                             self.identification_id = self.env['identification.type'].search([('code',
                                                                                               '=',
-                                                                                              clasificacion)], limit=1).id
+                                                                                              clasificacion)],
+                                                                                            limit=1).id
 
                     if contenido.get('actividades') and 'activity_id' in self._fields:
                         for act in contenido.get('actividades'):
