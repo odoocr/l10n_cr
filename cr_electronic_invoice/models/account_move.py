@@ -424,6 +424,7 @@ class AccountInvoiceElectronic(models.Model):
     def get_invoice_sequence(self):
         tipo_documento = self.tipo_documento
         sequence = False
+        no_sequence_message = "This journal doesn't have the sequence configure for documents of type: " + tipo_documento + ". Please consider to configure the sequence and reset the invoice to draft."
 
         if self.move_type == 'out_invoice':
             # tipo de identificación
@@ -435,13 +436,37 @@ class AccountInvoiceElectronic(models.Model):
                 tipo_documento = 'TE'
                 self.tipo_documento = 'TE'
             if tipo_documento == 'FE':
-                sequence = self.journal_id.FE_sequence_id.next_by_id()
+                if self.journal_id.FE_sequence_id:
+                    sequence = self.journal_id.FE_sequence_id.next_by_id()
+                else:
+                    self.state_tributacion = "na"
+                    self.message_post(
+                        subject=_('Warning'),
+                        body=no_sequence_message)
             elif tipo_documento == 'TE':
-                sequence = self.journal_id.TE_sequence_id.next_by_id()
+                if self.journal_id.TE_sequence_id:
+                    sequence = self.journal_id.TE_sequence_id.next_by_id()
+                else:
+                    self.state_tributacion = "na"
+                    self.message_post(
+                        subject=_('Warning'),
+                        body=no_sequence_message)
             elif tipo_documento == 'ND':
-                sequence = self.journal_id.ND_sequence_id.next_by_id()
+                if self.journal_id.ND_sequence_id:
+                    sequence = self.journal_id.ND_sequence_id.next_by_id()
+                else:
+                    self.state_tributacion = "na"
+                    self.message_post(
+                        subject=_('Warning'),
+                        body=no_sequence_message)
             elif tipo_documento == 'FEE':
-                sequence = self.journal_id.FEE_sequence_id.next_by_id()
+                if self.journal_id.FEE_sequence_id:
+                    sequence = self.journal_id.FEE_sequence_id.next_by_id()
+                else:
+                    self.state_tributacion = "na"
+                    self.message_post(
+                        subject=_('Warning'),
+                        body=no_sequence_message)
             else:
                 raise UserError('Tipo documento "%s" es inválido para una factura', tipo_documento)
 
