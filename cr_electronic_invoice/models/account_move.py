@@ -897,7 +897,7 @@ class AccountInvoiceElectronic(models.Model):
         raise UserError(_('Hacienda API is disabled in company'))
 
     @api.model
-    def _send_invoices_to_hacienda(self, max_invoices=1000):  # cron
+    def _send_invoices_to_hacienda(self, max_invoices=10):  # cron
         company = False
         for c in self.env.companies:
             if c.country_id.name == 'Costa Rica':
@@ -912,7 +912,7 @@ class AccountInvoiceElectronic(models.Model):
                                                     ('state_tributacion', '=', 'ne')], order='id asc',
                                                    limit=max_invoices)
         if days_left >= 0:
-            self.with_delay().generate_and_send_invoices(invoices)
+            self.generate_and_send_invoices(invoices)
         else:
             #multicompany active company Costa Rica
 
