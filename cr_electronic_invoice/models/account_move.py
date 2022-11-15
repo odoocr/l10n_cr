@@ -1455,7 +1455,7 @@ class AccountInvoiceElectronic(models.Model):
                         id_code = '03'
                     else:
                         id_code = '05'
-
+                """
                 if id_code == '01' and len(identificacion) != 9:
                     raise UserError(_("The recipient's Physical ID must have 9 digits"))
                 elif id_code == '02' and len(identificacion) != 10:
@@ -1464,6 +1464,7 @@ class AccountInvoiceElectronic(models.Model):
                     raise UserError(_("The recipient's DIMEX identification must have 11 or 12 digits"))
                 elif id_code == '04' and len(identificacion) != 10:
                     raise UserError(_('The NITE identification of the receiver must have 10 digits'))
+                """
 
             if inv.invoice_payment_term_id and not inv.invoice_payment_term_id.sale_conditions_id:
                 raise UserError(_('The electronic invoice could not be created: \n'
