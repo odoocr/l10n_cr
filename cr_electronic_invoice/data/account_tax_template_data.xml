@@ -653,7 +653,7 @@
         <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
     </record>
 
-    <record id="service_tax_sale" model="account.tax.template">
+    <record id="service_tax_template_sale" model="account.tax.template">
         <field name="tax_code">service</field>
         <field name="name">Impuesto de Servicio</field>
         <field name="amount">10</field>
@@ -667,7 +667,7 @@
         <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
     </record>
 
-    <record id="exempt_tax_sale" model="account.tax.template">
+    <record id="exempt_tax_template_sale" model="account.tax.template">
         <field name="tax_code">00</field>
         <field name="name">Exento</field>
         <field name="amount">0</field>
@@ -681,7 +681,7 @@
         <field name="chart_template_id" ref="l10n_cr.account_chart_template_0"/>
     </record>
 
-    <record id="exempt_tax_purchase" model="account.tax.template">
+    <record id="exempt_tax_template_purchase" model="account.tax.template">
         <field name="tax_code">00</field>
         <field name="name">Exento</field>
         <field name="amount">0</field>
