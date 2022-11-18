@@ -32,6 +32,7 @@
     'data': [
         'data/report_paperformat_data.xml',
         'views/res_company_view.xml',
+        'views/account_move_views.xml',
         'views/report_sales_invoice_qweb.xml',
     ],
     'auto_install': False,
