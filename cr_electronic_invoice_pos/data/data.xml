@@ -3,7 +3,7 @@
 <odoo>
 
     <record id="ir_cron_consultahacienda_pos" model="ir.cron">
-        <field name="name">Consulta Hacienda POS</field>
+        <field name="name">ODOOCR: Consulta Hacienda POS</field>
         <field name="model_id" ref="model_pos_order" />
         <field name="state">code</field>
         <field name="code">model._consultahacienda_pos(20)</field>
@@ -14,7 +14,7 @@
     </record>
 
     <record id="ir_cron_valida_hacienda_pos" model="ir.cron">
-        <field name="name">Valida Hacienda POS</field>
+        <field name="name">ODOOCR: Valida Hacienda POS</field>
         <field name="model_id" ref="model_pos_order" />
         <field name="state">code</field>
         <field name="code">model._validahacienda_pos(20)</field>
@@ -25,7 +25,7 @@
     </record>
 
     <record id="ir_cron_reenvia_correos_pos" model="ir.cron">
-        <field name="name">Reenvia Correos POS</field>
+        <field name="name">ODOOCR: Reenvia Correos POS</field>
         <field name="model_id" ref="model_pos_order" />
         <field name="state">code</field>
         <field name="code">model._reenviacorreos_pos()</field>
