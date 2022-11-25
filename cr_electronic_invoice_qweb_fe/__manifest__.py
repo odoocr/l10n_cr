@@ -25,7 +25,7 @@
     'author': 'Odoo CR, CYSFuturo',
     'summary': 'Update Invoice QWEB template to meet DGT requirements for Costa Rica',
     'description': """Update Invoice QWEB template to meet DGT requirements for Costa Rica""",
-    'category': 'Accounting & Finance',
+    'category': 'Hidden',
     'sequence': 4,
     'website': 'http://cysfuturo.com',
     'depends': ['cr_electronic_invoice', 'sale_stock'],

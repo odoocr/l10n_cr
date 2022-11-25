@@ -6,7 +6,7 @@
     'author': 'Odoo CR Community',
     'license': 'AGPL-3',
     'website': 'https://github.com/odoocr',
-    'category': 'Account',
+    'category': 'Accounting/Accounting',
     'description':
         '''
         Facturación electronica Costa Rica.

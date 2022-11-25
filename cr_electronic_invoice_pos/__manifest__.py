@@ -4,7 +4,7 @@
     'author': 'Odoo CR, TechMicro Inc S.A.',
     'license': 'OPL-1',
     'website': 'http://www.techmicrocr.com',
-    'category': 'Account',
+    'category': 'Accounting/Accounting',
     'description':
     '''
     Facturación electronica POS Costa Rica.
