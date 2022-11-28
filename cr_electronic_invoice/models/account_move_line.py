@@ -38,6 +38,9 @@ class InvoiceLineElectronic(models.Model):
     non_tax_deductible = fields.Boolean(
         string='Indicates if this invoice is non-tax deductible'
     )
+    cabys_code = fields.Char(
+        related="product_id.cabys_code",
+    )
 
     # -------------------------------------------------------------------------
     # ONCHANGE METHODS

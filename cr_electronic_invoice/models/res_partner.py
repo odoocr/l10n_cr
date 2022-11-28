@@ -77,6 +77,11 @@ class PartnerElectronic(models.Model):
     date_notification = fields.Date(
         string="Last notification date"
     )
+    allowed_cabys_ids = fields.One2many(
+        comodel_name='res.partner.cabys.line',
+        inverse_name='parent_id',
+        string='Allowed CABYS Codes'
+    )
 
     # -------------------------------------------------------------------------
     # ONCHANGE METHODS
@@ -218,6 +223,8 @@ class PartnerElectronic(models.Model):
                     self.date_expiration = fecha_vencimiento
                     self.percentage_exoneration = float(contenido.get('porcentajeExoneracion'))
                     self.institution_name = contenido.get('nombreInstitucion')
+                    if contenido.get('cabys'):
+                        self.allowed_cabys_ids = [(0, 0, {'name': code}) for code in contenido.get('cabys')]
 
                     tipo_documento = contenido.get('tipoDocumento')
 

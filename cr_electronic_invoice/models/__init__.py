@@ -13,6 +13,7 @@ from . import product_category
 from . import reference_code
 from . import reference_document
 from . import res_company
+from . import res_partner_cabys_line
 from . import res_partner
 from . import res_config_settings
 from . import resolution

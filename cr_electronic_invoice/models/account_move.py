@@ -248,6 +248,23 @@ class AccountInvoiceElectronic(models.Model):
     ]
 
     # -------------------------------------------------------------------------
+    # CONSTRAINT METHODS
+    # -------------------------------------------------------------------------
+
+    @api.depends('partner_id')
+    @api.constrains('line_ids')
+    def _check_allowes_cabys_code(self):
+        for record in self.line_ids.filtered(lambda x: not x.display_type and x.cabys_code):
+            partner_id = self.partner_id
+            allowed_codes = [code.name for code in partner_id.allowed_cabys_ids]
+            _logger.info(_("Checking CABYS code: %s") % record.cabys_code)
+            if partner_id.has_exoneration and record.cabys_code not in allowed_codes:
+                error_msg = _("The CABYS code: %s is not approved for exoneration\n") % (record.cabys_code)
+                error_msg += _("Please check it to be able to issue the document!")
+                _logger.info(error_msg)
+                raise UserError(error_msg)
+
+    # -------------------------------------------------------------------------
     # COMPUTE METHODS
     # -------------------------------------------------------------------------
 
