@@ -10,7 +10,7 @@
                 <div id="electronic_invoice">
                     <h2>Electronic Invoicing Costa Rica</h2>
                     <div class="row mt16 o_settings_container" name="users_setting_container">
-                        <div class="col-12 col-lg-6 o_setting_box" id="YO Contribuyo">
+                        <div class="col-12 col-lg-6 o_setting_box" id="yo_contribuyo_group">
                             <div class="o_setting_left_pane">
                                 <field name="get_yo_contribuyo_information"/>
                             </div>
@@ -18,7 +18,15 @@
                                 <span class="o_form_label">YO Contribuyo</span>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 o_setting_box" id="YO Contribuyo">
+                        <div class="col-12 col-lg-6 o_setting_box" id="tributary_information">
+                            <div class="o_setting_left_pane">
+                                <field name="get_tributary_information"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Tributary information</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box" id="yo_contribuyo_group_setting">
                             <div class="o_setting_right_pane" attrs="{'invisible':[('get_yo_contribuyo_information', '=', False)]}">
                                 <separator string="YO Contribuyo"/>
                                 <label for="url_base_yo_contribuyo"/>
@@ -34,18 +42,11 @@
                                 <label for="token_yo_contribuyo"/>
                                 <br/>
                                 <field name="token_yo_contribuyo"/>
+                                <br/>
+                                <field name="ultima_respuesta" readonly="1"/>
                             </div>
                         </div>
-
-                        <div class="col-12 col-lg-6 o_setting_box" id="companies_setting">
-                            <div class="o_setting_left_pane">
-                                <field name="get_tributary_information"/>
-                            </div>
-                            <div class="o_setting_right_pane">
-                                <span class="o_form_label">Tributary information</span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6 o_setting_box" id="companies_setting">
+                        <div class="col-12 col-lg-6 o_setting_box" id="tributary_information_setting">
                             <div class="o_setting_right_pane" attrs="{'invisible':[('get_tributary_information', '=', False)]}">
                                 <separator string="Tributary information"/>
                                 <label for="url_base"/>
