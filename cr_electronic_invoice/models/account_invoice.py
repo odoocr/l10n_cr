@@ -1496,7 +1496,7 @@ class AccountInvoiceElectronic(models.Model):
                     sequence = inv.company_id.FEC_sequence_id.next_by_id()
 
             if not inv.tipo_documento or (inv.type in ('in_invoice', 'in_refund') and inv.tipo_documento in (
-            "CCE", "CPCE", "RCE", "FE", "NC")):
+            "CCE", "CPCE", "RCE", "FE", "NC", "ND")):
                 super(AccountInvoiceElectronic, inv).action_invoice_open()
                 continue
 
