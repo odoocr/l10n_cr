@@ -22,7 +22,8 @@ class actualizar_pos_api(http.Controller):
         url_base_yo_contribuyo = company_id.url_base_yo_contribuyo
         usuario_yo_contribuyo = company_id.usuario_yo_contribuyo
         token_yo_contribuyo = company_id.token_yo_contribuyo
-        _logger.info(url_base_yo_contribuyo + " " + usuario_yo_contribuyo + " " + token_yo_contribuyo)
+        all_emails_yo_contribuyo = ""
+        # logger.info(url_base_yo_contribuyo + " " + usuario_yo_contribuyo + " " + token_yo_contribuyo)
         if url_base_yo_contribuyo and usuario_yo_contribuyo and token_yo_contribuyo:
             url_base_yo_contribuyo = url_base_yo_contribuyo.strip()
 
@@ -88,7 +89,7 @@ class actualizar_pos_api(http.Controller):
                                     identification_id = id_type.search([('code', '=', '05')], limit=1).id
                     if contenido.get('nombre') != None:
                         name = contenido.get('nombre')
-                        retorno = {"nombre":str(name),"identification_id":str(identification_id),"email": str(all_emails_yo_contribuyo)}
+                        retorno = {"nombre":str(name),"identification_id":str(identification_id),"email":str(all_emails_yo_contribuyo)}
                         return '%s' % str(retorno).replace("'","\"")
 
             #Si la petición arroja error se almacena en el campo ultima_respuesta de res_company. Nota: se usa execute ya que el metodo por objeto no funciono
