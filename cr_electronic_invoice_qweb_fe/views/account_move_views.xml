@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_reference" position="after">
+                <field name="show_cabys_codes_invoice_qweb" attrs="{'invisible':[('move_type','not in', ('out_invoice', 'out_refund','in_invoice', 'in_refund'))]}"/>
+            </field>
+        </field>
+    </record>
+</odoo>

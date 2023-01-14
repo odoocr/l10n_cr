@@ -477,6 +477,7 @@ class AccountInvoiceElectronic(models.Model):
     def get_invoice_sequence(self):
         tipo_documento = self.tipo_documento
         sequence = False
+
         no_sequence_message = "This journal doesn't have the sequence configure for documents of type: "
         no_sequence_message += tipo_documento
         no_sequence_message += ". Please consider to configure the sequence and reset the invoice to draft."
@@ -1590,6 +1591,10 @@ class AccountInvoiceElectronic(models.Model):
             # tipo de identificación
             if not inv.company_id.identification_id:
                 raise UserError(_('Select the type of issuer identification in the company profile'))
+            if not inv.company_id.vat:
+                raise UserError(_('Please configure the identification in the company profile'))
+            if not inv.company_id.state_id or not inv.company_id.county_id or not inv.company_id.district_id or not inv.company_id.neighborhood_id or not inv.company_id.street:
+                raise UserError(_('Please complete the address information in the company profile'))
 
             if inv.partner_id and inv.partner_id.vat:
                 identificacion = re.sub('[^0-9]', '', inv.partner_id.vat)
