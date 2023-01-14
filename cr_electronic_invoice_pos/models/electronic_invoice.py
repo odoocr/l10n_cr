@@ -613,6 +613,11 @@ class PosOrder(models.Model):
                 doc.date_issuance = date_cr
                 invoice_comments = ''
                 doc.economic_activity_id = doc.company_id.activity_id
+                if not doc.economic_activity_id:
+                    doc.message_post(
+                        subject=_('Error'),
+                        body='You must configure the economic activity on company profile')
+                    continue
                 xml_string_builder = api_facturae.gen_xml_v43(
                     doc, sale_conditions, round(total_servicio_gravado, 5),
                     round(total_servicio_exento, 5), total_servicio_exonerado,
