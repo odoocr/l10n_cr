@@ -350,6 +350,11 @@ class PosOrder(models.Model):
                     doc.xml_respuesta_tributacion = response_json.get('respuesta-xml')
                     doc.state_email = 'fe_error'
                     _logger.error('E-INV CR - Email no enviado - factura rechazada')
+                   decoded_xml=base64.b64decode(response_json.get('respuesta-xml')).decode('utf-8')
+                    xml_errors=decoded_xml.partition('<DetalleMensaje>')[2].partition('</DetalleMensaje>')[0]
+                    #_logger.error(xml_errors)
+                    doc.message_post(subject='Error',body=xml_errors)
+
                 elif estado_m_h == 'error':
                     doc.state_tributacion = estado_m_h
                     doc.state_email = 'fe_error'
