@@ -644,6 +644,10 @@ class AccountInvoiceElectronic(models.Model):
                                                       'res_field': 'xml_respuesta_tributacion',
                                                       'res_name': i.fname_xml_respuesta_tributacion,
                                                       'mimetype': 'text/xml'})
+                    decoded_xml=base64.b64decode(response_json.get('respuesta-xml')).decode('utf-8')
+                    xml_errors=decoded_xml.partition('<DetalleMensaje>')[2].partition('</DetalleMensaje>')[0]
+                    #_logger.error(xml_errors)
+                    i.message_post(subject='Error',body=xml_errors)
                 else:
                     if i.error_count > 10:
                         i.state_tributacion = 'error'
