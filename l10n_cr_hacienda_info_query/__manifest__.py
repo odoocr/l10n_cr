@@ -4,7 +4,7 @@
     "author": "Odoo CR, Factura Sempai, FSS Solutions",
     'license': 'LGPL-3',
     "website": "https://github.com/odoocr/l10n_cr",
-    "category": "API",
+    'category': 'Hidden',
     "summary": """Consultar Nombre de Clientes en Hacienda Costa Rica""",
     "description": """Actualización automática de nombre de clientes a partir del API de Hacienda""",
     "depends": ['base', 'contacts', 'base_setup', 'l10n_cr_country_codes'],

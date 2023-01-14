@@ -49,6 +49,12 @@
                         <field name="date_issue"/>
                         <field name="date_expiration"/>
                     </group>
+                    <field name="allowed_cabys_ids">
+                        <tree create="false" delete="false" editable="bottom">
+                            <field name="parent_id" invisible="1" />
+                            <field name="name" />
+                        </tree>
+                    </field>
                 </page>
             </xpath>
         </field>
