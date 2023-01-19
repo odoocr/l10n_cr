@@ -32,6 +32,25 @@ class PartnerElectronic(models.Model):
         string="It's export",
         default=False
     )
+    # === Customer defined XML fields === #
+    other_text_expression = fields.Text( default='''
+                    # Available variables:
+                    #----------------------
+                    # invoice: object containing the current invoice
+
+                    # Note: returned value have to be set in the variable 'result'
+
+                    result = "<MyTag>"+invoice.ref * "</MyTag>"''')
+
+
+    other_content_expression = fields.Text( default='''
+                    # Available variables:
+                    #----------------------
+                    # invoice: object containing the current invoice
+
+                    # Note: returned value have to be set in the variable 'result'
+
+                    result = "<MyTag>"+invoice.ref * "</MyTag>"''')
 
     # === Economic Activity fields === #
 

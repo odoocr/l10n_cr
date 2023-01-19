@@ -7,7 +7,7 @@
         <field name="name">IVA 0%</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA0"/>
+        <field name="tax_group_id" ref="tax_group_IVA0"/>
         <field name="description">IVA 0% </field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa 0%</field>
@@ -19,7 +19,7 @@
         <field name="name">IVA 0% </field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA0"/>
+        <field name="tax_group_id" ref="tax_group_IVA0"/>
         <field name="description">IVA 0%</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa 0%</field>
@@ -35,7 +35,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa 0% (No deducible)</field>
         <field name="iva_tax_code">01</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -44,7 +44,7 @@
         <field name="name">IVA</field>
         <field name="amount">13</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA13"/>
+        <field name="tax_group_id" ref="tax_group_IVA13"/>
         <field name="description">IVA General 13%</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa General 13%</field>
@@ -56,7 +56,7 @@
         <field name="name">IVA</field>
         <field name="amount">13</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA13"/>
+        <field name="tax_group_id" ref="tax_group_IVA13"/>
         <field name="description">IVA General 13%</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa General 13%</field>
@@ -72,7 +72,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa General 13% (No deducible)</field>
         <field name="iva_tax_code">08</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -81,7 +81,7 @@
         <field name="name">IVA 1% (Tarifa Reducida)</field>
         <field name="amount">1</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA1"/>
+        <field name="tax_group_id" ref="tax_group_IVA1"/>
         <field name="description">IVA 1% (Tarifa Reducida)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 1%</field>
@@ -93,7 +93,7 @@
         <field name="name">IVA 1% (Tarifa Reducida)</field>
         <field name="amount">1</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA1"/>
+        <field name="tax_group_id" ref="tax_group_IVA1"/>
         <field name="description">IVA 1% (Tarifa Reducida)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 1%</field>
@@ -109,7 +109,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 1% (No deducible)</field>
         <field name="iva_tax_code">02</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -118,7 +118,7 @@
         <field name="name">IVA 2% (Tarifa Reducida)</field>
         <field name="amount">2</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA2"/>
+        <field name="tax_group_id" ref="tax_group_IVA2"/>
         <field name="description">IVA 2% (Tarifa Reducida)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 2%</field>
@@ -130,7 +130,7 @@
         <field name="name">IVA 2% (Tarifa Reducida)</field>
         <field name="amount">2</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA2"/>
+        <field name="tax_group_id" ref="tax_group_IVA2"/>
         <field name="description">IVA 2% (Tarifa Reducida)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 2%</field>
@@ -146,7 +146,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 2% (No deducible)</field>
         <field name="iva_tax_code">03</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -155,7 +155,7 @@
         <field name="name">IVA 4% (Tarifa Reducida)</field>
         <field name="amount">4</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA4"/>
+        <field name="tax_group_id" ref="tax_group_IVA4"/>
         <field name="description">IVA 4% (Tarifa Reducida)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 4%</field>
@@ -167,7 +167,7 @@
         <field name="name">IVA 4% (Tarifa Reducida)</field>
         <field name="amount">4</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA4"/>
+        <field name="tax_group_id" ref="tax_group_IVA4"/>
         <field name="description">IVA 4% (Tarifa Reducida)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 4%</field>
@@ -183,7 +183,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Tarifa reducida 4% (No deducible)</field>
         <field name="iva_tax_code">04</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -192,7 +192,7 @@
         <field name="name">IVA 0% (Transitorio)</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA0"/>
+        <field name="tax_group_id" ref="tax_group_IVA0"/>
         <field name="description">IVA 0% (Transitorio)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 0%</field>
@@ -204,7 +204,7 @@
         <field name="name">IVA 0% (Transitorio)</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA0"/>
+        <field name="tax_group_id" ref="tax_group_IVA0"/>
         <field name="description">IVA 0% (Transitorio)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 0%</field>
@@ -220,7 +220,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 0% (Trans No deducible)</field>
         <field name="iva_tax_code">05</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -229,7 +229,7 @@
         <field name="name">IVA 4% (Transitorio)</field>
         <field name="amount">4</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA4"/>
+        <field name="tax_group_id" ref="tax_group_IVA4"/>
         <field name="description">IVA 4% (Transitorio)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 4%</field>
@@ -241,7 +241,7 @@
         <field name="name">IVA 4% (Transitorio)</field>
         <field name="amount">4</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA4"/>
+        <field name="tax_group_id" ref="tax_group_IVA4"/>
         <field name="description">IVA 4% (Transitorio)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 4%</field>
@@ -257,7 +257,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 4% (Trans No deducible)</field>
         <field name="iva_tax_code">06</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -266,7 +266,7 @@
         <field name="name">IVA 8% (Transitorio)</field>
         <field name="amount">8</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA8"/>
+        <field name="tax_group_id" ref="tax_group_IVA8"/>
         <field name="description">IVA 8% (Transitorio)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 8%</field>
@@ -278,7 +278,7 @@
         <field name="name">IVA 8% (Transitorio)</field>
         <field name="amount">8</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA8"/>
+        <field name="tax_group_id" ref="tax_group_IVA8"/>
         <field name="description">IVA 8% (Transitorio)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 8%</field>
@@ -294,7 +294,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Transitorio 8% (Trans No deducible)</field>
         <field name="iva_tax_code">07</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -303,7 +303,7 @@
         <field name="name">Impuesto Selectivo de Consumo</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_SC"/>
+        <field name="tax_group_id" ref="tax_group_SC"/>
         <field name="description">Impuesto Selectivo de Consumo</field>
         <field name="sequence">5</field>
         <field name="iva_tax_desc">N/A</field>
@@ -315,7 +315,7 @@
         <field name="name">Impuesto Selectivo de Consumo</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_SC"/>
+        <field name="tax_group_id" ref="tax_group_SC"/>
         <field name="description">Impuesto Selectivo de Consumo</field>
         <field name="sequence">5</field>
         <field name="iva_tax_desc">N/A</field>
@@ -331,7 +331,7 @@
         <field name="sequence">5</field>
         <field name="iva_tax_desc">N/A</field>
         <field name="iva_tax_code">N/A</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -340,7 +340,7 @@
         <field name="name">Impuesto Único a los Combustibles</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IUC"/>
+        <field name="tax_group_id" ref="tax_group_IUC"/>
         <field name="description">Impuesto Único a los Combustibles</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -352,7 +352,7 @@
         <field name="name">Impuesto Único a los Combustibles</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IUC"/>
+        <field name="tax_group_id" ref="tax_group_IUC"/>
         <field name="description">Impuesto Único a los Combustibles</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -364,7 +364,7 @@
         <field name="name">Impuesto específico de Bebidas Alcohólicas</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IEBA"/>
+        <field name="tax_group_id" ref="tax_group_IEBA"/>
         <field name="description">Impuesto específico de Bebidas Alcohólicas</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -377,7 +377,7 @@
         <field name="name">Impuesto específico de Bebidas Alcohólicas</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IEBA"/>
+        <field name="tax_group_id" ref="tax_group_IEBA"/>
         <field name="description">Impuesto específico de Bebidas Alcohólicas</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -389,7 +389,7 @@
         <field name="name">Impuesto Específico sobre las bebidas envasadas sin contenido alcohólico y jabones de tocador</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IEBE"/>
+        <field name="tax_group_id" ref="tax_group_IEBE"/>
         <field name="description">Impuesto Específico sobre las bebidas envasadas sin contenido alcohólico y jabones de tocador</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -401,7 +401,7 @@
         <field name="name">Impuesto Específico sobre las bebidas envasadas sin contenido alcohólico y jabones de tocador</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IEBE"/>
+        <field name="tax_group_id" ref="tax_group_IEBE"/>
         <field name="description">Impuesto Específico sobre las bebidas envasadas sin contenido alcohólico y jabones de tocador</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -413,7 +413,7 @@
         <field name="name">Impuesto a los Productos de Tabaco</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IPT"/>
+        <field name="tax_group_id" ref="tax_group_IPT"/>
         <field name="description">Impuesto a los Productos de Tabaco</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -425,7 +425,7 @@
         <field name="name">Impuesto a los Productos de Tabaco</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IPT"/>
+        <field name="tax_group_id" ref="tax_group_IPT"/>
         <field name="description">Impuesto a los Productos de Tabaco</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -437,7 +437,7 @@
         <field name="name">IVA (cálculo especial)</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA13"/>
+        <field name="tax_group_id" ref="tax_group_IVA13"/>
         <field name="description">IVA (cálculo especial)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -449,7 +449,7 @@
         <field name="name">IVA (cálculo especial)</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA13"/>
+        <field name="tax_group_id" ref="tax_group_IVA13"/>
         <field name="description">IVA (cálculo especial)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -465,7 +465,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
         <field name="iva_tax_code">N/A</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -474,7 +474,7 @@
         <field name="name">IVA Régimen de Bienes Usados (Factor)</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IRBU"/>
+        <field name="tax_group_id" ref="tax_group_IRBU"/>
         <field name="description">IVA Régimen de Bienes Usados (Factor)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -486,7 +486,7 @@
         <field name="name">IVA Régimen de Bienes Usados (Factor)</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IRBU"/>
+        <field name="tax_group_id" ref="tax_group_IRBU"/>
         <field name="description">IVA Régimen de Bienes Usados (Factor)</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -502,7 +502,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
         <field name="iva_tax_code">N/A</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -559,7 +559,7 @@
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
         <field name="iva_tax_code">N/A</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_IVA_ND"/>
+        <field name="tax_group_id" ref="tax_group_IVA_ND"/>
         <field name="non_tax_deductible">True</field>
     </record>
 
@@ -568,7 +568,7 @@
         <field name="name">Impuesto de Servicio</field>
         <field name="amount">10</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_Servicio"/>
+        <field name="tax_group_id" ref="tax_group_Servicio"/>
         <field name="description">Impuesto de servicio utilizado por los restaurantes</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">Impuesto Servicio 10%</field>
@@ -580,7 +580,7 @@
         <field name="name">Exento</field>
         <field name="amount">0</field>
         <field name="type_tax_use">sale</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_Exento"/>
+        <field name="tax_group_id" ref="tax_group_Exento"/>
         <field name="description">Exento</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>
@@ -592,7 +592,7 @@
         <field name="name">Exento</field>
         <field name="amount">0</field>
         <field name="type_tax_use">purchase</field>
-        <field name="tax_group_id" ref="cr_electronic_invoice.tax_group_Exento"/>
+        <field name="tax_group_id" ref="tax_group_Exento"/>
         <field name="description">Exento</field>
         <field name="sequence">10</field>
         <field name="iva_tax_desc">N/A</field>

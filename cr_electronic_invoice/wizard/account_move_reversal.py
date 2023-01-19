@@ -22,8 +22,14 @@ class AccountMoveReversal(models.TransientModel):
         # R1705(no-else-return)
         tipo_doc = False
         type_override = False
-        if move.state_tributacion == 'rechazado':
-            tipo_doc = 'disabled'
+        #if move.state_tributacion == 'rechazado':
+        #    tipo_doc = 'disabled'
+        if move.tipo_documento in ('FE', 'TE') and move.state_tributacion == 'rechazado':
+            #Se hace esto para que si el documento original es rechazado, se genere una "sustitutiva" en lugar de una NC
+            #no deberíamos tener casos de in_invoice pues no debemos registrar documentos de proveedor que hayan sido rechazados por Hacienda
+            #TODO: Analizar si debe aplicar también para una NC rechazada...
+            type_override = 'out_invoice'
+            tipo_doc = move.tipo_documento
         elif move.move_type == 'out_refund':
             type_override = 'out_invoice'
             tipo_doc = 'ND'
