@@ -81,6 +81,9 @@ class AccountJournalInherit(models.Model):
                 break
         if not invoice:
             invoice = self.env['account.move'].create({})
+        p_method = self.env['payment.methods'].search([('sequence', '=', '99')], limit=1)
+        if p_method:
+            invoice.payment_methods_id = p_method.id
         invoice.fname_xml_supplier_approval = attachment.name
         invoice.xml_supplier_approval = attachment.datas
         return invoice
