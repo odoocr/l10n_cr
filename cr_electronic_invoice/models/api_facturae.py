@@ -16,6 +16,7 @@ from cryptography.hazmat.backends import default_backend
 
 from odoo import _
 from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
 from xml.sax.saxutils import escape
 from ..xades.context2 import XAdESContext2, PolicyId2, create_xades_epes_signature
 
@@ -175,29 +176,29 @@ last_tokens_expire = {}
 last_tokens_refresh = {}
 
 
-def get_token_hacienda(inv, tipo_ambiente):
+def get_token_hacienda(company_id):
     global last_tokens
     global last_tokens_time
     global last_tokens_expire
     global last_tokens_refresh
 
-    token = last_tokens.get(inv.company_id.id, False)
-    token_time = last_tokens_time.get(inv.company_id.id, False)
-    token_expire = last_tokens_expire.get(inv.company_id.id, 0)
+    token = last_tokens.get(company_id.id, False)
+    token_time = last_tokens_time.get(company_id.id, False)
+    token_expire = last_tokens_expire.get(company_id.id, 0)
     current_time = time.time()
 
     if token and (current_time - token_time < token_expire - 10):
         token_hacienda = token
     else:
         headers = {}
-        data = {'client_id': tipo_ambiente,
+        data = {'client_id': company_id.frm_ws_ambiente,
                 'client_secret': '',
                 'grant_type': 'password',
-                'username': inv.company_id.frm_ws_identificador,
-                'password': inv.company_id.frm_ws_password}
+                'username': company_id.frm_ws_identificador,
+                'password': company_id.frm_ws_password}
 
         # establecer el ambiente al cual me voy a conectar
-        endpoint = fe_enums.UrlHaciendaToken[tipo_ambiente]
+        endpoint = fe_enums.UrlHaciendaToken[company_id.frm_ws_ambiente]
 
         try:
             # enviando solicitud post y guardando la respuesta como un objeto json
@@ -210,12 +211,12 @@ def get_token_hacienda(inv, tipo_ambiente):
 
             if 200 <= response.status_code <= 299:
                 token_hacienda = response_json.get('access_token')
-                last_tokens[inv.company_id.id] = token
-                last_tokens_time[inv.company_id.id] = time.time()
-                last_tokens_expire[inv.company_id.id] = response_json.get('expires_in')
-                last_tokens_refresh[inv.company_id.id] = response_json.get('refresh_expires_in')
+                last_tokens[company_id.id] = token
+                last_tokens_time[company_id.id] = time.time()
+                last_tokens_expire[company_id.id] = response_json.get('expires_in')
+                last_tokens_refresh[company_id.id] = response_json.get('refresh_expires_in')
             else:
-                _logger.error('FECR - token_hacienda failed.  error: %s' % (response.status_code))
+                _logger.error('FECR - token_hacienda failed.  error: %s' % (response_json))
 
         except requests.exceptions.RequestException as e:
             raise Warning(_('Error Obteniendo el Token desde MH. Excepcion %s'), (e))
@@ -345,7 +346,8 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
                 total_impuestos, total_descuento, lines,
                 otrosCargos, currency_rate, invoice_comments,
                 tipo_documento_referencia, numero_documento_referencia,
-                fecha_emision_referencia, codigo_referencia, razon_referencia):
+                fecha_emision_referencia, codigo_referencia, razon_referencia,
+                otro_texto_tag, otro_contenido_tag):
 
     numero_linea = 0
     payment_methods_id = []
@@ -643,14 +645,17 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
         sb.append('<Codigo>' + str(codigo_referencia) + '</Codigo>')
         sb.append('<Razon>' + str(razon_referencia) + '</Razon>')
         sb.append('</InformacionReferencia>')
-    if invoice_comments or invoice_ref:
+    if invoice_comments or otro_texto_tag or otro_contenido_tag:
         sb.append('<Otros>')
-        if invoice_comments:
+        if otro_texto_tag:
+            sb.append(otro_texto_tag)
+        elif invoice_comments:
             sb.append('<OtroTexto>' + str(invoice_comments) + '</OtroTexto>')
-        if invoice_ref:
+        if otro_contenido_tag:
             sb.append('<OtroContenido>')
             sb.append('<InformacionAdicional xmlns="https://FE-CR/DataInfo.xsd">')
-            sb.append('<OrdenCompra>' + invoice_ref + '</OrdenCompra>')
+            #sb.append('<OrdenCompra>' + invoice_ref + '</OrdenCompra>')
+            sb.append(otro_contenido_tag)
             sb.append('</InformacionAdicional>')
             sb.append('</OtroContenido>')
         sb.append('</Otros>')
@@ -1070,8 +1075,7 @@ def load_xml_data(invoice, load_lines, account_id, product_id=False, analytic_ac
                                                          'country_id': pais_emisor,
                                                          'phone': telefono_emisor,
                                                          'email': correo_emisor,
-                                                         'street': otrassenas_emisor,
-                                                         'supplier': 'True'})
+                                                         'street': otrassenas_emisor})
         if new_partner:
             invoice.partner_id = new_partner
         else:
@@ -1211,3 +1215,17 @@ def p12_expiration_date(p12file, password):
         if exc_str.find('mac verify failure'):
             raise
         raise
+
+def gen_other_tags(inv):
+    other_text_result = False
+    other_content_result = False
+    if inv.partner_id:
+        if inv.partner_id.other_text_expression:
+            localdict = dict(invoice=inv)
+            safe_eval(inv.partner_id.other_text_expression, localdict, mode='exec', nocopy=True)
+            other_text_result = localdict['result']
+        if inv.partner_id.other_content_expression:
+            localdict = dict(invoice=inv)
+            safe_eval(inv.partner_id.other_content_expression, localdict, mode='exec', nocopy=True)
+            other_content_result = localdict['result']
+    return (other_text_result, other_content_result)

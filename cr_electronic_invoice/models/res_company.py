@@ -189,8 +189,7 @@ class CompanyElectronic(models.Model):
 
     def test_get_token(self):
         self.get_expiration_date()
-        token_m_h = api_facturae.get_token_hacienda(
-            self.env.user, self.frm_ws_ambiente)
+        token_m_h = api_facturae.get_token_hacienda(self)
         if token_m_h:
             self.message_post(
                 subject=_('Info'),
