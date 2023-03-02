@@ -417,7 +417,7 @@ class AccountInvoiceElectronic(models.Model):
     def get_invoice_sequence(self):
         tipo_documento = self.tipo_documento
         sequence = False
-        no_sequence_message = "This journal doesn't have the sequence configure for documents of type: " + tipo_documento + ". Please consider to configure the sequence and reset the invoice to draft."
+        no_sequence_message = "This journal doesn't have the sequence configured for documents of type: " + tipo_documento + ". Please consider to configure the sequence and reset the invoice to draft."
 
         if self.move_type == 'out_invoice':
             # tipo de identificación
@@ -637,6 +637,10 @@ class AccountInvoiceElectronic(models.Model):
                                                       'res_field': 'xml_respuesta_tributacion',
                                                       'res_name': i.fname_xml_respuesta_tributacion,
                                                       'mimetype': 'text/xml'})
+                    decoded_xml=base64.b64decode(response_json.get('respuesta-xml')).decode('utf-8')
+                    xml_errors=decoded_xml.partition('<DetalleMensaje>')[2].partition('</DetalleMensaje>')[0]
+                    #_logger.error(xml_errors)
+                    i.message_post(subject='Error',body=xml_errors)
                 else:
                     if i.error_count > 10:
                         i.state_tributacion = 'error'
@@ -1420,6 +1424,10 @@ class AccountInvoiceElectronic(models.Model):
             # tipo de identificación
             if not inv.company_id.identification_id:
                 raise UserError(_('Select the type of issuer identification in the company profile'))
+            if not inv.company_id.vat:
+                raise UserError(_('Please configure the identification in the company profile'))
+            if not inv.company_id.state_id or not inv.company_id.county_id or not inv.company_id.district_id or not inv.company_id.neighborhood_id or not inv.company_id.street:
+                raise UserError(_('Please complete the address information in the company profile'))
 
             if inv.partner_id and inv.partner_id.vat:
                 identificacion = re.sub('[^0-9]', '', inv.partner_id.vat)

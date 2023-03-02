@@ -437,7 +437,21 @@
                     </thead>
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l" style="height:25px;font-size:16px">
-                            <td><span t-field="l.name"/></td>
+                            <td>
+                                <span t-field="l.name"/>
+                                <span t-if="o.show_cabys_codes_invoice_qweb">
+                                    <span t-if="l.product_id.default_code">
+                                        <span> - Código producto: </span>
+                                        <span t-field="l.product_id.default_code"/>
+                                    </span>
+                                    <span t-if="l.product_id.cabys_code">
+                                        <br/>
+                                        <span>CABYS: </span>
+                                        <span t-field="l.product_id.cabys_code"/>
+                                    </span>
+                                </span>
+                            </td>
+                            <!--td class="hidden"><span t-field="l.invoice_origin"/></td-->
                             <td class="text-right">
                                 <span t-field="l.quantity"/>
                                 <span t-field="l.uom_id" groups="product.group_uom"/>

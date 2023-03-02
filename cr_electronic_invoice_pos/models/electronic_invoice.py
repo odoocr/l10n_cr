@@ -349,6 +349,11 @@ class PosOrder(models.Model):
                     doc.xml_respuesta_tributacion = response_json.get('respuesta-xml')
                     doc.state_email = 'fe_error'
                     _logger.error('E-INV CR - Email no enviado - factura rechazada')
+                    decoded_xml=base64.b64decode(response_json.get('respuesta-xml')).decode('utf-8')
+                    xml_errors=decoded_xml.partition('<DetalleMensaje>')[2].partition('</DetalleMensaje>')[0]
+                    #_logger.error(xml_errors)
+                    doc.message_post(subject='Error',body=xml_errors)
+
                 elif estado_m_h == 'error':
                     doc.state_tributacion = estado_m_h
                     doc.state_email = 'fe_error'
@@ -612,6 +617,11 @@ class PosOrder(models.Model):
                 doc.date_issuance = date_cr
                 invoice_comments = ''
                 doc.economic_activity_id = doc.company_id.activity_id
+                if not doc.economic_activity_id:
+                    doc.message_post(
+                        subject=_('Error'),
+                        body='You must configure the economic activity on company profile')
+                    continue
                 xml_string_builder = api_facturae.gen_xml_v43(
                     doc, sale_conditions, round(total_servicio_gravado, 5),
                     round(total_servicio_exento, 5), total_servicio_exonerado,

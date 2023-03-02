@@ -35,6 +35,7 @@ Update Invoice QWEB template to meet DGT requirements for Costa Rica
     'data' : [
         'data/report_paperformat_data.xml',
         'views/res_company_view.xml',
+        'views/account_move_views.xml',
         'views/report_sales_invoice_qweb.xml',
     ],
     'test' : [
