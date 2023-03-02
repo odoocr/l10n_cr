@@ -387,39 +387,32 @@ class AccountInvoiceElectronic(models.Model):
     # -------------------------------------------------------------------------
 
     def load_xml_data(self):
-        account = False
         analytic_account = False
         product = False
 
-        purchase_journal = self.env['account.journal'].search([('type', '=', 'purchase')], limit=1)
-        default_account_id = purchase_journal.expense_account_id.id
-        if default_account_id:
-            account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
-            load_lines = purchase_journal.load_lines
+        purchase_journal = self.journal_id or self.env['account.journal'].search([('type', '=', 'purchase')], limit=1)
+        default_account = self.partner_id and self.partner_id.expense_account_id
+        if default_account:
+            load_lines = self.partner_id.load_lines
         else:
-            default_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
-            load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
-            if default_account_id:
-                account = self.env['account.account'].search([('id', '=', default_account_id)], limit=1)
+            default_account = purchase_journal.expense_account_id
+            if default_account:
+                load_lines = purchase_journal.load_lines
+            else:
+                default_account = self.env['ir.config_parameter'].sudo().get_param('expense_account_id')
+                load_lines = bool(self.env['ir.config_parameter'].sudo().get_param('load_lines'))
 
-        analytic_account_id = purchase_journal.expense_analytic_account_id.id
-        if analytic_account_id:
-            analytic_account = self.env['account.analytic.account'].search([('id', '=', analytic_account_id)], limit=1)
-        else:
-            analytic_account_id = self.env['ir.config_parameter'].sudo().get_param('expense_analytic_account_id')
-            if analytic_account_id:
-                analytic_account = self.env['account.analytic.account'].search([('id', '=', analytic_account_id)],
-                                                                               limit=1)
+        default_analytic_account = self.partner_id and self.partner_id.expense_analytic_account_id
+        if not default_analytic_account:
+            default_analytic_account = purchase_journal.expense_analytic_account_id
+            if not default_analytic_account:
+                default_analytic_account = self.env['ir.config_parameter'].sudo().get_param('expense_analytic_account_id')
 
-        product_id = purchase_journal.expense_product_id.id
-        if product_id:
-            product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
-        else:
-            product_id = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
-            if product_id:
-                product = self.env['product.product'].search([('id', '=', product_id)], limit=1)
+        default_product = purchase_journal.expense_product_id.id
+        if not default_product:
+            default_product = self.env['ir.config_parameter'].sudo().get_param('expense_product_id')
 
-        api_facturae.load_xml_data(self, load_lines, account, product, analytic_account)
+        api_facturae.load_xml_data(self, load_lines, default_account, default_product, default_analytic_account)
 
     def get_invoice_sequence(self):
         tipo_documento = self.tipo_documento

@@ -32,25 +32,42 @@ class PartnerElectronic(models.Model):
         string="It's export",
         default=False
     )
+
+    expense_account_id = fields.Many2one(
+        comodel_name='account.account',
+        company_dependent=True,
+        string="Default Expense Account when loading data from XML",
+        help="The expense account used when loading Costa Rican digital invoice"
+    )
+    expense_analytic_account_id = fields.Many2one(
+        comodel_name='account.analytic.account',
+        company_dependent=True,
+        string="Default Analytic Account for expenses when loading data from XML",
+        help="The analytic account used when loading Costa Rican digital invoice"
+    )
+
+    load_lines = fields.Boolean(
+        string='Indicates if invoice lines should be load when loading a Costa Rican Digital Invoice',
+        default=True
+    )
+
     # === Customer defined XML fields === #
     other_text_expression = fields.Text( default='''
-                    # Available variables:
-                    #----------------------
-                    # invoice: object containing the current invoice
-
-                    # Note: returned value have to be set in the variable 'result'
-
-                    result = "<MyTag>"+invoice.ref * "</MyTag>"''')
+# Available variables:
+#----------------------
+# invoice: object containing the current invoice
+# Note: returned value have to be set in the variable 'result'
+#result = "<MyTag>"+invoice.ref "</MyTag>"
+result=False''')
 
 
     other_content_expression = fields.Text( default='''
-                    # Available variables:
-                    #----------------------
-                    # invoice: object containing the current invoice
-
-                    # Note: returned value have to be set in the variable 'result'
-
-                    result = "<MyTag>"+invoice.ref * "</MyTag>"''')
+# Available variables:
+#----------------------
+# invoice: object containing the current invoice
+# Note: returned value have to be set in the variable 'result'
+#result = "<MyTag>"+invoice.ref "</MyTag>"
+result=False''')
 
     # === Economic Activity fields === #
 
