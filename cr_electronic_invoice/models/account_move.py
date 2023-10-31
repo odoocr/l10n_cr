@@ -1600,7 +1600,7 @@ class AccountInvoiceElectronic(models.Model):
                 for line in reverse_move.line_ids:
                     if line.currency_id:
                         line._onchange_currency()
-            reverse_move._recompute_dynamic_lines(recompute_all_taxes=False)
+            #reverse_move._recompute_dynamic_lines(recompute_all_taxes=False)
         reverse_moves._check_balanced()
 
         # Reconcile moves together to cancel the previous one.
