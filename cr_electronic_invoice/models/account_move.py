@@ -1555,7 +1555,7 @@ class AccountInvoiceElectronic(models.Model):
 
         res = super()._compute_amount()
         return res
-
+    '''
     def _reverse_moves(self, default_values_list=None, cancel=False):
         """ Reverse a recordset of account.move.
         If cancel parameter is true, the reconcilable or liquidity lines
@@ -1619,7 +1619,8 @@ class AccountInvoiceElectronic(models.Model):
                     (line + counterpart_lines).with_context(move_reverse_cancel=cancel).reconcile()
 
         return reverse_moves
-
+    '''
+    
     def create_partner_from_xml(self):
 
         if not self.partner_id and self.xml_supplier_approval:
