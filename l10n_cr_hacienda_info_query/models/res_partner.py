@@ -82,5 +82,6 @@ class ResPartner(models.Model):
 
     @api.onchange('vat')
     def onchange_vat(self):
-        if self.vat:
-            self.definir_informacion(self.vat)
+        if self.country_id.code == 'CR':
+            if self.vat:
+                self.definir_informacion(self.vat)
