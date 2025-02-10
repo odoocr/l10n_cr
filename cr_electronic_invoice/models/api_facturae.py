@@ -32,8 +32,9 @@ except(ImportError, IOError) as err:
 _logger = logging.getLogger(__name__)
 
 
-def sign_xml(cert, password, xml, policy_id='https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/'
-             '2016/v4.2/ResolucionComprobantesElectronicosDGT-R-48-2016_4.2.pdf'):
+def sign_xml(cert, password, xml, policy_id='https://cdn.comprobanteselectronicos.go.cr/xml-schemas/'
+             'Resoluci%C3%B3n_General_sobre_disposiciones_t%C3%A9cnicas_comprobantes_electr%C3%B3nicos_'
+             'para_efectos_tributarios.pdf'):
     root = etree.fromstring(xml)
     signature = create_xades_epes_signature()
 
