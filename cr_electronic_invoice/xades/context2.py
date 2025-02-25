@@ -66,6 +66,7 @@ def create_xades_epes_signature(sign_date=datetime.datetime.now(pytz.timezone('U
         signature, 'XadesObjects', 'xades')
     props = template.create_signed_properties(
         qualifying, name=signed_properties_id, datetime=sign_date)
+    xmlsig.template.add_claimed_role(props, 'Emisor')
     # Manually add DataObjectFormat
     data_obj = xmlsig.utils.create_node(
         'SignedDataObjectProperties', props, ns=constants.EtsiNS)
