@@ -66,6 +66,7 @@ def create_xades_epes_signature(sign_date=datetime.datetime.now(pytz.timezone('U
         signature, 'XadesObjects', 'xades')
     props = template.create_signed_properties(
         qualifying, name=signed_properties_id, datetime=sign_date)
+    xmlsig.template.add_claimed_role(props, 'Emisor')
     # Manually add DataObjectFormat
     data_obj = xmlsig.utils.create_node(
         'SignedDataObjectProperties', props, ns=constants.EtsiNS)
@@ -129,19 +130,14 @@ class PolicyId2Exception(Exception):
 
 class PolicyId2(PolicyId):
     check_strict = False
-    hash_method = xmlsig.constants.TransformSha1
+    hash_method = xmlsig.constants.TransformSha256
     # Theres is something wrong with Hacienda's hash for their policy document, so we need to use their
     # previously generated value
     cache = {
-        'https://www.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2016/v4.2/'
-        'ResolucionComprobantesElectronicosDGT-R-48-2016_4.2.pdf': {
-            'http://www.w3.org/2000/09/xmldsig#sha1': 'E9/BBP0G1Z3JJQzOpwqpJuf7xdY=',
-        },
-        'https://tribunet.hacienda.go.cr/docs/esquemas/2016/v4/'
-        'Resolucion%20Comprobantes%20Electronicos%20%20DGT-R-48-2016.pdf': {
-            # 'V8lVVNGDCPen6VELRD1Ja8HARFk=',
-            'http://www.w3.org/2000/09/xmldsig#sha1': 'JyeDiicXk0QZL9hHKZW097BHnDo=',
-        },
+        'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/'
+        'Resoluci%C3%B3n_General_sobre_disposiciones_t%C3%A9cnicas_comprobantes_electr%C3%B3nicos_'
+        'para_efectos_tributarios.pdf': {
+            'http://www.w3.org/2001/04/xmlenc#sha256': 'DWxin1xWOeI8OuWQXazh4VjLWAaCLAA954em7DMh0h8=',
     }
 
     def calculate_policy_node(self, node, sign=False):
