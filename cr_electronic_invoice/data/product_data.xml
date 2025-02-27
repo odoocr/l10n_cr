@@ -6,7 +6,7 @@
         <field name="type">consu</field>
         <field name="default_code">01</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
     <record id="product_cruz_roja" model="product.template">
@@ -14,7 +14,7 @@
         <field name="type">consu</field>
         <field name="default_code">02</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
     <record id="product_bomberos" model="product.template">
@@ -22,7 +22,7 @@
         <field name="type">consu</field>
         <field name="default_code">03</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
     <record id="product_tercero" model="product.template">
@@ -30,7 +30,7 @@
         <field name="type">consu</field>
         <field name="default_code">04</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
     <record id="product_exportacion" model="product.template">
@@ -38,7 +38,7 @@
         <field name="type">consu</field>
         <field name="default_code">05</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
     <record id="product_servicio" model="product.template">
@@ -46,7 +46,7 @@
         <field name="type">consu</field>
         <field name="default_code">06</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
     <record id="product_profesionales" model="product.template">
@@ -54,7 +54,7 @@
         <field name="type">consu</field>
         <field name="default_code">07</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
     <record id="product_otros_cargos" model="product.template">
@@ -62,7 +62,7 @@
         <field name="type">consu</field>
         <field name="default_code">99</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
     <record id="product_iva_devuelto" model="product.template">
@@ -70,7 +70,7 @@
         <field name="type">consu</field>
         <field name="default_code">999</field>
         <field name="categ_id" ref="product_category_otros_cargos" />
-        <field name="code_type_id" ref="cr_electronic_invoice.CodeTypeProduct_99" />
+        <field name="code_type_id" ref="CodeTypeProduct_99" />
         <field name="taxes_id" eval="[(5,0,0)]" />
     </record>
 

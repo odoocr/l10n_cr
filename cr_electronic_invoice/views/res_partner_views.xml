@@ -50,6 +50,12 @@
                         <field name="date_expiration"/>
                     </group>
                 </page>
+                <page name="expressions_config" string="Otros XML">
+                    <group col="2">
+                        <field name="other_text_expression"/>
+                        <field name="other_content_expression"/>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>

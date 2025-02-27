@@ -281,8 +281,7 @@ class PosOrder(models.Model):
             current_order += 1
             _logger.info(
                 'E-INV CR - Consulta Hacienda - POS Order %s / %s', current_order, total_orders)
-            token_m_h = api_facturae.get_token_hacienda(
-                doc, doc.company_id.frm_ws_ambiente)
+            token_m_h = api_facturae.get_token_hacienda( doc.company_id )
             if doc.number_electronic and len(doc.number_electronic) == 50:
                 response_json = api_facturae.consulta_clave(
                     doc.number_electronic, token_m_h, doc.company_id.frm_ws_ambiente)
@@ -642,8 +641,7 @@ class PosOrder(models.Model):
             else:
                 xml_firmado = doc.xml_comprobante
             # get token
-            token_m_h = api_facturae.get_token_hacienda(
-                doc, doc.company_id.frm_ws_ambiente)
+            token_m_h = api_facturae.get_token_hacienda( doc.company_id )
             response_json = api_facturae.send_xml_fe(doc,
                                                      token_m_h,
                                                      date_cr,
