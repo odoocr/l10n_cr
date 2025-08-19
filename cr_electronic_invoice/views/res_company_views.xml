@@ -10,10 +10,11 @@
             <xpath expr="//sheet" position="inside">
                 <group>
                     <field name="invoice_qr_type"/>
-                    <field name="invoice_field_ids" attrs="{'required':[('invoice_qr_type','=','by_info')],'invisible':[('invoice_qr_type','!=','by_info')]}">
+                    <field name="invoice_field_ids"
+                           attrs="{'required':[('invoice_qr_type','=','by_info')],'invisible':[('invoice_qr_type','!=','by_info')]}">
                         <tree editable="bottom">
-                            <field name="sequence" widget="handle" />
-                            <field name="field_id" />
+                            <field name="sequence" widget="handle"/>
+                            <field name="field_id"/>
                         </tree>
                     </field>
                 </group>
@@ -29,8 +30,10 @@
             <field name="website" position="before">
                 <field name="commercial_name"/>
                 <field name="legal_name"/>
-                <field name="activity_id" domain="[('active', '=', True)]" options='{"no_open": True, "no_create": True}' />
-                <button name="action_get_economic_activities" type="object" string="Consultar Actividad Economica en Hacienda" colspan="2" />
+                <field name="activity_id" domain="[('active', '=', True)]"
+                       options='{"no_open": True, "no_create": True}'/>
+                <button name="action_get_economic_activities" type="object"
+                        string="Consultar Actividad Economica en Hacienda" colspan="2"/>
             </field>
 
             <field name="partner_id" position="after">
@@ -53,7 +56,8 @@
                         <group col="2"/>
                     </group>
                     <group col="4">
-                        <field attrs="{'invisible' : [('ultima_respuesta_exo', 'in', (False,''))], 'readonly' : [('ultima_respuesta_exo', '!=', False)]}" colspan="4" name="ultima_respuesta_exo"/>
+                        <field attrs="{'invisible' : [('ultima_respuesta_exo', 'in', (False,''))], 'readonly' : [('ultima_respuesta_exo', '!=', False)]}"
+                               colspan="4" name="ultima_respuesta_exo"/>
                     </group>
                 </page>
             </xpath>
@@ -70,9 +74,14 @@
                             <field name="range_days"/>
                             <field name="send_user_ids" widget="many2many_tags"/>
                             <field name="to_emails"/>
+                            <field name="invoice_provider_type"/>
+                            <field name="invoice_provider_identification"
+                                   attrs="{'invisible': [('invoice_provider_type', '=', 'inhouse')],
+               'required': [('invoice_provider_type', '=', 'external')]}"/>
+
                         </group>
                         <group cols="2">
-                            <button name="test_get_token" type="object" string="Test get token" colspan="2" />
+                            <button name="test_get_token" type="object" string="Test get token" colspan="2"/>
                             <field name="frm_ws_ambiente" widget="radio"/>
                         </group>
                         <group cols="2">

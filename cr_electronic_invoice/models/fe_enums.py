@@ -36,27 +36,22 @@ TipoDocumento = {
 
 # Xmlns used by Hacienda
 XmlnsHacienda = {
-    'FE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/facturaElectronica',
-    'ND': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/notaDebitoElectronica',
-    'NC': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/notaCreditoElectronica',
-    'TE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/tiqueteElectronico',
-    'FEC': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/facturaElectronicaCompra',
-    'FEE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.3/facturaElectronicaExportacion'
+    'FE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica',
+    'ND': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/notaDebitoElectronica',
+    'NC': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/notaCreditoElectronica',
+    'TE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/tiqueteElectronico',
+    'FEC': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronicaCompra',
+    'FEE': 'https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronicaExportacion'
 }
 
 schemaLocation = {
-    'FE': 'https://www.hacienda.go.cr/ATV/Comprobante' +
-    'Electronico/docs/esquemas/2016/v4.3/FacturaElectronica_V4.3.xsd',
-    'ND': 'https://www.hacienda.go.cr/ATV/Comprobante' +
-    'Electronico/docs/esquemas/2016/v4.3/NotaDebitoElectronica_V4.3.xsd',
-    'NC': 'https://www.hacienda.go.cr/ATV/Comprobante' +
-    'Electronico/docs/esquemas/2016/v4.3/NotaCreditoElectronica_V4.3.xsd',
-    'TE': 'https://www.hacienda.go.cr/ATV/Comprobante' +
-    'Electronico/docs/esquemas/2016/v4.3/TiqueteElectronico_V4.3.xsd',
-    'FEC': 'https://www.hacienda.go.cr/ATV/Comprobante' +
-    'Electronico/docs/esquemas/2016/v4.3/FacturaElectronicaCompra_V4.3.xsd',
-    'FEE': 'https://www.hacienda.go.cr/ATV/Comprobante' +
-    'Electronico/docs/esquemas/2016/v4.3/FacturaElectronicaExportacion_V4.3.xsd'
+    'FE': 'https://atv.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2024/v4.4/FacturaElectronica_V4.4.xsd',
+    'ND': 'https://atv.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2024/v4.4/NotaDebitoElectronica_V4.4.xsd',
+    'NC': 'https://atv.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2024/v4.4/NotaCreditoElectronica_V4.4.xsd',
+    'TE': 'https://atv.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2024/v4.4/TiqueteElectronico_V4.4.xsd',
+    'FEC': 'https://atv.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2024/v4.4/FacturaElectronicaCompra_V4.4.xsd',
+    'FEE': 'https://atv.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2024/v4.4/FacturaElectronicaExportacion_V4.4.xsd',
+    'REP': 'https://atv.hacienda.go.cr/ATV/ComprobanteElectronico/docs/esquemas/2024/v4.4/ReciboElectronicoPago_V4.4.xsd'
 }
 
 tagName = {

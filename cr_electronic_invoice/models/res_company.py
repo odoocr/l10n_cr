@@ -85,6 +85,20 @@ class CompanyElectronic(models.Model):
         readonly=False, copy=False,
     )
 
+    invoice_provider_type = fields.Selection(
+        selection=[
+            ('external', 'Proveedor Externo'),
+            ('inhouse', 'Desarrollo Local')
+        ],
+        string="Provider Type",
+        required=True,
+        default='inhouse',
+        help='Tipo de proveedor de servicios de facturación electrónica, se utiliza para en el encabezado de los documentos electronicos'
+    )
+    invoice_provider_identification = fields.Char(
+        string="Provider Identification",
+        help='Identificación del proveedor de servicios de facturación electrónica'
+    )
     invoice_qr_type = fields.Selection([('by_url', 'Invoice Url'), ('by_info', 'Invoice Text Information')],
                                        default='by_url',
                                        required=True)
