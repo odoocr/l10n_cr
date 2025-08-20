@@ -1577,7 +1577,8 @@ class AccountInvoiceElectronic(models.Model):
 
         res = super()._compute_amount()
         return res
-    '''
+
+    
     def _reverse_moves(self, default_values_list=None, cancel=False):
         """ Reverse a recordset of account.move.
         If cancel parameter is true, the reconcilable or liquidity lines
@@ -1622,7 +1623,7 @@ class AccountInvoiceElectronic(models.Model):
                 for line in reverse_move.line_ids:
                     if line.currency_id:
                         line._onchange_currency()
-            #reverse_move._recompute_dynamic_lines(recompute_all_taxes=False)
+            reverse_move._recompute_dynamic_lines(recompute_all_taxes=False)
         reverse_moves._check_balanced()
 
         # Reconcile moves together to cancel the previous one.
@@ -1632,16 +1633,16 @@ class AccountInvoiceElectronic(models.Model):
             for move, reverse_move in zip(self, reverse_moves):
                 lines = move.line_ids.filtered(
                     lambda x: (x.account_id.reconcile or x.account_id.internal_type == 'liquidity')
-                    and not x.reconciled
+                              and not x.reconciled
                 )
                 for line in lines:
                     counterpart_lines = reverse_move.line_ids.filtered(lambda x: x.account_id == line.account_id
-                                                                       and x.currency_id == line.currency_id
-                                                                       and not x.reconciled)
+                                                                                 and x.currency_id == line.currency_id
+                                                                                 and not x.reconciled)
                     (line + counterpart_lines).with_context(move_reverse_cancel=cancel).reconcile()
 
         return reverse_moves
-    '''
+    
     
     def create_partner_from_xml(self):
 

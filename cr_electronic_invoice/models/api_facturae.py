@@ -384,18 +384,21 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
     sb.append('<Clave>' + inv.number_electronic + '</Clave>')
 
     _logger.error('HOLA ESTA ES LA FACTURA --------------------- QUE NO TIENE ACTIVIDAD ECONOMICA ------ %s',inv.name)
-    try:
-        sb.append('<CodigoActividad>' + inv.economic_activity_id.code + '</CodigoActividad>')
-    except:
-        sb.append('<CodigoActividad>' + inv.company_id.activity_id.code + '</CodigoActividad>')
-
     sb.append('<ProveedorSistemas>' +
               (inv.company_id.invoice_provider_identification
                if inv.company_id.invoice_provider_type == 'external'
                else inv.company_id.vat) + '</ProveedorSistemas>')
+    
     sb.append('<CodigoActividadEmisor>' + str(inv.company_id.activity_id.code) + '</CodigoActividadEmisor>')
     if inv.tipo_documento in ["FE", "FEC", "NC", "ND"] and inv.partner_id.activity_id.code:
         sb.append('<CodigoActividadReceptor>' + str(inv.partner_id.activity_id.code) + '</CodigoActividadReceptor>')
+
+    '''
+    try:
+        sb.append('<CodigoActividad>' + inv.economic_activity_id.code + '</CodigoActividad>')
+    except:
+        sb.append('<CodigoActividad>' + inv.company_id.activity_id.code + '</CodigoActividad>')
+    '''
 
     sb.append('<NumeroConsecutivo>' + inv.number_electronic[21:41] + '</NumeroConsecutivo>')
     sb.append('<FechaEmision>' + inv.date_issuance + '</FechaEmision>')
