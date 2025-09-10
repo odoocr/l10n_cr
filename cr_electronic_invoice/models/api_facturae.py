@@ -645,14 +645,15 @@ def gen_xml_v43(inv, sale_conditions, total_servicio_gravado,
               '</TotalVenta>')
     sb.append('<TotalDescuentos>' + str(round(total_descuento, 5)) + '</TotalDescuentos>')
     sb.append('<TotalVentaNeta>' + str(round(base_total, 5)) + '</TotalVentaNeta>')
-    sb.append('<TotalDesgloseImpuesto>')
+
     for tax_code in total_desgloce_impuesto:
         for iva_tax in total_desgloce_impuesto[tax_code]:
+            sb.append('<TotalDesgloseImpuesto>')
             sb.append('<Codigo>' + str(tax_code) + '</Codigo>')
             sb.append('<CodigoTarifaIVA>' + str(iva_tax) + '</CodigoTarifaIVA>')
             sb.append('<TotalMontoImpuesto>' + str(
                 round(total_desgloce_impuesto[tax_code][iva_tax], 5)) + '</TotalMontoImpuesto>')
-    sb.append('</TotalDesgloseImpuesto>')
+            sb.append('</TotalDesgloseImpuesto>')
     sb.append('<TotalImpuesto>' + str(round(total_impuestos, 5)) + '</TotalImpuesto>')
 
     if total_iva_devuelto:
