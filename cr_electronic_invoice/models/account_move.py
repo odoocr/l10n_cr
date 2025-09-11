@@ -1446,7 +1446,7 @@ class AccountInvoiceElectronic(models.Model):
                 raise UserError(_('Select the type of issuer identification in the company profile'))
             if not inv.company_id.vat:
                 raise UserError(_('Please configure the identification in the company profile'))
-            if not inv.company_id.state_id or not inv.company_id.county_id or not inv.company_id.district_id or not inv.company_id.neighborhood_id or not inv.company_id.street:
+            if not inv.company_id.state_id or not inv.company_id.county_id or not inv.company_id.district_id or not inv.company_id.street:
                 raise UserError(_('Please complete the address information in the company profile'))
 
             if inv.partner_id and inv.partner_id.vat:
